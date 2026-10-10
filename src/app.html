@@ -17467,6 +17467,28 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       const x2 = x + cw + 12; card(rec, x2, y, cw, h); title(rec, LgS(lang, "Etapas por persona", "Stages per person"), x2 + 12, y + 20, cw - 24); barsH(rec, x2 + 12, y + 50, cw - 24, per, { lw: 96, rh: 17 });
     } };
   }
+  // v178 · Actividad del proyecto: gráfica de puntos en el tiempo (notas, cambios, revisiones, bloqueos)
+  function secActividad(p, lang) {
+    const Hs = (p.historial || []).filter(h => h && h.ts).map(h => ({ d: String(h.ts).slice(0, 10), t: String(h.texto || ""), tipo: h.tipo || "" }));
+    (p.bloqueos || []).forEach(b => { if (b.inicio) Hs.push({ d: b.inicio, t: "bloqueo", tipo: "bloqueo" }); });
+    if (Hs.length < 2) return null;
+    const cat = (h) => h.tipo === "bloqueo" || /bloque/i.test(h.t) ? 3 : /revisi|feedback|aprob|ajuste/i.test(h.t) ? 2 : h.tipo === "nota" || h.tipo === "dibujo" || h.tipo === "pin" || !h.tipo && !/→|quitad|agregad|asignad/i.test(h.t) ? 0 : 1;
+    const R = [[LgS(lang, "Notas", "Notes"), VIOLET], [LgS(lang, "Cambios", "Changes"), "#61B3FF"], [LgS(lang, "Revisiones", "Reviews"), "#E0A100"], [LgS(lang, "Bloqueos", "Blockers"), "#F0476B"]];
+    const ds = Hs.map(h => h.d).sort(), a0 = inicio(p), z0 = planFin(p) || cierre(p);
+    const a = a0 && a0 < ds[0] ? a0 : ds[0], z = [ds[ds.length - 1], z0 || "", hoy()].sort().pop(), n = Math.max(1, dd(a, z) + 1);
+    const h = 64 + R.length * 26 + 18;
+    return { h, fill: true, draw(rec, x, y, w) { const h = this.h, rh = Math.min(60, (h - 82) / R.length);
+      card(rec, x, y, w, h); title(rec, LgS(lang, "Actividad del proyecto", "Project activity"), x + 12, y + 20, w - 24);
+      rec.text({ s: `${Hs.length} ${LgS(lang, "movimientos", "events")}`, x: x + w - 12, y: y + 14, font: "semi", size: 7, color: VIOLET, align: "r", cs: .6 });
+      const LW = 110, gx = x + 12 + LW, gw = w - 24 - LW - 6, top = y + 46, pos = (d) => gx + Math.max(0, Math.min(1, dd(a, d) / Math.max(1, n - 1))) * gw;
+      const cnt = [0, 0, 0, 0]; Hs.forEach(hh => cnt[cat(hh)]++);
+      R.forEach(([l, c], i) => { const ry = top + i * rh + rh / 2; rec.line({ x1: gx, y1: ry, x2: gx + gw, y2: ry, stroke: LINE, lw: .6 });
+        rec.circle({ x: x + 16, y: ry - 2.5, r: 3, fill: c }); rec.text({ s: l, x: x + 24, y: ry, font: "reg", size: 8, color: INK }); rec.text({ s: String(cnt[i]), x: x + 12 + LW - 10, y: ry, font: "cond", size: 10, color: cnt[i] ? INK : MUTED, align: "r" }); });
+      const apil = {}; Hs.forEach(hh => { const i = cat(hh), k2 = i + "|" + hh.d, m = apil[k2] = (apil[k2] || 0) + 1, ry = top + i * rh + rh / 2; rec.circle({ x: pos(hh.d), y: ry, r: Math.min(rh / 4, 3 + m * 1.1), fill: R[i][1], a: .55 }); });
+      const bot = top + R.length * rh + 4; rec.line({ x1: gx, y1: bot, x2: gx + gw, y2: bot, stroke: LINE, lw: .6 });
+      [[a, LgS(lang, "Inicio", "Start"), "#1E88E5"], [hoy(), LgS(lang, "Hoy", "Today"), INK], [z0, LgS(lang, "Entrega", "Delivery"), "#7B61FF"]].forEach(([d, l, c]) => { if (!d || d < a || d > z) return; const lx = pos(d); rec.line({ x1: lx, y1: top - 4, x2: lx, y2: bot, stroke: c, lw: .8, a: .7 }); rec.text({ s: `${l} · ${fshort(d, lang)}`, x: Math.min(Math.max(lx, gx + 28), gx + gw - 28), y: bot + 11, font: "semi", size: 6.6, color: c, align: "c" }); });
+    } };
+  }
   function secEquipo(p, lang) {
     const eq = equipoDe(p); if (!eq.length) return null; const cols = 3, rows = Math.ceil(eq.length / cols), h = 36 + rows * 31 + 4;
     return { h, draw(rec, x, y, w) {
@@ -17533,9 +17555,14 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
           [tr(lang, "duration"), dur ? `${dur} ${tr(lang, dur === 1 ? "day" : "days")}` : ""],
           [tr(lang, "pieces"), pi.tot ? `${pi.ok}/${pi.tot} ${tr(lang, "delivered")}` : ""], [Lg("Etapas", "Stages"), (p.etapas || []).length ? `${(p.etapas || []).filter(e => e.estado === "listo").length}/${p.etapas.length} ${Lg("listas", "done")}` : ""],
           [Lg("Horas plan", "Planned hours"), (() => { const h = horasPorEtapa(p).reduce((a, x) => a + x.h, 0); return h ? `${Math.round(h * 10) / 10} h` : ""; })()], [Lg("Productor(a)", "Producer"), (equipoDe(p)[0] || { n: [""] }).n.join(", ")], [Lg("Equipo", "Team"), (() => { const n = equipoDe(p).reduce((a2, e) => a2 + e.n.length, 0); return n ? `${n} ${Lg(n === 1 ? "persona" : "personas", n === 1 ? "person" : "people")}` : ""; })()]].filter(f => f[1]);
-        const fc = 4, fr = Math.ceil(F.length / fc), fh = 36 + fr * 30 + 4, fcw = (CW - 24) / fc;
+        // v178 · Todos los que participaron: equipo del proyecto y responsables de etapas (los externos, con su marca)
+        const part = []; const addP = (n) => { n = String(n || "").trim(); if (n && !part.includes(n)) part.push(n); };
+        equipoDe(p).forEach(e => e.n.forEach(addP)); (p.etapas || []).forEach(e => (window.pxpResps ? pxpResps(e) : []).forEach(n => addP(String(n).replace(/^(Cliente|Agencia|Externo):\s*(.+)$/, "$2 ($1)"))));
+        const pLines = []; { let ln = ""; part.forEach(n => { const t2 = ln ? ln + "  ·  " + n : n; if (tw(t2, "semi", 9) > CW - 24 && ln) { pLines.push(ln); ln = n; } else ln = t2; }); if (ln) pLines.push(ln); }
+        const fc = 4, fr = Math.ceil(F.length / fc), fh = 36 + fr * 30 + 4 + (pLines.length ? 18 + pLines.length * 13 : 0), fcw = (CW - 24) / fc;
         card(rec, MX, y, CW, fh); title(rec, Lg("Ficha del proyecto", "Project card"), MX + 12, y + 20, CW - 24);
         F.forEach(([l, v], i) => { const fx = MX + 12 + (i % fc) * fcw, fy = y + 42 + Math.floor(i / fc) * 30; rec.text({ s: l.toUpperCase(), x: fx, y: fy, font: "reg", size: 6.4, color: MUTED, cs: .6 }); rec.text({ s: clip(String(v), "semi", 9.5, fcw - 10), x: fx, y: fy + 13, font: "semi", size: 9.5, color: INK }); });
+        if (pLines.length) { const py0 = y + 42 + fr * 30 + 4; rec.text({ s: `${Lg("PARTICIPARON", "PARTICIPANTS")} · ${part.length}`, x: MX + 12, y: py0, font: "reg", size: 6.4, color: MUTED, cs: .6 }); pLines.forEach((l2, i) => rec.text({ s: l2, x: MX + 12, y: py0 + 13 + i * 13, font: "semi", size: 9, color: INK })); }
         y += fh + 12;
     }
     // v177 · Equipo en red de nodos: tarjeta blanca, la forma y el color de cada grupo, nombre y cargo; cabe en media columna
@@ -17597,7 +17624,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       const resto = [];
       { const bp = secBarrasP2(p, lang); if (bp) resto.push(bp); }
       if (EQ0.length && !redP1 && opt.ficha === false) resto.push(secRed(196));
-      if (opt.etapas !== false) { const se = secEtapas(p, lang, { et: 40 }); if (se) resto.push(se); }   // v176 · el detalle de etapas va con el cronograma
+      { const ac = secActividad(p, lang); if (ac) resto.push(ac); else if (opt.etapas !== false) { const se = secEtapas(p, lang, { et: 40 }); if (se) resto.push(se); } }   // v178 · actividad en vez del detalle (repetía el cronograma)   // v176 · el detalle de etapas va con el cronograma
       dropped.filter(d => d !== "eq" && quiere[d]).forEach(d => { const sc = MK[d](); if (sc) resto.push(Object.assign(sc, { k: d })); });
       // Cronograma
       const P = (window.pxpPlanEtapas ? pxpPlanEtapas(p) : []).filter(x => x.ini && x.fin).sort((a, b) => a.ini.localeCompare(b.ini) || 0);
