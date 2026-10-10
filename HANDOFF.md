@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v163** · 10 oct 2026 · Responsable: Bastián Torres
+Versión: **v164** · 10 oct 2026 · Responsable: Bastián Torres
 
 ## Cómo está armado ahora
 - **Una sola fuente:** `src/app.html`, con todo el CSS y las capas JS.
@@ -127,6 +127,16 @@ Versión: **v163** · 10 oct 2026 · Responsable: Bastián Torres
   - Al pasar a Entregado sin fecha de cierre, se pone hoy.
   - El editor viejo (`saveFicha`) queda en el código sin acceso, para limpieza futura.
   - Pruebas: `node tools/test-cabecera.mjs [carpeta-capturas]`.
+
+- **v164:** etapas compactas, hitos, cabecera y piezas.
+  - Proceso: casilla de horas en una línea (− N h + ✓ · barra · registradas / estimado); quién registró va en el tooltip. Horario en una línea (el ícono dice la franja).
+  - Revisión y Entrega son hitos (`MINI_EST`): reciben equipo, cliente, agencia o externo (`"Cliente: X"`, `"Agencia: X"`, `"Externo: X"` en `resps`; no cuentan en la capacidad). Solo fecha y hora de entrega (fecha fija + `franja:"hora"`, acción `hEnt`) y, en revisión, cuánto tarda (`hp`). Estados Pendiente · Revisado/Entregado · Solicitud de ajustes · Aprobado, guardados como pendiente/revision/ajustes/listo (no cambian reportes ni estado automático). Las etapas de proceso conservan los 6 estados. `pxpEstEtapaL(e)` da la etiqueta.
+  - Solicitud de ajustes (solo Revisión): imagen, documento o enlace en `e.adj` (`pxpAjAdd`, `pxpAjVer`, `pxpAjQuitar`; sube con `pxpAdjSubir`).
+  - Cronograma del proyecto: filas con el gris y la marca de color de su grupo, y leyenda de grupos. Grises de los grupos más marcados (3 · 8 · 14 %).
+  - Cabecera: imagen del proyecto como botón al lado de la flor (también al crear); "Editar" junto al cliente; el nombre editable usa la tipografía del título; lista propia de clientes y marcas (`pxpCombo`); paleta pequeña. **El color automático de un proyecto es el de su cliente** (`projectColor`).
+  - La ficha resumen guarda su alto con los desplegables abiertos (`fijaFicha`, capa 50).
+  - Piezas: menús propios de tipo, derivada "Variación", duraciones y formatos típicos al tocar la casilla, "+ Otra pieza" que no depende del Hero.
+  - Pruebas: `node tools/test-v164.mjs [carpeta-capturas]`.
 
 ## No cambiar sin consultar
 - El ZIP de Netlify va sin datos, y no se guarda nada antes de cargar los datos del servidor.

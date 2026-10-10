@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bocetos del cronograma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Barlow:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#17171C;--muted:#6B6B76;--line:#E4E4EA;--card:#F6F6F9;--violet:#624AFF;--lime:#F3FF57;--band:#0B0B0F;
+  --pre:#1FB58F;--rod:#FB8847;--post:#624AFF;--rev:#1E88E5;--ent:#D98E04;--bg:#E9E9EE;--txt:#17171C}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121216;--txt:#EDEDF2}}
+:root[data-theme="dark"]{--bg:#121216;--txt:#EDEDF2}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font:400 15px/1.45 Barlow,system-ui,sans-serif;padding:32px 16px 64px}
+.wrap{max-width:1180px;margin:0 auto}
+h1{font:800 34px/1 "Barlow Condensed",sans-serif;letter-spacing:.01em;text-transform:uppercase;margin:0 0 6px}
+.intro{color:color-mix(in srgb,var(--txt) 70%,transparent);max-width:760px;margin:0 0 28px}
+.dir{margin:0 0 44px}
+.dir-h{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+.dir-h b{font:800 13px/1 "Barlow Condensed";letter-spacing:.16em;text-transform:uppercase;padding:6px 10px;border-radius:99px;background:var(--txt);color:var(--bg)}
+.dir-h h2{font:700 26px/1 "Barlow Condensed";text-transform:uppercase;margin:0}
+.dir-h p{margin:0;color:color-mix(in srgb,var(--txt) 65%,transparent);flex-basis:100%}
+.sheet-wrap{width:100%;overflow:hidden;border-radius:6px;box-shadow:0 20px 50px rgba(0,0,0,.18)}
+.sheet{width:1123px;height:794px;transform-origin:0 0;position:relative;overflow:hidden}
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:14px}
+.notes div{background:color-mix(in srgb,var(--txt) 5%,transparent);border-radius:10px;padding:10px 12px;font-size:14px}
+.notes b{display:block;font:700 12px/1.2 "Barlow Condensed";letter-spacing:.12em;text-transform:uppercase;margin-bottom:3px}
+
+/* ───────── A · EDITORIAL CLARO ───────── */
+.A{background:#fff;color:var(--ink);font-family:Barlow}
+.A .top{height:128px;background:var(--band);color:#fff;position:relative;padding:22px 36px}
+.A .top::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:3px;background:linear-gradient(90deg,var(--lime) 0 110px,var(--violet) 110px)}
+.A .kick{font:700 11px/1 "Barlow Condensed";letter-spacing:.2em;color:var(--lime);text-transform:uppercase}
+.A .ttl{font:900 36px/0.92 Barlow;letter-spacing:-.015em;text-transform:uppercase;margin-top:12px}
+.A .meta{position:absolute;right:36px;top:22px;text-align:right;font:300 11px/1.5 Barlow;opacity:.85}
+.A .meta b{font:700 22px/1 "Barlow Condensed";display:block;opacity:1;color:#fff;letter-spacing:.02em}
+.A .chips{position:absolute;right:36px;bottom:18px;display:flex;gap:6px}
+.A .chip{font:600 10px/1 Barlow;padding:5px 8px;border-radius:99px;border:1px solid rgba(255,255,255,.3)}
+.A .grid{position:absolute;left:36px;right:36px;top:152px;bottom:78px}
+.A .hd{display:grid;grid-template-columns:230px 1fr;height:36px;border-bottom:1.2px solid var(--ink)}
+.A .days{position:relative}
+.A .day{position:absolute;top:0;bottom:0;font:600 9px/1 "Barlow Condensed";letter-spacing:.06em;color:var(--muted);text-align:center;padding-top:6px}
+.A .day b{display:block;font:700 14px/1 "Barlow Condensed";color:var(--ink);margin-top:3px}
+.A .day.we b{color:#B9B9C2}
+.A .day.today b{color:#fff;background:var(--violet);border-radius:99px;width:22px;height:18px;line-height:18px;margin:2px auto 0}
+.A .body{position:absolute;top:36px;left:0;right:0;bottom:0}
+.A .cols{position:absolute;left:230px;right:0;top:0;bottom:0}
+.A .col{position:absolute;top:0;bottom:0;border-left:1px solid var(--line)}
+.A .col.we{background:repeating-linear-gradient(135deg,#F3F3F6 0 4px,#fff 4px 8px)}
+.A .todayln{position:absolute;top:-36px;bottom:0;width:0;border-left:1.5px solid var(--violet)}
+.A .ph{display:grid;grid-template-columns:230px 1fr;height:22px;align-items:center;position:relative}
+.A .ph span{font:800 10.5px/1 "Barlow Condensed";letter-spacing:.16em;text-transform:uppercase;display:flex;align-items:center;gap:7px}
+.A .ph span i{width:9px;height:9px;border-radius:2px;background:var(--c)}
+.A .ph small{font:500 9.5px Barlow;letter-spacing:0;text-transform:none;color:var(--muted)}
+.A .row{display:grid;grid-template-columns:230px 1fr;height:34px;align-items:center;position:relative;border-top:1px solid var(--line)}
+.A .row.g-pre{background:rgba(23,23,28,.018)}.A .row.g-rod{background:rgba(23,23,28,.04)}.A .row.g-post{background:rgba(23,23,28,.065)}
+.A .nm{display:flex;align-items:center;gap:8px;padding-left:10px;min-width:0;box-shadow:inset 3px 0 0 var(--c)}
+.A .nm em{font:600 9px/1 "Barlow Condensed";color:var(--muted);font-style:normal;width:14px}
+.A .nm div{min-width:0}
+.A .nm b{display:block;font:600 12px/1.15 Barlow;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.A .nm small{display:block;font:400 9.5px/1.2 Barlow;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.A .bar{position:absolute;height:16px;top:9px;border-radius:5px;background:var(--c);display:flex;align-items:center;padding:0 6px;font:700 9px/1 "Barlow Condensed";letter-spacing:.04em;color:#fff;white-space:nowrap;overflow:hidden}
+.A .bar.done{background:color-mix(in srgb,var(--c) 30%,#fff);color:var(--ink)}
+.A .bar.live{box-shadow:0 0 0 2px #fff,0 0 0 3.5px var(--c)}
+.A .ms.l{flex-direction:row-reverse;transform:translateX(-100%)}.A .ms.l i{margin:0 -6.5px 0 0}
+.A .ms{position:absolute;top:8px;display:flex;align-items:center;gap:5px;font:600 9.5px/1 Barlow;color:var(--ink);white-space:nowrap}
+.A .ms i{width:13px;height:13px;transform:rotate(45deg);border-radius:2.5px;background:var(--c);flex:none;margin-left:-6.5px}
+.A .ms.rev i{background:#fff;border:2.4px solid var(--c)}
+.A .ms .hr{font:700 9px/1 "Barlow Condensed";color:var(--muted)}
+.A .goal{position:absolute;top:-36px;bottom:0;border-left:1.5px dashed var(--ink)}
+.A .goal span{position:absolute;bottom:-17px;left:-30px;font:700 9px/1 "Barlow Condensed";letter-spacing:.1em;background:var(--ink);color:#fff;padding:3px 6px;border-radius:3px}
+.A .foot{position:absolute;left:36px;right:36px;bottom:20px;display:flex;justify-content:space-between;align-items:flex-end;border-top:1px solid var(--line);padding-top:10px}
+.A .leg{display:flex;gap:14px;font:500 9.5px Barlow;color:var(--muted);align-items:center}
+.A .leg span{display:inline-flex;align-items:center;gap:5px}
+.A .leg i{width:16px;height:7px;border-radius:3px;background:var(--c)}
+.A .leg i.d{width:9px;height:9px;transform:rotate(45deg);border-radius:2px}
+.A .leg i.o{width:9px;height:9px;transform:rotate(45deg);border-radius:2px;background:#fff;border:2px solid var(--c)}
+.A .team{display:flex;gap:4px;align-items:center;font:500 9.5px Barlow;color:var(--muted)}
+.A .av{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font:700 8px/1 Barlow;color:#fff;background:var(--c);margin-left:-5px;border:1.5px solid #fff}
+.A .pg{font:500 8.5px Barlow;color:var(--muted)}
+
+/* ───────── B · PÓSTER OSCURO ───────── */
+.B{background:#0B0B0F;color:#fff;font-family:Barlow}
+.B .side{position:absolute;left:0;top:0;bottom:0;width:270px;padding:30px 26px;background:#121218;border-right:1px solid #24242C;display:flex;flex-direction:column}
+.B .kick{font:700 10.5px/1 "Barlow Condensed";letter-spacing:.22em;color:var(--lime);text-transform:uppercase}
+.B .ttl{font:900 38px/0.92 Barlow;letter-spacing:-.02em;text-transform:uppercase;margin:14px 0 8px}
+.B .cli{display:inline-flex;align-items:center;gap:7px;font:600 11px Barlow;color:#C9C9D3}
+.B .cli i{width:9px;height:9px;border-radius:50%;background:var(--violet)}
+.B .kp{margin-top:22px;display:grid;gap:12px}
+.B .kp div{border-top:1px solid #26262E;padding-top:9px}
+.B .kp small{display:block;font:600 9px/1 "Barlow Condensed";letter-spacing:.18em;text-transform:uppercase;color:#8A8A96}
+.B .kp b{display:block;font:700 22px/1.05 "Barlow Condensed";margin-top:4px}
+.B .kp b em{font-style:normal;color:var(--lime)}
+.B .who{margin-top:auto}
+.B .who small{display:block;font:600 9px/1 "Barlow Condensed";letter-spacing:.18em;text-transform:uppercase;color:#8A8A96;margin-bottom:8px}
+.B .p{display:flex;align-items:center;gap:8px;font:500 10.5px/1.2 Barlow;color:#DADAE2;margin-bottom:6px}
+.B .p i{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font:700 7.5px Barlow;font-style:normal;background:var(--c);color:#0B0B0F}
+.B .p span{color:#8A8A96;font-size:9.5px}
+.B .logo{font:800 11px/1 "Barlow Condensed";letter-spacing:.2em;margin-top:14px;color:#8A8A96}
+.B .main{position:absolute;left:270px;right:0;top:0;bottom:0;padding:30px 30px 26px 26px}
+.B .wk{display:flex;height:44px;position:relative;margin-left:150px}
+.B .w{position:absolute;top:0;font:700 11px/1 "Barlow Condensed";letter-spacing:.14em;text-transform:uppercase;color:#8A8A96}
+.B .w b{display:block;font:800 20px/1 "Barlow Condensed";color:#fff;letter-spacing:.02em;margin-top:5px}
+.B .lanes{position:absolute;left:26px;right:30px;top:86px;bottom:58px}
+.B .colsB{position:absolute;left:150px;right:0;top:0;bottom:0}
+.B .colB{position:absolute;top:0;bottom:0;border-left:1px solid #1E1E25}
+.B .colB.we{background:#101015}
+.B .lane{position:relative;display:grid;grid-template-columns:150px 1fr;margin-bottom:14px;padding-top:6px;border-top:1px solid #1E1E25}
+.B .lane-h{font:800 13px/1 "Barlow Condensed";letter-spacing:.14em;text-transform:uppercase;color:var(--c);padding-top:9px;display:flex;gap:7px}
+.B .lane-h i{width:3px;height:14px;background:var(--c);border-radius:2px}
+.B .lane-h small{display:block;font:500 9.5px Barlow;letter-spacing:0;text-transform:none;color:#8A8A96;margin-top:4px}
+.B .trk{position:relative}
+.B .lbB{position:absolute;height:26px;display:flex;align-items:center;gap:6px;font:600 10.5px/1 Barlow;color:#fff;white-space:nowrap}.B .lbB small{font:600 9px/1 "Barlow Condensed";color:#8A8A96;letter-spacing:.04em}.B .lbB.l{transform:translateX(-100%)}
+.B .bB{position:absolute;height:26px;border-radius:7px;background:linear-gradient(90deg,var(--c),color-mix(in srgb,var(--c) 70%,#fff 0%));color:#0B0B0F;display:flex;align-items:center;gap:6px;padding:0 9px;font:700 10.5px/1 Barlow;white-space:nowrap;overflow:hidden}
+.B .bB small{font:600 9px/1 "Barlow Condensed";opacity:.75;letter-spacing:.04em}
+.B .bB.done{opacity:.4}
+.B .bB.rev{background:transparent;border:1.5px dashed var(--c);color:#fff}
+.B .mB{position:absolute;display:flex;flex-direction:column;align-items:flex-start;gap:3px;font:700 10px/1 Barlow;color:#fff;white-space:nowrap;padding-left:9px;border-left:2px solid var(--lime);height:26px;justify-content:center}
+.B .mB.l{border-left:0;border-right:2px solid var(--lime);padding:0 9px 0 0;align-items:flex-end;transform:translateX(-100%)}
+.B .mB small{font:600 9px/1 "Barlow Condensed";color:var(--lime);letter-spacing:.06em}
+.B .nowB{position:absolute;top:-38px;bottom:-6px;border-left:2px solid var(--lime)}
+.B .nowB span{position:absolute;bottom:-4px;top:auto;left:-17px;background:var(--lime);color:#0B0B0F;font:800 9.5px/1 "Barlow Condensed";letter-spacing:.1em;padding:4px 6px;border-radius:3px}
+.B .endB{position:absolute;top:-38px;bottom:-6px;border-left:2px dashed #fff}
+.B .endB span{position:absolute;bottom:-4px;left:6px;background:#fff;color:#0B0B0F;padding:4px 6px;border-radius:3px;font:800 9.5px/1 "Barlow Condensed";letter-spacing:.12em;white-space:nowrap}
+.B .footB{position:absolute;left:26px;right:30px;bottom:20px;display:flex;justify-content:space-between;font:400 8.5px Barlow;color:#6E6E7A;border-top:1px solid #1E1E25;padding-top:9px}
+.B .legB{display:flex;gap:14px}
+.B .legB span{display:inline-flex;gap:5px;align-items:center}
+.B .legB i{width:14px;height:7px;border-radius:2px;background:#9A9AA6}
+.B .legB i.r{background:transparent;border:1.3px dashed #9A9AA6}
+.B .legB i.m{width:2px;height:10px;background:var(--lime)}
+
+/* ───────── Panel + vista previa (esquema) ───────── */
+.tool{display:grid;grid-template-columns:300px 1fr;gap:0;border-radius:18px;overflow:hidden;background:#fff;color:var(--ink);box-shadow:0 20px 50px rgba(0,0,0,.18)}
+.cfgp{padding:20px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:14px;background:#FAFAFC}
+.cfgp h3{margin:0;font:900 22px/1 Barlow;text-transform:uppercase;letter-spacing:-.01em}
+.cf{border:1px solid var(--line);border-radius:12px;background:#fff;padding:10px 12px}
+.cf small{display:block;font:600 10.5px/1 "Barlow Condensed";letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.seg{display:flex;background:var(--card);border-radius:99px;padding:2px}
+.seg span{flex:1;text-align:center;font:600 12.5px/1 Barlow;padding:7px 6px;border-radius:99px;color:var(--muted)}
+.seg span.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.ppl{display:flex;flex-wrap:wrap;gap:5px}
+.ppl span{font:600 12px Barlow;padding:5px 9px;border-radius:99px;background:var(--card)}
+.ppl span.on{background:var(--ink);color:#fff}
+.sw{display:flex;gap:6px;flex-wrap:wrap}
+.sw span{display:inline-flex;align-items:center;gap:5px;font:500 12px Barlow}
+.sw i{width:14px;height:14px;border-radius:4px;background:var(--c)}
+.rng{display:flex;gap:6px}
+.rng span{flex:1;border:1px solid var(--line);border-radius:8px;padding:7px 9px;font:600 13px Barlow}
+.gen{margin-top:auto;background:var(--lime);border-radius:99px;text-align:center;font:700 14px Barlow;padding:11px}
+.pv{position:relative;background:repeating-conic-gradient(#EFEFF3 0 25%,#F7F7FA 0 50%) 0 0/22px 22px;min-height:440px;overflow:hidden}
+.pv .mini{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%) scale(.36);transform-origin:center;box-shadow:0 18px 40px rgba(0,0,0,.25)}
+.zb{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);display:flex;align-items:center;gap:2px;background:#17171C;color:#fff;border-radius:99px;padding:4px;font:600 12.5px Barlow;z-index:2}
+.zb span{padding:7px 12px;border-radius:99px}
+.zb span.on{background:#2C2C36}
+.zb em{font-style:normal;padding:0 8px;color:var(--lime);font-weight:700}
+.hand{position:absolute;right:18px;top:16px;background:#fff;border-radius:99px;padding:7px 12px;font:600 12px Barlow;box-shadow:0 4px 12px rgba(0,0,0,.1);z-index:2}
+@media (max-width:820px){.tool{grid-template-columns:1fr}.cfgp{border-right:0;border-bottom:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Cronograma en PDF · 2 direcciones</h1>
+  <p class="intro">Bocetos con datos de ejemplo (Caso Oreo Sabores). Las dos usan la marca: negro, violeta Publicis y lima, con Barlow y Barlow Condensed. Las etapas de proceso son barras y las revisiones y entregas son hitos con su hora. Dime cuál prefieres o qué tomas de cada una.</p>
+
+  <section class="dir">
+    <div class="dir-h"><b>A</b><h2>Editorial claro</h2><p>Hoja blanca, como un calendario de producción. Se lee rápido impresa y en pantalla. Es para el equipo y para el cliente.</p></div>
+    <div class="sheet-wrap"><div class="sheet A" id="A"></div></div>
+    <div class="notes">
+      <div><b>Grupos</b>Preproducción, Rodaje y Postproducción como franjas en gris, con la marca de color a la izquierda.</div>
+      <div><b>Hitos</b>Las revisiones son un rombo hueco y las entregas un rombo lleno, siempre con la hora.</div>
+      <div><b>Días</b>Una columna por día hábil, el fin de semana rayado y hoy en violeta.</div>
+      <div><b>Personas</b>El nombre bajo cada etapa y el equipo con sus iniciales en el pie.</div>
+    </div>
+  </section>
+
+  <section class="dir">
+    <div class="dir-h"><b>B</b><h2>Póster oscuro</h2><p>Más impacto visual, para presentar. Un carril por grupo y una columna lateral con el resumen del proyecto.</p></div>
+    <div class="sheet-wrap"><div class="sheet B" id="B"></div></div>
+    <div class="notes">
+      <div><b>Carriles</b>Cada grupo es un carril con su color; las etapas son barras grandes con nombre y duración.</div>
+      <div><b>Resumen</b>Fechas clave, avance y equipo en la columna izquierda, como una ficha.</div>
+      <div><b>Hitos</b>Una línea lima con la hora; las revisiones van punteadas.</div>
+      <div><b>Semanas</b>La escala es por semanas: cabe un proyecto largo sin achicar la letra.</div>
+    </div>
+  </section>
+
+  <section class="dir">
+    <div class="dir-h"><b>+</b><h2>Panel de ajustes y vista previa</h2><p>Sirve para cualquiera de las dos. Usa el mismo lenguaje de la ventana del proyecto. La vista previa se acerca, se ajusta a la pantalla y se arrastra.</p></div>
+    <div class="tool">
+      <div class="cfgp">
+        <h3>Time table</h3>
+        <div class="cf"><small>Idioma</small><div class="seg"><span class="on">Español</span><span>English</span></div></div>
+        <div class="cf"><small>Personas en el PDF</small><div class="ppl"><span class="on">Andrea López</span><span class="on">Juliana Canal</span><span class="on">Cliente · Mondelez</span><span>Carlos Ruiz</span></div></div>
+        <div class="cf"><small>Color por</small><div class="seg"><span class="on">Grupo</span><span>Tipo</span><span>Etapa</span></div><div class="sw" style="margin-top:10px"><span><i style="--c:var(--pre)"></i>Pre</span><span><i style="--c:var(--rod)"></i>Rodaje</span><span><i style="--c:var(--post)"></i>Post</span></div></div>
+        <div class="cf"><small>Rango de fechas</small><div class="rng"><span>16 sept</span><span>17 oct</span></div></div>
+        <div class="gen">Descargar PDF</div>
+      </div>
+      <div class="pv"><span class="hand">✋ Arrastra para moverte</span><div class="sheet A mini" id="A2"></div>
+        <div class="zb"><span>−</span><em>36 %</em><span>+</span><span class="on">Ajustar</span><span>100 %</span></div></div>
+    </div>
+  </section>
+</div>
+<script>
+// Datos de ejemplo
+const DIAS = []; { const d = new Date(2026, 8, 16); while (DIAS.length < 32) { DIAS.push(new Date(d)); d.setDate(d.getDate() + 1); } }
+const iso = d => d.toISOString().slice(0, 10), HOY = "2026-10-06", FIN = "2026-10-15";
+const G = { pre: ["Preproducción", "var(--pre)"], rod: ["Rodaje", "var(--rod)"], post: ["Postproducción", "var(--post)"] };
+const E = [
+  { g: "pre", n: "Kickoff y brief", w: "Juliana Canal", a: 0, b: 0.5, st: "done" },
+  { g: "pre", n: "Guion y storyboard", w: "Andrea López", a: 1, b: 4, st: "done" },
+  { g: "pre", n: "Revisión de guion", w: "Cliente · Mondelez", m: 6, h: "10:30", rev: 1 },
+  { g: "pre", n: "PPM", w: "Juliana Canal · Cliente", m: 8, h: "15:00" },
+  { g: "rod", n: "Rodaje día 1 y 2", w: "Equipo de rodaje", a: 9, b: 10.9, st: "done" },
+  { g: "rod", n: "Dailies y DIT", w: "Carlos Ruiz", a: 10, b: 12, st: "done" },
+  { g: "post", n: "Offline / edición", w: "Andrea López", a: 14, b: 18, st: "done" },
+  { g: "post", n: "Revisión del offline", w: "Cliente · Mondelez", m: 19, h: "11:00", rev: 1 },
+  { g: "post", n: "Color", w: "Carlos Ruiz", a: 20, b: 21.9, st: "live" },
+  { g: "post", n: "Online / finishing", w: "Andrea López", a: 22, b: 24 },
+  { g: "post", n: "Audio y mezcla", w: "Casa de audio", a: 23, b: 25 },
+  { g: "post", n: "Revisión final", w: "Agencia · Leo", m: 27, h: "09:00", rev: 1 },
+  { g: "post", n: "Entrega de masters", w: "Juliana Canal", m: 29, h: "16:00" },
+];
+const DN = ["D", "L", "M", "M", "J", "V", "S"], MES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sept", "oct", "nov", "dic"];
+const N = DIAS.length;
+
+function sheetA(el) {
+  const W = 1123 - 72 - 230, dx = W / N, x = i => i * dx, iH = DIAS.findIndex(d => iso(d) === HOY), iF = DIAS.findIndex(d => iso(d) === FIN);
+  let days = "", cols = "";
+  DIAS.forEach((d, i) => { const we = d.getDay() === 0 || d.getDay() === 6; days += `<div class="day${we ? " we" : ""}${i === iH ? " today" : ""}" style="left:${x(i)}px;width:${dx}px">${DN[d.getDay()]}<b>${d.getDate()}</b></div>`; cols += `<i class="col${we ? " we" : ""}" style="left:${x(i)}px;width:${dx}px"></i>`; });
+  let rows = "";
+  Object.keys(G).forEach(g => {
+    const L = E.filter(e => e.g === g);
+    rows += `<div class="ph g-${g}" style="--c:${G[g][1]}"><span><i></i>${G[g][0]} <small>${L.length} etapas</small></span><div></div></div>`;
+    L.forEach((e, j) => {
+      const c = G[g][1];
+      const vis = e.m != null ? `<span class="ms${e.rev ? " rev" : ""}${e.m > N - 4 ? " l" : ""}" style="left:${x(e.m) + dx / 2}px;--c:${e.rev ? "var(--rev)" : "var(--ent)"}"><i></i>${e.n.split(" ")[0]} <span class="hr">${e.h}</span></span>`
+        : `<span class="bar ${e.st || ""}" style="left:${x(e.a) + 1}px;width:${(e.b - e.a + 1) * dx - 2}px;--c:${c}">${e.st === "done" ? "✓ " : ""}${Math.round(e.b - e.a + 1)} d</span>`;
+      rows += `<div class="row g-${g}"><div class="nm" style="--c:${c}"><em>${String(E.indexOf(e) + 1).padStart(2, "0")}</em><div><b>${e.n}</b><small>${e.w}${e.m != null ? " · " + e.h : ""}</small></div></div><div style="position:relative;height:100%">${vis}</div></div>`;
+    });
+  });
+  el.innerHTML = `<div class="top"><div class="kick">Time table · Cronograma de producción</div><div class="ttl">Caso Oreo<br>Sabores</div>
+      <div class="meta"><b>16 sept → 15 oct</b>Mondelez · Oreo · 22 días hábiles</div>
+      <div class="chips"><span class="chip">13 etapas</span><span class="chip">4 hitos</span><span class="chip">54 % listo</span></div></div>
+    <div class="grid"><div class="hd"><div style="font:700 10px/36px 'Barlow Condensed';letter-spacing:.14em;color:var(--muted)">SEPT – OCT 2026</div><div class="days">${days}</div></div>
+      <div class="body"><div class="cols">${cols}<i class="todayln" style="left:${x(iH) + dx / 2}px"></i><i class="goal" style="left:${x(iF) + dx}px"><span>ENTREGA FINAL</span></i></div>${rows}</div></div>
+    <div class="foot"><div class="leg"><span><i style="--c:var(--pre)"></i>Preproducción</span><span><i style="--c:var(--rod)"></i>Rodaje</span><span><i style="--c:var(--post)"></i>Postproducción</span><span><i class="o" style="--c:var(--rev)"></i>Revisión</span><span><i class="d" style="--c:var(--ent)"></i>Entrega</span></div>
+      <div class="team">Equipo <span style="margin-left:9px"></span>${[["AL", "#624AFF"], ["JC", "#F63DA9"], ["CR", "#1FB58F"], ["BT", "#FB8847"]].map(([t, c]) => `<span class="av" style="--c:${c}">${t}</span>`).join("")}</div>
+      <div class="pg">Tráfico Post · Publicis Production · 1/1</div></div>`;
+}
+function sheetB(el) {
+  const W = 1123 - 270 - 56 - 150, dx = W / N, x = i => i * dx, iH = DIAS.findIndex(d => iso(d) === HOY), iF = DIAS.findIndex(d => iso(d) === FIN);
+  let wk = "", cols = "";
+  DIAS.forEach((d, i) => { const we = d.getDay() === 0 || d.getDay() === 6; cols += `<i class="colB${we ? " we" : ""}" style="left:${x(i)}px;width:${dx}px"></i>`; if (d.getDay() === 1 || i === 0) wk += `<div class="w" style="left:${x(i)}px">Semana<b>${d.getDate()} ${MES[d.getMonth()]}</b></div>`; });
+  const lanes = Object.keys(G).map(g => {
+    const L = E.filter(e => e.g === g), c = G[g][1];
+    const H = L.length * 30 + 4; let y = 2;
+    const items = L.map(e => { const t = y; y += 30;
+      if (e.m != null) return `<div class="mB${e.m > N - 6 ? " l" : ""}" style="left:${x(e.m) + dx / 2}px;top:${t}px"><span>${e.n}</span><small>${e.h} · ${e.w}</small></div>`;
+      const w = (e.b - e.a + 1) * dx, end = x(e.a) + w, lab = `${e.st === "done" ? "✓ " : ""}${e.n}<small>${Math.round(e.b - e.a + 1)} d · ${e.w}</small>`, izq = end > W - 150;
+      return `<div class="bB ${e.st || ""}" style="left:${x(e.a)}px;width:${w}px;top:${t}px;--c:${c}"></div><div class="lbB${izq ? " l" : ""}" style="left:${izq ? x(e.a) - 8 : end + 8}px;top:${t}px">${lab}</div>`; }).join("");
+    return `<div class="lane" style="--c:${c}"><div class="lane-h"><i></i><div>${G[g][0]}<small>${L.length} etapas</small></div></div><div class="trk" style="height:${H}px">${items}</div></div>`;
+  }).join("");
+  el.innerHTML = `<div class="side"><div class="kick">Time table</div><div class="ttl">Caso Oreo Sabores</div><span class="cli"><i></i>Mondelez · Oreo</span>
+      <div class="kp"><div><small>Inicio</small><b>16 sept</b></div><div><small>Entrega final</small><b><em>15 oct</em> · 16:00</b></div><div><small>Avance</small><b>54 % <span style="font:500 11px Barlow;color:#8A8A96">· 7 de 13 etapas</span></b></div></div>
+      <div class="who"><small>Equipo</small>${[["AL", "Andrea López", "Editora", "#624AFF"], ["JC", "Juliana Canal", "Productora", "#F63DA9"], ["CR", "Carlos Ruiz", "Colorista", "#1FB58F"], ["MD", "Mondelez", "Cliente", "#61B3FF"]].map(([t, n, r, c]) => `<div class="p" style="--c:${c}"><i>${t}</i>${n} <span>${r}</span></div>`).join("")}<div class="logo">PUBLICIS PRODUCTION</div></div></div>
+    <div class="main"><div class="wk">${wk}</div>
+      <div class="lanes"><div class="colsB">${cols}<i class="nowB" style="left:${x(iH) + dx / 2}px"><span>HOY</span></i><i class="endB" style="left:${x(iF) + dx}px"><span>ENTREGA FINAL</span></i></div>${lanes}</div>
+      <div class="footB"><div class="legB"><span><i></i>Etapa</span><span><i class="r"></i>Revisión</span><span><i class="m"></i>Hito con hora</span></div><span>Tráfico Post · Publicis Production · Generado el 10 de octubre de 2026</span></div></div>`;
+}
+sheetA(document.getElementById("A")); sheetB(document.getElementById("B")); sheetA(document.getElementById("A2"));
+// La hoja A4 (1123×794) se escala al ancho disponible
+function fit() { document.querySelectorAll(".sheet-wrap").forEach(w => { const s = w.firstElementChild, k = w.clientWidth / 1123; s.style.transform = `scale(${k})`; w.style.height = 794 * k + "px"; }); }
+addEventListener("resize", fit); fit();
+</script>
+</body>
+</html>

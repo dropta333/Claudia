@@ -5931,6 +5931,180 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;tr
 .pm-foot .pj-del{margin-right:auto;color:var(--muted)}
 .pm-foot .pj-del .i{width:16px;height:16px}
 .pm-foot .pj-del:hover,.pm-foot .pj-del.armed{color:#F0476B;border-color:#F0476B}
+/* ═════ v164 · Etapas más bajas: horas en una línea · Revisión y Entrega como hitos ═════ */
+#pxp-proj .et-cell{padding:7px 12px!important;gap:3px!important}
+#pxp-proj .et-cell.c-dur{gap:0!important}
+.c-dur{flex-direction:row!important;flex-wrap:wrap;align-items:center!important;column-gap:10px}
+.c-dur > .et-cl{flex:1 0 100%;margin-bottom:3px}
+.hq.mini{gap:4px}
+.hq.mini > button:not(.hq-go){width:24px;height:24px;border-radius:7px;font-size:14px}
+.hq.mini .hq-n{min-width:20px;font-size:16px}
+.hq.mini .hq-go{width:26px;height:26px;margin-left:2px}
+.hr-par{display:inline-flex;align-items:center;gap:0;min-width:0}
+.hr-par .et-reg{width:auto;max-width:none;margin:0;padding:3px 2px 3px 4px;gap:6px}
+.hr-par .et-reg > .i{display:none}
+.hr-par .et-rb{width:44px;flex:none}
+.hr-par .et-rt{font:500 13px/1 var(--sans);color:var(--muted)}
+.hr-par .et-rt b{font:700 14px/1 var(--sans);color:var(--text)}
+.hr-par .et-est{border:0;padding:3px 4px;margin:0;border-radius:6px;font:500 13px/1 var(--sans);color:var(--muted)}
+.hr-par .et-est.auto{text-decoration:underline dotted;text-underline-offset:3px}
+.hr-par .et-est:hover:not(:disabled){background:var(--surface2);color:var(--text)}
+#pxp-proj .et-bot{margin-top:8px!important}
+/* Hitos */
+.et-row.mini .et-line{padding-left:46px;gap:6px 22px;margin-top:6px}
+.et-li .mi-k{font:600 11px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--muted2)}
+.et-li{gap:8px}
+.mi-sts{display:inline-flex;gap:2px;padding:2px;border-radius:99px;background:var(--surface2);margin-left:auto;flex:none}
+.mi-s{border:0;background:transparent;color:var(--muted);font:600 12.5px/1 var(--sans);padding:6px 11px;border-radius:99px;cursor:pointer;white-space:nowrap;transition:background-color .15s,color .15s}
+.mi-s:hover:not(:disabled){color:var(--text)}
+.mi-s.on{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.12),inset 0 0 0 1.5px var(--c)}
+.mi-s.on::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--c);margin-right:6px;vertical-align:1px}
+.mi-s:disabled{cursor:default}
+.mi-s .mi-c{display:none}
+@media (max-width:1100px){.mi-s .mi-l{display:none}.mi-s .mi-c{display:inline}}
+.et-pick.mi-h,.et-pick.mi-t{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:5px;padding:3px 7px;border-radius:7px;font:600 14px/1.2 var(--sans);color:var(--text)}
+.et-pick.mi-h .i,.et-pick.mi-t .i{width:15px;height:15px;color:var(--muted)}
+.et-pick.mi-h:not(.fixed) b{color:var(--muted);font-weight:500}
+.et-pick.mi-h:hover:not(:disabled),.et-pick.mi-t:hover:not(:disabled){background:var(--surface2)}
+.et-pick.mi-h:disabled,.et-pick.mi-t:disabled{cursor:default}
+.mt-ops{display:grid!important;grid-template-columns:repeat(3,1fr);gap:6px}
+.et-av.ext{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--surface2);color:var(--text);flex:none}
+.et-av.ext .i{width:13px;height:13px}
+.et-av.ext-cliente{background:color-mix(in srgb,#61B3FF 22%,var(--surface))}
+.et-av.ext-agencia{background:color-mix(in srgb,#F63DA9 18%,var(--surface))}
+.et-av.ext-externo{background:color-mix(in srgb,#FFC800 25%,var(--surface))}
+.ep-it .et-av.ext{width:26px;height:26px}
+.ep-it small{display:block;font:600 10.5px/1.1 var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.ep-sel i.et-av.ext{width:20px;height:20px}
+.ep-ext{display:flex;gap:6px;padding:4px 8px 8px}
+.ep-ext input{flex:1;min-width:0;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);padding:0 10px;font:500 13.5px var(--sans)}
+.ep-ext input:focus{outline:none;border-color:var(--text)}
+.ep-ext button{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font:600 17px/1 var(--sans);cursor:pointer}
+/* Solicitud de ajustes: adjuntos mínimos */
+.c-aj{flex-wrap:wrap}
+.aj-it{position:relative;display:inline-flex;align-items:center}
+.aj-th{all:unset;cursor:pointer;width:30px;height:30px;border-radius:7px;overflow:hidden;box-shadow:inset 0 0 0 1px var(--border)}
+.aj-th img{width:100%;height:100%;object-fit:cover;display:block}
+.aj-a{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 9px;border-radius:99px;background:var(--surface2);font:500 12.5px/1 var(--sans);color:var(--text);max-width:190px}
+.aj-a span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.aj-a .i{width:14px;height:14px;flex:none;color:#FF9F43}
+.aj-a:hover{background:var(--border)}
+.aj-x{position:absolute;top:-6px;right:-6px;width:16px;height:16px;border-radius:50%;border:0;background:var(--text);color:var(--surface);font:700 11px/1 var(--sans);cursor:pointer;display:none;place-items:center;padding:0}
+.aj-it:hover .aj-x,.aj-x:focus-visible{display:grid}
+.aj-add{display:inline-flex;gap:2px;padding:2px;border-radius:99px;border:1px dashed color-mix(in srgb,#FF9F43 60%,var(--border))}
+.aj-b{width:28px;height:28px;border-radius:50%;border:0;background:transparent;color:#C46F12;cursor:pointer;display:grid;place-items:center}
+.aj-b .i{width:16px;height:16px}
+.aj-b:hover{background:color-mix(in srgb,#FF9F43 16%,transparent)}
+.aj-pop{display:flex;gap:6px;padding:8px;width:340px;max-width:calc(100vw - 16px)}
+.aj-pop input{flex:1;min-width:0;height:34px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);padding:0 10px;font:500 13.5px var(--sans)}
+.aj-pop input:focus{outline:none;border-color:var(--text)}
+@media (max-width:720px){.et-row.mini .et-line{padding-left:0}.mi-sts{margin-left:0;order:9}}
+#pxp-proj .et-bot,.et-bot{grid-template-columns:minmax(140px,1.1fr) minmax(110px,.85fr) minmax(130px,1fr) minmax(250px,1.7fr) minmax(90px,.7fr) minmax(100px,.75fr)!important}
+@media (max-width:1100px){#pxp-proj .et-bot,.et-bot{grid-template-columns:repeat(3,minmax(0,1fr))!important}#pxp-proj .et-cell.c-dur{grid-column:span 2}}
+@media (max-width:720px){#pxp-proj .et-bot,.et-bot{grid-template-columns:1fr 1fr!important}#pxp-proj .et-cell.c-dur{grid-column:1/-1}}
+.c-dur{flex-wrap:nowrap!important;display:grid!important;grid-template-columns:auto 1fr;align-content:center}
+.c-dur > .et-cl{grid-column:1/-1}
+.et-cell .et-pick small{display:none}
+.et-cell .et-pick.fr-auto b,.et-cell .et-pick b{white-space:nowrap}
+.et-cell .et-pick.ext small{display:inline;margin-left:6px}
+.et-row.mini .et-bq{margin-left:auto}
+.et-row.mini .et-bq{font-size:0!important;gap:0!important;padding:0!important;width:30px;height:30px;justify-content:center;border-radius:50%!important;flex:none}
+.et-row.mini .et-bq .i{width:15px;height:15px;margin:0!important}
+/* v164 · Grupos de etapas más marcados (lista y cronograma) */
+.et-grp.fs-pre{background:color-mix(in srgb,var(--text) 3%,var(--bg))!important}
+.et-grp.fs-rodaje{background:color-mix(in srgb,var(--text) 8%,var(--bg))!important}
+.et-grp.fs-post{background:color-mix(in srgb,var(--text) 14%,var(--bg))!important}
+.cr-row.g-pre{--gz:#1FB58F;--gb:color-mix(in srgb,var(--text) 3%,transparent)}
+.cr-row.g-rodaje{--gz:#FB8847;--gb:color-mix(in srgb,var(--text) 7%,transparent)}
+.cr-row.g-post{--gz:var(--blue);--gb:color-mix(in srgb,var(--text) 12%,transparent)}
+.cr-row[class*=" g-"] .cr-l{background:var(--gb);position:relative;box-shadow:inset 4px 0 0 var(--gz)}
+.cr-row.g-pre .cr-t{--gt:color-mix(in srgb,var(--text) 1.5%,transparent)}.cr-row.g-rodaje .cr-t{--gt:color-mix(in srgb,var(--text) 4%,transparent)}.cr-row.g-post .cr-t{--gt:color-mix(in srgb,var(--text) 7%,transparent)}
+.cr-row[class*=" g-"] .cr-t{background:linear-gradient(var(--gt),var(--gt))}
+.cr-row[class*=" g-"] + .cr-row[class*=" g-"]:not(.g-pre):not(.g-rodaje):not(.g-post){}
+.cr-gleg{display:inline-flex;align-items:center;gap:6px}
+.cr-gleg i{width:4px;height:12px;border-radius:2px;background:var(--gz)}
+.cr-leg.cr-gl{justify-content:flex-start;gap:18px;padding-bottom:0;border-top:1px solid var(--border)}
+.cr-leg.cr-gl + .cr-leg{border-top:0}
+.cr-gleg.cr-row{display:inline-flex!important;grid-template-columns:none!important;border:0!important;min-height:0!important;background:none!important}
+/* ═════ v164 · Cabecera ═════ */
+.pj-ban-act{position:static!important;opacity:1!important;display:flex;gap:6px;margin-left:auto;align-self:flex-start;margin-top:4px;z-index:2}
+.pj-ban-act + .pj-flor{margin-left:14px}
+.pj-ban-act button{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 10px;border-radius:99px;font:600 12.5px/1 var(--sans)!important;letter-spacing:0!important;text-transform:none!important;color:var(--text)!important;background:color-mix(in srgb,var(--surface) 70%,transparent)!important;border:1px solid var(--border)!important;backdrop-filter:blur(8px);opacity:.75;transition:opacity .15s,background-color .15s}
+.pj-head:hover .pj-ban-act button,.pj-ban-act button:focus-visible{opacity:1}
+.pj-ban-act button:hover{background:var(--surface)!important}
+.pj-ban-act button .i{width:15px;height:15px}
+.pj-ban-act .x{padding:0 9px!important}
+.pj-ban-act .x span:empty{display:none}
+.pj-ban-act .x.armed{color:#fff!important;background:#F0476B!important;border-color:#F0476B!important}
+.pj-ban.has ~ .pj-ban-act button{color:#fff!important;background:rgba(0,0,0,.45)!important;border-color:rgba(255,255,255,.25)!important}
+@media (max-width:720px){.pj-ban-act button span{display:none}.pj-ban-act button{padding:0 9px}}
+.pj-sub .pj-edit{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 10px 0 8px;margin:0;border-radius:99px;border:1px dashed var(--border2);font:600 12.5px/1 var(--sans);color:var(--muted);opacity:1;width:auto;transition:color .15s,border-color .15s,background-color .15s}
+.pj-sub .pj-edit .i{width:14px;height:14px}
+.pj-sub .pj-edit:hover,.pj-sub .pj-edit:focus-visible{color:var(--text);border-style:solid;border-color:var(--text);background:var(--surface)}
+.pj-new-name{font-family:var(--black)!important;font-weight:900!important;letter-spacing:-.015em!important;line-height:.95!important;text-transform:uppercase;font-size:clamp(30px,3.4vw,46px)!important;padding:0 0 4px!important;border-bottom-width:2px!important}
+.pj-new.edit{gap:10px}
+.pj-new.edit .pj-new-name{border-bottom-style:solid;border-bottom-color:color-mix(in srgb,var(--text) 25%,transparent)}
+@media (max-width:720px){.pj-new-name{font-size:26px!important}}
+.cb-pop{padding:6px;overflow:auto;z-index:4000}
+.cb-h{font:600 11px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);padding:8px 10px 6px}
+.cb-it{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border-radius:9px;font:600 14px/1.2 var(--sans);color:var(--text)}
+.cb-it span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cb-it small{font:500 12px var(--sans);color:var(--muted)}
+.cb-it:hover,.cb-it.sel{background:var(--surface2)}
+.cb-dot{width:12px;height:12px;border-radius:50%;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)}
+.cb-dot.mk{background:transparent;border:2px solid var(--border2)}
+.cb-new{border-top:1px solid var(--border);border-radius:0 0 9px 9px;margin-top:4px;color:var(--text)}
+.cb-new span{font-weight:500}
+.cb-plus{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--brand);color:#0A0A0A;font:700 15px/1 var(--sans);font-style:normal;flex:none}
+.cb-empty{margin:8px 10px;font:500 13px var(--sans);color:var(--muted)}
+.cp-pop{padding:12px;width:auto!important}
+.cp-auto{display:flex;align-items:center;gap:10px;padding:0 0 10px;margin-bottom:10px;border-bottom:1px solid var(--border)}
+.cp-auto span{display:flex;flex-direction:column;gap:2px;font:600 13px/1.1 var(--sans)}
+.cp-auto small{font:500 12px var(--sans);color:var(--muted)}
+.cp-pop .cp-g{display:grid;grid-template-columns:repeat(6,22px);gap:8px;margin:0}
+.cp-pop .cp-c{width:22px;height:22px;aspect-ratio:auto}
+.cp-auto .cp-c{width:26px;height:26px;flex:none}
+.cp-auto.on .cp-c,.cp-pop .cp-c.on{box-shadow:0 0 0 2px var(--surface),0 0 0 3.5px var(--text)}
+.cp-pop .cp-x{background:conic-gradient(#F63DA9,#FFC800,#64FF61,#61B3FF,#624AFF,#F63DA9)}
+.cp-pop .cp-x[style*="--c"]{background:var(--c)}
+#pxp-proj .pj-new-name,#pxp-proj input.pj-new-name{background:transparent!important;border:0!important;border-bottom:2px dashed var(--border2)!important;border-radius:0!important;box-shadow:none!important;outline:0!important;height:auto!important;padding:0 0 4px!important;color:var(--text)!important}
+#pxp-proj .pj-new.edit input.pj-new-name{border-bottom-style:solid!important;border-bottom-color:color-mix(in srgb,var(--text) 22%,transparent)!important}
+#pxp-proj input.pj-new-name:focus{border-bottom-color:var(--text)!important;border-bottom-style:solid!important}
+/* v164 · ficha estable */
+#pxp-proj .cfg{align-items:start!important}
+#pxp-proj .cfg-sum{align-self:start!important;height:auto!important}
+.cfg-col.cfg-medir .cfg-p{display:none!important}
+/* ═════ v164 · Piezas ═════ */
+.hd{gap:8px}
+.hd-hero{grid-template-columns:auto minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr) auto!important;padding:8px!important}
+.hd-der,.hd-o2{grid-template-columns:minmax(0,1.3fr) auto minmax(0,1fr) minmax(0,1fr) auto!important;gap:6px!important}
+.pd-sel{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:7px;min-width:0;height:34px;padding:0 8px 0 10px;border-radius:9px;background:var(--surface);border:1px solid var(--border);font:600 13.5px/1 var(--sans);color:var(--text);transition:border-color .15s}
+.pd-sel span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pd-sel .i{width:16px;height:16px;flex:none;color:var(--muted)}
+.pd-sel .pd-chev{width:14px;height:14px}
+.pd-sel:hover:not(:disabled){border-color:var(--text)}
+.pd-sel:disabled{cursor:default}
+.hd input.pd-in{height:34px;border-radius:9px;font:500 13.5px var(--sans);padding:0 10px}
+.hd input.pd-in:focus{outline:none;border-color:var(--text)}
+.hd-tree::before{top:-8px;bottom:17px}
+.hd-ot{gap:6px!important;padding:10px!important;border-style:solid!important;border-color:var(--border)!important;background:color-mix(in srgb,var(--text) 2%,transparent)}
+.hd-st small{font:500 12px var(--sans);letter-spacing:0;text-transform:none;color:var(--muted);margin-left:6px}
+.pd-adds{display:flex;flex-wrap:wrap;gap:6px}
+.pd-addb{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:99px;border:1px dashed var(--border2);font:600 13px/1 var(--sans);color:var(--muted);transition:color .15s,border-color .15s}
+.pd-addb:hover{color:var(--text);border-color:var(--text);border-style:solid}
+.pd-addb .i{width:14px;height:14px}
+.pd-addb.hero{border-style:solid;border-color:var(--brand);color:var(--text);background:color-mix(in srgb,var(--brand) 18%,transparent)}
+.pd-menu{width:230px}
+.pd-ops{display:grid;gap:2px;padding:2px}
+.pd-op{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;font:600 13.5px/1.2 var(--sans);color:var(--text)}
+.pd-op .i{width:17px;height:17px;color:var(--muted)}
+.pd-op:hover{background:var(--surface2)}
+.pd-op.on{background:var(--surface2);box-shadow:inset 3px 0 0 var(--brand)}
+.pd-quick{padding:10px;width:auto;max-width:300px}
+.pd-qh{display:block;font:600 11px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin-bottom:8px}
+.pd-qs{display:flex;flex-wrap:wrap;gap:5px}
+@media (max-width:720px){.hd-hero{grid-template-columns:auto 1fr auto!important}.hd-der,.hd-o2{grid-template-columns:1fr auto auto!important}}
+@media (max-width:720px){.mi-sts{width:100%;margin-left:0}.mi-s{flex:1;padding:6px 2px;font-size:11.5px;text-align:center}.mi-s.on::before{display:none}}
 </style>
 </head>
 <body>
@@ -9677,7 +9851,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   const pkey = (name) => norm(typeof cleanTag === "function" ? cleanTag(name) : name);
   function defaultProjectColor(name) { return PAL[hash(pkey(name)) % PAL.length]; }
   // Un proyecto usa su color propio (colorHex en su ficha) o, si no lo tiene, el automatico
-  function projectColor(name) { const p = PROJECTS[pkey(name)]; return (p && /^#[0-9a-f]{6}$/i.test(p.colorHex || "")) ? p.colorHex : defaultProjectColor(name); }
+  // v164 · El automático es el color de su cliente (si no tiene cliente, uno estable de la paleta)
+  function projectColor(name) { const p = PROJECTS[pkey(name)] || (pkey(name) === window.__pxpProjK ? (Object.getOwnPropertyDescriptor(PROJECTS, pkey(name)) || {}).value : null); return (p && /^#[0-9a-f]{6}$/i.test(p.colorHex || "")) ? p.colorHex : (p && String(p.cliente || "").trim() ? clientColor(p.cliente) : defaultProjectColor(name)); }
 
   // Clientes: los más frecuentes reciben los colores más distintos; el mapa es estable
   let clientMap = null;
@@ -12024,9 +12199,9 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     pmBox.style.setProperty("--pc", col);
     pmBox.innerHTML = `
       <header class="pj-head">
-        ${edP && !p._borrador ? `<button type="button" class="pj-sw pj-sw-b" style="background:${col}" onclick="pxpColorProy(this)" aria-label="Color del proyecto" data-tip="Color del proyecto"></button>` : `<span class="pj-sw" style="background:${col}"></span>`}
-        ${(p._borrador || window.__pxpCabEdit === k) && window.pxpNuevoCab ? pxpNuevoCab(k, p, tipo, !p._borrador) : `<div class="pj-id"><h2 id="pj-title">${esc(p.nombre || k)}</h2>${edP ? `<button type="button" class="pj-edit" onclick="pxpCabEditar('${ea(k)}')" aria-label="Editar nombre, cliente y marca" data-tip="Editar nombre, cliente y marca"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></svg></button>` : ""}
-          <div class="pj-sub">${cli ? `<button class="pj-cli" data-cname="${esc(cli)}" title="Abrir la ficha del cliente">${av("client", cli, 24)}<span>${esc(cli)}</span></button>` : `<span class="muted">Sin cliente</span>`}${p.marca ? `<span class="pj-marca">${esc(p.marca)}</span>` : ""}<span class="tp-chip" style="--tc:${(window.pxpTipoColor || {})[tipo]}" title="Tipo de proyecto">${tipo}</span>${agenciaV ? `<span class="pj-ag-chip" title="Agencia creativa"><em>Agencia</em> ${esc(agenciaV)}</span>` : ""}${p.piezas ? `<span class="pj-ag-chip" title="Piezas entregadas / total"><em>Piezas</em> ${p.piezasOk || 0}/${p.piezas}</span>` : ""}</div></div>`}
+        ${edP ? `<button type="button" class="pj-sw pj-sw-b" style="background:${col}" onclick="pxpColorProy(this)" aria-label="Color del proyecto" data-tip="Color del proyecto"></button>` : `<span class="pj-sw" style="background:${col}"></span>`}
+        ${(p._borrador || window.__pxpCabEdit === k) && window.pxpNuevoCab ? pxpNuevoCab(k, p, tipo, !p._borrador) : `<div class="pj-id"><h2 id="pj-title">${esc(p.nombre || k)}</h2>
+          <div class="pj-sub">${cli ? `<button class="pj-cli" data-cname="${esc(cli)}" title="Abrir la ficha del cliente">${av("client", cli, 24)}<span>${esc(cli)}</span></button>` : `<span class="muted">Sin cliente</span>`}${p.marca ? `<span class="pj-marca">${esc(p.marca)}</span>` : ""}<span class="tp-chip" style="--tc:${(window.pxpTipoColor || {})[tipo]}" title="Tipo de proyecto">${tipo}</span>${agenciaV ? `<span class="pj-ag-chip" title="Agencia creativa"><em>Agencia</em> ${esc(agenciaV)}</span>` : ""}${p.piezas ? `<span class="pj-ag-chip" title="Piezas entregadas / total"><em>Piezas</em> ${p.piezasOk || 0}/${p.piezas}</span>` : ""}${edP ? `<button type="button" class="pj-edit" onclick="pxpCabEditar('${ea(k)}')" aria-label="Editar nombre, cliente y marca" data-tip="Editar nombre, cliente y marca"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></svg><span>Editar</span></button>` : ""}</div></div>`}
         ${window.pxpPlantaHtml && !p._borrador ? `<div class="pj-flor">${pxpPlantaHtml(k, 92, true)}</div>` : ""}
         <button class="ficha-close" onclick="pxpCloseProject()" aria-label="Cerrar">✕</button>
       </header>
@@ -13660,6 +13835,16 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   };
   const ETS = { pendiente: ["Pendiente", "var(--muted)"], en_curso: ["En curso", "var(--blue)"], bloqueada: ["Bloqueada", "#F0476B"], ajustes: ["En ajustes", "#FF9F43"], revision: ["En revisión", "#61B3FF"], listo: ["Listo", "var(--green)"] };
 
+  // v164 · Estados de los hitos (Revisión · Entrega). Se guardan con los valores de siempre para no romper reportes ni el estado del proyecto:
+  // Pendiente = pendiente · Revisado/Entregado = revision · Solicitud de ajustes = ajustes · Aprobado = listo
+  const MINI_EST = {
+    revision: [["pendiente", "Pendiente", "var(--muted)"], ["revision", "Revisado", "#61B3FF"], ["ajustes", "Solicitud de ajustes", "#FF9F43"], ["listo", "Aprobado", "var(--green)"]],
+    entrega: [["pendiente", "Pendiente", "var(--muted)"], ["revision", "Entregado", "#61B3FF"], ["ajustes", "Solicitud de ajustes", "#FF9F43"], ["listo", "Aprobado", "var(--green)"]],
+  };
+  const miniV = (st) => ({ en_curso: "pendiente", bloqueada: "ajustes" })[st] || st;
+  window.pxpEstEtapaL = (e, v) => { v = v || (e && e.estado) || "pendiente"; const cl = pxpClaseEtapa(e || {}); if (cl !== "proceso") { const m = MINI_EST[cl].find(z => z[0] === miniV(v)); if (m) return m[1]; } return (ETS[v] || ETS.pendiente)[0]; };
+  IC.clock2 = "<svg class='i' viewBox='0 0 24 24' aria-hidden='true'><path d='M7 3.5h10M7 20.5h10'/><path d='M8 3.5c0 4.5 8 4.5 8 8.5s-8 4-8 8.5M16 3.5c0 4.5-8 4.5-8 8.5s8 4 8 8.5'/></svg>";
+  const durCorto = (H) => H < 8 ? String(Math.round(H * 10) / 10).replace(".", ",") + " h" : (H % 40 === 0 ? (H / 40) + " sem" : String(Math.round(H / 8 * 10) / 10).replace(".", ",") + " d");
   // v146 · Etapas por horas (jornada de 8 h). Cada etapa empieza donde terminó la anterior, aunque sea a mitad del día.
   // Las que tienen fecha fija la respetan. Las antiguas (solo "dias") valen dias × 8 h y empiezan al inicio del día.
   const JOR = 8;
@@ -13747,17 +13932,26 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   const grpKey = "pxp_etg";
   const grpGet = () => { try { return JSON.parse(pref(grpKey, "{}")) || {}; } catch (e) { return {}; } };
 
+  // v164 · Fuera del equipo (solo Revisión y Entrega): "Cliente: X", "Agencia: X", "Externo: X". No cuentan en la capacidad.
+  const extT = (r) => { const m = /^(Cliente|Agencia|Externo):/i.exec(String(r || "")); return m ? m[1].toLowerCase() : ""; };
+  const extN = (r) => String(r || "").replace(/^[^:]+:\s*/, "");
+  window.pxpExtT = extT;
+  const EXT_IC = {
+    cliente: "<svg class='i' viewBox='0 0 24 24' aria-hidden='true'><path d='M4 20V9l8-5 8 5v11'/><path d='M9 20v-6h6v6'/></svg>",
+    agencia: "<svg class='i' viewBox='0 0 24 24' aria-hidden='true'><path d='M12 3.5l2.4 5 5.4.6-4 3.8 1 5.4-4.8-2.7-4.8 2.7 1-5.4-4-3.8 5.4-.6z'/></svg>",
+    externo: "<svg class='i' viewBox='0 0 24 24' aria-hidden='true'><circle cx='10' cy='8.5' r='3.5'/><path d='M3.5 20a6.5 6.5 0 0 1 13 0'/><path d='M18 8v6M15 11h6'/></svg>",
+  };
   function respChip(i, e, ed, mini) {
     const R = pxpResps(e), n = R.length;
-    const nm = n ? (R[0] || "").trim().split(/\s+/)[0] : "";
-    const avs = R.slice(0, 3).map(r => `<span class="et-av">${av(r, mini ? 22 : 24)}</span>`).join("");
+    const nm = n ? (extT(R[0]) ? extN(R[0]) : (R[0] || "").trim().split(/\s+/)[0]) : "";
+    const avs = R.slice(0, 3).map(r => extT(r) ? `<span class="et-av ext ext-${extT(r)}">${EXT_IC[extT(r)]}</span>` : `<span class="et-av">${av(r, mini ? 22 : 24)}</span>`).join("");
     return `<button type="button" class="et-chip et-who${n ? "" : " empty"}${n > 1 ? " multi" : ""}" ${ed ? `onclick="pxpEtWho(${i},this)"` : "disabled"} aria-haspopup="dialog" aria-label="${n ? "Responsables: " + esc(R.join(", ")) : "Asignar responsables"}" data-tip="${n ? esc(R.join("<br>")) + (n > 1 ? "<br>Las horas se reparten entre " + n : "") : (ed ? "Asignar responsables" : "Sin responsable")}">${n ? `<span class="et-avs">${avs}</span><span>${esc(nm)}${n > 1 ? ` <em>+${n - 1}</em>` : ""}</span>` : IC.user + `<span>${mini ? "Asignar" : "Responsables"}</span>`}</button>`;
   }
   // Botón de horario: muestra la franja y el rango; abre un selector con el estilo del calendario
   function franjaBtn(i, e, x, ed) {
     const v = e.franja || "", F = FRANJAS.find(f => f[0] === v) || FRANJAS[0];
     const rango = x.ini ? `${reloj(x.hi || 0, true)}–${reloj(x.hf == null ? JOR : x.hf)}${x.fin && x.fin !== x.ini ? ` +${x.dias - 1}d` : ""}` : "";
-    return `<button type="button" class="et-pick fr-${v || "auto"}${e.extiende ? " ext" : ""}" ${ed ? `onclick="pxpEtPick('fr',${i},this)"` : "disabled"} aria-haspopup="dialog" aria-label="Horario: ${F[1]} ${rango}${e.extiende ? ", se extiende hasta " + (e.hasta || "19:00") : ""}">${FR_IC[v]}<span><b>${v === "hora" ? reloj(+e.hIni || 0, true) : F[1]}</b><small>${rango}${e.extiende ? ` · hasta ${esc(e.hasta || "19:00")}` : ""}</small></span></button>`;
+    return `<button type="button" class="et-pick fr-${v || "auto"}${e.extiende ? " ext" : ""}" ${ed ? `onclick="pxpEtPick('fr',${i},this)"` : "disabled"} aria-haspopup="dialog" data-tip="${F[1]}${v === "" ? " · empieza al terminar la anterior" : ""}" aria-label="Horario: ${F[1]} ${rango}${e.extiende ? ", se extiende hasta " + (e.hasta || "19:00") : ""}">${FR_IC[v]}<span><b>${rango || F[1]}</b>${e.extiende ? `<small>hasta ${esc(e.hasta || "19:00")}</small>` : ""}</span></button>`;
   }
   function pesoBtn(i, e, ed) {
     const v = e.peso || "", t = pxpTipoEtapa(e), L = PESOS.find(p => p[0] === t)[1];
@@ -13777,32 +13971,39 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const cr = cruces(k, x), crTip = cr.map(o => `${esc((o.quien || "").split(/\s+/)[0])}: ${esc(o.nombre)} · ${esc(getProjectDisplay(o.k).nombre || o.k)}`).join("<br>");
     const cl = pxpClaseEtapa(e), CL = PXP_CLASES[cl], mini = cl !== "proceso";
     const hrsOk = ed || own;
-    const reg = window.pxpEtHorasReg ? pxpEtHorasReg(k, i, e, x.horas, mini) : "";
+    const reg = window.pxpEtHorasReg ? pxpEtHorasReg(k, i, e, x.horas, 2) : "";
     // v162 · Horas reales: cada responsable registra con − N h + (hoy). El estimado (duración en el cronograma) es automático y editable.
     const canReg = window.pxpPuedeRegistrar && pxpPuedeRegistrar(e), kk = ea(k);
-    const q = canReg ? `<span class="hq${mini ? " mini" : ""}" role="group" aria-label="Registrar horas de hoy"><button type="button" onclick="pxpHrQ('${kk}',${i},-1,this)" aria-label="Menos horas">−</button><b class="hq-n">${fH(window.pxpHrQVal ? pxpHrQVal(k, i) : 1)}</b><i>h</i><button type="button" onclick="pxpHrQ('${kk}',${i},1,this)" aria-label="Más horas">+</button><button type="button" class="hq-go" onclick="pxpHrQGo('${kk}',${i})" data-tip="Registrar estas horas hoy a tu nombre">${mini ? IC.listo : "Registrar"}</button></span>` : "";
-    const per = window.pxpHorasPorPersona ? pxpHorasPorPersona(e) : [];
-    const who = per.length && !mini ? `<span class="hq-who">${per.slice(0, 4).map(([u, h]) => `<span>${esc(String(u).split(" ")[0].toLowerCase().replace(/^./, c => c.toUpperCase()))} <b>${fH(h)} h</b></span>`).join("")}</span>` : "";
-    const est = `<button type="button" class="et-est${e.hpAuto ? " auto" : ""}" ${hrsOk ? `onclick="pxpEtPick('est',${i},this)"` : "disabled"} aria-haspopup="dialog" aria-label="Horas estimadas: ${fH(x.horas)}${e.hpAuto ? ", automáticas" : ""}">Estimado <b>${fH(x.horas)} h</b>${x.horas >= 8 && !mini ? ` · ${fH(x.horas / 8)} d` : ""}${e.hpAuto ? " · auto" : ""}</button>`;
-    const dur = `${q}${reg}${est}${who}`;
+    const q = canReg ? `<span class="hq mini" role="group" aria-label="Registrar horas de hoy"><button type="button" onclick="pxpHrQ('${kk}',${i},-1,this)" aria-label="Menos horas">−</button><b class="hq-n">${fH(window.pxpHrQVal ? pxpHrQVal(k, i) : 1)}</b><i>h</i><button type="button" onclick="pxpHrQ('${kk}',${i},1,this)" aria-label="Más horas">+</button><button type="button" class="hq-go" onclick="pxpHrQGo('${kk}',${i})" aria-label="Registrar" data-tip="Registrar estas horas hoy a tu nombre">${IC.listo}</button></span>` : "";
+    // v164 · Una sola línea: − N h + ✓ · barra con lo registrado / estimado (el estimado se toca para cambiarlo). Quién registró va en el tooltip.
+    const est = `<button type="button" class="et-est${e.hpAuto ? " auto" : ""}" ${hrsOk ? `onclick="pxpEtPick('est',${i},this)"` : "disabled"} aria-haspopup="dialog" aria-label="Horas estimadas: ${fH(x.horas)}${e.hpAuto ? ", automáticas" : ""}" data-tip="Estimado${e.hpAuto ? " automático" : ""}: ${durTxt(x.horas)}${hrsOk ? "<br>Toca para cambiarlo" : ""}">/ ${fH(x.horas)} h</button>`;
+    const dur = `${q}<span class="hr-par">${reg}${est}</span>`;
     const fecha = (a, ic, lb, id, iso, fx) => `<span class="et-chip et-date${fx ? " fixed" : ""}${a === "fin" ? " et-end" : ""}">${ic}<input type="text" readonly class="et-dt" id="${id}" data-iso="${iso || ""}" value="${fmtL(iso)}" onclick="pxpCal(this,'${a}',${i})" aria-label="${lb}" ${ed ? "" : "disabled"}>${a === "inicio" ? `<button type="button" class="et-pin" onclick="pxpEt('${x.fija ? "auto" : "fix"}',${i})" aria-label="${x.fija ? "Fecha fija: toca para encadenarla a la anterior" : "Encadenada a la anterior: toca para fijar la fecha"}" data-tip="${x.fija ? "Fecha fija · toca para que empiece al terminar la anterior" : "Empieza al terminar la anterior · toca para fijar la fecha"}">${x.fija ? IC.pin : IC.link}</button>` : ""}</span>`;
     const head = `<button class="et-grip" type="button" aria-label="Arrastrar para cambiar el orden" data-tip="Arrastra para cambiar el orden">${IC.grip}</button>
           <span class="et-n">${i + 1}</span>
           <button type="button" class="et-cls cl-${cl}${e.clase ? "" : " auto"}" ${ed ? `onclick="pxpEtCls(${i},this)"` : "disabled"} aria-haspopup="menu" aria-label="Tipo: ${CL[0]}${e.clase ? "" : " (automático)"}. Fase: ${faseL(pxpFaseEtapa(e))}" data-tip="${CL[0]} · ${faseL(pxpFaseEtapa(e))}${ed ? "<br>Toca para cambiar tipo, fase o exigencia" : ""}">${CLI[cl]}<span>${CL[0]}</span></button>
-          <input class="et-name" id="et-name-${i}" value="${esc(e.nombre || "")}" placeholder="Nombre de la etapa o tarea" onchange="pxpEt('name',${i},this.value)" aria-label="Nombre de la etapa ${i + 1}" ${nmOk ? "" : "readonly"}>${own && !ed ? `<span class="et-mine">Tuya</span>` : ""}${e.propuesta ? `<span class="et-prop" data-tip="La agregó ${esc(e.propuesta)}. Administración la confirma.">Propuesta${ed ? `<button type="button" onclick="pxpEt('confirmar',${i})">Confirmar</button>` : ""}</span>` : ""}${cr.length ? `<span class="et-cruce" data-tip="<b>Se cruza con</b><br>${crTip}">⚠ Cruce</span>` : ""}${e.extiende && !mini ? `<span class="et-xt" data-tip="Esta etapa se extiende después de las 17:30">Hasta ${esc(e.hasta || "19:00")}</span>` : ""}${bloqSug(k, e, i, st, late)}${due ? `<span class="et-due">${due}</span>` : ""}`;
+          <input class="et-name" id="et-name-${i}" value="${esc(e.nombre || "")}" placeholder="Nombre de la etapa o tarea" onchange="pxpEt('name',${i},this.value)" aria-label="Nombre de la etapa ${i + 1}" ${nmOk ? "" : "readonly"}>${own && !ed ? `<span class="et-mine">Tuya</span>` : ""}${e.propuesta ? `<span class="et-prop" data-tip="La agregó ${esc(e.propuesta)}. Administración la confirma.">Propuesta${ed ? `<button type="button" onclick="pxpEt('confirmar',${i})">Confirmar</button>` : ""}</span>` : ""}${cr.length ? `<span class="et-cruce" data-tip="<b>Se cruza con</b><br>${crTip}">⚠ Cruce</span>` : ""}${e.extiende && !mini ? `<span class="et-xt" data-tip="Esta etapa se extiende después de las 17:30">Hasta ${esc(e.hasta || "19:00")}</span>` : ""}${mini ? "" : bloqSug(k, e, i, st, late)}${due ? `<span class="et-due">${due}</span>` : ""}`;
     const sts = `<span class="et-sts" role="group" aria-label="Estado de la etapa">${Object.entries(ETS).map(([v, [l, c]]) => `<button type="button" class="et-sb${v === st ? " on" : ""}" style="--c:${c}" onclick="pxpEt('estado',${i},'${v}')" aria-pressed="${v === st}" aria-label="${l}" data-tip="${stOk ? l : l + " · solo sus responsables o Administración"}" ${stOk ? "" : "disabled"}>${IC[v]}</button>`).join("")}</span>`;
     const moves = `<span class="et-moves"><button type="button" onclick="pxpEt('up',${i})" ${i === 0 ? "disabled" : ""} aria-label="Subir" data-tip="Subir">${IC.up}</button><button type="button" onclick="pxpEt('down',${i})" ${i === n - 1 ? "disabled" : ""} aria-label="Bajar" data-tip="Bajar">${IC.down}</button><button type="button" class="et-del${confirmDel === i ? " confirm" : ""}" onclick="pxpEt('del',${i})" aria-label="Borrar etapa" data-tip="${confirmDel === i ? "Toca otra vez para borrar" : "Borrar"}">${confirmDel === i ? "¿Borrar?" : IC.trash}</button></span>`;
     const take = !e.resp && !ed && enProyecto(k) && st !== "listo" ? `<button type="button" class="et-take" onclick="pxpEt('tomar',${i})">Tomar</button>` : "";
 
-    // Revisión y Entrega: fila compacta de una línea, con el color de su tipo
-    if (mini) return `<li class="et-row mini cl-${cl} ${st}${late ? " late" : ""}${own ? " own" : ""}" data-i="${i}" style="--sc:${ETS[st][1]}">
-        <div class="et-top">${head}${sts}${moves}</div>
+    // v164 · Revisión y Entrega son hitos: quién la recibe (equipo, cliente, agencia o externo), cuándo se entrega (fecha y hora),
+    // cuánto tarda la revisión y su estado (Pendiente · Revisado/Entregado · Solicitud de ajustes · Aprobado)
+    if (mini) {
+      const ME = MINI_EST[cl], stv = miniV(st), MC = ME.find(z => z[0] === stv) || ME[0];
+      const sts2 = `<span class="mi-sts" role="group" aria-label="Estado">${ME.map(([v, l, c]) => `<button type="button" class="mi-s${v === stv ? " on" : ""}" style="--c:${c}" onclick="pxpEt('estado',${i},'${v}')" aria-pressed="${v === stv}" ${stOk ? "" : `disabled data-tip="Solo sus responsables o Administración"`}>${v === "ajustes" ? `<span class="mi-l">Solicitud de ajustes</span><span class="mi-c">Ajustes</span>` : esc(l)}</button>`).join("")}</span>`;
+      const hora = `<button type="button" class="et-pick mi-h${e.franja === "hora" ? " fixed" : ""}" ${ed ? `onclick="pxpEtPick('mh',${i},this)"` : "disabled"} aria-haspopup="dialog" aria-label="Hora de entrega: ${x.ini ? reloj(x.hi || 0, true) : "sin hora"}" data-tip="${e.franja === "hora" ? "Hora de entrega" : "Hora calculada: al terminar la anterior"}${ed ? " · toca para elegirla" : ""}">${FR_IC.hora}<b>${x.ini ? reloj(x.hi || 0, true) : "—"}</b></button>`;
+      const tarda = cl === "revision" ? `<button type="button" class="et-pick mi-t" ${hrsOk ? `onclick="pxpEtPick('mt',${i},this)"` : "disabled"} aria-haspopup="dialog" aria-label="La revisión tarda ${durCorto(x.horas)}">${IC.clock2}<b>${durCorto(x.horas)}</b></button>` : "";
+      const adj = cl === "revision" && (stv === "ajustes" || (e.adj || []).length) ? ajHtml(k, i, e, stOk, stv === "ajustes") : "";
+      return `<li class="et-row mini cl-${cl} ${st} mi-${stv}${late ? " late" : ""}${own ? " own" : ""}" data-i="${i}" style="--sc:${MC[2]}">
+        <div class="et-top">${head}${sts2}${moves}</div>
         <div class="et-line">
-          <span class="et-li c-who">${take}${respChip(i, e, ed, true)}</span>
-          <span class="et-li c-when">${fecha("inicio", IC.cal, "Fecha de inicio", "et-ini-" + i, x.ini, x.fija)}${franjaBtn(i, e, x, ed)}</span>
-          <span class="et-li c-dur">${dur}</span>
-          <span class="et-li c-end">${fecha("fin", IC.flag, "Fecha de fin", "et-fin-" + i, x.fin)}</span>
+          <span class="et-li c-who"><span class="mi-k">${cl === "revision" ? "Revisa" : "Recibe"}</span>${take}${respChip(i, e, ed, true)}</span>
+          <span class="et-li c-when"><span class="mi-k">Se entrega</span>${fecha("inicio", IC.cal, "Fecha de entrega", "et-ini-" + i, x.ini, x.fija)}${hora}</span>
+          ${tarda ? `<span class="et-li c-dur"><span class="mi-k">Tarda</span>${tarda}</span>` : ""}
+          ${adj}${bloqSug(k, e, i, st, late)}
         </div></li>`;
+    }
     return `<li class="et-row cl-${cl} ${st}${late ? " late" : ""}${own ? " own" : ""}" data-i="${i}" style="--sc:${ETS[st][1]}">
         <div class="et-top">${head}${sts}${moves}</div>
         <div class="et-bot">
@@ -13861,7 +14062,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       ${P.length ? `<div class="et-grps">${grupos}</div>` : `<div class="empty-cta"><b>Sin etapas todavía</b>Agrega las etapas o tareas en el orden en que se hacen, o pide una sugerencia por fase según el equipo del proyecto.</div>`}
       ${!ed && enProyecto(k) ? `<div class="et-actions"><button type="button" class="btn-ghost sm" onclick="pxpEt('proponer')">+ Agregar mi etapa</button>${P.some(x => !x.e.resp && x.e.estado !== "listo") ? `<span class="note">o toma una etapa sin responsable con <b>Tomar</b></span>` : ""}</div>` : ""}
       ${ed ? `<div class="et-actions"><button type="button" class="btn-ghost sm et-addb" onclick="pxpEtAdd(this)" aria-haspopup="menu">+ Agregar etapa</button>${sugBar}</div>` : (P.some(x => pxpEsResp(x.e, meN)) ? `<p class="note et-own-note">Puedes cambiar el estado de las etapas marcadas como <b>Tuya</b>. El resto lo ajusta Administración.</p>` : "")}
-      ${P.length ? `<p class="note">Van en orden y por horas (jornada de 8:30 a 17:30, almuerzo de 12:30 a 13:30): cada etapa empieza donde termina la anterior, salvo que elijas Mañana, Tarde u Hora exacta, o le fijes una fecha. Revisiones y entregas se ven más compactas y vienen con menos horas y exigencia liviana; puedes cambiarlas.</p>` : ""}
+      ${P.length ? `<p class="note">Van en orden y por horas (jornada de 8:30 a 17:30, almuerzo de 12:30 a 13:30): cada etapa empieza donde termina la anterior, salvo que elijas Mañana, Tarde u Hora exacta, o le fijes una fecha. Revisiones y entregas son hitos: eliges quién la recibe (equipo, cliente, agencia o externo), cuándo se entrega (fecha y hora) y, en las revisiones, cuánto tarda.</p>` : ""}
     </div><div id="et-gantt">${ganttHtml(k)}</div>${P.length && ed && window.pxpRepOpen ? `<div class="tt-act"><button type="button" class="linkbtn tt-btn" onclick="pxpRepOpen('tt','${ea(k)}')"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4M8 14h3M13 14h3M8 17h3"/></svg>Time table en PDF</button></div>` : ""}`;
   }
   window.pxpEtGrp = function (k, f, btn) {
@@ -13960,7 +14161,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     if (a !== "del") confirmDel = null;
     switch (a) {
       case "name": E[i].nombre = String(v || "").trim(); if (E[i].hpAuto) { E[i].hp = pxpEstAuto(E[i]); E[i].dias = Math.max(1, Math.ceil(E[i].hp / 8)); } break;
-      case "estado": E[i].estado = v; log(`Etapa "${nm(i)}" → ${ETS[v][0]}`); struct = true; break;
+      case "estado": E[i].estado = v; log(`Etapa "${nm(i)}" → ${window.pxpEstEtapaL(E[i], v)}`); struct = true; break;
+      case "hEnt": if (v === "" || v == null) { delete E[i].franja; } else { E[i].franja = "hora"; E[i].hIni = Math.max(0, Math.min(JOR - 0.5, parseFloat(v) || 0)); } log(`Etapa "${nm(i)}": se entrega ${v === "" ? "al terminar la anterior" : "a las " + reloj(E[i].hIni, true)}`); break;
       case "resp": {   // v154 · alterna a la persona en la lista de responsables ("" = quitar a todos)
         if (!can()) return; const R0 = pxpResps(E[i]), ya = R0.some(r => normName(r) === normName(v));
         pxpSetResps(E[i], !v ? [] : ya ? R0.filter(r => normName(r) !== normName(v)) : R0.concat([v]));
@@ -14033,6 +14235,52 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   };
 
 
+  // v164 · Solicitud de ajustes: imagen, documento o enlace con el feedback (solo en etapas de Revisión)
+  const AJ_IC = {
+    img: "<svg class='i' viewBox='0 0 24 24' aria-hidden='true'><rect x='3.5' y='4.5' width='17' height='15' rx='2'/><circle cx='9' cy='10' r='1.8'/><path d='m4 18 5-5 4 4 2.5-2.5L20 18'/></svg>",
+    doc: "<svg class='i' viewBox='0 0 24 24' aria-hidden='true'><path d='M6 3.5h8l4 4v13H6z'/><path d='M14 3.5v4h4M9 12h6M9 16h6'/></svg>",
+    link: IC.link,
+  };
+  function ajHtml(k, i, e, ok, activo) {
+    const L = e.adj || [];
+    const items = L.map((a, j) => `<span class="aj-it aj-${a.t}">${a.t === "img" ? `<button type="button" class="aj-th" onclick="pxpAjVer(${i},${j})" aria-label="Ver ${esc(a.nombre || "imagen")}"><img src="${esc(a.url)}" alt="" loading="lazy"></button>` : `<button type="button" class="aj-a" onclick="pxpAjVer(${i},${j})" data-tip="${esc(a.nombre || a.url)}">${AJ_IC[a.t]}<span>${esc(a.t === "link" ? String(a.nombre || a.url).replace(/^https?:\/\/(www\.)?/, "").slice(0, 26) : (a.nombre || "Documento").slice(0, 22))}</span></button>`}${ok ? `<button type="button" class="aj-x" onclick="pxpAjQuitar(${i},${j})" aria-label="Quitar">×</button>` : ""}</span>`).join("");
+    const add = ok && activo ? `<span class="aj-add" role="group" aria-label="Adjuntar el feedback">${[["img", "Imagen"], ["doc", "Documento"], ["link", "Enlace"]].map(([t, l]) => `<button type="button" class="aj-b" onclick="pxpAjAdd(${i},'${t}',this)" aria-label="Adjuntar ${l.toLowerCase()}" data-tip="${l}">${AJ_IC[t]}</button>`).join("")}</span>` : "";
+    return `<span class="et-li c-aj"><span class="mi-k">Ajustes</span>${items}${add}</span>`;
+  }
+  const ajE = (i) => { const w = $("et-wrap"); const p = w && PROJECTS[w.dataset.k]; return p && (p.etapas || [])[i]; };
+  const ajOk = (e) => can() || pxpEsResp(e, currentUser);
+  const ajPush = async (i, a) => { const e = ajE(i); if (!e) return; (e.adj = e.adj || []).push(Object.assign({ ts: new Date().toISOString(), user: currentUser }, a)); const p = PROJECTS[$("et-wrap").dataset.k]; (p.historial = p.historial || []).push({ ts: new Date().toISOString(), usuario: currentUser, texto: `Ajustes en "${e.nombre || "Revisión"}": ${a.t === "link" ? "enlace" : a.t === "img" ? "imagen" : "documento"} adjunto`, tipo: "cambio" }); if (window.pxpRenderProj) pxpRenderProj(); await save(); };
+  window.pxpAjAdd = function (i, t, btn) {
+    const e = ajE(i); if (!e || !ajOk(e)) return;
+    if (t === "link") {
+      const old = document.querySelector(".aj-pop"); if (old) { old.remove(); if (old.dataset.i === String(i)) return; }
+      const d = document.createElement("div"); d.className = "et-pop aj-pop"; d.dataset.i = String(i);
+      d.innerHTML = `<input type="url" placeholder="Pega el enlace (Frame.io, Drive, WeTransfer…)" aria-label="Enlace con los ajustes"><button type="button" class="ficha-save sm">Agregar</button>`;
+      document.body.appendChild(d); const r = btn.getBoundingClientRect(); d.style.left = Math.max(8, Math.min(r.left - 120, innerWidth - d.offsetWidth - 8)) + "px"; d.style.top = (r.bottom + 6) + "px";
+      const inp = d.querySelector("input"), go = () => { let u = inp.value.trim(); if (!u) return; if (!/^https?:\/\//i.test(u)) u = "https://" + u; d.remove(); ajPush(i, { t: "link", url: u, nombre: u }); };
+      d.querySelector("button").onclick = go; inp.onkeydown = (ev) => { if (ev.key === "Enter") go(); if (ev.key === "Escape") d.remove(); };
+      setTimeout(() => inp.focus(), 0);
+      setTimeout(() => document.addEventListener("pointerdown", function f(ev) { if (!d.contains(ev.target)) { d.remove(); document.removeEventListener("pointerdown", f, true); } }, true), 0);
+      return;
+    }
+    const f = document.createElement("input"); f.type = "file"; f.accept = t === "img" ? "image/*" : ".pdf,.doc,.docx,.txt,.rtf,.xls,.xlsx,.csv,.ppt,.pptx,.key,.pages,.numbers";
+    f.onchange = async () => {
+      const file = f.files && f.files[0]; if (!file) return;
+      try { if (window.pxpToast) pxpToast("Subiendo " + file.name + "…"); const [a] = await window.pxpAdjSubir([file]); await ajPush(i, Object.assign({ t }, a)); }
+      catch (err) { if (window.pxpToast) pxpToast(err.message || "No se pudo subir el archivo."); }
+    };
+    f.click();
+  };
+  window.pxpAjVer = async function (i, j) {
+    const a = ((ajE(i) || {}).adj || [])[j]; if (!a) return;
+    if (a.t === "link") { window.open(a.url, "_blank", "noopener"); return; }
+    try { let u = (window.pxpAdjUrl ? await pxpAdjUrl(a) : a.url) || a.url; if (/^data:/.test(u)) u = URL.createObjectURL(await (await fetch(u)).blob()); window.open(u, "_blank", "noopener"); } catch (e) { if (window.pxpToast) pxpToast("No se pudo abrir el archivo."); }
+  };
+  window.pxpAjQuitar = async function (i, j) {
+    const e = ajE(i); if (!e || !ajOk(e) || !(e.adj || [])[j]) return;
+    const [a] = e.adj.splice(j, 1); if (!e.adj.length) delete e.adj; if (a && a.id && window.pxpAdjBorrar) pxpAdjBorrar([a]);
+    if (window.pxpRenderProj) pxpRenderProj(); await save();
+  };
   // Selector de responsables con fotos · v154: se pueden marcar varias personas (las horas se reparten)
   let pop = null;
   const closePop = () => { if (pop) { pop.remove(); pop = null; } };
@@ -14042,10 +14290,14 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     (p.pms || []).forEach(n => { if (n && !team.some(x => normName(x) === normName(n))) team.push(n); });
     const rest = TEAM.map(t => t.name).filter(n => !team.some(x => normName(x) === normName(n))).sort((a, b) => a.localeCompare(b, "es"));
     const on = (n) => R.some(r => normName(r) === normName(n));
-    const item = (n) => `<button type="button" class="ep-it${on(n) ? " on" : ""}" role="menuitemcheckbox" aria-checked="${on(n)}" data-n="${esc(n)}" onclick="pxpEt('resp',${i},this.dataset.n);">${av(n, 26)}<span>${esc(n)}</span><i class="ep-ck" aria-hidden="true">${IC.listo}</i></button>`;
-    return `${R.length ? `<div class="ep-sel">${R.map(r => `<span>${av(r, 20)}${esc(r.split(/\s+/)[0])}</span>`).join("")}${R.length > 1 ? `<small>Horas repartidas entre ${R.length}</small>` : ""}</div>` : ""}
+    const item = (n) => `<button type="button" class="ep-it${on(n) ? " on" : ""}" role="menuitemcheckbox" aria-checked="${on(n)}" data-n="${esc(n)}" onclick="pxpEt('resp',${i},this.dataset.n);">${extT(n) ? `<span class="et-av ext ext-${extT(n)}">${EXT_IC[extT(n)]}</span>` : av(n, 26)}<span>${extT(n) ? `<small>${esc(extT(n)[0].toUpperCase() + extT(n).slice(1))}</small>${esc(extN(n))}` : esc(n)}</span><i class="ep-ck" aria-hidden="true">${IC.listo}</i></button>`;
+    // Revisión y Entrega: también cliente, agencia o alguien externo
+    const eI = (p.etapas || [])[i] || {}, hito = pxpClaseEtapa(eI) !== "proceso";
+    const fuera = hito ? [p.cliente ? "Cliente: " + p.cliente : "", p.agencia ? "Agencia: " + p.agencia : ""].filter(Boolean).concat(R.filter(r => extT(r) === "externo")) : [];
+    const fueraH = hito ? `<div class="ep-h">Fuera del equipo</div>${fuera.map(item).join("")}<div class="ep-ext"><input type="text" placeholder="Otra persona o empresa…" aria-label="Agregar a alguien externo" onkeydown="if(event.key==='Enter'&&this.value.trim()){event.preventDefault();pxpEt('resp',${i},'Externo: '+this.value.trim())}"><button type="button" aria-label="Agregar externo" onclick="const q=this.previousElementSibling;if(q.value.trim())pxpEt('resp',${i},'Externo: '+q.value.trim())">+</button></div>` : "";
+    return `${R.length ? `<div class="ep-sel">${R.map(r => `<span>${extT(r) ? `<i class="et-av ext ext-${extT(r)}">${EXT_IC[extT(r)]}</i>` : av(r, 20)}${esc(extT(r) ? extN(r) : r.split(/\s+/)[0])}</span>`).join("")}${R.length > 1 ? `<small>Horas repartidas entre ${R.length}</small>` : ""}</div>` : ""}
       ${R.length ? `<button type="button" class="ep-it ep-none" onclick="pxpEt('resp',${i},'')">${IC.user}<span>Quitar a todos</span></button>` : ""}
-      ${team.length ? `<div class="ep-h">Equipo del proyecto</div>${team.map(item).join("")}` : ""}<div class="ep-h">Todo el equipo</div>${rest.map(item).join("")}`;
+      ${fueraH}${team.length ? `<div class="ep-h">Equipo del proyecto</div>${team.map(item).join("")}` : ""}<div class="ep-h">Todo el equipo</div>${rest.map(item).join("")}`;
   }
   function repaintPop(i) {
     if (!pop) return; const l = pop.querySelector(".ep-list"), y = l.scrollTop, q = pop.querySelector(".ep-q").value;
@@ -14104,7 +14356,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     document.body.appendChild(menu); menu._t = Date.now(); menu._a = btn; colocar();
     const f0 = menu.querySelector(".on"); if (f0) setTimeout(() => f0.focus(), 0);
   };
-  const colocar = () => { if (!menu || !menu._a) return; const btn = document.querySelector(`.et-row[data-i="${menu.dataset.i}"] .${menu._a.classList.contains("et-est") ? "et-est" : menu._a.classList.contains("pz") ? "pz" : "et-pick:not(.pz)"}`) || menu._a, r = btn.getBoundingClientRect(), H = menu.offsetHeight, W = menu.offsetWidth; menu.style.left = Math.max(8, Math.min(r.left, innerWidth - W - 8)) + "px"; menu.style.top = (r.bottom + 6 + H > innerHeight ? Math.max(8, r.top - 6 - H) : r.bottom + 6) + "px"; };
+  const colocar = () => { if (!menu || !menu._a) return; const btn = document.querySelector(`.et-row[data-i="${menu.dataset.i}"] .${menu._a.classList.contains("et-est") ? "et-est" : menu._a.classList.contains("pz") ? "pz" : menu._a.classList.contains("mi-h") ? "mi-h" : menu._a.classList.contains("mi-t") ? "mi-t" : "et-pick:not(.pz)"}`) || menu._a, r = btn.getBoundingClientRect(), H = menu.offsetHeight, W = menu.offsetWidth; menu.style.left = Math.max(8, Math.min(r.left, innerWidth - W - 8)) + "px"; menu.style.top = (r.bottom + 6 + H > innerHeight ? Math.max(8, r.top - 6 - H) : r.bottom + 6) + "px"; };
   // v159 · "+ Agregar etapa": primero se elige la fase
   window.pxpEtAdd = function (btn) {
     if (menu && menu.classList.contains("pk-add")) { closeMenu(); return; }
@@ -14112,11 +14364,14 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const SUB = { pre: "Brief, guion, pruebas, PPM", rodaje: "Set, DIT, dailies", post: "Edición, color, audio, entregas" };
     abrir(btn, -1, "pk-add", `<div class="pk-h"><b>¿En qué fase va la etapa?</b></div><div class="pk-ops">${PXP_FASES.map(([f, l]) => `<button type="button" role="menuitem" class="pk-op fs-${f}" onclick="pxpEt('add',0,'${f}')">${SVG(FI[f])}<span><b>${l}</b><small>${SUB[f]}</small></span></button>`).join("")}</div>`);
   };
+  window.pxpEtPickClose = () => closeMenu();
   window.pxpEtPick = function (kind, i, btn) {
     if (menu && menu.dataset.i === String(i) && menu.classList.contains("pk-" + kind)) { closeMenu(); return; }
     if (!can()) return; const w = $("et-wrap"); if (!w) return;
     const e = (getProjectDisplay(w.dataset.k).etapas || [])[i] || {};
     if (kind === "est") { abrir(btn, i, "pk-est", estHtml(i)); return; }
+    if (kind === "mh") { const v = e.franja === "hora" ? +e.hIni || 0 : null; abrir(btn, i, "pk-mh", `<div class="pk-h"><b>Hora de entrega</b></div><div class="pk-hrs">${HORAS_OPC.map(h => `<button type="button" class="pk-d${v != null && Math.abs(h - v) < 1e-6 ? " sel" : ""}" onclick="pxpEt('hEnt',${i},${h});pxpEtPickClose()">${reloj(h, true)}</button>`).join("")}</div><button type="button" class="em-auto" onclick="pxpEt('hEnt',${i},'');pxpEtPickClose()">${v == null ? "Ahora: al terminar la anterior" : "Que sea al terminar la anterior"}</button>`); return; }
+    if (kind === "mt") { const H = horasDe(e) || 4; abrir(btn, i, "pk-mt", `<div class="pk-h"><b>¿Cuánto tarda la revisión?</b></div><div class="pk-ext mt-ops">${[[2, "2 h"], [4, "4 h"], [8, "1 día"], [16, "2 días"], [24, "3 días"], [40, "1 semana"]].map(([h, l]) => `<button type="button" class="pk-q${Math.abs(H - h) < 1e-6 ? " on" : ""}" onclick="pxpEt('horas',${i},'${h}');pxpEtPickClose()">${l}</button>`).join("")}</div><p class="em-note">Lo que siguiente empieza cuando termina la revisión.</p>`); return; }
     abrir(btn, i, "pk-" + kind, kind === "fr" ? frHtml(i) : `<div class="pk-h"><b>Exigencia</b></div>${pesoOpts(i, e)}<p class="em-note">Pesa en la carga del equipo: 40 h ponderadas = 100 %.</p>`);
   };
   // v162 · Horas estimadas: definen la duración en el cronograma y la carga; automáticas por tipo y nombre
@@ -15191,7 +15446,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const visibles = (e.horas || []).filter(h => can() || isMe(h.user)), tot = visibles.reduce((s, h) => s + (+h.h || 0), 0);
     if (!can() && !pxpResps(e).some(isMe) && !tot) return "";
     const pct = plan ? Math.min(100, tot / plan * 100) : 0, over = plan && tot > plan + 1e-9;
-    return `<button type="button" class="et-reg${over ? " over" : ""}${mini ? " mini" : ""}" onclick="pxpHorasOpen('${ea(k)}',${i})" aria-label="${n1(tot)} de ${n1(plan)} horas registradas. Toca para registrar horas" data-tip="${can() ? "Horas registradas en esta etapa" : "Tus horas en esta etapa"} · toca para registrar">${ic(IC.clock)}<span class="et-rb"><i style="width:${pct}%"></i></span><span class="et-rt"><b>${n1(tot)}</b> / ${n1(plan)} h${mini ? "" : " reales"}</span></button>`;
+    return `<button type="button" class="et-reg${over ? " over" : ""}${mini ? " mini" : ""}" onclick="pxpHorasOpen('${ea(k)}',${i})" aria-label="${n1(tot)} de ${n1(plan)} horas registradas. Toca para registrar horas" data-tip="${can() ? "Horas registradas en esta etapa" : "Tus horas en esta etapa"}${(() => { const per = window.pxpHorasPorPersona ? pxpHorasPorPersona(e) : []; return per.length ? "<br>" + per.slice(0, 6).map(([u, h]) => esc(String(u).split(" ")[0].toLowerCase().replace(/^./, c => c.toUpperCase())) + ": " + n1(h) + " h").join("<br>") : ""; })()}<br>Toca para ver el detalle">${ic(IC.clock)}<span class="et-rb"><i style="width:${pct}%"></i></span><span class="et-rt"><b>${n1(tot)}</b>${mini === 2 ? "" : ` / ${n1(plan)} h${mini ? "" : " reales"}`}</span></button>`;
   };
   function formHtml() {
     const { k, i } = ctx, p = PROJECTS[k] || {}, e = (p.etapas || [])[i] || {};
@@ -15818,7 +16073,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   };
   // Quitar pide un segundo toque para no confundirlo con cerrar la ventana
   window.pxpBannerQuitarConf = function (b) {
-    if (!b.dataset.arm) { b.dataset.arm = "1"; b.classList.add("armed"); b.textContent = "¿Quitar? Toca otra vez"; clearTimeout(b.__t); b.__t = setTimeout(() => { delete b.dataset.arm; b.classList.remove("armed"); b.textContent = "Quitar imagen"; }, 3500); return; }
+    const sp = b.querySelector("span") || b;
+    if (!b.dataset.arm) { b.dataset.arm = "1"; b.classList.add("armed"); sp.textContent = "¿Quitar?"; clearTimeout(b.__t); b.__t = setTimeout(() => { delete b.dataset.arm; b.classList.remove("armed"); sp.textContent = ""; }, 3500); return; }
     window.pxpBannerQuitar();
   };
   window.pxpBannerSrc = (k) => { const b = PROJECTS[k] && PROJECTS[k].banner; return b ? (typeof b === "string" ? b : b.src) : ""; };
@@ -15869,7 +16125,12 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     if (head && !head.dataset.ban) {
       head.dataset.ban = "1"; const src = window.pxpBannerSrc(k);
       head.insertAdjacentHTML("afterbegin", `<div class="pj-ban${src ? " has" : ""}" ${src ? `style="background-image:url('${esc(src)}')"` : ""} aria-hidden="true"></div>`);
-      if (can()) head.insertAdjacentHTML("beforeend", `<div class="pj-ban-act"><button type="button" onclick="pxpBannerPick()">${src ? "Cambiar imagen" : "Agregar imagen del proyecto"}</button>${src ? `<button type="button" class="x" onclick="pxpBannerQuitarConf(this)" aria-label="Quitar imagen">Quitar imagen</button>` : ""}</div>`);
+      if (can()) {
+        const IMG = `<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="m4 18 5-5 4 4 2.5-2.5L20 18"/></svg>`, TR = `<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13"/></svg>`;
+        const html = `<div class="pj-ban-act"><button type="button" onclick="pxpBannerPick()" data-tip="${src ? "Cambiar la imagen del proyecto" : "Agregar una imagen del proyecto"}">${IMG}<span>${src ? "Cambiar imagen" : "Agregar imagen"}</span></button>${src ? `<button type="button" class="x" onclick="pxpBannerQuitarConf(this)" aria-label="Quitar imagen" data-tip="Quitar imagen">${TR}<span></span></button>` : ""}</div>`;
+        const ref = head.querySelector(".pj-flor") || head.querySelector(".ficha-close");
+        if (ref) ref.insertAdjacentHTML("beforebegin", html); else head.insertAdjacentHTML("beforeend", html);
+      }
     }
     // equipo: imagen dentro del hexágono central y panel de disponibles
     const wrap = box.querySelector(".mm-wrap");
@@ -19355,14 +19616,14 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       const dentro = r.bars.filter(b => b.b > A && b.a < B);
       if (opts.todas && !dentro.length && r.bars.length) {
         const b0 = r.bars[0], antes = b0.b <= A;
-        return `<div class="cr-row"><div class="cr-l">${r.av || ""}<span><b>${esc(r.l)}</b>${r.sub ? `<small>${esc(r.sub)}</small>` : ""}</span></div><div class="cr-t"><span class="cr-out ${antes ? "l" : "r"} ${b0.st || "pendiente"}" style="--c:${b0.c || r.c || "var(--brand)"}" data-tip="${b0.tip || ""}">${antes ? "‹ " + esc(fueraTxt({ d: b0.dFin })) : esc(fueraTxt({ d: b0.dIni })) + " ›"}</span></div></div>`;
+        return `<div class="cr-row${r.g ? " g-" + r.g : ""}"${r.g ? ` data-g="${r.gl || ""}"` : ""}><div class="cr-l">${r.av || ""}<span><b>${esc(r.l)}</b>${r.sub ? `<small>${esc(r.sub)}</small>` : ""}</span></div><div class="cr-t"><span class="cr-out ${antes ? "l" : "r"} ${b0.st || "pendiente"}" style="--c:${b0.c || r.c || "var(--brand)"}" data-tip="${b0.tip || ""}">${antes ? "‹ " + esc(fueraTxt({ d: b0.dFin })) : esc(fueraTxt({ d: b0.dIni })) + " ›"}</span></div></div>`;
       }
       const bars = dentro.map(b => {
         const w = Math.max(.8, Math.min(100, x(b.b)) - Math.max(0, x(b.a))), l = Math.min(Math.max(0, x(b.a)), 100 - w), live = nowIn && nowV > b.a && nowV < b.b && b.st !== "listo", late = b.b <= nowV && b.st !== "listo";
         const tx = w > (E === "w" ? 6 : E === "m" ? 4 : 10) ? `<em>${esc(b.txt || "")}</em>` : "";
         return `<span class="cr-bar ${b.st || "pendiente"}${late ? " late" : ""}${live ? " live" : ""}${b.cls ? " " + b.cls : ""}${b.fr ? " " + b.fr : ""}" style="left:${l}%;width:${w}%;--c:${b.c || r.c || "var(--brand)"}" data-a="${b.a}" data-b="${b.b}" data-tip="${b.tip || ""}"${b.k ? ` role="button" tabindex="0" onclick="pxpOpenProject('${ea(b.k)}')"` : ""}>${tx}</span>`;
       }).join("");
-      return `<div class="cr-row"><div class="cr-l">${r.av || ""}<span><b>${esc(r.l)}</b>${r.sub ? `<small>${esc(r.sub)}</small>` : ""}</span></div><div class="cr-t">${bars}</div></div>`;
+      return `<div class="cr-row${r.g ? " g-" + r.g : ""}"${r.g ? ` data-g="${r.gl || ""}"` : ""}><div class="cr-l">${r.av || ""}<span><b>${esc(r.l)}</b>${r.sub ? `<small>${esc(r.sub)}</small>` : ""}</span></div><div class="cr-t">${bars}</div></div>`;
     }).join("");
     const seg = [["todo", "Todo", "Se ajusta a todas las fechas, con hoy al centro"], ["dia", "Día", ""], ["semana", "Semana", ""], ["mes", "Mes", ""], ["anio", "Año", ""]].map(([v, l, tp]) => `<button type="button" class="${s.m === v ? "on" : ""}" aria-pressed="${s.m === v}" onclick="pxpCrono('${ea(id)}','m','${v}')"${tp ? ` data-tip="${tp}"` : ""}>${l}</button>`).join("");
     const now = nowIn ? `<div class="cr-now" style="left:${x(nowV)}%" aria-hidden="true"><i class="cr-trail"></i><i class="cr-head"></i></div>` : "";
@@ -19382,6 +19643,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
         <div class="cr-row cr-h"><div class="cr-l">${many ? `<small class="cr-cnt">${vis.length} filas</small>` : ""}</div><div class="cr-t">${ticks}${iniH}${finH}${nowH}</div></div>
         <div class="cr-body"><div class="cr-in"><div class="cr-bg"><div class="cr-l"></div><div class="cr-t">${cols}${ini}${fin}${now}</div></div>${body || `<p class="cr-empty">${esc(opts.empty || "Nada programado en este periodo.")}</p>`}</div></div>
       </div>
+      ${vis.some(r => r.g) ? `<div class="cr-leg cr-gl">${[["pre", "Preproducción"], ["rodaje", "Rodaje"], ["post", "Postproducción"]].filter(([g]) => vis.some(r => r.g === g)).map(([g, l]) => `<span class="cr-gleg cr-row g-${g}"><i></i>${l}</span>`).join("")}</div>` : ""}
       <div class="cr-leg">${[["pendiente", "Pendiente"], ["en_curso", "En curso"], ["revision", "Ajustes · revisión"], ["bloqueada", "Bloqueada"], ["listo", "Listo"], ["late", "Vencida"]].map(([k, l]) => `<span class="lg ${k}"><i></i>${l}</span>`).join("")}${hayFr && (E === "w" || E === "m") ? `<span class="lg am"><i></i>Mañana</span><span class="lg pm"><i></i>Tarde</span>` : ""}${iniIn ? `<span class="lg ini"><i></i>Inicio del proyecto</span>` : ""}${finIn ? `<span class="lg fin"><i></i>Entrega final${opts.finEst ? " (estimada)" : ""}</span>` : ""}${opts.leg || ""}</div>
     </div>`;
   }
@@ -19393,7 +19655,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const el = document.querySelector(`.cr[data-id="${CSS.escape(id)}"]`); if (el && BUILD[id]) { const t = document.createElement("div"); t.innerHTML = BUILD[id](); el.replaceWith(t.firstElementChild); }
   };
 
-  const tipEtapa = (x, extra) => `<b>${esc(x.e.nombre || "Etapa")}</b>${extra ? "<br>" + extra : ""}<br>${fD(x.ini)} ${reloj(x.hi || 0, true)} → ${fD(x.fin)} ${reloj(x.hf == null ? J() : x.hf)}<br>${window.pxpDurTxt ? pxpDurTxt(x.horas) : n1(x.horas) + " h"}${frTxt(x)}${x.e.extiende ? " · hasta " + esc(x.e.hasta || "19:00") : ""} · ${ETS[x.e.estado || "pendiente"]}${x.e.resp ? " · " + esc(pxpResps(x.e).join(", ")) : ""}`;
+  const tipEtapa = (x, extra) => `<b>${esc(x.e.nombre || "Etapa")}</b>${extra ? "<br>" + extra : ""}<br>${fD(x.ini)} ${reloj(x.hi || 0, true)} → ${fD(x.fin)} ${reloj(x.hf == null ? J() : x.hf)}<br>${window.pxpDurTxt ? pxpDurTxt(x.horas) : n1(x.horas) + " h"}${frTxt(x)}${x.e.extiende ? " · hasta " + esc(x.e.hasta || "19:00") : ""} · ${window.pxpEstEtapaL ? pxpEstEtapaL(x.e) : ETS[x.e.estado || "pendiente"]}${x.e.resp ? " · " + esc(pxpResps(x.e).join(", ")) : ""}`;
   const barTxt = (x) => x.horas < J() ? n1(x.horas) + " h" : n1(x.horas / J()) + " d";
   // v155 · Etapas de un solo día: mañana (antes de las 12:30) o tarde (desde las 13:30)
   const frDe = (x) => x.ini && x.ini === x.fin ? ((x.hf == null ? J() : x.hf) <= 4 + 1e-9 ? "am" : (x.hi || 0) >= 4 - 1e-9 ? "pm" : "") : "";
@@ -19406,7 +19668,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     BUILD[id] = () => {
       const p = getProjectDisplay(k), col = window.pxpProjectColor ? pxpProjectColor(k) : "var(--brand)";
       const P = (window.pxpPlanEtapas ? pxpPlanEtapas(p) : []).filter(x => x.ini && x.fin).sort((a, b) => abs(a.ini, a.hi || 0) - abs(b.ini, b.hi || 0) || a.i - b.i);
-      const rows = P.map(x => ({ l: `${x.i + 1}. ${x.e.nombre || "Etapa"}`, sub: pxpResps(x.e).join(", ") || "Sin responsable", av: av(x.e.resp, 22), c: col,
+      const FL = { pre: "Preproducción", rodaje: "Rodaje", post: "Postproducción" };
+      const rows = P.map(x => ({ l: `${x.i + 1}. ${x.e.nombre || "Etapa"}`, sub: pxpResps(x.e).map(r => r.replace(/^(Cliente|Agencia|Externo):\s*/i, "")).join(", ") || "Sin responsable", av: av(x.e.resp, 22), c: col, g: pxpFaseEtapa(x.e), gl: FL[pxpFaseEtapa(x.e)],
         bars: [{ a: abs(x.ini, x.hi || 0), b: abs(x.fin, x.hf == null ? J() : x.hf), dIni: x.ini, dFin: x.fin, fr: frDe(x), st: x.e.estado || "pendiente", txt: barTxt(x), tip: tipEtapa(x) }] }));
       ((PROJECTS[k] || {}).bloqueos || []).filter(b => b.inicio).forEach(b => rows.push({ l: "Bloqueo · " + (b.tipo || ""), sub: b.desc || "", c: "var(--red)", bars: [{ a: abs(b.inicio, 0), b: b.fin ? abs(b.fin, J()) : ahoraAbs(), dIni: b.inicio, dFin: b.fin || hoy(), st: "bloqueada", cls: "blk" + (b.fin ? "" : " open"), txt: b.fin ? "" : "activo", tip: `<b>Bloqueo · ${esc(b.tipo || "")}</b>${b.desc ? "<br>" + esc(b.desc) : ""}` }] }));
       const ent = (PROJECTS[k] || {}).entregaFinal;
@@ -19552,8 +19815,12 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   // Se guardan en piezasDet: { hero:true } es la pieza madre; { deriv:"Reducción" } son las que salen de ella.
   // Las piezas antiguas (sin hero ni deriv) se muestran como "Otras piezas" y pueden convertirse en Hero.
   const TIPOS_P = ["TV", "Digital", "Social", "DOOH / OOH", "Print", "Otro"];
-  const CLASES = ["Reducción", "Reformato", "Cutdown", "Bumper", "Sin legales", "Director's Cut"];
-  const CL_IC = { "Reducción": "M5 12h14M9 8l-4 4 4 4", "Reformato": "M7 4h10v16H7zM4 9h3M17 9h3", "Cutdown": "M6 6l12 12M6 18L18 6", "Bumper": "M4 12h3l2-5 3 10 2-5h6", "Sin legales": "M5 5l14 14M8 4h8l3 3v8", "Director's Cut": "M4 8h16v11H4zM4 8l3-4h3l-3 4M11 8l3-4h3l-3 4" };
+  const CLASES = ["Reducción", "Reformato", "Cutdown", "Bumper", "Variación", "Sin legales", "Director's Cut"];
+  // v164 · Otras piezas (no dependen del Hero) y valores típicos de duración y formato
+  const TIPOS_O = ["TV", "Digital", "Social", "DOOH / OOH", "Print", "Key visual", "Banner", "Spot de radio", "Foto", "Otro"];
+  const T_IC = { "TV": "M3.5 6.5h17v11h-17zM9 20.5h6", "Digital": "M4 5.5h16v10H4zM2.5 18.5h19", "Social": "M7.5 3.5h9v17h-9zM11 17.5h2", "DOOH / OOH": "M4 4.5h16v9H4zM12 13.5v7M8 20.5h8", "Print": "M6 3.5h9l3 3v14H6zM9 11h6M9 15h6", "Key visual": "M4 4.5h16v15H4zM4 15l5-5 4 4 2.5-2.5L20 15", "Banner": "M3.5 8.5h17v7h-17z", "Spot de radio": "M12 3.5a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0v-5a3 3 0 0 1 3-3zM6 11a6 6 0 0 0 12 0M12 17v3.5", "Foto": "M4 7.5h3l2-2.5h6l2 2.5h3v12H4zM12 16.5a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4z", "Otro": "M12 5v14M5 12h14" };
+  const QUICK = { dur: ["6s", "10s", "15s", "20s", "30s", "45s", "60s", "90s", "2 min"], formato: ["16:9", "9:16", "1:1", "4:5", "4:3", "21:9", "2:3"] };
+  const CL_IC = { "Variación": "M4 7h3l10 10h3M4 17h3L17 7h3M18 4.5 20.5 7 18 9.5M18 14.5l2.5 2.5-2.5 2.5", "Reducción": "M5 12h14M9 8l-4 4 4 4", "Reformato": "M7 4h10v16H7zM4 9h3M17 9h3", "Cutdown": "M6 6l12 12M6 18L18 6", "Bumper": "M4 12h3l2-5 3 10 2-5h6", "Sin legales": "M5 5l14 14M8 4h8l3 3v8", "Director's Cut": "M4 8h16v11H4zM4 8l3-4h3l-3 4M11 8l3-4h3l-3 4" };
   const ic = (d) => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="${d}"/></svg>`;
   window.pxpPiezasResumen = function (p) {
     const det = (p && p.piezasDet) || [], h = det.find(x => x.hero), dv = det.filter(x => x.deriv), ot = det.filter(x => !x.hero && !x.deriv);
@@ -19561,25 +19828,51 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     return { hero: h, der: dv, otras: ot, nD, nO, total: (h ? 1 : 0) + nD + nO };
   };
   function pdHtml(k) {
-    const p = PROJECTS[k] || {}, det = p.piezasDet || [], ed = can(), R = pxpPiezasResumen(p);
+    const p = PROJECTS[k] || {}, det = p.piezasDet || [], ed = can(), R = pxpPiezasResumen(p), K = ea(k);
     const idx = (x) => det.indexOf(x);
-    const inp = (x, f, ph, lb) => `<input type="text" value="${esc(x[f] || "")}" placeholder="${ph}" ${ed ? `onchange="pxpHD('${ea(k)}','${f}',${idx(x)},this.value)"` : "disabled"} aria-label="${lb}">`;
-    const del = (x) => ed ? `<button type="button" class="pd-x" onclick="pxpHD('${ea(k)}','del',${idx(x)})" aria-label="Quitar">✕</button>` : "";
+    // Duración y formato: se escriben o se eligen de los típicos (aparecen al tocar la casilla)
+    const inp = (x, f, ph, lb) => `<input type="text" class="pd-in" value="${esc(x[f] || "")}" placeholder="${ph}" ${ed ? `onfocus="pxpPDQuick(this,'${f}')" onchange="pxpHD('${K}','${f}',${idx(x)},this.value)"` : "disabled"} aria-label="${lb}" autocomplete="off">`;
+    const del = (x) => ed ? `<button type="button" class="pd-x" onclick="pxpHD('${K}','del',${idx(x)})" aria-label="Quitar">✕</button>` : "";
+    const cant = (x) => `<span class="pd-cant"><button type="button" ${ed ? `onclick="pxpHD('${K}','cant',${idx(x)},${Math.max(1, (+x.cant || 1) - 1)})"` : "disabled"} aria-label="Una menos">−</button><b>${+x.cant || 1}</b><button type="button" ${ed ? `onclick="pxpHD('${K}','cant',${idx(x)},${(+x.cant || 1) + 1})"` : "disabled"} aria-label="Una más">+</button></span>`;
+    const sel = (x, campo, val, icd) => `<button type="button" class="pd-sel" ${ed ? `onclick="pxpPDMenu(this,'${K}',${idx(x)},'${campo}')"` : "disabled"} aria-haspopup="menu">${ic(icd)}<span>${esc(val)}</span><svg class="i pd-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg></button>`;
     const hero = R.hero ? `<div class="hd-hero">
         <span class="hd-badge">${ic("M12 3l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.8z")}Hero</span>
-        <select ${ed ? `onchange="pxpHD('${ea(k)}','tipo',${idx(R.hero)},this.value)"` : "disabled"} aria-label="Tipo de la pieza Hero">${TIPOS_P.map(t => `<option ${t === R.hero.tipo ? "selected" : ""}>${t}</option>`).join("")}</select>
-        ${inp(R.hero, "dur", "Duración (45s…)", "Duración del Hero")}${inp(R.hero, "formato", "Formato (16:9…)", "Formato del Hero")}${del(R.hero)}</div>`
-      : `<div class="hd-empty">${ed ? `<button type="button" class="cfg-add" onclick="pxpHD('${ea(k)}','hero')">+ Definir la pieza Hero</button>` : ""}<p class="note">La pieza Hero es la principal; las reducciones, reformatos y demás versiones salen de ella.</p></div>`;
+        ${sel(R.hero, "tipo", R.hero.tipo || "TV", T_IC[R.hero.tipo] || T_IC.TV)}
+        ${inp(R.hero, "dur", "Duración", "Duración del Hero")}${inp(R.hero, "formato", "Formato", "Formato del Hero")}${del(R.hero)}</div>`
+      : `<div class="hd-empty">${ed ? `<button type="button" class="pd-addb hero" onclick="pxpHD('${K}','hero')">${ic("M12 3l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.8z")}Definir la pieza Hero</button>` : ""}<p class="note">La Hero es la pieza principal; reducciones, reformatos y variaciones salen de ella.</p></div>`;
     const ders = R.der.map(x => `<div class="hd-der"><span class="hd-ln" aria-hidden="true"></span>
-        <span class="hd-cl">${ic(CL_IC[x.deriv] || CL_IC["Reducción"])}<select ${ed ? `onchange="pxpHD('${ea(k)}','deriv',${idx(x)},this.value)"` : "disabled"} aria-label="Tipo de derivada">${CLASES.map(c => `<option ${c === x.deriv ? "selected" : ""}>${c}</option>`).join("")}</select></span>
-        <span class="pd-cant"><button type="button" ${ed ? `onclick="pxpHD('${ea(k)}','cant',${idx(x)},${Math.max(1, (+x.cant || 1) - 1)})"` : "disabled"} aria-label="Una menos">−</button><b>${+x.cant || 1}</b><button type="button" ${ed ? `onclick="pxpHD('${ea(k)}','cant',${idx(x)},${(+x.cant || 1) + 1})"` : "disabled"} aria-label="Una más">+</button></span>
-        ${inp(x, "dur", "Duración", "Duración")}${inp(x, "formato", "Formato", "Formato")}${del(x)}</div>`).join("");
-    const otras = R.otras.length ? `<div class="hd-ot"><span class="hd-st">Otras piezas</span>${R.otras.map(x => `<div class="hd-o"><b>${+x.cant || 1}×</b><span>${esc(x.tipo || "Pieza")}${x.dur || x.formato ? ` · ${esc([x.dur, x.formato].filter(Boolean).join(" · "))}` : ""}</span>${ed && !R.hero ? `<button type="button" class="linkbtn" onclick="pxpHD('${ea(k)}','mkhero',${idx(x)})">Usar como Hero</button>` : ""}${del(x)}</div>`).join("")}</div>` : "";
+        ${sel(x, "deriv", x.deriv, CL_IC[x.deriv] || CL_IC["Reducción"])}${cant(x)}${inp(x, "dur", "Duración", "Duración")}${inp(x, "formato", "Formato", "Formato")}${del(x)}</div>`).join("");
+    const otras = R.otras.length ? `<div class="hd-ot"><span class="hd-st">Otras piezas <small>no dependen del Hero</small></span>${R.otras.map(x => `<div class="hd-der hd-o2">${sel(x, "tipo", x.tipo || "Pieza", T_IC[x.tipo] || T_IC.Otro)}${cant(x)}${inp(x, "dur", "Duración", "Duración")}${inp(x, "formato", "Formato", "Formato")}${del(x)}</div>`).join("")}</div>` : "";
+    const adds = ed ? `<div class="pd-adds">${R.hero ? `<button type="button" class="pd-addb" onclick="pxpHD('${K}','der')">+ Derivada del Hero</button>` : ""}<button type="button" class="pd-addb" onclick="pxpHD('${K}','otra')">+ Otra pieza</button></div>` : "";
     return `<div class="hd">${hero}
-      ${R.hero || R.der.length ? `<div class="hd-tree">${ders}${ed ? `<button type="button" class="cfg-add hd-add" onclick="pxpHD('${ea(k)}','der')" ${R.hero ? "" : "disabled"}>+ Agregar derivada</button>` : ""}</div>` : ""}
-      ${otras}
+      ${R.der.length ? `<div class="hd-tree">${ders}</div>` : ""}
+      ${otras}${adds}
       ${R.total ? `<p class="hd-tot"><b>${R.total}</b> pieza${R.total !== 1 ? "s" : ""} · ${R.hero ? "1 Hero" : "sin Hero"}${R.nD ? ` + ${R.nD} derivada${R.nD !== 1 ? "s" : ""}` : ""}${R.nO ? ` + ${R.nO} otra${R.nO !== 1 ? "s" : ""}` : ""}</p>` : ""}</div>`;
   }
+  // Menús de tipo (Hero, derivada, otra pieza) con el mismo lenguaje de los demás selectores
+  let pdm = null; const pdClose = () => { if (pdm) { pdm.remove(); pdm = null; } };
+  const colocarPop = (el, btn) => { const r = btn.getBoundingClientRect(), H = el.offsetHeight, W = el.offsetWidth; el.style.left = Math.max(8, Math.min(r.left, innerWidth - W - 8)) + "px"; el.style.top = (r.bottom + 6 + H > innerHeight ? Math.max(8, r.top - 6 - H) : r.bottom + 6) + "px"; };
+  window.pxpPDMenu = function (btn, k, i, campo) {
+    if (pdm && pdm._b === btn) { pdClose(); return; } pdClose(); if (!can()) return;
+    const x = ((PROJECTS[k] || {}).piezasDet || [])[i]; if (!x) return;
+    const L = campo === "deriv" ? CLASES : TIPOS_O, IC2 = campo === "deriv" ? CL_IC : T_IC, cur = x[campo];
+    pdm = document.createElement("div"); pdm.className = "et-pop pk-menu pd-menu"; pdm.setAttribute("role", "menu"); pdm._b = btn;
+    pdm.innerHTML = `<div class="pk-h"><b>${campo === "deriv" ? "Tipo de derivada" : "Tipo de pieza"}</b></div><div class="pd-ops">${L.map(v => `<button type="button" role="menuitemradio" aria-checked="${v === cur}" class="pd-op${v === cur ? " on" : ""}" data-v="${esc(v)}">${ic(IC2[v] || IC2.Otro || CL_IC["Reducción"])}<span>${esc(v)}</span></button>`).join("")}</div>`;
+    pdm.addEventListener("click", (e) => { const b = e.target.closest(".pd-op"); if (!b) return; pdClose(); window.pxpHD(k, campo, i, b.dataset.v); });
+    document.body.appendChild(pdm); colocarPop(pdm, btn);
+  };
+  // Típicos de duración y formato: aparecen al tocar la casilla; también se puede escribir
+  let pq = null; const pqClose = () => { if (pq) { pq.remove(); pq = null; } };
+  window.pxpPDQuick = function (inp, f) {
+    pqClose(); pq = document.createElement("div"); pq.className = "et-pop pd-quick"; pq._i = inp;
+    pq.innerHTML = `<span class="pd-qh">${f === "dur" ? "Duraciones típicas" : "Formatos típicos"}</span><div class="pd-qs">${QUICK[f].map(v => `<button type="button" class="pk-q${String(inp.value).trim().toLowerCase() === v.toLowerCase() ? " on" : ""}" onmousedown="event.preventDefault()" data-v="${v}">${v}</button>`).join("")}</div>`;
+    pq.addEventListener("click", (e) => { const b = e.target.closest("[data-v]"); if (!b) return; inp.value = b.dataset.v; pqClose(); inp.dispatchEvent(new Event("change", { bubbles: true })); });
+    document.body.appendChild(pq); colocarPop(pq, inp);
+    inp.addEventListener("blur", () => setTimeout(pqClose, 120), { once: true });
+  };
+  document.addEventListener("pointerdown", (e) => { if (pdm && !pdm.contains(e.target) && !pdm._b.contains(e.target)) pdClose(); if (pq && !pq.contains(e.target) && e.target !== pq._i) pqClose(); }, true);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && (pdm || pq)) { e.stopImmediatePropagation(); pdClose(); pqClose(); } }, true);
+  document.addEventListener("scroll", (e) => { if (pdm && !pdm.contains(e.target)) pdClose(); if (pq && !pq.contains(e.target)) pqClose(); }, true);
   window.pxpPDHtml = pdHtml;
   window.pxpHD = async function (k, a, i, v) {
     if (!can()) { toast("Solo Administración cambia las piezas del proyecto."); return; }
@@ -19588,6 +19881,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     if (a === "hero") { if (det.some(z => z.hero)) return; det.unshift({ hero: true, tipo: "TV", cant: 1, dur: "", formato: "" }); log("Pieza Hero definida"); }
     else if (a === "mkhero") { if (!x || det.some(z => z.hero)) return; x.hero = true; const extra = (+x.cant || 1) - 1; x.cant = 1; det.splice(i, 1); det.unshift(x); if (extra > 0) det.push({ deriv: "Reformato", tipo: "Reformato", cant: extra, dur: x.dur || "", formato: "" }); log("Pieza Hero definida"); }
     else if (a === "der") { if (!det.some(z => z.hero)) return; det.push({ deriv: "Reducción", tipo: "Reducción", cant: 1, dur: "", formato: "" }); }
+    else if (a === "otra") { det.push({ tipo: "Digital", cant: 1, dur: "", formato: "" }); log("Pieza agregada (sin depender del Hero)"); }
     else if (a === "del") { if (!x) return; det.splice(i, 1); log(x.hero ? "Pieza Hero quitada" : `Pieza quitada (${x.deriv || x.tipo || "pieza"})`); }
     else if (x) {
       if (a === "cant") x.cant = Math.max(1, parseInt(v) || 1);
@@ -20141,17 +20435,66 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   const toast = (m) => (window.pxpToast ? pxpToast(m) : null);
   // Cabecera editable: proyecto nuevo, o "Editar" en uno existente (solo Administración; renombrar mueve la clave)
   window.pxpNuevoCab = function (k, p, tipo, editar) {
-    const cl = (typeof knownClientes === "function" ? knownClientes() : []), mk = (window.pxpMarcas ? pxpMarcas() : []);
     const set = editar ? "pxpCabSet" : "pxpNuevoSet", go = editar ? "pxpCabGuardar()" : "pxpNuevoCrear()";
     return `<div class="pj-id pj-new${editar ? " edit" : ""}">
-      <span class="pj-new-k">${editar ? "Editar proyecto" : "Nuevo proyecto"}</span>
+      ${editar ? "" : `<span class="pj-new-k">Nuevo proyecto</span>`}
       <input id="pj-new-name" class="pj-new-name" type="text" value="${esc(p.nombre || "")}" placeholder="Nombre del proyecto" autocomplete="off" aria-label="Nombre del proyecto (obligatorio)" oninput="${set}('nombre',this.value)" onkeydown="if(event.key==='Enter')${go};if(event.key==='Escape'&&${!!editar}){event.stopPropagation();pxpCabCancelar()}">
       <div class="pj-sub pj-new-sub">
-        <label class="pj-new-f"><span>Cliente *</span><input id="pj-new-cli" type="text" list="pj-new-cl" value="${esc(p.cliente || "")}" placeholder="Elige o escribe uno nuevo" autocomplete="off" onchange="${set}('cliente',this.value)"><datalist id="pj-new-cl">${cl.map(c => `<option value="${esc(c)}">`).join("")}</datalist></label>
-        <label class="pj-new-f"><span>Marca</span><input id="pj-new-marca" type="text" list="pj-new-mk" value="${esc(p.marca || "")}" placeholder="Ej: Oreo, Chiky…" autocomplete="off" onchange="${set}('marca',this.value)"><datalist id="pj-new-mk">${mk.map(c => `<option value="${esc(c)}">`).join("")}</datalist></label>
+        <label class="pj-new-f"><span>Cliente *</span><input id="pj-new-cli" type="text" value="${esc(p.cliente || "")}" placeholder="Elige o escribe uno nuevo" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" onfocus="pxpCombo(this,'cli',1)" oninput="pxpCombo(this,'cli')" onkeydown="pxpComboKey(event,this)" onchange="${set}('cliente',this.value)"></label>
+        <label class="pj-new-f"><span>Marca</span><input id="pj-new-marca" type="text" value="${esc(p.marca || "")}" placeholder="Ej: Oreo, Chiky…" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" onfocus="pxpCombo(this,'mk',1)" oninput="pxpCombo(this,'mk')" onkeydown="pxpComboKey(event,this)" onchange="${set}('marca',this.value)"></label>
         ${editar ? `<span class="pj-new-act"><button type="button" class="btn-ghost sm" onclick="pxpCabCancelar()">Cancelar</button><button type="button" class="ficha-save sm" onclick="pxpCabGuardar()">Guardar</button></span>` : `<span class="tp-chip" style="--tc:${(window.pxpTipoColor || {})[tipo]}" title="Tipo de proyecto (se ajusta con el nombre; puedes cambiarlo abajo)">${esc(tipo)}</span>`}
       </div>${editar ? `<p class="nm-err" id="pj-cab-err" role="alert" hidden></p>` : ""}</div>`;
   };
+  // ── v164 · Lista para elegir cliente o marca (con su color y cuántos proyectos tiene) ──
+  let cb = null, cbIn = null, cbSel = -1;
+  const cbClose = () => { if (cb) { cb.remove(); cb = null; } if (cbIn) cbIn.setAttribute("aria-expanded", "false"); cbIn = null; cbSel = -1; };
+  const cbItems = (kind, q) => {
+    const L = kind === "cli" ? (typeof knownClientes === "function" ? knownClientes() : []) : (window.pxpMarcas ? pxpMarcas() : []);
+    const n = (x) => normName(x), Q = n(q || ""), cnt = {};
+    Object.values(PROJECTS).forEach(p => { const v = kind === "cli" ? p.cliente : p.marca; if (v) cnt[n(v)] = (cnt[n(v)] || 0) + 1; });
+    const vis = new Set(), L2 = L.filter(x => { const k = n(x); if (vis.has(k)) return false; vis.add(k); return true; });
+    const out = L2.filter(x => !Q || n(x).includes(Q)).sort((a, b) => (Q && n(a).startsWith(Q) ? 0 : 1) - (Q && n(b).startsWith(Q) ? 0 : 1) || (cnt[n(b)] || 0) - (cnt[n(a)] || 0) || a.localeCompare(b, "es")).slice(0, 40).map(x => ({ v: x, c: cnt[n(x)] || 0 }));
+    return { out, nuevo: q && q.trim() && !L2.some(x => n(x) === Q) ? q.trim() : "" };
+  };
+  const cbPaint = () => {
+    if (!cb || !cbIn) return; if (!document.body.contains(cbIn)) { cbClose(); return; }
+    const kind = cb.dataset.k, { out, nuevo } = cbItems(kind, cb.dataset.todos ? "" : cbIn.value);
+    const dot = (v) => kind === "cli" ? `<i class="cb-dot" style="background:${window.pxpClientColor ? pxpClientColor(v) : "var(--muted)"}"></i>` : `<i class="cb-dot mk"></i>`;
+    cb.innerHTML = `${out.length ? `<div class="cb-h">${kind === "cli" ? "Clientes" : "Marcas"}</div>` : ""}${out.map((x, j) => `<button type="button" role="option" class="cb-it${j === cbSel ? " sel" : ""}" data-v="${esc(x.v)}" onmousedown="event.preventDefault()" onclick="pxpComboPick(this.dataset.v)">${dot(x.v)}<span>${esc(x.v)}</span><small>${x.c ? x.c + " proy." : ""}</small></button>`).join("")}
+      ${nuevo ? `<button type="button" role="option" class="cb-it cb-new${cbSel === out.length ? " sel" : ""}" data-v="${esc(nuevo)}" onmousedown="event.preventDefault()" onclick="pxpComboPick(this.dataset.v)"><i class="cb-plus">+</i><span>${kind === "cli" ? "Nuevo cliente" : "Nueva marca"}: <b>${esc(kind === "cli" ? nuevo.toUpperCase() : nuevo)}</b></span></button>` : ""}
+      ${!out.length && !nuevo ? `<p class="cb-empty">Escribe para crear ${kind === "cli" ? "un cliente" : "una marca"}.</p>` : ""}`;
+    const r = cbIn.getBoundingClientRect(); cb.style.left = Math.max(8, Math.min(r.left, innerWidth - cb.offsetWidth - 8)) + "px"; cb.style.width = Math.max(260, r.width) + "px";
+    const H = Math.min(320, innerHeight - r.bottom - 14); cb.style.maxHeight = Math.max(160, H) + "px"; cb.style.top = (H < 160 ? Math.max(8, r.top - 6 - Math.min(320, cb.scrollHeight)) : r.bottom + 6) + "px";
+  };
+  window.pxpCombo = function (inp, kind, todos) {
+    if (cbIn !== inp) { cbClose(); cb = document.createElement("div"); cb.className = "et-pop cb-pop"; cb.setAttribute("role", "listbox"); cb.dataset.k = kind; document.body.appendChild(cb); cbIn = inp; inp.setAttribute("aria-expanded", "true"); }
+    cb.dataset.todos = todos ? "1" : ""; cbSel = -1; cbPaint();
+  };
+  window.pxpComboPick = function (v) {
+    const inp = cbIn; if (!inp) return; inp.value = cb && cb.dataset.k === "cli" ? String(v).toUpperCase() : v; cbClose();
+    inp.dispatchEvent(new Event("change", { bubbles: true })); const nx = inp.closest(".pj-new-sub") && inp.id === "pj-new-cli" ? $("pj-new-marca") : null; if (nx) nx.focus(); else inp.blur();
+  };
+  window.pxpComboKey = function (ev, inp) {
+    if (!cb || cbIn !== inp) return; const n = cb.querySelectorAll(".cb-it").length;
+    if (ev.key === "ArrowDown" || ev.key === "ArrowUp") { ev.preventDefault(); cbSel = n ? (cbSel + (ev.key === "ArrowDown" ? 1 : -1) + n) % n : -1; cbPaint(); const s = cb.querySelector(".cb-it.sel"); if (s) s.scrollIntoView({ block: "nearest" }); }
+    else if (ev.key === "Enter" && cbSel >= 0) { ev.preventDefault(); ev.stopPropagation(); const b = cb.querySelectorAll(".cb-it")[cbSel]; if (b) window.pxpComboPick(b.dataset.v); }
+    else if (ev.key === "Escape") { ev.stopPropagation(); cbClose(); }
+    else if (ev.key === "Tab") cbClose();
+  };
+  document.addEventListener("pointerdown", (e) => { if (cb && !cb.contains(e.target) && e.target !== cbIn) cbClose(); }, true);
+  setInterval(() => { if (cb && cbIn && !document.body.contains(cbIn)) cbClose(); }, 500);
+  document.addEventListener("scroll", (e) => { if (cb && !cb.contains(e.target)) cbPaint(); }, true);
+  // ── v164 · La ficha resumen no cambia de alto al abrir un desplegable de la derecha:
+  // se mide la columna con todo cerrado y ese es el alto mínimo de la ficha (crece solo si su contenido lo pide)
+  const fijaFicha = () => {
+    const cfg = document.querySelector("#pxp-proj.open .cfg"); if (!cfg) return;
+    const sum = cfg.querySelector(".cfg-sum"), col = cfg.querySelector(".cfg-col"); if (!sum || !col) return;
+    const firma = col.children.length + "|" + Math.round(cfg.getBoundingClientRect().width);
+    if (cfg.dataset.fija === firma) return;
+    col.classList.add("cfg-medir"); const h = col.getBoundingClientRect().height; col.classList.remove("cfg-medir");
+    if (h > 40) { sum.style.minHeight = Math.round(h) + "px"; cfg.dataset.fija = firma; }
+  };
+  if (window.pxpOnDom) pxpOnDom(fijaFicha); addEventListener("resize", () => { const c = document.querySelector("#pxp-proj .cfg"); if (c) delete c.dataset.fija; fijaFicha(); });
   // ── Editar nombre, cliente y marca (solo Administración) ──
   const puede = () => !window.pxpPuedeEditar || pxpPuedeEditar();
   const repintar = () => { try { const m = document.getElementById("pxp-proj"), y = m ? m.scrollTop : 0; if (window.pxpRenderProj) pxpRenderProj(); if (m) m.scrollTop = y; } catch (e) { console.error(e); } };
@@ -20188,11 +20531,12 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     if (cpop) { cerrarC(); return; } if (!puede()) return;
     const k = window.__pxpProjK, p = PROJECTS[k]; if (!p) return;
     const pal = window.pxpPalette || [], cur = /^#[0-9a-f]{6}$/i.test(p.colorHex || "") ? p.colorHex.toUpperCase() : "";
-    cpop = document.createElement("div"); cpop.className = "et-pop et-menu pk-menu pj-cpop"; cpop.setAttribute("role", "dialog"); cpop.setAttribute("aria-label", "Color del proyecto");
-    cpop.innerHTML = `<div class="pk-h"><b>Color del proyecto</b></div><div class="cp-g">${pal.map(c => `<button type="button" class="cp-c${cur === c.toUpperCase() ? " on" : ""}" style="--c:${c}" onclick="pxpColorProySet('${c}')" aria-label="Color ${c}"></button>`).join("")}<label class="cp-c cp-x" aria-label="Otro color" data-tip="Otro color"><input type="color" value="${cur || "#624AFF"}" onchange="pxpColorProySet(this.value)"><span>+</span></label></div>
-      <button type="button" class="em-auto" onclick="pxpColorProySet('')">${cur ? "Volver al automático" : "Ahora es automático"}</button><p class="em-note">Se usa en el cronograma, las fichas y los reportes.</p>`;
+    const auto = p.cliente && window.pxpClientColor ? pxpClientColor(p.cliente) : (pal[0] || "#624AFF");
+    cpop = document.createElement("div"); cpop.className = "et-pop cp-pop"; cpop.setAttribute("role", "dialog"); cpop.setAttribute("aria-label", "Color del proyecto");
+    cpop.innerHTML = `<div class="cp-auto${cur ? "" : " on"}"><button type="button" class="cp-c" style="--c:${auto}" onclick="pxpColorProySet('')" aria-label="Automático: color del cliente"></button><span><b>Automático</b><small>${p.cliente ? "Color de " + esc(p.cliente) : "Sin cliente"}</small></span></div>
+      <div class="cp-g">${pal.filter(c => c.toUpperCase() !== String(auto).toUpperCase()).slice(0, 11).map(c => `<button type="button" class="cp-c${cur === c.toUpperCase() ? " on" : ""}" style="--c:${c}" onclick="pxpColorProySet('${c}')" aria-label="Color ${c}"></button>`).join("")}<label class="cp-c cp-x${cur && !pal.some(c => c.toUpperCase() === cur) ? " on" : ""}" aria-label="Otro color" style="${cur && !pal.some(c => c.toUpperCase() === cur) ? "--c:" + cur : ""}"><input type="color" value="${cur || auto}" onchange="pxpColorProySet(this.value)"></label></div>`;
     const tp = $("pxp-tip"); if (tp) tp.classList.remove("on");   // que el tooltip no tape el título de la paleta
-    document.body.appendChild(cpop); const r = btn.getBoundingClientRect(); cpop.style.left = Math.max(8, Math.min(r.right + 8, innerWidth - cpop.offsetWidth - 8)) + "px"; cpop.style.top = Math.max(8, Math.min(r.top, innerHeight - cpop.offsetHeight - 8)) + "px";
+    document.body.appendChild(cpop); const r = btn.getBoundingClientRect(); cpop.style.left = Math.max(8, Math.min(r.right + 10, innerWidth - cpop.offsetWidth - 8)) + "px"; cpop.style.top = Math.max(8, Math.min(r.top, innerHeight - cpop.offsetHeight - 8)) + "px";
   };
   window.pxpColorProySet = async function (c) {
     const k = window.__pxpProjK, p = PROJECTS[k]; if (!p || !puede()) return;
@@ -20240,7 +20584,6 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     if (Object.prototype.propertyIsEnumerable.call(PROJECTS, key) || getAllKnownProjectKeys().includes(key)) { err(`Ya existe un proyecto llamado "${key}".`, ` <button class="linkbtn" onclick="pxpNuevoAbrir('${ea(key)}')">Abrirlo</button>`); return; }
     if (d.fechaInicio && d.entregaFinal && d.entregaFinal < d.fechaInicio) { err("La entrega final no puede ser antes del inicio."); return; }
     d.nombre = key; d.cliente = cli.toUpperCase();
-    if (!d.colorHex && window.pxpClientColor) { const c = pxpClientColor(d.cliente); if (/^#[0-9a-f]{6}$/i.test(c)) d.colorHex = c; }   // toma el color de su cliente (se cambia en la cabecera)
     if (!d.tipo && window.pxpTipoAuto) { const t = pxpTipoAuto(nm); if (t) d.tipo = t; }
     delete d._borrador;
     d.historial = [{ ts: new Date().toISOString(), usuario: currentUser, texto: "Proyecto creado", tipo: "cambio" }].concat(d.historial || []);

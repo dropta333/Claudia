@@ -1,9 +1,11 @@
-# Tráfico Post · v163 — cómo publicar
+# Tráfico Post · v164 — cómo publicar
 
 1. En el tablero actual toca **Descargar copia** (pie de página) para tener un respaldo de hoy.
 2. En Netlify, abre tu sitio → **Deploys** y arrastra este ZIP (o la carpeta descomprimida) a la zona de despliegue.
 3. Los datos del equipo **no se tocan**: viven en Netlify Blobs y el tablero los carga al abrir.
 4. Entra primero como Administración y espera el aviso **"Tablero optimizado"** (mueve las imágenes viejas a archivos).
+
+Novedades v164 (solo el tablero): etapas más bajas; revisiones y entregas como hitos (fecha y hora, cliente/agencia/externo, solicitud de ajustes con adjuntos); grupos en el cronograma; cabecera y piezas renovadas; el color automático del proyecto es el de su cliente.
 
 Novedades v163 (solo el tablero): todo se edita en la ventana del proyecto. Lápiz junto al título para nombre, cliente y marca (renombrar, solo Administración); color del proyecto tocando su franja en la cabecera; Eliminar proyecto en el pie con doble confirmación.
 

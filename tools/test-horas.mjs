@@ -19,7 +19,7 @@ await page.locator(`${row} .et-bot`).screenshot({ path: shots + "/t-horas-celda.
 await page.click(`${row} .hq-go`); await page.waitForTimeout(500);
 const reg = await page.evaluate(k => PROJECTS[k].etapas[0].horas.filter(h => /BAST/i.test(h.user)).map(h => h.h), K);
 check("registra 3 h a mi nombre hoy", reg.length === 1 && reg[0] === 3);
-check("muestra quién registró", /Andrea/.test(await page.$eval(`${row} .hq-who`, w => w.textContent)) );
+check("quién registró va en el tooltip", /Andrea/.test(await page.$eval(`${row} .et-reg`, w => w.dataset.tip)) && !(await page.$(`${row} .hq-who`)));
 // estimado automático y editable
 const idx = await page.evaluate(k => { const E = PROJECTS[k].etapas; pxpEt("add", 0, "post"); return E.findIndex(e => e.hpAuto && !e.nombre); }, K); await page.waitForTimeout(400);
 await page.fill(`.et-row[data-i="${idx}"] .et-name`, "Corrección de color"); await page.dispatchEvent(`.et-row[data-i="${idx}"] .et-name`, "change"); await page.waitForTimeout(400);

@@ -12,13 +12,13 @@ const ok = [], fail = []; const check = (n, c) => (c ? ok : fail).push(n);
 const k = await page.evaluate(() => { const k = Object.keys(PROJECTS).find(x => [...TEAM, ...AUDIO].some(t => (t.weeks || []).some(w => w.some(c => projectKey(c) === x)))) || Object.keys(PROJECTS)[0]; PROJECTS[k].color = "#AABBCC"; pxpOpenProject(k); return k; });
 await page.waitForTimeout(700);
 check("sin 'Editar ficha completa'", !(await page.$$eval("#pxp-proj button", bs => bs.some(x => /ficha completa/i.test(x.textContent)))));
-check("lápiz de editar en el título", await page.$("#pxp-proj .pj-edit") !== null);
+check("botón Editar en la cabecera", await page.$("#pxp-proj .pj-edit") !== null);
 // color
 await page.click("#pxp-proj .pj-sw-b"); await page.waitForTimeout(300);
-check("abre la paleta del color del proyecto", await page.$(".pj-cpop .cp-c") !== null);
+check("abre la paleta del color del proyecto", await page.$(".cp-pop .cp-g .cp-c") !== null);
 await page.screenshot({ path: shots + "/t-color.png", clip: { x: 0, y: 0, width: 1440, height: 520 } });
-await page.click(".pj-cpop .cp-c >> nth=2"); await page.waitForTimeout(400);
-check("guarda colorHex y no toca 'color' (colorista)", await page.evaluate(k => /^#[0-9a-f]{6}$/i.test(PROJECTS[k].colorHex || "") && !document.querySelector(".pj-cpop"), k));
+await page.click(".cp-pop .cp-g .cp-c >> nth=2"); await page.waitForTimeout(400);
+check("guarda colorHex y no toca 'color' (colorista)", await page.evaluate(k => /^#[0-9a-f]{6}$/i.test(PROJECTS[k].colorHex || "") && !document.querySelector(".cp-pop"), k));
 // editar + renombrar
 await page.click("#pxp-proj .pj-edit"); await page.waitForTimeout(400);
 check("modo edición con valores", (await page.$eval("#pj-new-name", i => i.value)).length > 0 && await page.$("#pxp-proj .pj-new.edit") !== null);
