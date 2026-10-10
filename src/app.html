@@ -6105,6 +6105,36 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;tr
 .pd-qs{display:flex;flex-wrap:wrap;gap:5px}
 @media (max-width:720px){.hd-hero{grid-template-columns:auto 1fr auto!important}.hd-der,.hd-o2{grid-template-columns:1fr auto auto!important}}
 @media (max-width:720px){.mi-sts{width:100%;margin-left:0}.mi-s{flex:1;padding:6px 2px;font-size:11.5px;text-align:center}.mi-s.on::before{display:none}}
+/* ═════ v165 ═════ */
+#pxp-proj .et-grp .et-row.mini .et-name{font:700 22px/1.2 var(--sans)!important;letter-spacing:-.015em}
+.cr-leg .cr-sep{width:1px;height:14px;background:var(--border2);flex:none;align-self:center}
+.cr-leg{flex-wrap:nowrap!important;gap:6px 12px!important;justify-content:flex-start!important}
+.cr-leg .lg,.cr-leg .cr-gleg{font-size:12.5px;white-space:nowrap}
+.cr-leg .cr-gleg{color:var(--text)}
+@media (max-width:1100px){.cr-leg{flex-wrap:wrap!important}}
+.et-addb2{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:9px;height:40px;padding:0 16px 0 6px;border-radius:99px;background:var(--text);color:var(--bg);font:700 14px/1 var(--sans);transition:transform .15s,box-shadow .15s}
+.et-addb2 span{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--brand);color:#0A0A0A;font:700 18px/1 var(--sans)}
+.et-addb2 small{font:500 12.5px/1 var(--sans);opacity:.6}
+.et-addb2:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(0,0,0,.15)}
+.et-addb2:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.et-menu,.pk-add{padding:14px!important}
+.pk-add{width:340px!important}
+.et-menu .ep-h,.pk-add .ep-h{font:600 11px/1 var(--display)!important;letter-spacing:.14em!important;text-transform:uppercase;color:var(--muted2)!important;margin:12px 2px 8px!important;padding:0!important}
+.et-menu .ep-h:first-child{margin-top:2px!important}
+.add-h{display:flex;flex-direction:column;gap:3px;padding:0 2px 4px}
+.add-h b{font:800 19px/1.1 var(--sans);letter-spacing:-.01em}
+.add-h small{font:500 12.5px var(--sans);color:var(--muted)}
+.em-cls{gap:6px}
+.em-c{padding:12px 4px 10px!important;border-radius:12px!important;gap:7px!important}
+.em-c .i{width:22px!important;height:22px!important}
+.em-fs{border-radius:12px!important;background:var(--surface)}
+.em-f{padding:10px 4px!important;font-size:13px!important}
+.add-go{display:block;width:100%;margin-top:14px;height:42px;border-radius:12px!important;font:700 14px/1 var(--sans)!important}
+.add-sg{margin-top:14px;padding:12px;border-radius:12px;background:var(--surface2)}
+.add-sg-h{display:flex;align-items:center;gap:7px;font:700 13.5px/1 var(--sans)}
+.add-sg-h .i{width:16px;height:16px;color:#C79A00}
+.add-sg .em-note{margin:6px 0 10px!important}
+.add-sg .em-fs.sg{background:var(--surface)}
 </style>
 </head>
 <body>
@@ -13981,8 +14011,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const fecha = (a, ic, lb, id, iso, fx) => `<span class="et-chip et-date${fx ? " fixed" : ""}${a === "fin" ? " et-end" : ""}">${ic}<input type="text" readonly class="et-dt" id="${id}" data-iso="${iso || ""}" value="${fmtL(iso)}" onclick="pxpCal(this,'${a}',${i})" aria-label="${lb}" ${ed ? "" : "disabled"}>${a === "inicio" ? `<button type="button" class="et-pin" onclick="pxpEt('${x.fija ? "auto" : "fix"}',${i})" aria-label="${x.fija ? "Fecha fija: toca para encadenarla a la anterior" : "Encadenada a la anterior: toca para fijar la fecha"}" data-tip="${x.fija ? "Fecha fija · toca para que empiece al terminar la anterior" : "Empieza al terminar la anterior · toca para fijar la fecha"}">${x.fija ? IC.pin : IC.link}</button>` : ""}</span>`;
     const head = `<button class="et-grip" type="button" aria-label="Arrastrar para cambiar el orden" data-tip="Arrastra para cambiar el orden">${IC.grip}</button>
           <span class="et-n">${i + 1}</span>
-          <button type="button" class="et-cls cl-${cl}${e.clase ? "" : " auto"}" ${ed ? `onclick="pxpEtCls(${i},this)"` : "disabled"} aria-haspopup="menu" aria-label="Tipo: ${CL[0]}${e.clase ? "" : " (automático)"}. Fase: ${faseL(pxpFaseEtapa(e))}" data-tip="${CL[0]} · ${faseL(pxpFaseEtapa(e))}${ed ? "<br>Toca para cambiar tipo, fase o exigencia" : ""}">${CLI[cl]}<span>${CL[0]}</span></button>
-          <input class="et-name" id="et-name-${i}" value="${esc(e.nombre || "")}" placeholder="Nombre de la etapa o tarea" onchange="pxpEt('name',${i},this.value)" aria-label="Nombre de la etapa ${i + 1}" ${nmOk ? "" : "readonly"}>${own && !ed ? `<span class="et-mine">Tuya</span>` : ""}${e.propuesta ? `<span class="et-prop" data-tip="La agregó ${esc(e.propuesta)}. Administración la confirma.">Propuesta${ed ? `<button type="button" onclick="pxpEt('confirmar',${i})">Confirmar</button>` : ""}</span>` : ""}${cr.length ? `<span class="et-cruce" data-tip="<b>Se cruza con</b><br>${crTip}">⚠ Cruce</span>` : ""}${e.extiende && !mini ? `<span class="et-xt" data-tip="Esta etapa se extiende después de las 17:30">Hasta ${esc(e.hasta || "19:00")}</span>` : ""}${mini ? "" : bloqSug(k, e, i, st, late)}${due ? `<span class="et-due">${due}</span>` : ""}`;
+          <button type="button" class="et-cls cl-${cl}${e.clase ? "" : " auto"}" ${ed ? `onclick="pxpEtCls(${i},this)"` : "disabled"} aria-haspopup="menu" aria-label="Tipo: ${CL[0]}${e.clase ? "" : " (automático)"}. Fase: ${faseL(pxpFaseEtapa(e))}" data-tip="${CL[0]} · ${faseL(pxpFaseEtapa(e))}${ed ? "<br>Toca para cambiar el tipo o la fase" : ""}">${CLI[cl]}<span>${CL[0]}</span></button>
+          <input class="et-name" id="et-name-${i}" value="${esc(e.nombre || "")}" placeholder="Nombre de la etapa o tarea" onchange="pxpEt('name',${i},this.value)" aria-label="Nombre de la etapa ${i + 1}" ${nmOk ? "" : "readonly"}>${own && !ed ? `<span class="et-mine">Tuya</span>` : ""}${e.propuesta ? `<span class="et-prop" data-tip="La agregó ${esc(e.propuesta)}. Administración la confirma.">Propuesta${ed ? `<button type="button" onclick="pxpEt('confirmar',${i})">Confirmar</button>` : ""}</span>` : ""}${cr.length ? `<span class="et-cruce" data-tip="<b>Se cruza con</b><br>${crTip}">⚠ Cruce</span>` : ""}${e.extiende && !mini ? `<span class="et-xt" data-tip="Esta etapa se extiende después de las 17:30">Hasta ${esc(e.hasta || "19:00")}</span>` : ""}${bloqSug(k, e, i, st, late)}${due ? `<span class="et-due">${due}</span>` : ""}`;
     const sts = `<span class="et-sts" role="group" aria-label="Estado de la etapa">${Object.entries(ETS).map(([v, [l, c]]) => `<button type="button" class="et-sb${v === st ? " on" : ""}" style="--c:${c}" onclick="pxpEt('estado',${i},'${v}')" aria-pressed="${v === st}" aria-label="${l}" data-tip="${stOk ? l : l + " · solo sus responsables o Administración"}" ${stOk ? "" : "disabled"}>${IC[v]}</button>`).join("")}</span>`;
     const moves = `<span class="et-moves"><button type="button" onclick="pxpEt('up',${i})" ${i === 0 ? "disabled" : ""} aria-label="Subir" data-tip="Subir">${IC.up}</button><button type="button" onclick="pxpEt('down',${i})" ${i === n - 1 ? "disabled" : ""} aria-label="Bajar" data-tip="Bajar">${IC.down}</button><button type="button" class="et-del${confirmDel === i ? " confirm" : ""}" onclick="pxpEt('del',${i})" aria-label="Borrar etapa" data-tip="${confirmDel === i ? "Toca otra vez para borrar" : "Borrar"}">${confirmDel === i ? "¿Borrar?" : IC.trash}</button></span>`;
     const take = !e.resp && !ed && enProyecto(k) && st !== "listo" ? `<button type="button" class="et-take" onclick="pxpEt('tomar',${i})">Tomar</button>` : "";
@@ -13991,7 +14021,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     // cuánto tarda la revisión y su estado (Pendiente · Revisado/Entregado · Solicitud de ajustes · Aprobado)
     if (mini) {
       const ME = MINI_EST[cl], stv = miniV(st), MC = ME.find(z => z[0] === stv) || ME[0];
-      const sts2 = `<span class="mi-sts" role="group" aria-label="Estado">${ME.map(([v, l, c]) => `<button type="button" class="mi-s${v === stv ? " on" : ""}" style="--c:${c}" onclick="pxpEt('estado',${i},'${v}')" aria-pressed="${v === stv}" ${stOk ? "" : `disabled data-tip="Solo sus responsables o Administración"`}>${v === "ajustes" ? `<span class="mi-l">Solicitud de ajustes</span><span class="mi-c">Ajustes</span>` : esc(l)}</button>`).join("")}</span>`;
+      const MI_IC = { pendiente: IC.pendiente, revision: cl === "entrega" ? CLI.entrega : IC.revision, ajustes: IC.ajustes, listo: IC.listo };
+      const sts2 = `<span class="et-sts mi-sts2" role="group" aria-label="Estado">${ME.map(([v, l, c]) => `<button type="button" class="et-sb${v === stv ? " on" : ""}" style="--c:${c}" onclick="pxpEt('estado',${i},'${v}')" aria-pressed="${v === stv}" aria-label="${l}" data-tip="${stOk ? l : l + " · solo sus responsables o Administración"}" ${stOk ? "" : "disabled"}>${MI_IC[v]}</button>`).join("")}</span>`;
       const hora = `<button type="button" class="et-pick mi-h${e.franja === "hora" ? " fixed" : ""}" ${ed ? `onclick="pxpEtPick('mh',${i},this)"` : "disabled"} aria-haspopup="dialog" aria-label="Hora de entrega: ${x.ini ? reloj(x.hi || 0, true) : "sin hora"}" data-tip="${e.franja === "hora" ? "Hora de entrega" : "Hora calculada: al terminar la anterior"}${ed ? " · toca para elegirla" : ""}">${FR_IC.hora}<b>${x.ini ? reloj(x.hi || 0, true) : "—"}</b></button>`;
       const tarda = cl === "revision" ? `<button type="button" class="et-pick mi-t" ${hrsOk ? `onclick="pxpEtPick('mt',${i},this)"` : "disabled"} aria-haspopup="dialog" aria-label="La revisión tarda ${durCorto(x.horas)}">${IC.clock2}<b>${durCorto(x.horas)}</b></button>` : "";
       const adj = cl === "revision" && (stv === "ajustes" || (e.adj || []).length) ? ajHtml(k, i, e, stOk, stv === "ajustes") : "";
@@ -14001,7 +14032,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
           <span class="et-li c-who"><span class="mi-k">${cl === "revision" ? "Revisa" : "Recibe"}</span>${take}${respChip(i, e, ed, true)}</span>
           <span class="et-li c-when"><span class="mi-k">Se entrega</span>${fecha("inicio", IC.cal, "Fecha de entrega", "et-ini-" + i, x.ini, x.fija)}${hora}</span>
           ${tarda ? `<span class="et-li c-dur"><span class="mi-k">Tarda</span>${tarda}</span>` : ""}
-          ${adj}${bloqSug(k, e, i, st, late)}
+          ${adj}
         </div></li>`;
     }
     return `<li class="et-row cl-${cl} ${st}${late ? " late" : ""}${own ? " own" : ""}" data-i="${i}" style="--sc:${ETS[st][1]}">
@@ -14050,18 +14081,17 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
           <span class="et-gp" aria-label="${pct}% listo"><i style="width:${pct}%"></i></span>
         </button>
         <ol class="et-list" id="et-g-${f}">${L.map(x => rowHtml(k, x, x.i, P.length, t, ed, meN)).join("")}</ol>
-        ${ed ? `<button type="button" class="et-gadd" onclick="pxpEt('add',0,'${f}')">+ Agregar etapa a ${l}</button>` : ""}
+        ${ed ? `<button type="button" class="et-gadd" onclick="pxpEtAdd(this,'${f}')" aria-haspopup="dialog">+ Agregar etapa a ${l}</button>` : ""}
       </section>`;
     }).join("");
     const H = P.reduce((s, x) => s + (x.horas || 0), 0);
     const undo = ultimaSug && ultimaSug.k === k && Date.now() - ultimaSug.ts < 60000 ? `<span class="sg-undo" role="status">${ultimaSug.ids.length} etapa${ultimaSug.ids.length !== 1 ? "s" : ""} de ${faseL(ultimaSug.fase)} agregada${ultimaSug.ids.length !== 1 ? "s" : ""}<button type="button" class="linkbtn" onclick="pxpEt('deshacerSug')">Deshacer</button></span>` : "";
-    const sugBar = ed ? `<div class="sg-bar"><span class="sg-l"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>Sugerir etapas</span>${PXP_FASES.map(([f, l]) => `<button type="button" class="sg-c" onclick="pxpEt('sugerir',0,'${f}')" data-tip="Agrega etapas típicas de ${l.toLowerCase()} según quién está en el proyecto. Cada clic propone una combinación distinta.">${l}</button>`).join("")}${undo}</div>` : "";
     return `<div class="et-wrap" id="et-wrap" data-k="${esc(k)}">
       ${P.length ? `<div class="et-sum"><span><b>${P.length}</b> etapa${P.length !== 1 ? "s" : ""} · <b>${fH(H)}</b> h (${fH(H / 8)} d) · ${fmtD(first)} → ${fmtD(last)} · <b>${Math.round(listos / P.length * 100)}%</b> listo</span>
         <span class="et-leg" aria-label="Tipos de etapa">${Object.entries(PXP_CLASES).map(([c, [l]]) => `<span class="cl-${c}">${CLI[c]}${l}</span>`).join("")}</span></div>` : ""}
-      ${P.length ? `<div class="et-grps">${grupos}</div>` : `<div class="empty-cta"><b>Sin etapas todavía</b>Agrega las etapas o tareas en el orden en que se hacen, o pide una sugerencia por fase según el equipo del proyecto.</div>`}
+      ${P.length ? `<div class="et-grps">${grupos}</div>` : `<div class="empty-cta"><b>Sin etapas todavía</b>Agrega las etapas o tareas en el orden en que se hacen, o toca <b>+ Agregar etapa</b> para pedir una sugerencia por fase según el equipo.</div>`}
       ${!ed && enProyecto(k) ? `<div class="et-actions"><button type="button" class="btn-ghost sm" onclick="pxpEt('proponer')">+ Agregar mi etapa</button>${P.some(x => !x.e.resp && x.e.estado !== "listo") ? `<span class="note">o toma una etapa sin responsable con <b>Tomar</b></span>` : ""}</div>` : ""}
-      ${ed ? `<div class="et-actions"><button type="button" class="btn-ghost sm et-addb" onclick="pxpEtAdd(this)" aria-haspopup="menu">+ Agregar etapa</button>${sugBar}</div>` : (P.some(x => pxpEsResp(x.e, meN)) ? `<p class="note et-own-note">Puedes cambiar el estado de las etapas marcadas como <b>Tuya</b>. El resto lo ajusta Administración.</p>` : "")}
+      ${ed ? `<div class="et-actions"><button type="button" class="et-addb2" onclick="pxpEtAdd(this)" aria-haspopup="dialog"><span>+</span>Agregar etapa<small>o sugerir</small></button>${undo}</div>` : (P.some(x => pxpEsResp(x.e, meN)) ? `<p class="note et-own-note">Puedes cambiar el estado de las etapas marcadas como <b>Tuya</b>. El resto lo ajusta Administración.</p>` : "")}
       ${P.length ? `<p class="note">Van en orden y por horas (jornada de 8:30 a 17:30, almuerzo de 12:30 a 13:30): cada etapa empieza donde termina la anterior, salvo que elijas Mañana, Tarde u Hora exacta, o le fijes una fecha. Revisiones y entregas son hitos: eliges quién la recibe (equipo, cliente, agencia o externo), cuándo se entrega (fecha y hora) y, en las revisiones, cuánto tarda.</p>` : ""}
     </div><div id="et-gantt">${ganttHtml(k)}</div>${P.length && ed && window.pxpRepOpen ? `<div class="tt-act"><button type="button" class="linkbtn tt-btn" onclick="pxpRepOpen('tt','${ea(k)}')"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4M8 14h3M13 14h3M8 17h3"/></svg>Time table en PDF</button></div>` : ""}`;
   }
@@ -14195,7 +14225,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
         { const fin = plan(p).filter(x => objs.includes(x.e)).map(x => x.fin).filter(Boolean).sort().pop(); if (ent && fin && fin > ent && window.pxpToast) pxpToast("Ojo: con las etapas que ya había, algunas sugeridas terminan después de la entrega final."); }
         ultimaSug = { k, ids: objs, fase: v, ts: Date.now() };
         { const G = grpGet(); G[k + "|" + v] = 1; setPref(grpKey, JSON.stringify(G)); }
-        log(`${L.length} etapas sugeridas de ${faseL(v)} según el equipo`); struct = true; break; }
+        log(`${L.length} etapas sugeridas de ${faseL(v)} según el equipo`); closeMenu(); struct = true; break; }
       case "deshacerSug": {
         if (!ultimaSug || ultimaSug.k !== k) return; const n0 = E.length;
         ultimaSug.ids.forEach(o => { const j = E.indexOf(o); if (j >= 0) E.splice(j, 1); });
@@ -14219,10 +14249,12 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       case "down": if (i < E.length - 1) { [E[i + 1], E[i]] = [E[i], E[i + 1]]; struct = true; } break;
       case "move": if (v !== i && v >= 0 && v < E.length) { const [m] = E.splice(i, 1); E.splice(v, 0, m); struct = true; } break;
       case "del": if (confirmDel !== i) { confirmDel = i; refresh(k); return; } confirmDel = null; log(`Etapa "${nm(i)}" eliminada`); E.splice(i, 1); struct = true; break;
-      case "add": {   // v159 · se agrega al final de la fase elegida (Preproducción · Rodaje · Postproducción)
-        const f = PXP_FASES.some(z => z[0] === v) ? v : "post", rk = (x) => PXP_FASES.findIndex(z => z[0] === x);
+      case "add": {   // v159 · se agrega al final de la fase elegida · v165: "fase|tipo"
+        const [f0, c0] = String(v || "").split("|"), f = PXP_FASES.some(z => z[0] === f0) ? f0 : "post", rk = (x) => PXP_FASES.findIndex(z => z[0] === x);
         let at = E.findIndex(e => rk(pxpFaseEtapa(e)) > rk(f)); if (at < 0) at = E.length;
-        E.splice(at, 0, { nombre: "", estado: "pendiente", hp: 8, dias: 1, hpAuto: true, resp: "", nota: "", fase: f });
+        const ne = { nombre: "", estado: "pendiente", hp: 8, dias: 1, hpAuto: true, resp: "", nota: "", fase: f };
+        if (PXP_CLASES[c0] && c0 !== "proceso") { ne.clase = c0; ne.hp = pxpEstAuto(ne); ne.dias = Math.max(1, Math.ceil(ne.hp / 8)); }
+        E.splice(at, 0, ne);
         { const G = grpGet(); G[k + "|" + f] = 1; setPref(grpKey, JSON.stringify(G)); }
         closeMenu(); struct = true; focusId = "et-name-" + at; break; }
     }
@@ -14329,8 +14361,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       <div class="em-cls">${Object.entries(PXP_CLASES).map(([c, [l]]) => `<button type="button" role="menuitemradio" aria-checked="${c === cl}" class="em-c cl-${c}${c === cl ? " on" : ""}" onclick="pxpEt('clase',${i},'${c}')">${CLI[c]}<span>${l}</span></button>`).join("")}</div>
       ${e.clase ? `<button type="button" class="em-auto" onclick="pxpEt('clase',${i},'')">Volver a automático (según el nombre)</button>` : `<p class="em-note">Ahora es automático, según el nombre.</p>`}
       <div class="ep-h">Fase</div>
-      <div class="em-fs">${PXP_FASES.map(([f, l]) => `<button type="button" role="menuitemradio" aria-checked="${f === fa}" class="em-f${f === fa ? " on" : ""}" onclick="pxpEt('fase',${i},'${f}')">${l}</button>`).join("")}</div>
-      <div class="ep-h">Exigencia</div>${pesoOpts(i, e)}`;
+      <div class="em-fs">${PXP_FASES.map(([f, l]) => `<button type="button" role="menuitemradio" aria-checked="${f === fa}" class="em-f${f === fa ? " on" : ""}" onclick="pxpEt('fase',${i},'${f}')">${l}</button>`).join("")}</div>`;
     document.body.appendChild(menu); menu._t = Date.now();
     const r = btn.getBoundingClientRect(), H = menu.offsetHeight || 260;
     menu.style.left = Math.max(8, Math.min(r.left, innerWidth - 300)) + "px";
@@ -14358,12 +14389,28 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   };
   const colocar = () => { if (!menu || !menu._a) return; const btn = document.querySelector(`.et-row[data-i="${menu.dataset.i}"] .${menu._a.classList.contains("et-est") ? "et-est" : menu._a.classList.contains("pz") ? "pz" : menu._a.classList.contains("mi-h") ? "mi-h" : menu._a.classList.contains("mi-t") ? "mi-t" : "et-pick:not(.pz)"}`) || menu._a, r = btn.getBoundingClientRect(), H = menu.offsetHeight, W = menu.offsetWidth; menu.style.left = Math.max(8, Math.min(r.left, innerWidth - W - 8)) + "px"; menu.style.top = (r.bottom + 6 + H > innerHeight ? Math.max(8, r.top - 6 - H) : r.bottom + 6) + "px"; };
   // v159 · "+ Agregar etapa": primero se elige la fase
-  window.pxpEtAdd = function (btn) {
-    if (menu && menu.classList.contains("pk-add")) { closeMenu(); return; }
-    const FI = { pre: "<rect x='5' y='4' width='14' height='17' rx='2'/><path d='M9 4V3h6v1M9 10h6M9 14h6M9 18h3'/>", rodaje: "<path d='M3.5 10h17v9.5a1.5 1.5 0 0 1-1.5 1.5H5a1.5 1.5 0 0 1-1.5-1.5z'/><path d='m3.3 10-.6-3.3 15.8-3 .6 3.3z'/>", post: "<rect x='3.5' y='4.5' width='17' height='15' rx='2'/><path d='M8 4.5v15M16 4.5v15'/>" };
-    const SUB = { pre: "Brief, guion, pruebas, PPM", rodaje: "Set, DIT, dailies", post: "Edición, color, audio, entregas" };
-    abrir(btn, -1, "pk-add", `<div class="pk-h"><b>¿En qué fase va la etapa?</b></div><div class="pk-ops">${PXP_FASES.map(([f, l]) => `<button type="button" role="menuitem" class="pk-op fs-${f}" onclick="pxpEt('add',0,'${f}')">${SVG(FI[f])}<span><b>${l}</b><small>${SUB[f]}</small></span></button>`).join("")}</div>`);
+  // v165 · "+ Agregar etapa": se elige tipo y fase con el mismo lenguaje del menú de tipo; las sugerencias viven aquí
+  let addSel = null;
+  const SPARK = SVG("<path d='M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z'/><path d='M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z'/>");
+  function addHtml() {
+    const { cl, f } = addSel, CLv = PXP_CLASES[cl][0], FLv = faseL(f);
+    return `<div class="add-h"><b>Nueva etapa</b><small>Elige el tipo y la fase</small></div>
+      <div class="ep-h">Tipo</div>
+      <div class="em-cls">${Object.entries(PXP_CLASES).map(([c, [l]]) => `<button type="button" role="radio" aria-checked="${c === cl}" class="em-c cl-${c}${c === cl ? " on" : ""}" onclick="pxpEtAddSel('cl','${c}')">${CLI[c]}<span>${l}</span></button>`).join("")}</div>
+      <div class="ep-h">Fase</div>
+      <div class="em-fs">${PXP_FASES.map(([x, l]) => `<button type="button" role="radio" aria-checked="${x === f}" class="em-f fs-${x}${x === f ? " on" : ""}" onclick="pxpEtAddSel('f','${x}')">${l}</button>`).join("")}</div>
+      <button type="button" class="ficha-save add-go" onclick="pxpEt('add',0,'${f}|${cl}')">+ Agregar ${CLv.toLowerCase()} a ${FLv}</button>
+      <div class="add-sg"><div class="add-sg-h">${SPARK}<b>Sugerir etapas típicas</b></div><p class="em-note">Según quién está en el proyecto. Cada toque propone otra combinación.</p>
+        <div class="em-fs sg">${PXP_FASES.map(([x, l]) => `<button type="button" class="em-f" onclick="pxpEt('sugerir',0,'${x}')">${l}</button>`).join("")}</div></div>`;
+  }
+  window.pxpEtAdd = function (btn, fase) {
+    if (menu && menu.classList.contains("pk-add") && menu._a === btn) { closeMenu(); return; }
+    const w = $("et-wrap"); if (!w) return; const P = plan(getProjectDisplay(w.dataset.k));
+    const nx = P.find(x => x.e.estado !== "listo") || P[P.length - 1];
+    addSel = { cl: (addSel && addSel.cl) || "proceso", f: fase || (nx ? pxpFaseEtapa(nx.e) : "pre") };
+    abrir(btn, -1, "pk-add", addHtml());
   };
+  window.pxpEtAddSel = function (a, v) { if (!addSel || !menu) return; addSel[a] = v; menu.innerHTML = addHtml(); colocar(); };
   window.pxpEtPickClose = () => closeMenu();
   window.pxpEtPick = function (kind, i, btn) {
     if (menu && menu.dataset.i === String(i) && menu.classList.contains("pk-" + kind)) { closeMenu(); return; }
@@ -14393,7 +14440,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     if (!keep) { closeMenu(); return; }
     setTimeout(() => { if (menu && menu.classList.contains("pk-fr")) { menu.innerHTML = frHtml(i); colocar(); } }, 30);
   };
-  document.addEventListener("pointerdown", (e) => { if (menu && !menu.contains(e.target) && !(e.target.closest && e.target.closest(".et-cls,.et-pick,.et-addb,.et-est"))) closeMenu(); }, true);
+  document.addEventListener("pointerdown", (e) => { if (menu && !menu.contains(e.target) && !(e.target.closest && e.target.closest(".et-cls,.et-pick,.et-addb,.et-addb2,.et-gadd,.et-est"))) closeMenu(); }, true);
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && menu) { e.stopImmediatePropagation(); closeMenu(); } }, true);
   document.addEventListener("scroll", (e) => { if (menu && !menu.contains(e.target) && Date.now() - (menu._t || 0) > 350) closeMenu(); }, true);
   document.addEventListener("pointerdown", (e) => { if (pop && !pop.contains(e.target) && !(e.target.closest && e.target.closest(".et-who"))) closePop(); }, true);
@@ -19643,8 +19690,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
         <div class="cr-row cr-h"><div class="cr-l">${many ? `<small class="cr-cnt">${vis.length} filas</small>` : ""}</div><div class="cr-t">${ticks}${iniH}${finH}${nowH}</div></div>
         <div class="cr-body"><div class="cr-in"><div class="cr-bg"><div class="cr-l"></div><div class="cr-t">${cols}${ini}${fin}${now}</div></div>${body || `<p class="cr-empty">${esc(opts.empty || "Nada programado en este periodo.")}</p>`}</div></div>
       </div>
-      ${vis.some(r => r.g) ? `<div class="cr-leg cr-gl">${[["pre", "Preproducción"], ["rodaje", "Rodaje"], ["post", "Postproducción"]].filter(([g]) => vis.some(r => r.g === g)).map(([g, l]) => `<span class="cr-gleg cr-row g-${g}"><i></i>${l}</span>`).join("")}</div>` : ""}
-      <div class="cr-leg">${[["pendiente", "Pendiente"], ["en_curso", "En curso"], ["revision", "Ajustes · revisión"], ["bloqueada", "Bloqueada"], ["listo", "Listo"], ["late", "Vencida"]].map(([k, l]) => `<span class="lg ${k}"><i></i>${l}</span>`).join("")}${hayFr && (E === "w" || E === "m") ? `<span class="lg am"><i></i>Mañana</span><span class="lg pm"><i></i>Tarde</span>` : ""}${iniIn ? `<span class="lg ini"><i></i>Inicio del proyecto</span>` : ""}${finIn ? `<span class="lg fin"><i></i>Entrega final${opts.finEst ? " (estimada)" : ""}</span>` : ""}${opts.leg || ""}</div>
+      <div class="cr-leg">${vis.some(r => r.g) ? [["pre", "Preproducción"], ["rodaje", "Rodaje"], ["post", "Postproducción"]].filter(([g]) => vis.some(r => r.g === g)).map(([g, l]) => `<span class="cr-gleg cr-row g-${g}"><i></i>${l}</span>`).join("") + `<i class="cr-sep" aria-hidden="true"></i>` : ""}${[["pendiente", "Pendiente"], ["en_curso", "En curso"], ["revision", "Ajustes · revisión"], ["bloqueada", "Bloqueada"], ["listo", "Listo"], ["late", "Vencida"]].map(([k, l]) => `<span class="lg ${k}"><i></i>${l}</span>`).join("")}${hayFr && (E === "w" || E === "m") ? `<span class="lg am"><i></i>Mañana</span><span class="lg pm"><i></i>Tarde</span>` : ""}${iniIn ? `<span class="lg ini"><i></i>Inicio del proyecto</span>` : ""}${finIn ? `<span class="lg fin"><i></i>Entrega final${opts.finEst ? " (estimada)" : ""}</span>` : ""}${opts.leg || ""}</div>
     </div>`;
   }
 
@@ -19815,12 +19861,12 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   // Se guardan en piezasDet: { hero:true } es la pieza madre; { deriv:"Reducción" } son las que salen de ella.
   // Las piezas antiguas (sin hero ni deriv) se muestran como "Otras piezas" y pueden convertirse en Hero.
   const TIPOS_P = ["TV", "Digital", "Social", "DOOH / OOH", "Print", "Otro"];
-  const CLASES = ["Reducción", "Reformato", "Cutdown", "Bumper", "Variación", "Sin legales", "Director's Cut"];
+  const CLASES = ["Reducción", "Adaptación de formato", "Adaptación de región", "Cutdown", "Bumper", "Variación", "Sin legales", "Director's Cut"];
   // v164 · Otras piezas (no dependen del Hero) y valores típicos de duración y formato
   const TIPOS_O = ["TV", "Digital", "Social", "DOOH / OOH", "Print", "Key visual", "Banner", "Spot de radio", "Foto", "Otro"];
   const T_IC = { "TV": "M3.5 6.5h17v11h-17zM9 20.5h6", "Digital": "M4 5.5h16v10H4zM2.5 18.5h19", "Social": "M7.5 3.5h9v17h-9zM11 17.5h2", "DOOH / OOH": "M4 4.5h16v9H4zM12 13.5v7M8 20.5h8", "Print": "M6 3.5h9l3 3v14H6zM9 11h6M9 15h6", "Key visual": "M4 4.5h16v15H4zM4 15l5-5 4 4 2.5-2.5L20 15", "Banner": "M3.5 8.5h17v7h-17z", "Spot de radio": "M12 3.5a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0v-5a3 3 0 0 1 3-3zM6 11a6 6 0 0 0 12 0M12 17v3.5", "Foto": "M4 7.5h3l2-2.5h6l2 2.5h3v12H4zM12 16.5a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4z", "Otro": "M12 5v14M5 12h14" };
   const QUICK = { dur: ["6s", "10s", "15s", "20s", "30s", "45s", "60s", "90s", "2 min"], formato: ["16:9", "9:16", "1:1", "4:5", "4:3", "21:9", "2:3"] };
-  const CL_IC = { "Variación": "M4 7h3l10 10h3M4 17h3L17 7h3M18 4.5 20.5 7 18 9.5M18 14.5l2.5 2.5-2.5 2.5", "Reducción": "M5 12h14M9 8l-4 4 4 4", "Reformato": "M7 4h10v16H7zM4 9h3M17 9h3", "Cutdown": "M6 6l12 12M6 18L18 6", "Bumper": "M4 12h3l2-5 3 10 2-5h6", "Sin legales": "M5 5l14 14M8 4h8l3 3v8", "Director's Cut": "M4 8h16v11H4zM4 8l3-4h3l-3 4M11 8l3-4h3l-3 4" };
+  const CL_IC = { "Variación": "M4 7h3l10 10h3M4 17h3L17 7h3M18 4.5 20.5 7 18 9.5M18 14.5l2.5 2.5-2.5 2.5", "Reducción": "M5 12h14M9 8l-4 4 4 4", "Adaptación de formato": "M7 4h10v16H7zM4 9h3M17 9h3", "Adaptación de región": "M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17zM3.5 12h17M12 3.5c2.5 2.4 3.6 5.2 3.6 8.5s-1.1 6.1-3.6 8.5c-2.5-2.4-3.6-5.2-3.6-8.5s1.1-6.1 3.6-8.5z", "Cutdown": "M6 6l12 12M6 18L18 6", "Bumper": "M4 12h3l2-5 3 10 2-5h6", "Sin legales": "M5 5l14 14M8 4h8l3 3v8", "Director's Cut": "M4 8h16v11H4zM4 8l3-4h3l-3 4M11 8l3-4h3l-3 4" };
   const ic = (d) => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="${d}"/></svg>`;
   window.pxpPiezasResumen = function (p) {
     const det = (p && p.piezasDet) || [], h = det.find(x => x.hero), dv = det.filter(x => x.deriv), ot = det.filter(x => !x.hero && !x.deriv);
@@ -19840,6 +19886,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
         ${sel(R.hero, "tipo", R.hero.tipo || "TV", T_IC[R.hero.tipo] || T_IC.TV)}
         ${inp(R.hero, "dur", "Duración", "Duración del Hero")}${inp(R.hero, "formato", "Formato", "Formato del Hero")}${del(R.hero)}</div>`
       : `<div class="hd-empty">${ed ? `<button type="button" class="pd-addb hero" onclick="pxpHD('${K}','hero')">${ic("M12 3l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.8z")}Definir la pieza Hero</button>` : ""}<p class="note">La Hero es la pieza principal; reducciones, reformatos y variaciones salen de ella.</p></div>`;
+    R.der.forEach(x => { if (x.deriv === "Reformato") x.deriv = "Adaptación de formato"; });
     const ders = R.der.map(x => `<div class="hd-der"><span class="hd-ln" aria-hidden="true"></span>
         ${sel(x, "deriv", x.deriv, CL_IC[x.deriv] || CL_IC["Reducción"])}${cant(x)}${inp(x, "dur", "Duración", "Duración")}${inp(x, "formato", "Formato", "Formato")}${del(x)}</div>`).join("");
     const otras = R.otras.length ? `<div class="hd-ot"><span class="hd-st">Otras piezas <small>no dependen del Hero</small></span>${R.otras.map(x => `<div class="hd-der hd-o2">${sel(x, "tipo", x.tipo || "Pieza", T_IC[x.tipo] || T_IC.Otro)}${cant(x)}${inp(x, "dur", "Duración", "Duración")}${inp(x, "formato", "Formato", "Formato")}${del(x)}</div>`).join("")}</div>` : "";
@@ -19879,7 +19926,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const p = PROJECTS[k] = PROJECTS[k] || blankProject(k), det = p.piezasDet = p.piezasDet || [], x = det[i];
     const log = (t) => { p.historial = p.historial || []; p.historial.push({ ts: new Date().toISOString(), usuario: currentUser, texto: t, tipo: "cambio" }); };
     if (a === "hero") { if (det.some(z => z.hero)) return; det.unshift({ hero: true, tipo: "TV", cant: 1, dur: "", formato: "" }); log("Pieza Hero definida"); }
-    else if (a === "mkhero") { if (!x || det.some(z => z.hero)) return; x.hero = true; const extra = (+x.cant || 1) - 1; x.cant = 1; det.splice(i, 1); det.unshift(x); if (extra > 0) det.push({ deriv: "Reformato", tipo: "Reformato", cant: extra, dur: x.dur || "", formato: "" }); log("Pieza Hero definida"); }
+    else if (a === "mkhero") { if (!x || det.some(z => z.hero)) return; x.hero = true; const extra = (+x.cant || 1) - 1; x.cant = 1; det.splice(i, 1); det.unshift(x); if (extra > 0) det.push({ deriv: "Adaptación de formato", tipo: "Adaptación de formato", cant: extra, dur: x.dur || "", formato: "" }); log("Pieza Hero definida"); }
     else if (a === "der") { if (!det.some(z => z.hero)) return; det.push({ deriv: "Reducción", tipo: "Reducción", cant: 1, dur: "", formato: "" }); }
     else if (a === "otra") { det.push({ tipo: "Digital", cant: 1, dur: "", formato: "" }); log("Pieza agregada (sin depender del Hero)"); }
     else if (a === "del") { if (!x) return; det.splice(i, 1); log(x.hero ? "Pieza Hero quitada" : `Pieza quitada (${x.deriv || x.tipo || "pieza"})`); }
@@ -20205,6 +20252,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   "use strict";
   function normalizar() {
     let n = 0;
+    // v165 · La derivada "Reformato" ahora se llama "Adaptación de formato"
+    Object.values(PROJECTS || {}).forEach(p => (p && p.piezasDet || []).forEach(x => { if (x.deriv === "Reformato") { x.deriv = "Adaptación de formato"; if (x.tipo === "Reformato") x.tipo = x.deriv; n++; } }));
     // v163 · Versiones anteriores podían guardar el color del cliente en "color" (que es el colorista): se mueve a colorHex
     Object.values(PROJECTS || {}).forEach(p => { if (p && typeof p.color === "string" && /^(#[0-9a-f]{3,8}|var\(|hsl|rgb)/i.test(p.color.trim())) { if (/^#[0-9a-f]{6}$/i.test(p.color) && !p.colorHex) p.colorHex = p.color; delete p.color; n++; } });
     Object.values(PROJECTS || {}).forEach(p => {

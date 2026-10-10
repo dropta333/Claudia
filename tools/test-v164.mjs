@@ -18,10 +18,10 @@ check("sin nombres de quién registró en la casilla", !r0.who && /Andrea/.test(
 check("estimado al lado de lo registrado", r0.par);
 // 2 · hitos
 const iRev = await page.evaluate(() => +document.querySelector(".et-row.mini.cl-revision").dataset.i);
-check("revisión con 4 estados", (await page.$$eval(`.et-row[data-i="${iRev}"] .mi-s`, x => x.map(b => b.textContent.trim()))).join("|").startsWith("Pendiente|Revisado|Solicitud de ajustes"));
-check("entrega dice Entregado", (await page.$$eval(".et-row.mini.cl-entrega .mi-s", x => x.map(b => b.textContent.trim()))).includes("Entregado"));
+check("revisión con 4 estados", (await page.$$eval(`.et-row[data-i="${iRev}"] .mi-sts2 .et-sb`, x => x.map(b => b.getAttribute("aria-label")))).join("|").startsWith("Pendiente|Revisado|Solicitud de ajustes"));
+check("entrega dice Entregado", (await page.$$eval(".et-row.mini.cl-entrega .mi-sts2 .et-sb", x => x.map(b => b.getAttribute("aria-label")))).includes("Entregado"));
 check("hitos sin fecha de inicio ni registro de horas", await page.$$eval(".et-row.mini", L => L.every(li => !li.querySelector(".hq") && !li.querySelector(".et-end") && /Se entrega/.test(li.textContent))));
-await page.click(`.et-row[data-i="${iRev}"] .mi-s:nth-child(3)`); await page.waitForTimeout(400);
+await page.click(`.et-row[data-i="${iRev}"] .mi-sts2 .et-sb:nth-child(3)`); await page.waitForTimeout(400);
 check("Solicitud de ajustes = estado ajustes", await page.evaluate(([k, i]) => PROJECTS[k].etapas[i].estado === "ajustes", [K, iRev]));
 check("aparecen imagen, documento y enlace", await page.$$eval(`.et-row[data-i="${iRev}"] .aj-b`, x => x.length) === 3);
 await page.click(`.et-row[data-i="${iRev}"] .aj-b:nth-child(3)`); await page.waitForTimeout(200);
@@ -43,7 +43,7 @@ check("externos no suman en la capacidad", await page.evaluate(() => !TEAM.some(
 await page.keyboard.press("Escape");
 await page.locator("#et-wrap").screenshot({ path: shots + "/t164-etapas.png" });
 // 3 · cronograma con grupos
-check("cronograma marca el grupo de cada etapa", await page.$$eval("#pxp-proj .cr-row.g-post", x => x.length) > 0 && await page.$("#pxp-proj .cr-gl") !== null);
+check("cronograma marca el grupo de cada etapa y la leyenda va en una fila", await page.$$eval("#pxp-proj .cr-row.g-post", x => x.length) > 0 && await page.$$eval("#pxp-proj .cr-leg", L => L.length === 1 && !!L[0].querySelector(".cr-gleg") && !!L[0].querySelector(".lg")));
 // 4 · cabecera
 check("lápiz Editar junto al cliente", await page.$("#pxp-proj .pj-sub .pj-edit") !== null);
 check("imagen sin pisar la flor", await page.evaluate(() => { const a = document.querySelector(".pj-ban-act").getBoundingClientRect(), f = document.querySelector(".pj-flor").getBoundingClientRect(); return a.right <= f.left + 1 || a.bottom <= f.top; }));
@@ -59,12 +59,23 @@ const h0 = await page.evaluate(() => document.querySelector("#pxp-proj .cfg-sum"
 await page.click("#pxp-proj .cfg-col .cfg-f:nth-child(2) .cfg-b"); await page.waitForTimeout(400);
 const h1 = await page.evaluate(() => document.querySelector("#pxp-proj .cfg-sum").getBoundingClientRect().height);
 check("la ficha no cambia de alto al abrir un desplegable", Math.abs(h1 - h0) < 2);
+// v165 · agregar etapa con tipo y fase; tipo sin exigencia
+await page.click(".et-addb2"); await page.waitForTimeout(250);
+check("menú de agregar con tipo, fase y sugerencias", await page.$$eval(".pk-add .em-c", x => x.length) === 3 && await page.$$eval(".pk-add .add-sg .em-f", x => x.length) === 3);
+const nA = await page.evaluate(k => PROJECTS[k].etapas.length, K);
+await page.click(".pk-add .em-c.cl-revision"); await page.waitForTimeout(150); await page.click(".pk-add .em-f.fs-post"); await page.waitForTimeout(150); await page.click(".pk-add .add-go"); await page.waitForTimeout(400);
+check("agrega una revisión en Postproducción", await page.evaluate(([k, n]) => { const E = PROJECTS[k].etapas; return E.length === n + 1 && E.some(e => !e.nombre && e.clase === "revision" && e.fase === "post"); }, [K, nA]));
+await page.click(".et-row .et-cls >> nth=0"); await page.waitForTimeout(250);
+check("menú de tipo sin exigencia", !(await page.$(".et-menu .pz-dot")));
+await page.keyboard.press("Escape");
+check("sin barra de sugerencias suelta", !(await page.$("#et-wrap .sg-bar")));
 // 6 · piezas
 await page.evaluate(k => { PROJECTS[k].piezasDet = [{ hero: true, tipo: "TV", cant: 1 }]; pxpCfg("pd"); }, K); await page.waitForTimeout(400);
 await page.click("#pxp-proj .pd-addb:has-text('Otra pieza')"); await page.waitForTimeout(400);
 check("otra pieza sin depender del Hero", await page.evaluate(k => PROJECTS[k].piezasDet.some(x => !x.hero && !x.deriv), K));
 await page.click("#pxp-proj .pd-addb:has-text('Derivada')"); await page.waitForTimeout(400);
 await page.click("#pxp-proj .hd-tree .pd-sel"); await page.waitForTimeout(250);
+check("derivadas con adaptación de formato y de región", await page.$$eval(".pd-menu .pd-op", x => x.map(b => b.textContent.trim()).join("|")).then(t => /Adaptación de formato/.test(t) && /Adaptación de región/.test(t) && !/Reformato/.test(t)));
 await page.click(".pd-menu .pd-op:has-text('Variación')"); await page.waitForTimeout(400);
 check("derivada Variación", await page.evaluate(k => PROJECTS[k].piezasDet.some(x => x.deriv === "Variación"), K));
 await page.click("#pxp-proj .hd-hero .pd-in >> nth=0"); await page.waitForTimeout(250);

@@ -56,7 +56,7 @@ check("revisión: 4 h y liviana", eR.e.hp === 4 && eR.t === "liviana");
 check("revisión: fila compacta", await page.$(`.et-row.mini[data-i="${idxR}"]`) !== null);
 // 4 · sugerir por fase (un clic) y deshacer
 const antes = await page.evaluate(k => PROJECTS[k].etapas.length, K);
-await page.click('.sg-c:nth-of-type(2)'); await page.waitForTimeout(500);
+await page.click('.et-addb2'); await page.waitForTimeout(250); await page.click('.add-sg .em-f:nth-child(2)'); await page.waitForTimeout(500);
 const despues = await page.evaluate(k => PROJECTS[k].etapas.length, K);
 check("sugerir Rodaje agrega etapas", despues > antes);
 const sug = await page.evaluate(k => PROJECTS[k].etapas.filter(e => e.fase === "rodaje").map(e => pxpResps(e)), K);
@@ -68,7 +68,7 @@ check("sugeridas no empiezan en el pasado", fechas.every(f => f >= hoyIso));
 check("grupo Rodaje visible", await page.$('.et-grp[data-f="rodaje"]') !== null);
 await page.click('.sg-undo .linkbtn'); await page.waitForTimeout(500);
 check("deshacer quita las sugeridas", await page.evaluate(k => PROJECTS[k].etapas.length, K) === antes);
-await page.click('.sg-c:nth-of-type(3)'); await page.waitForTimeout(500);
+await page.click('.et-addb2'); await page.waitForTimeout(250); await page.click('.add-sg .em-f:nth-child(3)'); await page.waitForTimeout(500);
 await page.locator("#et-wrap").screenshot({ path: shots + "/t-et.png" });
 // bloqueador sugerido en una revisión en curso
 const iRev = await page.evaluate(k => PROJECTS[k].etapas.findIndex(e => pxpClaseEtapa(e) === "revision" && e.estado !== "listo"), K);
@@ -93,11 +93,11 @@ check("inicio guardado", await page.evaluate(k => PROJECTS[k].fechaInicio === "2
 check("KPI de inicio primero", await page.$eval("#pxp-proj .pj-kpis > :first-child", d => d.classList.contains("pj-ini")));
 // v159 · agregar etapa eligiendo la fase, botones del cronograma a la derecha y sin scroll horizontal
 const nAntes = await page.evaluate(k => PROJECTS[k].etapas.length, K);
-await page.click(".et-addb"); await page.waitForTimeout(250);
-await page.click(".pk-add .pk-op.fs-rodaje"); await page.waitForTimeout(400);
+await page.click(".et-addb2"); await page.waitForTimeout(250);
+await page.click(".pk-add .em-f.fs-rodaje"); await page.waitForTimeout(200); await page.click(".pk-add .add-go"); await page.waitForTimeout(400);
 const nueva = await page.evaluate(([k, n]) => { const E = PROJECTS[k].etapas; return E.length === n + 1 ? E.find(e => !e.nombre && e.fase === "rodaje") : null; }, [K, nAntes]);
 check("agregar etapa en Rodaje", !!nueva);
-await page.click('.et-grp[data-f="pre"] .et-gadd'); await page.waitForTimeout(400);
+await page.click('.et-grp[data-f="pre"] .et-gadd'); await page.waitForTimeout(250); await page.click(".pk-add .add-go"); await page.waitForTimeout(400);
 check("agregar desde el grupo Preproducción", await page.evaluate(k => PROJECTS[k].etapas.filter(e => !e.nombre && e.fase === "pre").length === 1, K));
 for (const m of ["Todo", "Mes"]) {
   await page.click(`#et-gantt .cr-seg button:has-text("${m}")`); await page.waitForTimeout(300);

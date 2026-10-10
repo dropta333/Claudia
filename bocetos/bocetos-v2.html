@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Time table v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Barlow:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#17171C;--muted:#6B6B76;--line:#E4E4EA;--card:#F6F6F9;--violet:#624AFF;--lime:#F3FF57;--band:#0B0B0F;
+  --pre:#1FB58F;--rod:#FB8847;--post:#624AFF;--rev:#1E88E5;--aj:#E5483A;--ent:#E0A100;--bg:#E9E9EE;--txt:#17171C}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121216;--txt:#EDEDF2}}
+:root[data-theme="dark"]{--bg:#121216;--txt:#EDEDF2}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font:400 15px/1.45 Barlow,system-ui,sans-serif;padding:32px 16px 64px}
+.wrap{max-width:1180px;margin:0 auto}
+h1{font:800 34px/1 "Barlow Condensed",sans-serif;text-transform:uppercase;margin:0 0 6px}
+.intro{color:color-mix(in srgb,var(--txt) 70%,transparent);max-width:780px;margin:0 0 28px}
+.dir{margin:0 0 44px}
+.dir-h{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+.dir-h b{font:800 13px/1 "Barlow Condensed";letter-spacing:.16em;text-transform:uppercase;padding:6px 10px;border-radius:99px;background:var(--txt);color:var(--bg)}
+.dir-h h2{font:700 26px/1 "Barlow Condensed";text-transform:uppercase;margin:0}
+.dir-h p{margin:0;color:color-mix(in srgb,var(--txt) 65%,transparent);flex-basis:100%}
+.sheet-wrap{width:100%;overflow:hidden;border-radius:6px;box-shadow:0 20px 50px rgba(0,0,0,.18)}
+.sheet{width:1123px;height:794px;transform-origin:0 0;position:relative;overflow:hidden;background:#fff;color:var(--ink);font-family:Barlow}
+
+/* ── Cabecera común (la del póster oscuro) ── */
+.top{position:absolute;left:0;right:0;top:0;height:148px;background:var(--band);color:#fff;padding:24px 36px 0;display:grid;grid-template-columns:330px 1fr 190px;gap:28px}
+.top::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:3px;background:linear-gradient(90deg,var(--lime) 0 110px,var(--violet) 110px)}
+.kick{font:700 10.5px/1 "Barlow Condensed";letter-spacing:.22em;color:var(--lime);text-transform:uppercase}
+.ttl{font:900 38px/.9 Barlow;letter-spacing:-.02em;text-transform:uppercase;margin:12px 0 9px}
+.cli{display:inline-flex;align-items:center;gap:7px;font:600 11.5px Barlow;color:#C9C9D3}
+.cli i{width:9px;height:9px;border-radius:50%;background:var(--c)}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:9px 26px;align-content:start;padding-top:2px;border-left:1px solid #26262E;padding-left:26px}
+.meta div{min-width:0}
+.meta small{display:block;font:600 8.5px/1 "Barlow Condensed";letter-spacing:.18em;text-transform:uppercase;color:#8A8A96}
+.meta b{display:block;font:600 12px/1.25 Barlow;color:#fff;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta .wide{grid-column:1/-1}
+.meta .wide b{color:var(--lime)}
+.rng{text-align:right;display:flex;flex-direction:column;align-items:flex-end}
+.rng small{font:600 8.5px/1 "Barlow Condensed";letter-spacing:.18em;text-transform:uppercase;color:#8A8A96}
+.rng b{font:800 26px/1 "Barlow Condensed";margin-top:5px;letter-spacing:.01em}
+.rng b em{font-style:normal;color:var(--lime)}
+.rng .pp{margin-top:auto;margin-bottom:18px;font:800 12px/1 "Barlow Condensed";letter-spacing:.26em;color:#fff;opacity:.9}
+.foot{position:absolute;left:36px;right:36px;bottom:18px;display:flex;align-items:center;gap:14px;border-top:1px solid var(--line);padding-top:9px;font:500 9.5px Barlow;color:var(--muted)}
+.foot .leg{display:flex;gap:12px;align-items:center;flex-wrap:nowrap}
+.foot .leg span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.foot .leg i{width:14px;height:8px;border-radius:2.5px;background:var(--c)}
+.foot .leg i.o{background:#fff;border:1.6px solid var(--c)}
+.foot .leg i.d{width:9px;height:9px;transform:rotate(45deg);border-radius:2px}
+.foot .leg i.h{background:repeating-linear-gradient(135deg,#C9C9D2 0 2px,#fff 2px 4px);border:1px solid #D5D5DD}
+.foot .sep{width:1px;height:12px;background:var(--line)}
+.foot .pg{margin-left:auto;white-space:nowrap}
+
+/* ── Vista Gantt ── */
+.G .grid{position:absolute;left:36px;right:36px;top:170px;bottom:56px}
+.G .hd{display:grid;grid-template-columns:220px 1fr;height:34px;border-bottom:1.2px solid var(--ink)}
+.G .days{position:relative}
+.G .day{position:absolute;top:0;bottom:0;font:600 8.5px/1 "Barlow Condensed";color:var(--muted);text-align:center;padding-top:5px}
+.G .day b{display:block;font:700 13px/1 "Barlow Condensed";color:var(--ink);margin-top:3px}
+.G .day.we b{color:#B9B9C2}
+.G .day.today b{color:#fff;background:var(--violet);border-radius:99px;width:21px;height:17px;line-height:17px;margin:2px auto 0}
+.G .body{position:absolute;top:34px;left:0;right:0;bottom:0}
+.G .cols{position:absolute;left:220px;right:0;top:0;bottom:0}
+.G .col{position:absolute;top:0;bottom:0;border-left:1px solid var(--line)}
+.G .col.we{background:repeating-linear-gradient(135deg,#F3F3F6 0 4px,#fff 4px 8px)}
+.G .col.fe{background:repeating-linear-gradient(135deg,#ECECF1 0 3px,#fff 3px 6px)}
+.G .todayln{position:absolute;top:-34px;bottom:0;border-left:1.5px solid var(--violet)}
+.G .ph{display:grid;grid-template-columns:220px 1fr;height:20px;align-items:center}
+.G .ph span{font:800 10px/1 "Barlow Condensed";letter-spacing:.16em;text-transform:uppercase;display:flex;align-items:center;gap:7px}
+.G .ph span i{width:9px;height:9px;border-radius:2px;background:var(--c)}
+.G .ph small{font:500 9px Barlow;letter-spacing:0;text-transform:none;color:var(--muted)}
+.G .row{display:grid;grid-template-columns:220px 1fr;height:27px;align-items:center;position:relative;border-top:1px solid var(--line)}
+.G .row.g-pre{background:rgba(23,23,28,.018)}.G .row.g-rod{background:rgba(23,23,28,.04)}.G .row.g-post{background:rgba(23,23,28,.065)}
+.G .nm{display:flex;align-items:center;gap:8px;padding-left:10px;min-width:0;box-shadow:inset 3px 0 0 var(--c);height:100%}
+.G .nm em{font:600 8.5px/1 "Barlow Condensed";color:var(--muted);font-style:normal;width:13px}
+.G .nm div{min-width:0}
+.G .nm b{display:block;font:600 11px/1.1 Barlow;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.G .nm small{display:block;font:400 8.5px/1.15 Barlow;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.G .bar{position:absolute;height:14px;top:6px;border-radius:4px;background:var(--c);display:flex;align-items:center;padding:0 5px;font:700 8.5px/1 "Barlow Condensed";color:#fff;white-space:nowrap;overflow:hidden}
+.G .bar.done{background:color-mix(in srgb,var(--c) 30%,#fff);color:var(--ink)}
+.G .bar.aj{background:#fff;border:1.5px solid var(--aj);color:var(--aj)}
+.G .ms{position:absolute;top:6px;display:flex;align-items:center;gap:5px;font:600 9px/1 Barlow;white-space:nowrap}
+.G .ms i{width:12px;height:12px;transform:rotate(45deg);border-radius:2px;background:var(--c);flex:none;margin-left:-6px}
+.G .ms.rev i{background:#fff;border:2.2px solid var(--c)}
+.G .ms.fin i{width:15px;height:15px;margin-left:-7.5px;box-shadow:0 0 0 2px #fff,0 0 0 3.2px var(--c)}
+.G .ms .hr{font:700 8.5px/1 "Barlow Condensed";color:var(--muted)}
+.G .ms.l{flex-direction:row-reverse;transform:translateX(-100%)}.G .ms.l i{margin:0 -6px 0 0}
+
+/* ── Vista Calendario ── */
+.C .cal{position:absolute;left:36px;right:36px;top:166px;bottom:52px;display:grid;grid-template-rows:24px repeat(7,1fr)}
+.C .wd{display:grid;grid-template-columns:repeat(5,1fr) .5fr .5fr;border-bottom:1.2px solid var(--ink)}
+.C .wd span{font:700 9.5px/24px "Barlow Condensed";letter-spacing:.18em;text-transform:uppercase;color:var(--muted);padding-left:8px}
+.C .wk{display:grid;grid-template-columns:repeat(5,1fr) .5fr .5fr;border-bottom:1px solid var(--line);min-height:0}
+.C .d{position:relative;border-left:1px solid var(--line);padding:18px 5px 4px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.C .d:first-child{border-left:0}
+.C .d.we{background:#F7F7FA}
+.C .d.fe{background:repeating-linear-gradient(135deg,#F1F1F5 0 4px,#fff 4px 8px)}
+.C .d.out .n{color:#C3C3CC}
+.C .n{position:absolute;top:5px;left:6px;font:700 11px/1 "Barlow Condensed";color:var(--ink);display:flex;gap:5px;align-items:center}
+.C .n em{font-style:normal;font:800 8.5px/1 "Barlow Condensed";letter-spacing:.12em;text-transform:uppercase;padding:2px 5px;border-radius:3px;background:var(--ink);color:#fff}
+.C .d.today .n b{background:var(--violet);color:#fff;border-radius:99px;padding:2px 6px;margin:-2px 0 0 -3px}
+.C .fe-l{position:absolute;inset:0;display:grid;place-items:center;font:700 9px/1 "Barlow Condensed";letter-spacing:.2em;text-transform:uppercase;color:#9A9AA6}
+.C .ev{border-radius:5px;padding:4px 6px 4px 7px;font:600 9px/1.15 Barlow;color:var(--ink);background:color-mix(in srgb,var(--c) 13%,#fff);box-shadow:inset 2.5px 0 0 var(--c);display:flex;gap:5px;align-items:flex-start;min-height:0;overflow:hidden}
+.C .ev small{font:700 8px/1.15 "Barlow Condensed";color:var(--muted);letter-spacing:.04em;flex:none;padding-top:.5px}
+.C .ev.full{flex:1}
+.C .ev.rev{background:#fff;box-shadow:inset 0 0 0 1.2px color-mix(in srgb,var(--c) 70%,#fff),inset 2.5px 0 0 var(--c)}
+.C .ev.aj{background:#fff;color:var(--aj);box-shadow:inset 0 0 0 1.2px color-mix(in srgb,var(--aj) 45%,#fff),inset 2.5px 0 0 var(--aj)}
+.C .ev.ent{background:color-mix(in srgb,var(--ent) 22%,#fff);box-shadow:inset 2.5px 0 0 var(--ent)}
+.C .ev.fin{background:var(--ink);color:#fff;box-shadow:inset 3px 0 0 var(--lime);font-weight:700}
+.C .ev.fin small{color:var(--lime)}
+.C .ev .ic{width:7px;height:7px;transform:rotate(45deg);border-radius:1.5px;background:var(--c);flex:none;margin-top:2px}
+.C .ev.rev .ic{background:#fff;border:1.6px solid var(--c)}
+.C .ev.fin .ic{background:var(--lime)}
+
+/* ── Panel ── */
+.tool{display:grid;grid-template-columns:300px 1fr;border-radius:18px;overflow:hidden;background:#fff;color:var(--ink);box-shadow:0 20px 50px rgba(0,0,0,.18)}
+.cfgp{padding:20px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:12px;background:#FAFAFC}
+.cfgp h3{margin:0;font:900 22px/1 Barlow;text-transform:uppercase;letter-spacing:-.01em}
+.cf{border:1px solid var(--line);border-radius:12px;background:#fff;padding:10px 12px}
+.cf small{display:block;font:600 10.5px/1 "Barlow Condensed";letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.seg{display:flex;background:var(--card);border-radius:99px;padding:2px}
+.seg span{flex:1;text-align:center;font:600 12.5px/1 Barlow;padding:7px 6px;border-radius:99px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:5px}
+.seg span.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.views{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.views div{border:1px solid var(--line);border-radius:10px;padding:8px;text-align:center;font:600 12.5px Barlow}
+.views div.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.views svg{display:block;margin:0 auto 5px;width:56px;height:34px}
+.gen{margin-top:auto;background:var(--lime);border-radius:99px;text-align:center;font:700 14px Barlow;padding:11px}
+.pv{position:relative;background:repeating-conic-gradient(#EFEFF3 0 25%,#F7F7FA 0 50%) 0 0/22px 22px;min-height:470px;overflow:hidden}
+.pv .mini{position:absolute;left:50%;top:50%;transform-origin:center;transform:translate(-50%,-54%) scale(.4);box-shadow:0 18px 40px rgba(0,0,0,.25)}
+.zb{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);display:flex;align-items:center;gap:2px;background:#17171C;color:#fff;border-radius:99px;padding:4px;font:600 12.5px Barlow;z-index:2}
+.zb span{padding:7px 12px;border-radius:99px}.zb span.on{background:#2C2C36}.zb em{font-style:normal;padding:0 8px;color:var(--lime);font-weight:700}
+@media (max-width:820px){.tool{grid-template-columns:1fr}.cfgp{border-right:0;border-bottom:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Time table · v2</h1>
+  <p class="intro">La cabecera es la del póster oscuro (tipografía, ficha y diagramación) sobre la hoja clara. En el panel se elige la vista: <b>Gantt</b>, para seguir el avance, o <b>Calendario</b>, el formato que usan hoy por semanas, con mañana y tarde. Los datos son del ejemplo que me compartiste.</p>
+
+  <section class="dir">
+    <div class="dir-h"><b>1</b><h2>Vista Calendario</h2><p>Semanas de lunes a domingo con el fin de semana angosto. Los festivos van rayados y el mes se marca cuando cambia. Cada día tiene mañana y tarde. El color sale del grupo o del tipo: revisión con borde, ajustes en rojo, entrega en dorado y la entrega final en negro con lima.</p></div>
+    <div class="sheet-wrap"><div class="sheet C" id="C"></div></div>
+  </section>
+
+  <section class="dir">
+    <div class="dir-h"><b>2</b><h2>Vista Gantt</h2><p>La organización del claro (filas por grupo, días y hitos con su hora) con la cabecera nueva.</p></div>
+    <div class="sheet-wrap"><div class="sheet G" id="G"></div></div>
+  </section>
+
+  <section class="dir">
+    <div class="dir-h"><b>+</b><h2>Panel</h2><p>Igual que antes, ahora con el selector de vista arriba.</p></div>
+    <div class="tool">
+      <div class="cfgp">
+        <h3>Time table</h3>
+        <div class="cf"><small>Vista</small><div class="views">
+          <div class="on"><svg viewBox="0 0 56 34"><rect x="1" y="1" width="54" height="32" rx="3" fill="none" stroke="#C9C9D2"/><path d="M1 8h54M1 16.5h54M1 25h54M11.5 8v25M22 8v25M32.5 8v25M43 8v25M49 8v25" stroke="#E4E4EA"/><rect x="3" y="10" width="7" height="5" rx="1" fill="#1FB58F"/><rect x="13.5" y="10" width="7" height="5" rx="1" fill="#1FB58F"/><rect x="24" y="18.5" width="7" height="5" rx="1" fill="#624AFF"/><rect x="34.5" y="18.5" width="7" height="2.5" rx="1" fill="none" stroke="#1E88E5"/><rect x="3" y="27" width="7" height="5" rx="1" fill="#17171C"/><rect x="43" y="8" width="12" height="25" fill="#F3F3F6"/></svg>Calendario</div>
+          <div><svg viewBox="0 0 56 34"><rect x="1" y="1" width="54" height="32" rx="3" fill="none" stroke="#C9C9D2"/><path d="M5 6h46" stroke="#17171C" stroke-width="1.5"/><g fill="#C9C9D2"><rect x="5" y="10" width="9" height="3" rx="1"/><rect x="5" y="17" width="9" height="3" rx="1"/><rect x="5" y="24" width="9" height="3" rx="1"/></g><rect x="17" y="10" width="12" height="3" rx="1.5" fill="#1FB58F"/><rect x="26" y="17" width="12" height="3" rx="1.5" fill="#FB8847"/><rect x="36" y="24" width="14" height="3" rx="1.5" fill="#624AFF"/></svg>Gantt</div></div></div>
+        <div class="cf"><small>Idioma</small><div class="seg"><span class="on">Español</span><span>English</span></div></div>
+        <div class="cf"><small>Color por</small><div class="seg"><span class="on">Grupo</span><span>Tipo</span><span>Etapa</span></div></div>
+        <div class="cf"><small>Mostrar</small><div class="seg"><span class="on">Mañana y tarde</span><span>Día completo</span></div></div>
+        <div class="gen">Descargar PDF</div>
+      </div>
+      <div class="pv"><div class="sheet C mini" id="C2"></div><div class="zb"><span>−</span><em>40 %</em><span>+</span><span class="on">Ajustar</span><span>100 %</span></div></div>
+    </div>
+  </section>
+</div>
+<script>
+const P = { pre: "var(--pre)", rod: "var(--rod)", post: "var(--post)", rev: "var(--rev)", aj: "var(--aj)", ent: "var(--ent)", fin: "var(--ink)" };
+const cab = (ttl, rng1, rng2) => `<div class="top">
+  <div><div class="kick">Time table · Cronograma de producción</div><div class="ttl">${ttl}</div><span class="cli" style="--c:#FF644A"><i></i>Nutresa · Noel</span></div>
+  <div class="meta"><div><small>Productora ejecutiva</small><b>Connie González</b></div><div><small>Director de post</small><b>Nicolás Beltrán</b></div>
+    <div><small>Fotógrafo</small><b>Nicolás Ocampo</b></div><div><small>Productora</small><b>Publicis Production</b></div>
+    <div class="wide"><small>Entregables digital</small><b>1 × 45″ · 2 × 10″ — 9:16 · 16:9 · 1:1</b></div></div>
+  <div class="rng"><small>Del · al</small><b>${rng1} → <em>${rng2}</em></b><span style="font:400 10px Barlow;color:#8A8A96;margin-top:4px">Generado el 7 de octubre de 2026</span><span class="pp">PUBLICIS PRODUCTION</span></div></div>`;
+const legend = (extra) => `<div class="foot"><div class="leg"><span><i style="--c:var(--pre)"></i>Preproducción</span><span><i style="--c:var(--rod)"></i>Rodaje</span><span><i style="--c:var(--post)"></i>Postproducción</span><span class="sep"></span><span><i class="o" style="--c:var(--rev)"></i>Revisión</span><span><i class="o" style="--c:var(--aj)"></i>Ajustes</span><span><i style="--c:color-mix(in srgb,var(--ent) 45%,#fff)"></i>Entrega</span><span><i style="--c:var(--ink)"></i>Entrega final</span><span><i class="h"></i>Festivo</span>${extra || ""}</div><span class="pg">Tráfico Post · Publicis Production · 1/1</span></div>`;
+
+// ── Calendario (28 sept → 15 nov) ──
+const EV = {
+  "2026-10-01": [["ent", "Entrega de brief", "", 1]],
+  "2026-10-05": [["ent", "Entrega de costos y TT", "AM"], ["rev", "Revisión", "PM"]],
+  "2026-10-06": [["rev", "Revisión", "AM"], ["rev", "Aprobación de costos", "PM"]],
+  "2026-10-07": [["pre", "Kick off", "", 1]],
+  "2026-10-08": [["pre", "Preproducción", "", 1]],
+  "2026-10-09": [["pre", "Preproducción", "", 1]],
+  "2026-10-13": [["pre", "Preproducción", "", 1]],
+  "2026-10-14": [["pre", "Preproducción", "", 1]],
+  "2026-10-15": [["rev", "Junta de preproducción", "AM"], ["rev", "Junta PPM", "PM"]],
+  "2026-10-16": [["rod", "Shooting", "AM"], ["ent", "Entrega de material a post", "PM"]],
+  "2026-10-19": [["post", "Generación de imagen IA", "", 1]],
+  "2026-10-20": [["post", "Generación de imagen IA", "", 1]],
+  "2026-10-21": [["post", "Generación de imagen IA", "", 1]],
+  "2026-10-22": [["rev", "Presentación stills a agencia y cliente · Hero 45″", "AM"], ["post", "Ajustes internos", "PM"]],
+  "2026-10-23": [["aj", "Ajustes", "AM"], ["aj", "Ajustes", "PM"]],
+  "2026-10-26": [["aj", "Ajustes", "AM"], ["rev", "Presentación y aprobación stills Hero 45″", "PM"]],
+  "2026-10-27": [["post", "Generación video IA y montaje", "", 1]],
+  "2026-10-28": [["post", "Video IA y montaje con audio", "", 1]],
+  "2026-10-29": [["post", "Video IA y montaje", "AM"], ["rev", "Presentación montaje a agencia", "PM"]],
+  "2026-10-30": [["aj", "Ajustes", "AM"], ["rev", "Presentación montaje a cliente", "PM"]],
+  "2026-11-03": [["aj", "Ajustes", "AM"], ["rev", "Aprobación cliente y agencia", "PM"]],
+  "2026-11-04": [["fin", "Entrega final Hero 45″", "16:00", 1]],
+  "2026-11-05": [["post", "Adaptaciones 9:16 y 1:1", "AM"], ["post", "Reducciones 2 × 10″", "PM"]],
+  "2026-11-06": [["ent", "Entrega adaptaciones Hero", "AM"], ["rev", "Revisión reducciones", "PM"]],
+  "2026-11-09": [["fin", "Entrega final reducciones 10″ · 3 formatos", "12:00", 1]],
+};
+const FEST = ["2026-10-12", "2026-11-02"], HOY = "2026-10-07", MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sept", "oct", "nov", "dic"];
+const iso = (d) => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+function cal(el) {
+  let h = `<div class="wd">${["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sáb", "Dom"].map(x => `<span>${x}</span>`).join("")}</div>`;
+  const d = new Date(2026, 8, 28);
+  for (let w = 0; w < 7; w++) {
+    h += `<div class="wk">`;
+    for (let k = 0; k < 7; k++) {
+      const s = iso(d), we = k > 4, fe = FEST.includes(s), first = d.getDate() === 1 || (w === 0 && k === 0);
+      const ev = (EV[s] || []).map(([t, n, hr, full]) => `<div class="ev ${t === "rev" ? "rev" : t === "aj" ? "aj" : t === "ent" ? "ent" : t === "fin" ? "fin" : ""}${full ? " full" : ""}" style="--c:${P[t]}">${["rev", "ent", "fin"].includes(t) ? `<i class="ic"></i>` : ""}<span>${n}</span>${hr ? `<small>${hr}</small>` : ""}</div>`).join("");
+      h += `<div class="d${we ? " we" : ""}${fe ? " fe" : ""}${s === HOY ? " today" : ""}${s < "2026-10-01" ? " out" : ""}"><span class="n"><b>${d.getDate()}</b>${first ? `<em>${MESES[d.getMonth()]}</em>` : ""}</span>${fe ? `<span class="fe-l">Festivo</span>` : ev}</div>`;
+      d.setDate(d.getDate() + 1);
+    }
+    h += `</div>`;
+  }
+  el.innerHTML = cab("Noel<br>110 años", "28 sept", "9 nov") + `<div class="cal">${h}</div>` + legend(`<span class="sep"></span><span><b style="font:700 9px 'Barlow Condensed';color:var(--ink)">AM / PM</b> mañana · tarde</span>`);
+}
+
+// ── Gantt (mismos datos, por etapas) ──
+function gantt(el) {
+  const D0 = new Date(2026, 8, 28), N = 43, W = 1123 - 72 - 220, dx = W / N, x = (s) => (new Date(s + "T00:00") - D0) / 864e5 * dx;
+  const R = [
+    ["pre", "Entrega de brief", "Juliana Canal", "m", "2026-10-01", "10:00", "ent"],
+    ["pre", "Costos y time table", "Connie González", "b", "2026-10-02", "2026-10-05", "done"],
+    ["pre", "Aprobación de costos", "Cliente · Nutresa", "m", "2026-10-06", "15:00", "rev"],
+    ["pre", "Kick off", "Equipo", "m", "2026-10-07", "09:00", "ent"],
+    ["pre", "Preproducción", "Connie González", "b", "2026-10-08", "2026-10-14", ""],
+    ["pre", "PPM", "Agencia · Cliente", "m", "2026-10-15", "15:00", "rev"],
+    ["rod", "Shooting", "Nicolás Ocampo", "b", "2026-10-16", "2026-10-16", ""],
+    ["rod", "Material a post", "DIT", "m", "2026-10-16", "17:00", "ent"],
+    ["post", "Generación de imagen IA", "Equipo IA", "b", "2026-10-19", "2026-10-22", ""],
+    ["post", "Presentación stills Hero", "Agencia · Cliente", "m", "2026-10-22", "10:00", "rev"],
+    ["post", "Ajustes stills", "Equipo IA", "b", "2026-10-23", "2026-10-26", "aj"],
+    ["post", "Video IA y montaje", "Nicolás Beltrán", "b", "2026-10-27", "2026-10-29", ""],
+    ["post", "Presentación montaje", "Cliente · Nutresa", "m", "2026-10-30", "15:00", "rev"],
+    ["post", "Aprobación cliente y agencia", "Cliente · Agencia", "m", "2026-11-03", "15:00", "rev"],
+    ["post", "Entrega final Hero 45″", "Juliana Canal", "m", "2026-11-04", "16:00", "fin"],
+    ["post", "Adaptaciones y reducciones", "Nicolás Beltrán", "b", "2026-11-05", "2026-11-06", ""],
+    ["post", "Entrega final reducciones", "Juliana Canal", "m", "2026-11-09", "12:00", "fin"],
+  ];
+  const G = { pre: ["Preproducción", "var(--pre)"], rod: ["Rodaje", "var(--rod)"], post: ["Postproducción", "var(--post)"] };
+  let days = "", cols = ""; const d = new Date(D0);
+  for (let i = 0; i < N; i++) { const s = iso(d), we = d.getDay() === 0 || d.getDay() === 6, fe = FEST.includes(s); days += `<div class="day${we ? " we" : ""}${s === HOY ? " today" : ""}" style="left:${i * dx}px;width:${dx}px">${"DLMMJVS"[d.getDay()]}<b>${d.getDate()}</b></div>`; cols += `<i class="col${we ? " we" : fe ? " fe" : ""}" style="left:${i * dx}px;width:${dx}px"></i>`; d.setDate(d.getDate() + 1); }
+  let rows = "";
+  Object.keys(G).forEach(g => {
+    const L = R.filter(r => r[0] === g);
+    rows += `<div class="ph" style="--c:${G[g][1]}"><span><i></i>${G[g][0]} <small>${L.length} etapas</small></span><div></div></div>`;
+    L.forEach(r => {
+      const [, n, w, k, a, b, t] = r, c = G[g][1];
+      const v = k === "m" ? `<span class="ms ${t === "rev" ? "rev" : t === "fin" ? "fin" : ""}${x(a) > W - 140 ? " l" : ""}" style="left:${x(a) + dx / 2}px;--c:${t === "rev" ? "var(--rev)" : t === "fin" ? "var(--ink)" : "var(--ent)"}"><i></i>${n.split(" ")[0]} <span class="hr">${b}</span></span>`
+        : `<span class="bar ${t}" style="left:${x(a) + 1}px;width:${x(b) - x(a) + dx - 2}px;--c:${c}">${t === "done" ? "✓ " : ""}${Math.round((new Date(b) - new Date(a)) / 864e5) + 1} d</span>`;
+      rows += `<div class="row g-${g}"><div class="nm" style="--c:${c}"><em>${String(R.indexOf(r) + 1).padStart(2, "0")}</em><div><b>${n}</b><small>${w}${k === "m" ? " · " + b : ""}</small></div></div><div style="position:relative;height:100%">${v}</div></div>`;
+    });
+  });
+  el.innerHTML = cab("Noel<br>110 años", "28 sept", "9 nov") + `<div class="grid"><div class="hd"><div style="font:700 9.5px/34px 'Barlow Condensed';letter-spacing:.14em;color:var(--muted)">SEPT – NOV 2026</div><div class="days">${days}</div></div><div class="body"><div class="cols">${cols}<i class="todayln" style="left:${x(HOY) + dx / 2}px"></i></div>${rows}</div></div>` + legend();
+}
+cal(document.getElementById("C")); gantt(document.getElementById("G")); cal(document.getElementById("C2"));
+function fit() { document.querySelectorAll(".sheet-wrap").forEach(w => { const s = w.firstElementChild, k = w.clientWidth / 1123; s.style.transform = `scale(${k})`; w.style.height = 794 * k + "px"; }); }
+addEventListener("resize", fit); fit();
+</script>
+</body>
+</html>
