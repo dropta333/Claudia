@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v176** · 10 oct 2026 · Responsable: Bastián Torres
+Versión: **v177** · 10 oct 2026 · Responsable: Bastián Torres
 
 ## Cómo está armado ahora
 - **Una sola fuente:** `src/app.html`, con todo el CSS y las capas JS.
@@ -186,6 +186,8 @@ Versión: **v176** · 10 oct 2026 · Responsable: Bastián Torres
 - **v174:** reporte de proyecto: resumen con "Inicio → entrega"; página 2 con equipo como red de nodos y reparto del espacio para que no queden huecos. Ficha de cliente: fusionar un cliente repetido con otro (pxpClMerge) o eliminar uno sin proyectos.
 
 - **v175–v176:** reporte de proyecto rediseñado. Página 1: KPIs con Inicio (azul) y Entrega final (violeta) separados, ficha del proyecto, y a dos columnas Tiempo frente a avance, Etapas por estado y Días por fase (secTiempo, secEstados, secFases); las tarjetas se estiran (CARD_MIN) para no dejar huecos. Página 2: Gantt, equipo en red de nodos sobre fondo negro con la forma y el color de cada grupo, y detalle de etapas. Reporte de cliente: la tabla de proyectos empieza siempre en la página 2 y sigue en más páginas si hace falta. Ficha de cliente: "¿Repetido?" compacto abajo a la izquierda. Nuevo cliente con el look de nuevo proyecto (ncx-*). Selector de semana en Clientes con diseño. Estado del equipo: Ausentes y Freelance.
+
+- **v177:** reporte de proyecto: el equipo vuelve a tarjeta blanca y pasa a la página 1 a una columna (secRed se adapta a media columna); Etapas por estado más compacta; página 2 con dos gráficas de barras, días por etapa y etapas por persona (secBarrasP2).
 
 ## No cambiar sin consultar
 - El ZIP de Netlify va sin datos, y no se guarda nada antes de cargar los datos del servidor.

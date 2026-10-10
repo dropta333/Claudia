@@ -17432,10 +17432,10 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   const LgS = (lang, es, en) => lang === "en" ? en : es;
   function secEstados(p, lang) {
     const E = p.etapas || []; if (!E.length) return null; const cnt = {}; E.forEach(e => { const q = e.estado || "pendiente"; cnt[q] = (cnt[q] || 0) + 1; });
-    const it = ETS_ORD.filter(q => cnt[q]).map(q => ({ q, v: cnt[q], c: ST_COLOR[q] || MUTED })), h = Math.max(136, 56 + it.length * 15);
+    const it = ETS_ORD.filter(q => cnt[q]).map(q => ({ q, v: cnt[q], c: ST_COLOR[q] || MUTED })), h = Math.max(104, 50 + it.length * 14);
     return { h, draw(rec, x, y, w) { card(rec, x, y, w, h); title(rec, LgS(lang, "Etapas por estado", "Stages by status"), x + 12, y + 20, w - 24);
-      donut(rec, x + 58, y + 36 + (h - 36) / 2, 36, 23, it.map(o => ({ v: o.v, c: o.c })));
-      it.forEach((o, i) => { const ly = y + 48 + i * 15; rec.rect({ x: x + 112, y: ly - 7, w: 8, h: 8, r: 2, fill: o.c }); rec.text({ s: tr(lang, "st_" + o.q), x: x + 125, y: ly, font: "reg", size: 8, color: INK }); rec.text({ s: String(o.v), x: x + w - 12, y: ly, font: "cond", size: 10, color: INK, align: "r" }); });
+      donut(rec, x + 50, y + 34 + (h - 34) / 2, 28, 18, it.map(o => ({ v: o.v, c: o.c })));
+      it.forEach((o, i) => { const ly = y + 46 + i * 14; rec.rect({ x: x + 96, y: ly - 7, w: 8, h: 8, r: 2, fill: o.c }); rec.text({ s: tr(lang, "st_" + o.q), x: x + 109, y: ly, font: "reg", size: 8, color: INK }); rec.text({ s: String(o.v), x: x + w - 12, y: ly, font: "cond", size: 10, color: INK, align: "r" }); });
     } };
   }
   function secFases(p, lang) {
@@ -17452,6 +17452,19 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       const bar = (yy, l, f, c) => { rec.text({ s: l, x: x + 12, y: yy, font: "reg", size: 8, color: INK }); rec.text({ s: Math.round(f * 100) + "%", x: x + w - 12, y: yy, font: "cond", size: 11, color: c, align: "r" }); rec.rect({ x: x + 12, y: yy + 5, w: w - 24, h: 7, r: 3.5, fill: "#E3E3EA" }); rec.rect({ x: x + 12, y: yy + 5, w: Math.max(3, (w - 24) * f), h: 7, r: 3.5, fill: c }); };
       bar(y + 48, LgS(lang, "Tiempo transcurrido del plazo", "Time elapsed"), t, "#1E88E5"); bar(y + 80, LgS(lang, "Etapas terminadas", "Stages done"), v, VIOLET);
       const ok = gap <= 10; rec.text({ s: ok ? LgS(lang, "El avance va al ritmo del calendario.", "Progress is keeping pace with the calendar.") : LgS(lang, `El avance va ${gap} puntos detrás del calendario.`, `Progress is ${gap} points behind the calendar.`), x: x + 12, y: y + h - 14, font: "semi", size: 8, color: ok ? GREEN : RED });
+    } };
+  }
+  // v177 · Página 2: dos gráficas de barras lado a lado (días por etapa · etapas por persona)
+  function secBarrasP2(p, lang) {
+    const P = (window.pxpPlanEtapas ? pxpPlanEtapas(p) : []).filter(x => x.ini && x.fin); if (!P.length) return null;
+    const FC = { pre: "#1FB58F", rodaje: "#FB8847", post: VIOLET };
+    const dias = P.map(x => ({ l: x.e.nombre || "—", v: Math.max(1, dd(x.ini, x.fin) + 1), c: FC[window.pxpFaseEtapa ? pxpFaseEtapa(x.e) : "post"] || VIOLET })).slice(0, 9);
+    const cnt = {}; (p.etapas || []).forEach(e => { const r = (window.pxpResps ? pxpResps(e) : []).map(n => String(n).replace(/^(Cliente|Agencia|Externo):\s*/, "")); (r.length ? r : [LgS(lang, "Sin asignar", "Unassigned")]).forEach(n => { cnt[n] = (cnt[n] || 0) + 1; }); });
+    const per = Object.entries(cnt).sort((a, b) => b[1] - a[1]).slice(0, 9).map(([l, v]) => ({ l, v, c: /^Sin asignar|^Unassigned/.test(l) ? "#B7B7C2" : "#61B3FF" }));
+    const h = 62 + Math.max(dias.length, per.length) * 17;
+    return { h, draw(rec, x, y, w) { const cw = (w - 12) / 2;
+      card(rec, x, y, cw, h); title(rec, LgS(lang, "Días por etapa", "Days per stage"), x + 12, y + 20, cw - 24); barsH(rec, x + 12, y + 50, cw - 24, dias, { lw: 96, rh: 17 });
+      const x2 = x + cw + 12; card(rec, x2, y, cw, h); title(rec, LgS(lang, "Etapas por persona", "Stages per person"), x2 + 12, y + 20, cw - 24); barsH(rec, x2 + 12, y + 50, cw - 24, per, { lw: 96, rh: 17 });
     } };
   }
   function secEquipo(p, lang) {
@@ -17525,12 +17538,30 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
         F.forEach(([l, v], i) => { const fx = MX + 12 + (i % fc) * fcw, fy = y + 42 + Math.floor(i / fc) * 30; rec.text({ s: l.toUpperCase(), x: fx, y: fy, font: "reg", size: 6.4, color: MUTED, cs: .6 }); rec.text({ s: clip(String(v), "semi", 9.5, fcw - 10), x: fx, y: fy + 13, font: "semi", size: 9.5, color: INK }); });
         y += fh + 12;
     }
+    // v177 · Equipo en red de nodos: tarjeta blanca, la forma y el color de cada grupo, nombre y cargo; cabe en media columna
+    const EQ0 = equipoDe(p), secRed = (hR0) => {
+      const nodos = []; EQ0.forEach(e => e.n.forEach(nm => { const per = (typeof TEAM !== "undefined" ? TEAM : []).find(t => t.name === nm), g = per && window.pxpGrupo ? pxpGrupo(per) : "";
+        nodos.push({ nm, r: e.r, c: g && window.pxpCargoColor ? pxpCargoColor(g) : VIOLET, f: g && window.pxpGrupoForma ? pxpGrupoForma(g) : "circle" }); }));
+      const forma = (rec, f, x0, y0, r, o) => { const pg = (n, rot) => rec.poly(Object.assign({ pts: Array.from({ length: n }, (_, i) => { const t = rot + i * 2 * Math.PI / n; return [x0 + r * Math.cos(t), y0 + r * Math.sin(t)]; }) }, o));
+        if (f === "square") rec.rect(Object.assign({ x: x0 - r * .85, y: y0 - r * .85, w: r * 1.7, h: r * 1.7, r: 3 }, o)); else if (f === "hex" || f === "hexh") pg(6, f === "hex" ? 0 : Math.PI / 6); else if (f === "diamond") pg(4, -Math.PI / 2);
+        else if (f === "tri") pg(3, -Math.PI / 2); else if (f === "trid") pg(3, Math.PI / 2); else if (f === "penta" || f === "shield") pg(5, -Math.PI / 2); else if (f === "octa") pg(8, Math.PI / 8);
+        else if (f === "star") rec.poly(Object.assign({ pts: Array.from({ length: 10 }, (_, i) => { const t = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * .5 : r * 1.1; return [x0 + rr * Math.cos(t), y0 + rr * Math.sin(t)]; }) }, o)); else rec.circle(Object.assign({ x: x0, y: y0, r }, o)); };
+      return { h: hR0, fill: true, draw(rec, x, y, w) { const hR = this.h;
+        card(rec, x, y, w, hR); title(rec, tr(lang, "team"), x + 12, y + 20, w - 24); rec.text({ s: `${nodos.length} ${LgS(lang, nodos.length === 1 ? "persona" : "personas", nodos.length === 1 ? "person" : "people")}`, x: x + w - 12, y: y + 14, font: "semi", size: 7, color: VIOLET, align: "r", cs: .6 });
+        const nar = w < 340, NN = nodos.slice(0, nar ? 8 : 12), lw2 = nar ? 78 : 120, cx = x + w / 2, cy = y + 34 + (hR - 34) / 2, rx = w / 2 - (nar ? 46 : 90), ry = Math.max(0, (hR - 34) / 2 - 32);
+        const pts = NN.map((_, i) => { const t = (NN.length <= 3 ? Math.PI : -Math.PI / 2) + i * 2 * Math.PI / NN.length; return [cx + rx * Math.cos(t), cy + ry * Math.sin(t)]; });
+        pts.forEach(([px, py], i) => rec.line({ x1: cx, y1: cy, x2: px, y2: py, stroke: NN[i].c, lw: .8, a: .6 }));
+        rec.circle({ x: cx, y: cy, r: nar ? 15 : 20, fill: VIOLET }); rec.text({ s: String(nodos.length), x: cx, y: cy + 4, font: "cond", size: nar ? 11 : 13, color: "#FFFFFF", align: "c" });
+        NN.forEach((o, i) => { const [px, py] = pts[i], up = py < cy - 4, ini2 = o.nm.split(/\s+/).map(z => z[0] || "").slice(0, 2).join("").toUpperCase();
+          forma(rec, o.f, px, py, nar ? 11 : 13, { fill: o.c }); rec.text({ s: ini2, x: px, y: py + 3, font: "semi", size: 8, color: "#FFFFFF", align: "c" });
+          const ty = up ? py - (nar ? 21 : 25) : py + (nar ? 21 : 25); rec.text({ s: clip(o.nm, "semi", nar ? 7.2 : 8, lw2), x: px, y: ty, font: "semi", size: nar ? 7.2 : 8, color: INK, align: "c" }); rec.text({ s: clip(o.r.toUpperCase(), "reg", 5.6, lw2), x: px, y: ty + 8, font: "reg", size: 5.6, color: MUTED, align: "c", cs: .4 }); });
+      } }; };
     const avail = H - 42 - y;
     const arrange = (cap, drop) => {
-      const S = { pz: secPiezas(p, lang, cap), cr: opt.ficha !== false ? null : secCrono(p, lang, cap), st: opt.ficha !== false ? secEstados(p, lang) : null, fa: opt.ficha !== false ? secFases(p, lang) : null, tp: opt.ficha !== false ? secTiempo(p, lang) : null, ad: secAdapt(p, lang, cap), rv: secRevis(p, lang), eq: opt.equipo ? secEquipo(p, lang) : null, hr: opt.horas ? secHoras(p, lang, cap) : null, et: opt.etapas && opt.ficha === false ? secEtapas(p, lang, cap) : null, bl: opt.bloqueos ? secBloq(p, lang, cap) : null };
+      const S = { pz: secPiezas(p, lang, cap), cr: opt.ficha !== false ? null : secCrono(p, lang, cap), st: opt.ficha !== false ? secEstados(p, lang) : null, fa: opt.ficha !== false ? secFases(p, lang) : null, tp: opt.ficha !== false ? secTiempo(p, lang) : null, tm: opt.ficha !== false && EQ0.length ? secRed(EQ0.reduce((a2, e) => a2 + e.n.length, 0) > 4 ? 210 : 168) : null, ad: secAdapt(p, lang, cap), rv: secRevis(p, lang), eq: opt.equipo ? secEquipo(p, lang) : null, hr: opt.horas ? secHoras(p, lang, cap) : null, et: opt.etapas && opt.ficha === false ? secEtapas(p, lang, cap) : null, bl: opt.bloqueos ? secBloq(p, lang, cap) : null };
       drop.forEach(d => { S[d] = null; });
       const cw2 = (CW - 12) / 2, col = [[], []], hs = [0, 0], full0 = [];
-      [S.tp, S.st, S.fa, S.pz, S.cr, S.ad, S.rv].filter(Boolean).forEach(s => { const i = hs[0] <= hs[1] ? 0 : 1; col[i].push(s); hs[i] += s.h + 10; });
+      [S.tp, S.tm, S.st, S.fa, S.pz, S.cr, S.ad, S.rv].filter(Boolean).forEach(s => { const i = hs[0] <= hs[1] ? 0 : 1; col[i].push(s); hs[i] += s.h + 10; });
       if (!col[0].length || !col[1].length) { const solo = col[0].concat(col[1]); col[0] = []; col[1] = []; hs[0] = hs[1] = 0; full0.push(...solo); }   // v175 · una sola tarjeta no deja media página vacía
       const full = full0.concat([S.et, S.eq, S.hr, S.bl].filter(Boolean)), fh = full.reduce((s, c) => s + c.h + 10, 0), total = Math.max(hs[0], hs[1]) + fh;
       return { col, full, cw2, total, hs };
@@ -17542,26 +17573,6 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     outer: for (const d of dropOrder) for (const m of modes) { const t = arrange(m, d); if (t.total <= avail + 10) { lay = t; dropped = d.filter(x => ({ bl: opt.bloqueos, hr: opt.horas, eq: opt.equipo, et: opt.etapas, rv: true, ad: true }[x])); break outer; } }
     if (!lay) { lay = arrange(modes[2], dropOrder[6]); dropped = dropOrder[6]; }
     // v175 · Equipo en red de nodos (se usa en la página 1 si sobra espacio, o en la 2)
-    // v176 · Equipo como en la ventana del proyecto: fondo negro, la forma y el color de cada grupo, nombre y cargo
-    const EQ0 = equipoDe(p), secRed = (hR0) => {
-      const nodos = []; EQ0.forEach(e => e.n.forEach(nm => { const per = (typeof TEAM !== "undefined" ? TEAM : []).find(t => t.name === nm), g = per && window.pxpGrupo ? pxpGrupo(per) : "";
-        nodos.push({ nm, r: e.r, c: g && window.pxpCargoColor ? pxpCargoColor(g) : VIOLET, f: g && window.pxpGrupoForma ? pxpGrupoForma(g) : "circle" }); }));
-      const NN = nodos.slice(0, 12);
-      const forma = (rec, f, x0, y0, r, o) => { const pg = (n, rot) => rec.poly(Object.assign({ pts: Array.from({ length: n }, (_, i) => { const t = rot + i * 2 * Math.PI / n; return [x0 + r * Math.cos(t), y0 + r * Math.sin(t)]; }) }, o));
-        if (f === "square") rec.rect(Object.assign({ x: x0 - r * .85, y: y0 - r * .85, w: r * 1.7, h: r * 1.7, r: 3 }, o)); else if (f === "hex" || f === "hexh") pg(6, f === "hex" ? 0 : Math.PI / 6); else if (f === "diamond") pg(4, -Math.PI / 2);
-        else if (f === "tri") pg(3, -Math.PI / 2); else if (f === "trid") pg(3, Math.PI / 2); else if (f === "penta" || f === "shield") pg(5, -Math.PI / 2); else if (f === "octa") pg(8, Math.PI / 8);
-        else if (f === "star") rec.poly(Object.assign({ pts: Array.from({ length: 10 }, (_, i) => { const t = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * .5 : r * 1.1; return [x0 + rr * Math.cos(t), y0 + rr * Math.sin(t)]; }) }, o)); else rec.circle(Object.assign({ x: x0, y: y0, r }, o)); };
-      return { h: hR0, fill: true, draw(rec, x, y, w) { const hR = this.h;
-        rec.rect({ x, y, w, h: hR, r: 7, fill: BAND });
-        rec.text({ s: tr(lang, "team"), x: x + 14, y: y + 22, font: "serif", size: 12.5, color: "#FFFFFF" }); rec.text({ s: `${nodos.length} ${LgS(lang, nodos.length === 1 ? "persona" : "personas", nodos.length === 1 ? "person" : "people")}`, x: x + w - 14, y: y + 22, font: "semi", size: 7.4, color: LIME, align: "r", cs: .6 });
-        const cx = x + w / 2, cy = y + 34 + (hR - 34) / 2, rx = w / 2 - 90, ry = Math.max(0, (hR - 34) / 2 - 34);
-        const pts = NN.map((_, i) => { const t = (NN.length <= 3 ? Math.PI : -Math.PI / 2) + i * 2 * Math.PI / NN.length; return [cx + rx * Math.cos(t), cy + ry * Math.sin(t)]; });
-        pts.forEach(([px, py], i) => rec.line({ x1: cx, y1: cy, x2: px, y2: py, stroke: NN[i].c, lw: .7, a: .55 }));
-        rec.circle({ x: cx, y: cy, r: 20, fill: "#FFFFFF" }); rec.text({ s: clip((p.nombre || k).toUpperCase(), "cond", 6.6, 34).slice(0, 3), x: cx, y: cy + 3, font: "cond", size: 9, color: BAND, align: "c" });
-        NN.forEach((o, i) => { const [px, py] = pts[i], up = py < cy - 4, ini2 = o.nm.split(/\s+/).map(z => z[0] || "").slice(0, 2).join("").toUpperCase();
-          forma(rec, o.f, px, py, 13, { fill: o.c }); rec.text({ s: ini2, x: px, y: py + 3, font: "semi", size: 8, color: "#FFFFFF", align: "c" });
-          const ty = up ? py - 25 : py + 25; rec.text({ s: clip(o.nm, "semi", 8, 120), x: px, y: ty, font: "semi", size: 8, color: "#FFFFFF", align: "c" }); rec.text({ s: clip(o.r.toUpperCase(), "reg", 6, 120), x: px, y: ty + 9, font: "reg", size: 6, color: "#A9A9B6", align: "c", cs: .4 }); });
-      } }; };
     // v175 · Sin huecos: las dos columnas terminan a la misma altura y lo que sobra abajo lo toma la última tarjeta
     let extra = Math.max(0, avail - lay.total - 4), redP1 = null;
     if (opt.ficha === false && EQ0.length && extra >= (EQ0.reduce((a, e) => a + e.n.length, 0) > 3 ? 175 : 100)) {   // v176 · con la página 2, el equipo va allá
@@ -17584,7 +17595,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       const C0 = modes[0], MK = { et: () => secEtapas(p, lang, C0), bl: () => secBloq(p, lang, C0), hr: () => secHoras(p, lang, C0), eq: () => secEquipo(p, lang), rv: () => secRevis(p, lang), ad: () => secAdapt(p, lang, C0) };
       const quiere = { bl: opt.bloqueos, hr: opt.horas, eq: opt.equipo, et: opt.etapas, rv: true, ad: true };
       const resto = [];
-      if (EQ0.length && !redP1) resto.push(secRed(196));
+      { const bp = secBarrasP2(p, lang); if (bp) resto.push(bp); }
+      if (EQ0.length && !redP1 && opt.ficha === false) resto.push(secRed(196));
       if (opt.etapas !== false) { const se = secEtapas(p, lang, { et: 40 }); if (se) resto.push(se); }   // v176 · el detalle de etapas va con el cronograma
       dropped.filter(d => d !== "eq" && quiere[d]).forEach(d => { const sc = MK[d](); if (sc) resto.push(Object.assign(sc, { k: d })); });
       // Cronograma

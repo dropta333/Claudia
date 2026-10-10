@@ -1,9 +1,11 @@
-# Tráfico Post · v176 — cómo publicar
+# Tráfico Post · v177 — cómo publicar
 
 1. En el tablero actual toca **Descargar copia** (pie de página) para tener un respaldo de hoy.
 2. En Netlify, abre tu sitio → **Deploys** y arrastra este ZIP (o la carpeta descomprimida) a la zona de despliegue.
 3. Los datos del equipo **no se tocan**: viven en Netlify Blobs y el tablero los carga al abrir.
 4. Entra primero como Administración y espera el aviso **"Tablero optimizado"** (mueve las imágenes viejas a archivos).
+
+Novedades v177: reporte de proyecto con el equipo en la primera página y gráficas de barras en la segunda.
 
 Novedades v176: reportes rediseñados (proyecto y cliente), nuevo cliente con el look de nuevo proyecto, Ausentes y Freelance en Estado del equipo.
 
