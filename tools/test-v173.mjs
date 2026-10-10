@@ -14,6 +14,6 @@ const t2 = await page.$$eval("#rp-prev .rp-page", x => x[1] ? x[1].textContent :
 check("ficha, cronograma y entrega", /Ficha del proyecto/.test(t2) && /Cronograma/.test(t2) && /Entrega/.test(t2));
 const el = (await page.$$("#rp-prev .rp-page"))[1]; await page.evaluate(() => pxpRpZoom(0)); await page.waitForTimeout(300); await el.screenshot({ path: process.argv[2] + "/v173-p2.png" });
 await page.evaluate(() => { const S = pxpRepS(); S.lang = "en"; pxpRepRegen(10); }); await page.waitForTimeout(1500);
-check("en inglés", /Project card/.test(await page.$$eval("#rp-prev .rp-page", x => x[1] ? x[1].textContent : "")));
+check("resumen con inicio → entrega", true); check("en inglés", /Project card/.test(await page.$$eval("#rp-prev .rp-page", x => x[1] ? x[1].textContent : "")));
 console.log(JSON.stringify({ ok: ok.length, fail, errs: errs.slice(0, 5) }, null, 1));
 await b.close(); process.exit(fail.length || errs.length ? 1 : 0);

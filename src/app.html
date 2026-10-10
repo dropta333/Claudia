@@ -4938,6 +4938,11 @@ body.trf-tabla #main-grid > .section-label{display:none!important}
 
 /* ═════ v110 · Etapas: fin editable, duración rápida y estado "En ajustes" ═════ */
 .et-end.et-date input{width:122px}
+.cl-merge{margin-top:14px;padding:12px 14px;border:1px dashed var(--border2);border-radius:12px;display:flex;flex-direction:column;gap:4px}
+.cl-merge small{color:var(--muted)}
+.cl-merge>div{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.cl-merge select{min-width:180px}
+.cl-merge .cl-del{color:#F0476B;border-color:#F0476B}
 .pj-dot.bloqueada{border-color:#F0476B;background:color-mix(in srgb,#F0476B 30%,var(--surface))}
 .pj-dot.revision,.pj-dot.ajustes{border-color:var(--sc,#FF9F43);background:color-mix(in srgb,#FF9F43 30%,var(--surface))}
 
@@ -12689,7 +12694,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
           <div class="ficha-row">${f("cl-mail", "Correo", info.correo, "email", "nombre@empresa.com")}${f("cl-phone", "Teléfono", info.telefono, "tel", "+57 …")}</div>
           <div class="ficha-row"><div class="ficha-field"><label for="cl-notes">Notas generales</label><textarea id="cl-notes" rows="3" placeholder="Acuerdos, formatos de entrega, preferencias del cliente…" oninput="pxpClDirty()">${esc(info.notas || "")}</textarea></div></div>
           <p class="note">Si cambias el nombre, se actualiza en todos sus proyectos.</p>
-          <div class="cl-save"><p id="cl-warn" class="fb-msg warn" hidden><i></i>Tienes cambios sin guardar <button class="linkbtn" onclick="pxpCloseClient(true)">Descartar y cerrar</button></p><button class="ficha-save" onclick="pxpClSave()">Guardar datos</button></div></section>
+          <div class="cl-save"><p id="cl-warn" class="fb-msg warn" hidden><i></i>Tienes cambios sin guardar <button class="linkbtn" onclick="pxpCloseClient(true)">Descartar y cerrar</button></p><button class="ficha-save" onclick="pxpClSave()">Guardar datos</button></div>${(window.pxpPuedeEditar ? pxpPuedeEditar() : true) ? (() => { const otros = [...new Set([...knownClientes(), ...((META && META.clientesExtra) || [])].map(x => String(x).trim()).filter(x => x && norm(x) !== ck))].sort((a, b) => a.localeCompare(b, "es")); const np = Object.values(PROJECTS).filter(p => norm(p.cliente) === ck).length;
+            return `<div class="cl-merge"><b>Cliente repetido o que ya no se usa</b><small>${np ? `Fusiónalo con otro: sus ${np} proyecto${np !== 1 ? "s" : ""} pasan a ese cliente y este desaparece.` : "No tiene proyectos: puedes eliminarlo o fusionarlo."}</small><div><select id="cl-merge-to" aria-label="Fusionar con"><option value="">Fusionar con…</option>${otros.map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join("")}</select><button type="button" class="btn-ghost sm" onclick="pxpClMerge()">Fusionar</button>${np ? "" : `<button type="button" class="btn-ghost sm cl-del" onclick="pxpClMerge(true,this)">Eliminar cliente</button>`}</div></div>`; })() : ""}</section>
         <section class="pm-sec"><h3>Proyectos en marcha <span class="cnt">${act.length}</span></h3>
           ${act.length ? act.sort(byState).map(prow).join("") : `<p class="note" style="margin:0">No tiene proyectos activos.</p>`}
           <div class="pm-add"><input type="text" id="cl-newp" placeholder="Nombre del nuevo proyecto para ${esc(cl)}" onkeydown="if(event.key==='Enter')pxpClNewProject()"><button class="btn-add" onclick="pxpClNewProject()">+ Nuevo proyecto</button></div>
@@ -12719,6 +12725,18 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     }
     dirtyCl = false;
     await saveState(); repaint(); renderClient(); toast("Datos del cliente guardados.");
+  };
+  // v174 · Fusionar un cliente repetido con otro, o eliminar uno sin proyectos (solo Administración)
+  window.pxpClMerge = async function (borrar, btn) {
+    if ((window.pxpPuedeEditar && !pxpPuedeEditar()) || !ck) return; const old = ck, sel = $("cl-merge-to"), to = borrar ? "" : (sel ? sel.value.trim() : "");
+    if (!borrar && !to) { toast("Elige con qué cliente fusionarlo."); if (sel) sel.focus(); return; }
+    if (btn && !btn.dataset.ok) { btn.dataset.ok = "1"; btn.textContent = "¿Seguro? Toca de nuevo"; return; }
+    if (borrar && Object.values(PROJECTS).some(p => norm(p.cliente) === old)) { toast("Tiene proyectos: fusiónalo con otro cliente."); return; }
+    const nk = norm(to);
+    META = Object.assign({}, META); ["clientInfo", "clientColors", "clientPhotos"].forEach(m => { const o = Object.assign({}, META[m] || {}); if (o[old] !== undefined) { if (nk && o[nk] === undefined) o[nk] = o[old]; delete o[old]; } META[m] = o; });
+    META.clientesExtra = ((META.clientesExtra) || []).filter(n => norm(n) !== old);
+    Object.values(PROJECTS).forEach(p => { if (norm(p.cliente) === old) p.cliente = to; });
+    dirtyCl = false; await saveState(); window.pxpCloseClient(true); repaint(); toast(borrar ? "Cliente eliminado." : `Fusionado con ${to}.`); if (to) window.pxpOpenClient(to);
   };
   window.pxpClNewProject = async function () {
     const i = $("cl-newp"), n = i ? i.value.trim() : ""; if (!n) { if (i) i.focus(); return; }
@@ -17397,7 +17415,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     // KPIs
     let y = bandH + 18; const kw = (CW - 30) / 4, ini = inicio(p), fin = cierre(p), pl = plazo(p), pi = piezasInfo(p), dur = ini && fin ? Math.max(1, dd(ini, fin) + 1) : null, goal = planFin(p);
     kpi(rec, MX, y, kw, 62, tr(lang, "estado"), tr(lang, est), fin ? `${tr(lang, "closed")}: ${fdate(fin, lang)}` : "", EST_COLOR[est]);
-    kpi(rec, MX + (kw + 10), y, kw, 62, tr(lang, "duration"), dur ? `${dur} ${tr(lang, dur === 1 ? "day" : "days")}` : "—", ini && fin ? `${fshort(ini, lang)} - ${fshort(fin, lang)}` : "");
+    const fEnt = goal || fin;   // v174 · inicio y entrega a la vista en el resumen
+    kpi(rec, MX + (kw + 10), y, kw, 62, lang === "en" ? "Start → delivery" : "Inicio → entrega", ini || fEnt ? `${ini ? fshort(ini, lang) : "—"} → ${fEnt ? fshort(fEnt, lang) : "—"}` : "—", dur ? `${dur} ${tr(lang, dur === 1 ? "day" : "days")}${!p.entregaFinal && fEnt ? (lang === "en" ? " · est." : " · est.") : ""}` : "");
     kpi(rec, MX + 2 * (kw + 10), y, kw, 62, tr(lang, "deadline"), pl == null ? "—" : pl <= 0 && pl > -1 ? tr(lang, "ontime") : pl <= 0 ? tr(lang, "early", { n: -pl }) : tr(lang, "late", { n: pl }), goal ? `${lang === "en" ? "Goal" : "Meta"}: ${fdate(goal, lang)}` : "", pl == null ? INK : pl <= 0 ? GREEN : RED);
     kpi(rec, MX + 3 * (kw + 10), y, kw, 62, tr(lang, "pieces"), pi.tot ? `${pi.ok}/${pi.tot}` : "—", pi.tot ? tr(lang, "delivered") : "");
     y += 62 + 12;
@@ -17450,14 +17469,26 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       // Lo que va después del cronograma: equipo (si no salió en la primera) y las secciones que no cupieron
       const C0 = modes[0], MK = { et: () => secEtapas(p, lang, C0), bl: () => secBloq(p, lang, C0), hr: () => secHoras(p, lang, C0), eq: () => secEquipo(p, lang), rv: () => secRevis(p, lang), ad: () => secAdapt(p, lang, C0) };
       const quiere = { bl: opt.bloqueos, hr: opt.horas, eq: opt.equipo, et: opt.etapas, rv: true, ad: true };
-      const resto = []; if (!opt.equipo || dropped.includes("eq")) { const e2 = secEquipo(p, lang); if (e2) resto.push(e2); }
+      const resto = [], EQ = equipoDe(p);
+      if (EQ.length) { const nodos = []; EQ.forEach(e => e.n.forEach(nm => nodos.push({ nm, r: e.r }))); const NN = nodos.slice(0, 12), hR = 196;
+        resto.push({ h: hR, fill: true, draw(rec, x, y, w) { const hR = this.h;   // v174 · equipo como red de nodos (como en la ventana del proyecto)
+          card(rec, x, y, w, hR); title(rec, tr(lang, "team"), x + 12, y + 20, w - 24);
+          const cx = x + w / 2, cy = y + 30 + (hR - 30) / 2, rx = w / 2 - 92, ry = (hR - 30) / 2 - 30;
+          const pts = NN.map((_, i) => { const t = (NN.length <= 3 ? Math.PI : -Math.PI / 2) + i * 2 * Math.PI / NN.length; return [cx + rx * Math.cos(t), cy + ry * Math.sin(t)]; });
+          pts.forEach(([px, py]) => rec.line({ x1: cx, y1: cy, x2: px, y2: py, stroke: "#C9C2FF", lw: .8 }));
+          rec.circle({ x: cx, y: cy, r: 24, fill: VIOLET }); rec.text({ s: clip((p.nombre || k).toUpperCase(), "cond", 7.5, 120), x: cx, y: cy + 38, font: "cond", size: 7.5, color: INK, align: "c" });
+          rec.text({ s: String(NN.length), x: cx, y: cy + 4.5, font: "cond", size: 13, color: "#FFFFFF", align: "c" });
+          NN.forEach((o, i) => { const [px, py] = pts[i], ini2 = o.nm.split(/\s+/).map(z => z[0] || "").slice(0, 2).join("").toUpperCase(), up = py < cy - 4;
+            rec.circle({ x: px, y: py, r: 14, fill: "#FFFFFF", stroke: VIOLET, lw: 1.2 }); rec.text({ s: ini2, x: px, y: py + 3.5, font: "semi", size: 9, color: VIOLET, align: "c" });
+            const ty = up ? py - 26 : py + 25; rec.text({ s: clip(o.nm, "semi", 7.6, 110), x: px, y: ty, font: "semi", size: 7.6, color: INK, align: "c" }); rec.text({ s: clip(o.r.toUpperCase(), "reg", 5.8, 110), x: px, y: ty + 8.5, font: "reg", size: 5.8, color: MUTED, align: "c", cs: .4 }); });
+        } }); }
       dropped.filter(d => d !== "eq" && quiere[d]).forEach(d => { const sc = MK[d](); if (sc) resto.push(Object.assign(sc, { k: d })); });
       // Cronograma
       const P = (window.pxpPlanEtapas ? pxpPlanEtapas(p) : []).filter(x => x.ini && x.fin).sort((a, b) => a.ini.localeCompare(b.ini) || 0);
       const restoH = resto.reduce((a, c) => a + c.h + 10, 0), libre = H - 44 - y2;
       if (P.length) {
         let a = P[0].ini, z = P.reduce((m, x) => x.fin > m ? x.fin : m, P[0].fin); if (ini && ini < a) a = ini; if (fin2 && fin2 > z) z = fin2;
-        const n = Math.max(1, dd(a, z) + 1), want = 78 + P.length * 20, gh0 = Math.max(160, Math.min(want, libre - restoH)), rh = Math.max(10.5, Math.min(20, (gh0 - 78) / P.length));
+        const n = Math.max(1, dd(a, z) + 1), gh0 = Math.max(160, libre - restoH - 2), rh = Math.max(10.5, Math.min(34, (gh0 - 78) / P.length));
         const cap = Math.max(1, Math.floor((gh0 - 78) / rh)), rows = P.slice(0, cap), gh = 78 + rows.length * rh + (P.length > cap ? 10 : 0);
         card(rec, MX, y2, CW, gh); title(rec, Lg("Cronograma", "Timeline"), MX + 12, y2 + 20, CW - 24);
         const LW = 128, gx = MX + 12 + LW, gw = CW - 24 - LW, dw = gw / n, top = y2 + 44, bot = top + rows.length * rh;
@@ -17470,7 +17501,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
           if (i % 2 === 0) rec.rect({ x: MX + 8, y: ry - 1, w: CW - 16, h: rh, fill: "#FFFFFF", a: .55 });
           rec.circle({ x: MX + 15, y: ry + rh / 2 - 1, r: 2.2, fill: col });
           rec.text({ s: clip(e.nombre || "—", st === "listo" ? "light" : "reg", 8, LW - 18), x: MX + 21, y: ry + rh / 2 + 1.8, font: st === "listo" ? "light" : "reg", size: 8, color: st === "listo" ? MUTED : INK });
-          const bx = pos(x.ini), bw = Math.max(2.5, pos(x.fin) + dw - bx), by = ry + 2, bh = rh - 5;
+          const bx = pos(x.ini), bw = Math.max(2.5, pos(x.fin) + dw - bx), bh = Math.min(rh - 5, 16), by = ry + (rh - bh) / 2 - 1;
           if (cl !== "proceso" && dd(x.ini, x.fin) <= 1) { const cx = bx + Math.min(bw, dw) / 2, cy = by + bh / 2, r = Math.min(4.2, bh / 2 + .6); rec.poly({ pts: [[cx, cy - r], [cx + r, cy], [cx, cy + r], [cx - r, cy]], fill: MC[cl] || INK, a: st === "listo" ? 1 : .85 }); }
           else rec.rect({ x: bx, y: by, w: bw, h: bh, r: Math.min(2.5, bh / 2), fill: col, a: st === "listo" ? 1 : st === "pendiente" ? .32 : .7 });
         });
@@ -17482,6 +17513,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
           rec.text({ s: l, x: lx + 12, y: ly, font: "light", size: 6.8, color: MUTED }); lx += 16 + tw(l, "light", 6.8) + 10; });
         y2 += gh + 12;
       }
+      { const f = resto.find(r => r.fill); if (f) f.h = Math.max(f.h, H - 44 - y2 - resto.filter(r => r !== f).reduce((a, c) => a + c.h + 10, 0)); }   // el equipo ocupa lo que sobra: la página queda llena
       resto.forEach(sc => { if (y2 + sc.h > H - 40) { if (sc.k) omitted.push(NAME[sc.k]); return; } sc.draw(rec, MX, y2, CW); y2 += sc.h + 10; });
     } else dropped.forEach(d => omitted.push(NAME[d]));
     rec.pages.forEach((_, i) => { rec.p = rec.pages[i]; footer(rec, lang, i + 1, nP); });
