@@ -16,7 +16,9 @@ check("título y cabecera", /TIME TABLE · CRONOGRAMA DE PRODUCCIÓN/.test(t) &&
 check("logo en el pie", (await page.evaluate(() => { const S = pxpRepS(), p = S.rec.pages[0], H = S.rec.size[1]; return p.some(o => o.t === "img" && o.y > H - 40 && o.x > S.rec.size[0] - 120); })));
 check("meses con su tono de gris y fines de semana con uno fijo", /R:#F3F3F6/i.test(t) && /R:#ECECF1/i.test(t) && /R:#FFFFFF/.test(t));
 await page.evaluate(k => { PROJECTS[k].editor = "Andrea López"; }, K); await page.evaluate(() => { pxpRepRepaint(); }); await page.waitForTimeout(200);
-check("se elige el equipo de la cabecera", await page.$("#rp-opts .tt-rol") !== null);
+check("equipo de la cabecera en desplegable (3 marcados)", /3 de/.test(await page.$eval("#rp-opts .tt-dd-b", b => b.textContent)) || /de \d+ seleccionados/.test(await page.$eval("#rp-opts .tt-dd-b", b => b.textContent)));
+await page.click("#rp-opts .tt-dd-b"); await page.waitForTimeout(200);
+check("al abrirlo muestra los roles", await page.$$eval("#rp-opts .tt-rol", x => x.length) > 0);
 await page.evaluate(() => pxpTTRol("editor")); await page.waitForTimeout(2500);
 check("el editor sale en la cabecera", /Andrea/.test(await ops()));
 check("panel con Calendario y Gantt", await page.$$eval("#rp-opts .tt-v", x => x.length) === 2);

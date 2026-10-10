@@ -6158,6 +6158,21 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;tr
 .tt-rol.on{border-color:var(--text);background:color-mix(in srgb,var(--text) 4%,var(--surface))}
 .tt-rol.on i{background:var(--text);color:var(--bg)}
 .tt-rol:focus-visible{outline:2px solid var(--brand)}
+.tt-dd{border:1px solid var(--border);border-radius:12px;background:var(--surface);overflow:hidden}
+.tt-dd-b{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px}
+.tt-dd-b span{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.tt-dd-b b{font:600 14px/1.1 var(--sans)}
+.tt-dd-b small{font:500 12.5px/1.2 var(--sans);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tt-dd-b .i{width:18px;height:18px;color:var(--muted);transition:transform .2s}
+.tt-dd.open .tt-dd-b .i{transform:rotate(180deg)}
+.tt-dd-b:hover{background:var(--surface2)}
+.tt-dd-b:focus-visible{outline:2px solid var(--brand);outline-offset:-2px}
+.tt-dd .tt-roles{border-top:1px solid var(--border);padding:6px;gap:2px}
+.tt-dd .tt-rol{border:0;border-radius:8px;padding:7px 8px;background:none}
+.tt-dd .tt-rol:hover{background:var(--surface2)}
+.tt-dd .tt-rol i{border-radius:5px;border:1.5px solid var(--border2);background:none}
+.tt-dd .tt-rol.on{background:none}
+.tt-dd .tt-rol.on i{background:var(--text);border-color:var(--text);color:var(--bg)}
 </style>
 </head>
 <body>
@@ -20342,7 +20357,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     }
   }
   B.custom.tt = {
-    init: (k) => ({ fines: true, vista: "cal", color: "grupo", franja: true, roles: ["ep", "directorPost", "pm"] }),
+    init: (k) => { window.__ttRolOpen = false; return { fines: true, vista: "cal", color: "grupo", franja: true, roles: ["ep", "directorPost", "pm"] }; },
     title: (s) => (PROJECTS[s.key] || {}).nombre || s.key,
     kicker: () => "Time table",
     file: (s) => `TT_${slug(((PROJECTS[s.key] || {}).cliente || "").toUpperCase())}_${slug((PROJECTS[s.key] || {}).nombre || s.key)}_${hoy().split("-").reverse().join("_")}`,
@@ -20352,7 +20367,10 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
         <div class="rp-og"><h4>Idioma</h4>${u.seg("pxpTTo_lang", s.lang, [["es", "Español"], ["en", "English"]])}</div>
         <div class="rp-og"><h4>Color por</h4>${u.seg("pxpTTo_color", s.color, [["grupo", "Grupo de etapas"], ["tipo", "Tipo de etapa"]])}</div>
         ${s.vista === "cal" ? `<div class="rp-og"><h4>Mostrar</h4>${u.seg("pxpTTo_franja", s.franja ? "1" : "0", [["1", "Mañana y tarde"], ["0", "Día completo"]])}${u.tog("fines", s.fines, "Sábados y domingos", "Columnas angostas")}</div>` : ""}
-        <div class="rp-og"><h4>Equipo en la cabecera</h4>${(() => { const R2 = ttRoles(getProjectDisplay(s.key)); return R2.length ? `<div class="tt-roles">${R2.map(r => { const on = (s.roles || []).includes(r.k); return `<button type="button" class="tt-rol${on ? " on" : ""}" aria-pressed="${on}" onclick="pxpTTRol('${r.k}')"><i aria-hidden="true">${on ? "✓" : "+"}</i><span><b>${esc(r.es)}</b><small>${esc(r.n.join(", "))}</small></span></button>`; }).join("")}</div>` : `<p class="rp-note" style="margin-top:0">El proyecto aún no tiene equipo asignado.</p>`; })()}<p class="rp-note">Los colores salen del grupo y el tipo de cada etapa en el proyecto. La hora de revisiones y entregas es la que se eligió en cada hito.</p></div>`;
+        <div class="rp-og"><h4>Equipo en la cabecera</h4>${(() => { const R2 = ttRoles(getProjectDisplay(s.key)); if (!R2.length) return `<p class="rp-note" style="margin-top:0">El proyecto aún no tiene equipo asignado.</p>`;
+          const sel = R2.filter(r => (s.roles || []).includes(r.k)), open = !!window.__ttRolOpen, nm = sel.map(r => r.n[0].split(/\s+/)[0]).join(", ");
+          return `<div class="tt-dd${open ? " open" : ""}"><button type="button" class="tt-dd-b" aria-expanded="${open}" onclick="window.__ttRolOpen=!window.__ttRolOpen;pxpRepRepaint()"><span><b>${sel.length} de ${R2.length} seleccionados</b><small>${sel.length ? esc(nm) : "Nadie del equipo en la cabecera"}</small></span><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg></button>
+            ${open ? `<div class="tt-roles">${R2.map(r => { const on = (s.roles || []).includes(r.k); return `<button type="button" class="tt-rol${on ? " on" : ""}" role="checkbox" aria-checked="${on}" onclick="pxpTTRol('${r.k}')"><i aria-hidden="true">${on ? "✓" : ""}</i><span><b>${esc(r.es)}</b><small>${esc(r.n.join(", "))}</small></span></button>`; }).join("")}</div>` : ""}</div>`; })()}<p class="rp-note">Los colores salen del grupo y el tipo de cada etapa en el proyecto. La hora de revisiones y entregas es la que se eligió en cada hito.</p></div>`;
     },
     async build(s) {
       const W = 841.89, H = 595.28, rec = new Rec(); rec.size = [W, H]; rec.add();
