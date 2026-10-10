@@ -1,9 +1,11 @@
-# Tráfico Post · v169 — cómo publicar
+# Tráfico Post · v170 — cómo publicar
 
 1. En el tablero actual toca **Descargar copia** (pie de página) para tener un respaldo de hoy.
 2. En Netlify, abre tu sitio → **Deploys** y arrastra este ZIP (o la carpeta descomprimida) a la zona de despliegue.
 3. Los datos del equipo **no se tocan**: viven en Netlify Blobs y el tablero los carga al abrir.
 4. Entra primero como Administración y espera el aviso **"Tablero optimizado"** (mueve las imágenes viejas a archivos).
+
+Novedades v170 (solo el tablero): textos nuevos traducidos al inglés.
 
 Novedades v169 (solo el tablero): fichas de Tráfico con semáforo vertical y estados en íconos; notas con foto grande y @usuario; entrega en violeta y Hoy en negro en el cronograma; tarjeta corta de logros en el Home.
 

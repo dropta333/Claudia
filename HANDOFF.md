@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v169** · 10 oct 2026 · Responsable: Bastián Torres
+Versión: **v170** · 10 oct 2026 · Responsable: Bastián Torres
 
 ## Cómo está armado ahora
 - **Una sola fuente:** `src/app.html`, con todo el CSS y las capas JS.
@@ -174,6 +174,8 @@ Versión: **v169** · 10 oct 2026 · Responsable: Bastián Torres
   - Notas: foto de 60 px alineada con el nombre (18,5 px, con su @usuario) y el cargo; el comentario va debajo a todo el ancho.
   - Cronograma: Entrega final en violeta (#7B61FF, igual que su fila en las etapas); Hoy en negro (amarillo en tema oscuro).
   - Logros en la tarjeta de perfil del Home: tarjeta corta (nombre, nivel y progreso); la completa queda en la pestaña Logros.
+
+- **v170:** traducciones al inglés de los textos nuevos (v163–v169) en el diccionario de la capa 31. Pendiente: notas explicativas largas y el catálogo de logros (nombres y descripciones) en inglés.
 
 ## No cambiar sin consultar
 - El ZIP de Netlify va sin datos, y no se guarda nada antes de cargar los datos del servidor.
