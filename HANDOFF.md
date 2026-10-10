@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v156** · 10 oct 2026 · Responsable: Bastián Torres
+Versión: **v157** · 10 oct 2026 · Responsable: Bastián Torres
 
 ## Cómo está armado ahora
 - **Una sola fuente:** `src/app.html`, con todo el CSS y las capas JS.
@@ -78,6 +78,14 @@ Versión: **v156** · 10 oct 2026 · Responsable: Bastián Torres
   - Etapas sugeridas: **una por integrante** por fase (al azar entre las de su cargo). Empiezan hoy (o en el inicio del proyecto si es futuro) y, si hay entrega final, las horas se reducen para caber antes de ella; avisa si igual se pasan.
   - Cronograma con **hoy siempre al centro** (pasado a la izquierda, futuro a la derecha). Vistas: **Todo** (por defecto, se ajusta a las fechas de las etapas), Día, Semana (±2 días hábiles), Mes (±10) y Año (±130). La escala cambia sola (días, semanas o meses) y nunca hay desplazamiento horizontal. Preferencia guardada en `pxp_crono2_*`.
   - Ventana de proyecto más ancha: hasta 1320 px.
+
+- **v157:** estado automático y cronograma de inicio a entrega.
+  - Nuevo estado **En preproducción** (`preproduccion`) en todas las listas, filtros, colores, reportes y carga por proyectos.
+  - Estado automático (`pxpEstadoCalc`, `pxpEstadoAuto`): con la etapa actual (la marcada por el equipo; si no, la de hoy en el cronograma; si no, la próxima) → En preproducción, En rodaje, En postproducción o En revisión; **Entregado** cuando la última etapa de tipo Entrega queda en Listo. Cotizado, Standby y Aprobado son siempre a mano (`PXP_EST_MANUAL`).
+  - Un cambio a mano distinto del calculado queda fijado (`estadoFijo`) hasta "Volver a automático". Cada cambio automático queda en la actividad.
+  - Se recalcula en cada cambio de etapa y al abrir el proyecto (quien puede editar; en Netlify se guarda al momento, en la vista previa con el siguiente guardado).
+  - Cronograma **Todo**: borde izquierdo = inicio del proyecto, derecho = entrega final (con su marca, "est." si es estimada), hoy al centro; cada mitad tiene su propia escala. Columna de etapas de 280 px y textos más grandes.
+  - Pruebas: `node tools/test-estado.mjs [carpeta-capturas]`.
 
 ## No cambiar sin consultar
 - El ZIP de Netlify va sin datos, y no se guarda nada antes de cargar los datos del servidor.

@@ -1666,6 +1666,8 @@ svg.logo.pxp-pulse,.pxp-ld svg.logo{animation:pxpLogoPulse 2.2s ease-in-out infi
   .pv-bar select,.pv-search{min-height:46px}
 }
 .status-pill.rodaje{--c:#FB8847}
+.status-pill.preproduccion{--c:#1FB58F}
+.pv-chip.c-mint b{color:#1FB58F}
 .status-pill.revision{--c:#61B3FF}
 .pv-chip.c-orange b{color:#FB8847}
 .pv-chip.c-sky b{color:#61B3FF}
@@ -5744,6 +5746,29 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;tr
 .pj-ini.none{--ic:var(--muted)}
 .pj-ini-dot{display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--ic);margin-right:6px;vertical-align:1px}
 .cfg-ini .cfg-l .pl{color:#00A3C4}
+/* v157 · Cronograma: "Todo" de inicio a entrega final · columna de etapas más ancha y textos más grandes */
+.cr{--lw:280px}
+.cr-row,.cr-t{min-height:44px}
+.cr-l b{font-size:15px!important}
+.cr-l small{font-size:13.5px!important}
+.cr-tk{font-size:13.5px}
+.cr-bar{top:8px;bottom:8px}
+.cr-bar em{font-size:13.5px}
+.cr.many .cr-row,.cr.many .cr-t{min-height:36px}
+.cr.many .cr-l b{font-size:14.5px!important}
+.cr-fin{position:absolute;top:0;bottom:0;width:0;border-left:2px dashed #7B61FF;z-index:3}
+.cr-finh{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:#7B61FF;z-index:5}
+.cr-finh em{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-style:normal;font:700 12.5px/1 var(--display);letter-spacing:.04em;padding:4px 7px;border-radius:99px;white-space:nowrap;background:#7B61FF;color:#fff}
+.cr-inih.edge-l em,.cr-finh.edge-l em{left:0;transform:translate(0,-50%)}
+.cr-inih.edge-r em,.cr-finh.edge-r em{left:auto;right:0;transform:translate(0,-50%)}
+.cr-leg .fin i{border:0;border-left:2px dashed #7B61FF;border-radius:0;background:none;width:4px}
+.cr-nav[hidden]{display:none!important}
+@media (max-width:720px){.cr{--lw:130px}.cr-l b{font-size:13.5px!important}.cr-l small{font-size:12.5px!important}}
+/* v157 · Estado automático del proyecto */
+.cfg-tag.fijo{background:color-mix(in srgb,#E8892B 18%,transparent);color:#E8892B}
+.est-note{margin:0 2px 8px;font:500 13px/1.45 var(--sans);color:var(--muted)}
+.est-sug{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 10px;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--brand) 10%,transparent);border:1px dashed color-mix(in srgb,var(--brand) 45%,var(--border));font:500 13.5px/1.4 var(--sans)}
+.est-sug span{flex:1;min-width:180px}
 </style>
 </head>
 <body>
@@ -6610,8 +6635,8 @@ const PXP_UMBRAL_SOBRECARGA = 5;
 function pxpProyectosCarga(person, w) {
   const tags = ((person.weeks && person.weeks[w]) || []).filter(t => t && !String(t).startsWith("_"));
   let keys = [];
-  if (tags.length) keys = tags.map(t => projectKey(t)).filter(k => { const e = PROJECTS[k] && PROJECTS[k].estadoGeneral; return !e || e === "en_produccion" || e === "revision"; });
-  else if (ROLES_POR_CARGA_DE_PROYECTOS.has(categorizeRole(person.role)) || person.casa) keys = proyectosActivosDe(person.name).filter(x => x.estado === "en_produccion" || x.estado === "revision").map(x => x.key);
+  if (tags.length) keys = tags.map(t => projectKey(t)).filter(k => { const e = PROJECTS[k] && PROJECTS[k].estadoGeneral; return !e || e === "en_produccion" || e === "revision" || e === "preproduccion"; });
+  else if (ROLES_POR_CARGA_DE_PROYECTOS.has(categorizeRole(person.role)) || person.casa) keys = proyectosActivosDe(person.name).filter(x => x.estado === "en_produccion" || x.estado === "revision" || x.estado === "preproduccion").map(x => x.key);
   return Array.from(new Set(keys));
 }
 // v146 · Carga por etapas: cada etapa suma sus horas en la semana en que se hace, según su exigencia y la complejidad del proyecto.
@@ -7125,7 +7150,7 @@ function renderFechaAlerts(alertsEl) {
   alertsEl.appendChild(al);
 }
 
-const ESTADO_LABEL = { cotizado: "Cotizado", rodaje: "En rodaje", revision: "En revisión", en_produccion: "En postproducción", standby: "Standby", entregado: "Entregado", aprobado: "Aprobado (repositorio)" };
+const ESTADO_LABEL = { cotizado: "Cotizado", preproduccion: "En preproducción", rodaje: "En rodaje", revision: "En revisión", en_produccion: "En postproducción", standby: "Standby", entregado: "Entregado", aprobado: "Aprobado (repositorio)" };
 // Las productoras ejecutivas ya son miembros reales de TEAM (para poder verles
 // ausencias/horas/compensatorios). EP_DEFAULT_NAMES queda como la lista derivada de
 // TEAM, para no romper el código que ya la usa (tarjetas de asignación, conteos, etc).
@@ -7167,12 +7192,52 @@ function aplicarEstadoGeneral(key, value, before) {
   }
 }
 
+// ── v157 · Estado automático del proyecto según sus etapas ─────────────────
+// Cotizado, Standby y Aprobado son siempre a mano. Los demás (En preproducción, En rodaje, En postproducción,
+// En revisión y Entregado) se calculan con la etapa actual: primero la que el equipo marcó (en curso, en ajustes,
+// en revisión o bloqueada); si no hay, la que según el cronograma se hace hoy; si no, la próxima pendiente.
+// Si Administración elige otro estado a mano, queda "fijado a mano" (estadoFijo) hasta que vuelva a automático.
+const PXP_EST_MANUAL = new Set(["cotizado", "standby", "aprobado"]);
+function pxpEstadoCalc(p) {
+  if (!p || !window.pxpPlanEtapas) return null;
+  const P = pxpPlanEtapas(p).filter(x => x.e && (x.e.nombre || x.ini)); if (!P.length) return null;
+  const nom = (x) => `por la etapa "${x.e.nombre || "Etapa"}"`;
+  const ent = P.filter(x => pxpClaseEtapa(x.e) === "entrega" && x.fin).sort((a, b) => (a.fin + a.i).localeCompare(b.fin + b.i)).pop();
+  if (ent && ent.e.estado === "listo") return { v: "entregado", por: nom(ent) };
+  const vivos = P.filter(x => x.e.estado !== "listo"); if (!vivos.length) return null;
+  const t = new Date().toISOString().slice(0, 10);
+  let base = vivos.filter(x => ["en_curso", "ajustes", "revision", "bloqueada"].includes(x.e.estado));
+  if (!base.length) base = vivos.filter(x => x.ini && x.fin && x.ini <= t && x.fin >= t);
+  if (!base.length) base = [vivos.slice().sort((a, b) => (a.ini || "9999").localeCompare(b.ini || "9999"))[0]];
+  const RK = { pre: 0, rodaje: 1, post: 2 }, top = Math.max(...base.map(x => RK[pxpFaseEtapa(x.e)])), G = base.filter(x => RK[pxpFaseEtapa(x.e)] === top);
+  if (top === 0) return { v: "preproduccion", por: nom(G[0]) };
+  if (top === 1) return { v: "rodaje", por: nom(G[0]) };
+  const rev = G.find(x => pxpClaseEtapa(x.e) === "revision" || x.e.estado === "revision");
+  return rev ? { v: "revision", por: nom(rev) } : { v: "en_produccion", por: nom(G[0]) };
+}
+// Aplica el estado calculado (si corresponde). Devuelve true si cambió; quien llama guarda.
+function pxpEstadoAuto(key) {
+  const p = PROJECTS[key]; if (!p) return false;
+  const cur = p.estadoGeneral || "en_produccion"; if (PXP_EST_MANUAL.has(cur) || p.estadoFijo) return false;
+  const c = pxpEstadoCalc(p); if (!c || c.v === cur) return false;
+  aplicarEstadoGeneral(key, c.v, cur);
+  p.historial = p.historial || []; p.historial.push({ ts: new Date().toISOString(), usuario: currentUser, texto: `Estado → ${ESTADO_LABEL[c.v] || c.v} (automático, ${c.por})`, tipo: "cambio" });
+  return true;
+}
+// Un cambio hecho a mano: si no coincide con el calculado, queda fijado a mano
+function pxpMarcarEstadoManual(key, value) {
+  const p = PROJECTS[key]; if (!p) return;
+  if (PXP_EST_MANUAL.has(value)) { delete p.estadoFijo; return; }
+  const c = pxpEstadoCalc(p); if (c && c.v !== value) p.estadoFijo = true; else delete p.estadoFijo;
+}
+window.pxpEstadoCalc = pxpEstadoCalc; window.pxpEstadoAuto = pxpEstadoAuto;
+
 async function cycleEstadoGeneral(key) {
   if (!PROJECTS[key]) PROJECTS[key] = blankProject(key);
-  const order = ["cotizado","rodaje","en_produccion","revision","standby","entregado","aprobado"];
+  const order = ["cotizado","preproduccion","rodaje","en_produccion","revision","standby","entregado","aprobado"];
   const cur = PROJECTS[key].estadoGeneral || "en_produccion";
   const next = order[(order.indexOf(cur)+1) % order.length];
-  aplicarEstadoGeneral(key, next, cur);
+  aplicarEstadoGeneral(key, next, cur); pxpMarcarEstadoManual(key, next);
   await saveState();
   render(currentWeek);
 }
@@ -7180,7 +7245,7 @@ async function cycleEstadoGeneral(key) {
 async function setEstadoGeneral(key, value) {
   if (!PROJECTS[key]) PROJECTS[key] = blankProject(key);
   const before = PROJECTS[key].estadoGeneral || "en_produccion";
-  aplicarEstadoGeneral(key, value, before);
+  aplicarEstadoGeneral(key, value, before); pxpMarcarEstadoManual(key, value);
   await saveState();
   render(currentWeek);
 }
@@ -7194,6 +7259,7 @@ function estadoSelectHtml(key, estado) {
   const safeKey = key.replace(/'/g, "\\'");
   return `<select class="status-pill ${estado}" style="cursor:pointer;border-width:1px" onchange="setEstadoGeneral('${safeKey}', this.value)" title="Elegir estado directamente">
     <option value="cotizado" ${estado==="cotizado"?"selected":""}>${ESTADO_LABEL.cotizado}</option>
+    <option value="preproduccion" ${estado==="preproduccion"?"selected":""}>${ESTADO_LABEL.preproduccion}</option>
     <option value="rodaje" ${estado==="rodaje"?"selected":""}>${ESTADO_LABEL.rodaje}</option>
     <option value="en_produccion" ${estado==="en_produccion"?"selected":""}>${ESTADO_LABEL.en_produccion}</option>
     <option value="revision" ${estado==="revision"?"selected":""}>${ESTADO_LABEL.revision}</option>
@@ -7817,6 +7883,7 @@ function renderProjects() {
       <select onchange="projectsFilter.estado=this.value; renderProjects()">
         <option value="">Todos los estados</option>
         <option value="cotizado" ${projectsFilter.estado==="cotizado"?"selected":""}>Cotizado</option>
+        <option value="preproduccion" ${projectsFilter.estado==="preproduccion"?"selected":""}>En preproducción</option>
         <option value="en_produccion" ${projectsFilter.estado==="en_produccion"?"selected":""}>En postproducción</option>
         <option value="standby" ${projectsFilter.estado==="standby"?"selected":""}>Standby</option>
         <option value="entregado" ${projectsFilter.estado==="entregado"?"selected":""}>Entregado</option>
@@ -8875,6 +8942,7 @@ function renderFicha() {
         <div class="ficha-field"><label>Estado</label>
           <select id="ficha-estadoGeneral">
             <option value="cotizado" ${proj.estadoGeneral==="cotizado"?"selected":""}>Cotizado</option>
+            <option value="preproduccion" ${proj.estadoGeneral==="preproduccion"?"selected":""}>En preproducción</option>
             <option value="rodaje" ${proj.estadoGeneral==="rodaje"?"selected":""}>En rodaje</option>
             <option value="en_produccion" ${(!proj.estadoGeneral||proj.estadoGeneral==="en_produccion")?"selected":""}>En postproducción</option>
             <option value="revision" ${proj.estadoGeneral==="revision"?"selected":""}>En revisión</option>
@@ -8988,7 +9056,7 @@ async function saveFicha() {
   if (before.complejidad !== proj.complejidad) changes.push(`Complejidad → ${proj.complejidad}`);
   const nuevoEstado = document.getElementById("ficha-estadoGeneral").value;
   if (before.estadoGeneral !== nuevoEstado) {
-    aplicarEstadoGeneral(fichaCurrentKey, nuevoEstado, before.estadoGeneral || "en_produccion");
+    aplicarEstadoGeneral(fichaCurrentKey, nuevoEstado, before.estadoGeneral || "en_produccion"); pxpMarcarEstadoManual(fichaCurrentKey, nuevoEstado);
     // aplicarEstadoGeneral ya registra su propio texto de historial (incluye el archivado al Repositorio si aplica)
   }
 
@@ -9576,7 +9644,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       </div>`;
 
     // 1 · Estado de los proyectos: lista corta y clara
-    const EST = [["cotizado", "Cotizado", "var(--muted)"], ["rodaje", "En rodaje", "#FB8847"], ["en_produccion", "En postproducción", "var(--blue)"], ["revision", "En revisión", "#61B3FF"], ["standby", "Standby", "var(--pink)"], ["entregado", "Entregado", "var(--green)"]];
+    const EST = [["cotizado", "Cotizado", "var(--muted)"], ["preproduccion", "En preproducción", "#1FB58F"], ["rodaje", "En rodaje", "#FB8847"], ["en_produccion", "En postproducción", "var(--blue)"], ["revision", "En revisión", "#61B3FF"], ["standby", "Standby", "var(--pink)"], ["entregado", "Entregado", "var(--green)"]];
     const estCount = {}; EST.forEach(([k]) => estCount[k] = 0);
     keys.forEach(k => { const e = estadoDe(k); if (estCount[e] !== undefined) estCount[e]++; });
     const estadoBody = `<div class="est-list">${EST.map(([k, l, c]) => {
@@ -10950,9 +11018,9 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   let pv = Object.assign({ group: "none", sort: "nombre", dir: 1, gdir: 1, complejidad: "", tipo: "", agencia: "", collapsed: {} }, (() => { try { return JSON.parse(localStorage.getItem(PV_KEY) || "{}"); } catch (e) { return {}; } })());
   if (pv.sort === "etapa") pv.sort = "avance";
   const pvSave = () => { try { localStorage.setItem(PV_KEY, JSON.stringify(pv)); } catch (e) { } };
-  const ORD_EST = { cotizado: 0, rodaje: 1, en_produccion: 2, revision: 3, standby: 4, entregado: 5, aprobado: 6 };
+  const ORD_EST = { cotizado: 0, preproduccion: 0.5, rodaje: 1, en_produccion: 2, revision: 3, standby: 4, entregado: 5, aprobado: 6 };
   const ORD_CPX = { simple: 1, medio: 2, complejo: 3 };
-  const EST_LBL = { rodaje: "En rodaje", revision: "En revisión", en_produccion: "En postproducción", cotizado: "Cotizado", standby: "Standby", entregado: "Entregado", aprobado: "Aprobado" };
+  const EST_LBL = { preproduccion: "En preproducción", rodaje: "En rodaje", revision: "En revisión", en_produccion: "En postproducción", cotizado: "Cotizado", standby: "Standby", entregado: "Entregado", aprobado: "Aprobado" };
   const SIN = "Sin cliente", SINAG = "Sin agencia", TIPO_COL = window.pxpTipoColor || {};
 
   function sortVal(k, r) {
@@ -11096,7 +11164,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     wrap.innerHTML = `
       <div class="pv-bar">
         <label class="pv-search">${ICON.search}<input type="text" id="pv-search" placeholder="Buscar por proyecto, cliente o marca" value="${esc(projectsFilter.search)}" oninput="pvSet('search',this.value)" aria-label="Buscar"></label>
-        <select onchange="pvSet('estado',this.value)" aria-label="Filtrar por estado"><option value="">Todos los estados</option>${["cotizado", "rodaje", "en_produccion", "revision", "standby", "entregado"].map(e => `<option value="${e}" ${projectsFilter.estado === e ? "selected" : ""}>${EST_LBL[e]}</option>`).join("")}</select>
+        <select onchange="pvSet('estado',this.value)" aria-label="Filtrar por estado"><option value="">Todos los estados</option>${["cotizado", "preproduccion", "rodaje", "en_produccion", "revision", "standby", "entregado"].map(e => `<option value="${e}" ${projectsFilter.estado === e ? "selected" : ""}>${EST_LBL[e]}</option>`).join("")}</select>
         <select onchange="pvSet('cliente',this.value)" aria-label="Filtrar por cliente"><option value="">Todos los clientes</option>${clientes.map(c => `<option value="${esc(c)}" ${projectsFilter.cliente === c ? "selected" : ""}>${esc(c)}</option>`).join("")}</select>
         <select onchange="pvSet('complejidad',this.value)" aria-label="Filtrar por complejidad"><option value="">Toda complejidad</option>${["simple", "medio", "complejo"].map(c => `<option value="${c}" ${pv.complejidad === c ? "selected" : ""}>${c[0].toUpperCase() + c.slice(1)}</option>`).join("")}</select>
         <select onchange="pvSet('tipo',this.value)" aria-label="Filtrar por tipo"><option value="">Todos los tipos</option>${window.pxpTipos.map(t => `<option value="${t}" ${pv.tipo === t ? "selected" : ""}>${t}</option>`).join("")}</select>
@@ -11104,7 +11172,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
         <button class="btn-ghost sm" id="pv-clear" onclick="pvClear()" ${hasFilters() ? "" : "hidden"}>Limpiar filtros</button>
       </div>
       <div class="pv-bar2">
-        <div class="pv-chips"><span class="pv-tot"><b>${cnt.total}</b> proyectos</span>${chip("cotizado", "cotizados", "c-gray")}${chip("rodaje", "en rodaje", "c-orange")}${chip("en_produccion", "en postproducción", "c-blue")}${chip("revision", "en revisión", "c-sky")}${chip("standby", "en standby", "c-pink")}${chip("entregado", "entregados", "c-green")}
+        <div class="pv-chips"><span class="pv-tot"><b>${cnt.total}</b> proyectos</span>${chip("cotizado", "cotizados", "c-gray")}${chip("preproduccion", "en preproducción", "c-mint")}${chip("rodaje", "en rodaje", "c-orange")}${chip("en_produccion", "en postproducción", "c-blue")}${chip("revision", "en revisión", "c-sky")}${chip("standby", "en standby", "c-pink")}${chip("entregado", "entregados", "c-green")}
           ${projectsFilter.persona ? `<span class="filter-chip">Responsable: ${esc(projectsFilter.persona)} <button onclick="pvClear()">✕ quitar</button></span>` : ""}</div>
         <div class="pv-tools"><span class="seg-l">Agrupar por</span><div class="seg" role="group" aria-label="Agrupar">${gbtn("cliente", "Cliente")}${gbtn("agencia", "Agencia")}${gbtn("tipo", "Tipo")}${gbtn("estado", "Estado")}${gbtn("none", "Sin agrupar")}</div>
           ${pv.group === "cliente" ? `<button class="linkbtn" onclick="pvGdir()" title="Cambiar el orden de los clientes">Clientes ${(pv.gdir || 1) > 0 ? "A → Z" : "Z → A"}</button>` : ""}${pv.group !== "none" ? `<button class="linkbtn" onclick="pvAll(true)">Esconder todos</button><button class="linkbtn" onclick="pvAll(false)">Mostrar todos</button>` : ""}</div>
@@ -11272,7 +11340,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
 
   // ═════════ CLIENTES: gráfico "Trabajo por cliente" ═════════
   let metric = "personas";
-  const EST = [["cotizado", "Cotizado", "var(--muted)"], ["rodaje", "En rodaje", "#FB8847"], ["en_produccion", "En postproducción", "var(--blue)"], ["revision", "En revisión", "#61B3FF"], ["standby", "Standby", "var(--pink)"], ["entregado", "Entregado", "var(--green)"]];
+  const EST = [["cotizado", "Cotizado", "var(--muted)"], ["preproduccion", "En preproducción", "#1FB58F"], ["rodaje", "En rodaje", "#FB8847"], ["en_produccion", "En postproducción", "var(--blue)"], ["revision", "En revisión", "#61B3FF"], ["standby", "Standby", "var(--pink)"], ["entregado", "Entregado", "var(--green)"]];
   const EXPL = {
     proyectos: "Cuántos proyectos tiene cada cliente y en qué estado está cada uno.",
     horas: "Horas que el equipo ha anotado en los proyectos de cada cliente (ficha del proyecto → Horas trabajadas).",
@@ -11281,7 +11349,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   let scope = null;                       // en el Home usa el período del Home; en Clientes, su selector
   function cliData() {
     const map = new Map(), per = scope;
-    const get = (c) => { const label = (c || "").trim() || "Sin cliente"; const k = norm(label); if (!map.has(k)) map.set(k, { label, est: { cotizado: 0, rodaje: 0, en_produccion: 0, revision: 0, standby: 0, entregado: 0 }, horas: 0, ppl: new Set() }); return map.get(k); };
+    const get = (c) => { const label = (c || "").trim() || "Sin cliente"; const k = norm(label); if (!map.has(k)) map.set(k, { label, est: { cotizado: 0, preproduccion: 0, rodaje: 0, en_produccion: 0, revision: 0, standby: 0, entregado: 0 }, horas: 0, ppl: new Set() }); return map.get(k); };
     (per ? (per.modo === "activos" ? getAllKnownProjectKeys() : window.pxpPerKeys()) : (window.pxpCliKeys ? pxpCliKeys() : getAllKnownProjectKeys())).forEach(k => {
       const p = PROJECTS[k] || {}, o = get(p.cliente), e = p.estadoGeneral || "en_produccion";
       if (o.est[e] !== undefined) o.est[e]++;
@@ -11500,7 +11568,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   function closeProj() { pk = null; confirmDelNote = null; pm.classList.remove("open"); }
   window.pxpCloseProject = closeProj;
 
-  const EST = [["cotizado", "Cotizado", "var(--muted)"], ["rodaje", "En rodaje", "#FB8847"], ["en_produccion", "En postproducción", "var(--blue)"], ["revision", "En revisión", "#61B3FF"], ["standby", "Standby", "var(--pink)"], ["entregado", "Entregado", "var(--green)"], ["aprobado", "Aprobado", "var(--teal)"]];
+  const EST = [["cotizado", "Cotizado", "var(--muted)"], ["preproduccion", "En preproducción", "#1FB58F"], ["rodaje", "En rodaje", "#FB8847"], ["en_produccion", "En postproducción", "var(--blue)"], ["revision", "En revisión", "#61B3FF"], ["standby", "Standby", "var(--pink)"], ["entregado", "Entregado", "var(--green)"], ["aprobado", "Aprobado", "var(--teal)"]];
   const CPX = [["simple", "Simple"], ["medio", "Medio"], ["complejo", "Complejo"]];
   const ETS = { pendiente: "Pendiente", en_curso: "En curso", bloqueada: "Bloqueada", ajustes: "En ajustes", revision: "En revisión", listo: "Listo" };
   const AUTO = /→|^Registró |quitado\(a\)|agregado|Aprobado|Reactivado|^Cambios|^Proyecto creado/i;
@@ -11670,7 +11738,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
         <div class="ptl-today" style="left:${tp}%"><span>Hoy</span></div></div></div>`;
   }
   const PI = (d, cls) => `<svg class="i${cls ? " " + cls : ""}" viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
-  const ST_IC = { cotizado: "<path d='M3 12.5V4h8.5L21 13.5 13.5 21z'/><circle cx='7.5' cy='8' r='1.3'/>", rodaje: "<path d='M3.5 10h17v9.5a1.5 1.5 0 0 1-1.5 1.5H5a1.5 1.5 0 0 1-1.5-1.5z'/><path d='m3.3 10-.6-3.3 15.8-3 .6 3.3z'/><path d='m8 6.7 2 3.2M13 5.7l2 3.2'/>", en_produccion: "<rect x='3.5' y='4.5' width='17' height='15' rx='2'/><path d='M8 4.5v15M16 4.5v15M3.5 9H8M3.5 15H8M16 9h4.5M16 15h4.5'/>", revision: "<path d='M2.5 12s3.5-6.5 9.5-6.5S21.5 12 21.5 12s-3.5 6.5-9.5 6.5S2.5 12 2.5 12z'/><circle cx='12' cy='12' r='2.6'/>", standby: "<rect x='6.5' y='5' width='3.8' height='14' rx='1'/><rect x='13.7' y='5' width='3.8' height='14' rx='1'/>", entregado: "<path d='M4 8l8-4 8 4v8l-8 4-8-4z'/><path d='M4 8l8 4 8-4M12 12v8'/>", aprobado: "<circle cx='12' cy='12' r='8.5'/><path d='m8.5 12.3 2.4 2.4 4.6-5'/>" };
+  const ST_IC = { cotizado: "<path d='M3 12.5V4h8.5L21 13.5 13.5 21z'/><circle cx='7.5' cy='8' r='1.3'/>", preproduccion: "<rect x='5' y='4' width='14' height='17' rx='2'/><path d='M9 4V3h6v1M9 10h6M9 14h6M9 18h3'/>", rodaje: "<path d='M3.5 10h17v9.5a1.5 1.5 0 0 1-1.5 1.5H5a1.5 1.5 0 0 1-1.5-1.5z'/><path d='m3.3 10-.6-3.3 15.8-3 .6 3.3z'/><path d='m8 6.7 2 3.2M13 5.7l2 3.2'/>", en_produccion: "<rect x='3.5' y='4.5' width='17' height='15' rx='2'/><path d='M8 4.5v15M16 4.5v15M3.5 9H8M3.5 15H8M16 9h4.5M16 15h4.5'/>", revision: "<path d='M2.5 12s3.5-6.5 9.5-6.5S21.5 12 21.5 12s-3.5 6.5-9.5 6.5S2.5 12 2.5 12z'/><circle cx='12' cy='12' r='2.6'/>", standby: "<rect x='6.5' y='5' width='3.8' height='14' rx='1'/><rect x='13.7' y='5' width='3.8' height='14' rx='1'/>", entregado: "<path d='M4 8l8-4 8 4v8l-8 4-8-4z'/><path d='M4 8l8 4 8-4M12 12v8'/>", aprobado: "<circle cx='12' cy='12' r='8.5'/><path d='m8.5 12.3 2.4 2.4 4.6-5'/>" };
   const CPX_IC = (n) => `<path d='M6 19v-4' style='opacity:${n >= 1 ? 1 : .28}'/><path d='M12 19v-8' style='opacity:${n >= 2 ? 1 : .28}'/><path d='M18 19V6' style='opacity:${n >= 3 ? 1 : .28}'/>`;
   const TAG_IC = "<path d='M3.5 12.2V4.5a1 1 0 0 1 1-1h7.7l8.3 8.3-8.7 8.7z'/><circle cx='8' cy='8' r='1.4'/>";
   const TIPO_IC = { "Audio / Mix": "<path d='M4 13v-1a8 8 0 0 1 16 0v1'/><rect x='3' y='13' width='4' height='7' rx='1.5'/><rect x='17' y='13' width='4' height='7' rx='1.5'/>", "Automatización": "<circle cx='12' cy='12' r='3'/><path d='M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6 6l1.6 1.6M16.4 16.4 18 18M6 18l1.6-1.6M16.4 7.6 18 6'/>", "Banner web": "<rect x='3' y='5' width='18' height='10' rx='2'/><path d='M7 9h6M7 12h4'/><circle cx='17' cy='18.2' r='2.2'/><path d='M17 14.9v.8M17 20.7v.8M13.8 18.2h.8M19.4 18.2h.8'/>", "Recetas": "<path d='M4 11h16a8 8 0 0 1-16 0z'/><path d='M8 7c0-1.5 1-2 1-3.5M12 7c0-1.5 1-2 1-3.5M16 7c0-1.5 1-2 1-3.5'/>", "Comercial": "<rect x='3' y='5' width='18' height='12' rx='2'/><path d='M8 21h8M12 17v4'/>", "Casos": "<path d='M8 21h8M10 17.5h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z'/>", "Licitaciones": "<path d='M6 3h8l5 5v13H6z'/><path d='M14 3v5h5M9 13.5h6M9 17h4'/>", "Contenido Digital": "<rect x='7' y='2.5' width='10' height='19' rx='2.5'/><path d='m10.5 9.5 4 2.5-4 2.5z'/>", "Animatic": "<rect x='3' y='4.5' width='8' height='6.5' rx='1'/><rect x='13' y='4.5' width='8' height='6.5' rx='1'/><rect x='3' y='13.5' width='8' height='6.5' rx='1'/><path d='m15 15 4.5 2.2L15 19.4z'/>", "Estático": "<rect x='3.5' y='4.5' width='17' height='15' rx='2'/><circle cx='9' cy='10' r='1.8'/><path d='m20.5 16-5-5-8 8.5'/>" };
@@ -11709,7 +11777,12 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const panelPz = `<div class="pz2"><div class="stp"><span class="stp-l">${PI(PL.pzI)}Total</span><button type="button" onclick="pxpPz('piezas',-1)" aria-label="Una pieza menos" ${lock}>−</button><input type="number" min="0" id="pj-piezas" value="${tot}" onchange="pxpProjSet('piezas',this.value)" aria-label="Total de piezas" ${lock}><button type="button" onclick="pxpPz('piezas',1)" aria-label="Una pieza más" ${lock}>+</button></div>
       <div class="stp ok"><span class="stp-l">${PI("<path d='m5 12.5 4.5 4.5L19 7.5'/>")}Entregadas</span><button type="button" onclick="pxpPz('piezasOk',-1)" aria-label="Una entregada menos">−</button><input type="number" min="0" id="pj-piezas-ok" value="${ok}" onchange="pxpProjSet('piezasOk',this.value)" aria-label="Piezas entregadas"><button type="button" onclick="pxpPz('piezasOk',1)" aria-label="Una entregada más">+</button></div></div>${det.length ? `<small class="note">El total se calcula con las piezas por tipo.</small>` : ""}`;
     const left = edP ? `<div class="cfg-col">
-      ${field("est", "Estado", PL.estado, `<i class="cfg-dot" style="--sc:${E[2]}"></i>${E[1]}`, `<div class="cfg-list">${EST.map(([v, l, c]) => opt(est === v, c, PI(ST_IC[v]), l, `pxpCfgSel('estado','${v}')`)).join("")}</div>`)}
+      ${field("est", "Estado", PL.estado, `<i class="cfg-dot" style="--sc:${E[2]}"></i>${E[1]}${PXP_EST_MANUAL.has(est) ? "" : p.estadoFijo ? `<em class="cfg-tag fijo">a mano</em>` : `<em class="cfg-tag">auto</em>`}`, `${(() => {
+        const c = pxpEstadoCalc(PROJECTS[k] || p), L = (v) => (EST.find(z => z[0] === v) || [, v])[1];
+        if (PXP_EST_MANUAL.has(est)) return c && est !== "aprobado" && c.v !== est ? `<div class="est-sug"><span>Las etapas indican <b>${L(c.v)}</b> (${esc(c.por)}).</span><button type="button" class="btn-ghost sm" onclick="pxpCfgSel('estado','${c.v}')">Pasar a ${L(c.v)}</button></div>` : `<p class="est-note">${est === "aprobado" ? "Aprobado es siempre a mano: mueve el proyecto al Repositorio." : "Este estado es siempre a mano; las etapas no lo cambian."}</p>`;
+        if (p.estadoFijo) return `<div class="est-sug"><span>Fijado a mano.${c ? ` Las etapas indican <b>${L(c.v)}</b>.` : ""}</span><button type="button" class="btn-ghost sm" onclick="pxpCfgSel('estadoAuto','1')">Volver a automático</button></div>`;
+        return `<p class="est-note">Automático: cambia solo según las etapas${c ? ` (${esc(c.por)})` : ""}. Si eliges otro, queda fijado a mano. Cotizado, Standby y Aprobado son siempre a mano.</p>`;
+      })()}<div class="cfg-list">${EST.map(([v, l, c]) => opt(est === v, c, PI(ST_IC[v]), l, `pxpCfgSel('estado','${v}')`)).join("")}</div>`)}
       ${field("tipo", "Tipo", PL.tipo, `${PI(TIPO_IC[tipo] || TAG_IC)}${esc(tipo)}${tipoExp ? "" : `<em class="cfg-tag">auto</em>`}`, panelTipo)}
       ${field("ag", "Agencia creativa", PL.ag, agenciaV ? esc(agenciaV) : `<span class="cfg-nil">Sin agencia</span>`, panelAg)}
       ${window.pxpPDHtml ? field("pd", "Piezas · Hero y derivadas", PI("<rect x='3.5' y='4' width='17' height='5' rx='1.5'/><rect x='3.5' y='11' width='17' height='5' rx='1.5'/><path d='M7 20h10'/>", "pl"), (() => { const R = window.pxpPiezasResumen ? pxpPiezasResumen(p) : null; return !det.length ? `<span class="cfg-nil">Sin definir</span>` : R && R.hero ? `Hero${R.hero.dur ? " " + esc(R.hero.dur) : ""}${R.nD ? ` + ${R.nD} derivada${R.nD !== 1 ? "s" : ""}` : ""}` : `${nDet} pieza${nDet !== 1 ? "s" : ""} · <span class="cfg-req">sin Hero</span>`; })(), `<div class="pd">${pxpPDHtml(k)}</div>`) : ""}
@@ -11800,6 +11873,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   window.pxpOpenProject = function (key) {
     const k = typeof projectKey === "function" ? projectKey(key) : key;
     pk = k; confirmDelNote = null;
+    // v157 · Lo que depende solo de la fecha se aplica al abrir (quien puede editar). En la vista previa viaja con el siguiente guardado.
+    try { if ((!window.pxpPuedeEditar || pxpPuedeEditar()) && pxpEstadoAuto(k) && window.PXP_BACKEND === "netlify") saveState(); } catch (e) { console.error(e); }
     pm.classList.add("open"); renderProj();
     pm.scrollTop = 0;
     const t = pm.querySelector("#pj-title"); if (t) t.setAttribute("tabindex", "-1");
@@ -11809,6 +11884,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     if (window.pxpPuedeEditar && !pxpPuedeEditar()) { toast("Solo Administración (Dirección de Post, Producción Ejecutiva y Project Manager) cambia los datos generales del proyecto."); return; }
     const k = pk; if (!k) return;
     if (what === "estado") { await setEstadoGeneral(k, v); renderProj(); return; }
+    if (what === "estadoAuto") { const q = ensure(k); delete q.estadoFijo; pxpEstadoAuto(k); await saveP(); renderProj(); return; }
     if (what === "piezas" || what === "piezasOk") {
       const q = ensure(k), n = Math.max(0, parseInt(v) || 0); q.historial = q.historial || [];
       if (n) q[what] = n; else delete q[what];
@@ -11915,7 +11991,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const ppl = new Set(); act.forEach(r => members(r.p).forEach(m => ppl.add(norm(m.name))));
     const marcas = {}; rows.forEach(r => { const m = (r.p.marca || "").trim(); if (m) marcas[norm(m)] = { l: m, n: ((marcas[norm(m)] || {}).n || 0) + 1 }; });
     const photo = !!((META && META.clientPhotos) || {})[k];
-    const byState = (a, b) => ({ rodaje: 0, en_produccion: 1, revision: 2, cotizado: 3, standby: 4, entregado: 5, aprobado: 6 }[a.p.estadoGeneral || "en_produccion"] - { rodaje: 0, en_produccion: 1, revision: 2, cotizado: 3, standby: 4, entregado: 5, aprobado: 6 }[b.p.estadoGeneral || "en_produccion"]) || (a.p.nombre || a.k).localeCompare(b.p.nombre || b.k, "es");
+    const byState = (a, b) => ({ preproduccion: -0.5, rodaje: 0, en_produccion: 1, revision: 2, cotizado: 3, standby: 4, entregado: 5, aprobado: 6 }[a.p.estadoGeneral || "en_produccion"] - { preproduccion: -0.5, rodaje: 0, en_produccion: 1, revision: 2, cotizado: 3, standby: 4, entregado: 5, aprobado: 6 }[b.p.estadoGeneral || "en_produccion"]) || (a.p.nombre || a.k).localeCompare(b.p.nombre || b.k, "es");
     const prow = (r) => { const nx = nextEtapa(r.p); return `<div class="cl-p" style="--pc:${pColor(r.k)}">
       <button class="pn" onclick="pxpOpenProject('${ea(r.k)}')" title="Abrir el proyecto">${esc(r.p.nombre || r.k)}${r.p.marca ? `<small>${esc(r.p.marca)}</small>` : ""}</button>
       <span class="cl-nx">${nx ? `${esc(nx.nombre || "Etapa")} · ${fmtD(nx.fecha)}` : `<span class="muted">—</span>`}</span>
@@ -12731,7 +12807,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
           ${fld("np-brand", "Marca", `<input type="text" id="np-brand" list="np-br" value="${esc(pre.marca || "")}" placeholder="Ej: Oreo, Chiky…" autocomplete="off" onchange="pxpNPBrand(this)"><datalist id="np-br">${(window.pxpMarcas ? pxpMarcas() : []).map(c => `<option value="${esc(c)}">`).join("")}</datalist>`)}
           ${fld("np-agencia", "Agencia creativa (opcional)", `<input type="text" id="np-agencia" list="np-ag" value="${esc(pre.agencia || "")}" placeholder="¿De qué agencia viene este proyecto?" autocomplete="off"><datalist id="np-ag">${(window.pxpAgencias ? pxpAgencias() : []).map(c => `<option value="${esc(c)}">`).join("")}</datalist>`, "nm-full")}
           ${fld("np-tipo", "Tipo de proyecto", seg("tipo", (window.pxpTipos || []).map(t => [t, t]), np.tipo), "nm-full")}
-          ${fld("np-est", "Estado", seg("estado", [["cotizado", "Cotizado"], ["rodaje", "En rodaje"], ["en_produccion", "En postproducción"], ["revision", "En revisión"], ["standby", "Standby"]], np.estado), "nm-full")}
+          ${fld("np-est", "Estado", seg("estado", [["cotizado", "Cotizado"], ["preproduccion", "En preproducción"], ["rodaje", "En rodaje"], ["en_produccion", "En postproducción"], ["revision", "En revisión"], ["standby", "Standby"]], np.estado), "nm-full")}
           ${fld("np-cpx", "Complejidad", seg("cpx", [["simple", "Simple"], ["medio", "Medio"], ["complejo", "Complejo"]], np.cpx), "nm-full")}
           ${fld("np-start", "Fecha de inicio", `<input type="date" id="np-start" value="${esc(pre.inicio || isoToday())}">`)}
           ${fld("np-end", "Entrega prevista (opcional)", `<input type="date" id="np-end" value="">`)}
@@ -13119,7 +13195,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
 
   // ═════════ B · RED DE PROYECTOS (persona y cliente al centro) ═════════
   const TIPO_SHAPE = { "Audio / Mix": "square", "Comercial": "circle", "Casos": "diamond", "Licitaciones": "tri", "Contenido Digital": "hex", "Animatic": "square", "Estático": "penta", "Recetas": "octa", "Banner web": "trid", "Automatización": "star" };
-  const EST = { rodaje: ["En rodaje", "#FB8847"], en_produccion: ["En postproducción", "var(--blue)"], revision: ["En revisión", "#61B3FF"], cotizado: ["Cotizado", "var(--muted)"], standby: ["Standby", "var(--pink)"], entregado: ["Entregado", "var(--green)"] };
+  const EST = { preproduccion: ["En preproducción", "#1FB58F"], rodaje: ["En rodaje", "#FB8847"], en_produccion: ["En postproducción", "var(--blue)"], revision: ["En revisión", "#61B3FF"], cotizado: ["Cotizado", "var(--muted)"], standby: ["Standby", "var(--pink)"], entregado: ["Entregado", "var(--green)"] };
   function netSvg(center, items) {
     const shape = window.pxpShapeSvg, poly = window.pxpPoly;
     if (!items.length) return `<div class="empty-cta"><b>Sin proyectos activos</b>Cuando tenga proyectos asignados aparecerán aquí, conectados a su alrededor.</div>`;
@@ -13829,6 +13905,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       case "add": E.push({ nombre: "", estado: "pendiente", hp: 8, dias: 1, resp: "", nota: "" }); struct = true; focusId = "et-name-" + (E.length - 1); break;
     }
     applyPlan(p);
+    if (window.pxpEstadoAuto && pxpEstadoAuto(k)) struct = true;   // v157 · el estado del proyecto sigue a sus etapas
     if (struct && window.pxpRenderProj) { window.pxpRenderProj(); if (focusId && $(focusId)) $(focusId).focus(); }
     else setTimeout(() => refresh(k), 0);
     await save();
@@ -15740,7 +15817,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     hours: "<path d='M7 3h10M7 21h10M8 3c0 5 8 5 8 9s-8 4-8 9M16 3c0 5-8 5-8 9'/>", brand: "<path d='M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z'/>",
   };
   const LBL = [[/^Nombre del proyecto/i, "folder"], [/^Cliente/i, "user"], [/^Marca/i, "brand"], [/^Agencia/i, "bld"], [/^Piezas/i, "box"], [/^Fecha inicio/i, "cal"], [/^Fecha fin/i, "flag"], [/^Horas estimadas/i, "hours"]];
-  const ST = { cotizado: ["Cotizado", "#8E8E96", "<path d='M3 12.5V4h8.5L21 13.5 13.5 21z'/><circle cx='7.5' cy='8' r='1.3'/>"], rodaje: ["En rodaje", "#FB8847", "<path d='M3.5 10h17v9.5a1.5 1.5 0 0 1-1.5 1.5H5a1.5 1.5 0 0 1-1.5-1.5z'/><path d='m3.3 10-.6-3.3 15.8-3 .6 3.3z'/>"], en_produccion: ["En postproducción", "#8F80FF", "<rect x='3.5' y='4.5' width='17' height='15' rx='2'/><path d='M8 4.5v15M16 4.5v15'/>"], revision: ["En revisión", "#61B3FF", "<path d='M2.5 12s3.5-6.5 9.5-6.5S21.5 12 21.5 12s-3.5 6.5-9.5 6.5S2.5 12 2.5 12z'/><circle cx='12' cy='12' r='2.6'/>"], standby: ["Standby", "#F63DA9", "<rect x='6.5' y='5' width='3.8' height='14' rx='1'/><rect x='13.7' y='5' width='3.8' height='14' rx='1'/>"], entregado: ["Entregado", "#64FF61", "<path d='M4 8l8-4 8 4v8l-8 4-8-4z'/><path d='M4 8l8 4 8-4M12 12v8'/>"], aprobado: ["Aprobado", "#F3FF57", "<circle cx='12' cy='12' r='8.5'/><path d='m8.5 12.3 2.4 2.4 4.6-5'/>"] };
+  const ST = { cotizado: ["Cotizado", "#8E8E96", "<path d='M3 12.5V4h8.5L21 13.5 13.5 21z'/><circle cx='7.5' cy='8' r='1.3'/>"], preproduccion: ["En preproducción", "#1FB58F", "<rect x='5' y='4' width='14' height='17' rx='2'/><path d='M9 4V3h6v1M9 10h6M9 14h6M9 18h3'/>"], rodaje: ["En rodaje", "#FB8847", "<path d='M3.5 10h17v9.5a1.5 1.5 0 0 1-1.5 1.5H5a1.5 1.5 0 0 1-1.5-1.5z'/><path d='m3.3 10-.6-3.3 15.8-3 .6 3.3z'/>"], en_produccion: ["En postproducción", "#8F80FF", "<rect x='3.5' y='4.5' width='17' height='15' rx='2'/><path d='M8 4.5v15M16 4.5v15'/>"], revision: ["En revisión", "#61B3FF", "<path d='M2.5 12s3.5-6.5 9.5-6.5S21.5 12 21.5 12s-3.5 6.5-9.5 6.5S2.5 12 2.5 12z'/><circle cx='12' cy='12' r='2.6'/>"], standby: ["Standby", "#F63DA9", "<rect x='6.5' y='5' width='3.8' height='14' rx='1'/><rect x='13.7' y='5' width='3.8' height='14' rx='1'/>"], entregado: ["Entregado", "#64FF61", "<path d='M4 8l8-4 8 4v8l-8 4-8-4z'/><path d='M4 8l8 4 8-4M12 12v8'/>"], aprobado: ["Aprobado", "#F3FF57", "<circle cx='12' cy='12' r='8.5'/><path d='m8.5 12.3 2.4 2.4 4.6-5'/>"] };
   const CPX = { simple: ["Simple", "var(--green)", 1], medio: ["Medio", "var(--yellow)", 2], complejo: ["Complejo", "var(--red)", 3] };
   const TIPO_IC = { "Automatización": "<circle cx='12' cy='12' r='3'/><path d='M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6 6l1.6 1.6M16.4 16.4 18 18M6 18l1.6-1.6M16.4 7.6 18 6'/>", "Banner web": "<rect x='3' y='5' width='18' height='10' rx='2'/><path d='M7 9h6M7 12h4'/><circle cx='17' cy='18.2' r='2.2'/><path d='M17 14.9v.8M17 20.7v.8M13.8 18.2h.8M19.4 18.2h.8'/>", "Recetas": "<path d='M4 11h16a8 8 0 0 1-16 0z'/><path d='M8 7c0-1.5 1-2 1-3.5M12 7c0-1.5 1-2 1-3.5M16 7c0-1.5 1-2 1-3.5'/>", "": "<path d='M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1'/>", "Comercial": "<rect x='3' y='5' width='18' height='12' rx='2'/><path d='M8 21h8M12 17v4'/>", "Casos": "<path d='M8 21h8M10 17.5h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z'/>", "Licitaciones": "<path d='M6 3h8l5 5v13H6z'/><path d='M14 3v5h5M9 13.5h6M9 17h4'/>", "Contenido Digital": "<rect x='7' y='2.5' width='10' height='19' rx='2.5'/><path d='m10.5 9.5 4 2.5-4 2.5z'/>", "Animatic": "<rect x='3' y='4.5' width='8' height='6.5' rx='1'/><rect x='13' y='4.5' width='8' height='6.5' rx='1'/><rect x='3' y='13.5' width='8' height='6.5' rx='1'/><path d='m15 15 4.5 2.2L15 19.4z'/>", "Estático": "<rect x='3.5' y='4.5' width='17' height='15' rx='2'/><circle cx='9' cy='10' r='1.8'/><path d='m20.5 16-5-5-8 8.5'/>" };
   const bars = (n) => `<path d='M6 19v-4' style='opacity:${n >= 1 ? 1 : .28}'/><path d='M12 19v-8' style='opacity:${n >= 2 ? 1 : .28}'/><path d='M18 19V6' style='opacity:${n >= 3 ? 1 : .28}'/>`;
@@ -16221,11 +16298,11 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
 
   // ═════════ Textos del reporte (español / inglés) ═════════
   const RT = {
-    es: { rp: "Reporte de proyecto", rc: "Reporte de cliente", brand: "Tráfico Post · Publicis Production", estado: "Estado", aprobado: "Aprobado", entregado: "Entregado", en_produccion: "En postproducción", revision: "En revisión", rodaje: "En rodaje", standby: "Standby", cotizado: "Cotizado",
+    es: { rp: "Reporte de proyecto", rc: "Reporte de cliente", brand: "Tráfico Post · Publicis Production", estado: "Estado", aprobado: "Aprobado", entregado: "Entregado", en_produccion: "En postproducción", revision: "En revisión", rodaje: "En rodaje", preproduccion: "En preproducción", standby: "Standby", cotizado: "Cotizado",
       closed: "Cierre", started: "Inicio", duration: "Duración", days: "días", day: "día", deadline: "Cumplimiento del plazo", ontime: "A tiempo", late: "{n} d de retraso", early: "{n} d antes", pieces: "Piezas", piecesBy: "Piezas por tipo", delivered: "entregadas", of: "de", adapt: "Adaptaciones por país", versions: "versiones", version: "versión", countries: "países", schedule: "Cronograma", reviews: "Revisiones", shared: "Versiones compartidas", approvedV: "Aprobadas", changesV: "Con cambios", imgC: "Comentarios en imágenes", resolved: "resueltos", team: "Equipo", hours: "Horas registradas", hoursU: "h", blockers: "Bloqueos", daysLost: "días perdidos", generated: "Generado el", page: "Página", omitted: "Para mantener 1 página se omitieron: {x}.", more: "más",
       dp: "Entregados en el período", prog: "En curso", piecesD: "Piezas entregadas", ontimeR: "Entregas a tiempo", avgDur: "Duración promedio", byMonth: "Entregas por mes", byWeek: "Entregas por semana", byType: "Por tipo de proyecto", byBrand: "Por marca", noBrand: "Sin marca", table: "Proyectos del período", cProject: "Proyecto", cType: "Tipo", cStatus: "Estado", cStart: "Inicio", cClose: "Cierre", cPieces: "Piezas", cPlazo: "Plazo", moreProj: "+{n} proyectos más", inProgress: "En curso", deliveredT: "Entregados", noData: "Sin datos", brands: "marcas", projects: "proyectos", project: "proyecto", pm: "Año", half1: "Primer semestre", half2: "Segundo semestre", year: "Año",
       months: ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"], mshort: ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"], "Comercial": "Comercial", "Casos": "Casos", "Licitaciones": "Licitaciones", "Contenido Digital": "Contenido Digital", "Animatic": "Animatic", "Estático": "Estático", "Recetas": "Recetas", "Banner web": "Banner web", "Automatización": "Automatización", clientLbl: "Cliente", brandLbl: "Marca", agencyLbl: "Agencia", noClient: "Sin cliente", total: "Total" },
-    en: { rp: "Project report", rc: "Client report", brand: "Tráfico Post · Publicis Production", estado: "Status", aprobado: "Approved", entregado: "Delivered", en_produccion: "In post-production", revision: "In review", rodaje: "On set", standby: "On hold", cotizado: "Quoted",
+    en: { rp: "Project report", rc: "Client report", brand: "Tráfico Post · Publicis Production", estado: "Status", aprobado: "Approved", entregado: "Delivered", en_produccion: "In post-production", revision: "In review", rodaje: "On set", preproduccion: "In pre-production", standby: "On hold", cotizado: "Quoted",
       closed: "Closed", started: "Start", duration: "Duration", days: "days", day: "day", deadline: "Deadline compliance", ontime: "On time", late: "{n} d late", early: "{n} d early", pieces: "Pieces", piecesBy: "Pieces by type", delivered: "delivered", of: "of", adapt: "Adaptations by country", versions: "versions", version: "version", countries: "countries", schedule: "Schedule", reviews: "Reviews", shared: "Versions shared", approvedV: "Approved", changesV: "Changes requested", imgC: "Image comments", resolved: "resolved", team: "Team", hours: "Logged hours", hoursU: "h", blockers: "Blockers", daysLost: "days lost", generated: "Generated on", page: "Page", omitted: "To keep it to 1 page these were left out: {x}.", more: "more",
       dp: "Delivered in the period", prog: "In progress", piecesD: "Pieces delivered", ontimeR: "On-time delivery", avgDur: "Average duration", byMonth: "Deliveries by month", byWeek: "Deliveries by week", byType: "By project type", byBrand: "By brand", noBrand: "No brand", table: "Projects in the period", cProject: "Project", cType: "Type", cStatus: "Status", cStart: "Start", cClose: "Close", cPieces: "Pieces", cPlazo: "Deadline", moreProj: "+{n} more projects", inProgress: "In progress", deliveredT: "Delivered", noData: "No data", brands: "brands", projects: "projects", project: "project", pm: "Year", half1: "First half", half2: "Second half", year: "Year",
       months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"], mshort: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], "Comercial": "Commercial", "Casos": "Case studies", "Licitaciones": "Tenders", "Contenido Digital": "Digital content", "Animatic": "Animatic", "Estático": "Static", "Recetas": "Recipes", "Banner web": "Web banners", "Automatización": "Automation", clientLbl: "Client", brandLbl: "Brand", agencyLbl: "Agency", noClient: "No client", total: "Total" },
@@ -16310,7 +16387,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   const clientLogo = (name) => { const m = (META && META.clientPhotos) || {}; const v = m[normName(name)]; return typeof v === "string" && /^(data:image|\/api\/files)/.test(v) ? v : ""; };
 
   // ═════════ Datos ═════════
-  const ESTADOS_OK = ["aprobado", "entregado"], ACTIVOS = ["rodaje", "en_produccion", "revision", "standby"];
+  const ESTADOS_OK = ["aprobado", "entregado"], ACTIVOS = ["preproduccion", "rodaje", "en_produccion", "revision", "standby"];
   const planFin = (p) => { try { const v = window.pxpEntregaFinal ? pxpEntregaFinal(p) : ""; return /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : ""; } catch (e) { return ""; } };
   const cierre = (p) => { const a = p.fechaFin || (p.archivadoEn || "").slice(0, 10) || ""; return /^\d{4}-\d{2}-\d{2}$/.test(a) ? a : ""; };
   const inicio = (p) => { if (p.fechaInicio) return p.fechaInicio; const P = (window.pxpPlanEtapas ? pxpPlanEtapas(p) : []).filter(x => x.ini).map(x => x.ini).sort(); return P[0] || ""; };
@@ -16389,7 +16466,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   const $ = (id) => document.getElementById(id);
   const W = A4[0], H = A4[1], CW = W - MX * 2;
   const INK = "#17171C", MUTED = "#6B6B76", LINE = "#E4E4EA", CARD = "#F6F6F9", VIOLET = "#624AFF", LIME = "#F3FF57", BAND = "#0B0B0F", GREEN = "#1FA25A", RED = "#E5483A", AMBER = "#D99A00", BLUE = "#2F6FED";
-  const EST_COLOR = { aprobado: VIOLET, entregado: GREEN, en_produccion: BLUE, revision: "#2F9BED", rodaje: "#E27B2F", standby: "#D43F8F", cotizado: "#8E8E96" };
+  const EST_COLOR = { aprobado: VIOLET, entregado: GREEN, en_produccion: BLUE, revision: "#2F9BED", preproduccion: "#159A79", rodaje: "#E27B2F", standby: "#D43F8F", cotizado: "#8E8E96" };
   const ST_COLOR = { listo: GREEN, en_curso: BLUE, revision: "#2F9BED", ajustes: "#F08A24", bloqueada: "#D43F5E", pendiente: "#B7B7C2" };
   const tipoColor = (t) => ((window.pxpTipoColor || {})[t]) || VIOLET;
   const n0 = (x) => String(Math.round(x));
@@ -19110,10 +19187,14 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       dias = [d];
       return { dias, esc: "h", label: `${DIA[D(d).getDay()]} ${fD(d)}${d === t ? " · hoy" : ""}` };
     }
-    let h = HALF[s.m];
-    if (!h) {   // Todo: la mitad más larga entre lo que ya pasó y lo que falta, con un pequeño margen
-      const a = ext && ext.a ? ext.a : t, b = ext && ext.b ? ext.b : t;
-      h = Math.max(3, Math.min(130, Math.max(a < t ? habilesEntre(t, a) : 0, b > t ? habilesEntre(t, b) : 0) + 2));
+    const h = HALF[s.m];
+    if (!h) {   // v157 · Todo: a la izquierda el inicio, a la derecha la entrega final y hoy al centro (cada mitad con su propia escala)
+      let a = ext && ext.a && ext.a < t ? ext.a : null, b = ext && ext.b && ext.b > t ? ext.b : null;
+      if (!a) { a = t; let n = 5; while (n > 0) { a = addD(a, -1); if (habil(a)) n--; } }
+      if (!b) { b = t; let n = 5; while (n > 0) { b = addD(b, 1); if (habil(b)) n--; } }
+      for (let d = a; d <= b; d = addD(d, 1)) if (habil(d)) dias.push(d);
+      const N = dias.length, y = (z) => +z.slice(0, 4) !== D(t).getFullYear() ? " " + z.slice(0, 4) : "";
+      return { dias, pw: true, a, b, esc: N <= 10 ? "d" : N <= 70 ? "w" : "m", label: `${fD(a)}${y(a)} → ${fD(b)}${y(b)}` };
     }
     let c = habil(t) ? t : addD(t, 1); while (!habil(c)) c = addD(c, 1);
     let mv = s.off * (2 * h + 1); while (mv > 0) { c = addD(c, 1); if (habil(c)) mv--; } while (mv < 0) { c = addD(c, -1); if (habil(c)) mv++; }
@@ -19127,30 +19208,36 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   // rows: [{ l, sub, c, av, bars:[{a,b,st,tip,txt,k,cls,dIni,dFin}] }]
   function render(id, titulo, rows, opts) {
     const s = st(id, opts.def || "todo");
-    const fechas = []; rows.forEach(r => r.bars.forEach(b => { if (b.dIni) fechas.push(b.dIni); if (b.dFin) fechas.push(b.dFin); })); if (opts.inicio) fechas.push(opts.inicio); fechas.sort();
-    const R = rango(s, { a: fechas[0], b: fechas[fechas.length - 1] }), H = J(), E = R.esc;
+    const fechas = []; rows.forEach(r => r.bars.forEach(b => { if (b.dIni) fechas.push(b.dIni); if (b.dFin) fechas.push(b.dFin); })); fechas.sort();
+    // Extremos del "Todo": el inicio del proyecto (o la primera etapa) y la entrega final (o la última etapa)
+    const R = rango(s, { a: opts.inicio || fechas[0], b: opts.fin || fechas[fechas.length - 1] }), H = J(), E = R.esc;
     const A = abs(R.dias[0], 0), B = abs(R.dias[R.dias.length - 1], H), span = Math.max(1, B - A);
-    const x = (v) => (v - A) / span * 100;
     const nowV = ahoraAbs(), nowIn = nowV >= A && nowV <= B;
-    // Columnas y escala
-    let cols = "", ticks = "";
-    const wDay = 100 / R.dias.length;
-    if (E === "m") {   // meses (Año o un "Todo" largo): un bloque por mes
+    // Escala: lineal, o por tramos en "Todo" (inicio → hoy ocupa la mitad izquierda y hoy → entrega la derecha)
+    const x = R.pw && nowIn && nowV > A && nowV < B ? (v) => v <= nowV ? (v - A) / (nowV - A) * 50 : 50 + (v - nowV) / (B - nowV) * 50 : (v) => (v - A) / span * 100;
+    const L0 = (d) => x(abs(d, 0)), L1 = (d) => x(abs(d, H));
+    // Columnas y escala (posiciones calculadas con la misma escala de las barras)
+    let cols = "", ticks = "", ult = -99;
+    // Las fechas de la escala no se esconden detrás de las etiquetas de Hoy, Inicio y Entrega
+    const marcas = [nowIn ? x(nowV) : null, opts.inicio ? x(abs(opts.inicio, 0)) : null, opts.fin ? x(abs(opts.fin, H)) : null].filter(v => v != null && v >= 0 && v <= 100);
+    const tk = (pos, html, cls) => { if ((R.pw && pos - ult < 5.5) || marcas.some(m => Math.abs(m - pos) < 4.5)) return; ult = pos; ticks += `<span class="cr-tk ${cls}" style="left:${pos}%">${html}</span>`; };
+    if (E === "m") {   // meses: un bloque por mes
       const mesHoy = hoy().slice(0, 7); let i0 = 0, k = 0;
       while (i0 < R.dias.length) {
         const ym = R.dias[i0].slice(0, 7); let n = 0; while (i0 + n < R.dias.length && R.dias[i0 + n].slice(0, 7) === ym) n++;
-        cols += `<i class="cr-col${k % 2 ? " odd" : ""}${ym === mesHoy ? " today" : ""}" style="left:${i0 * wDay}%;width:${n * wDay}%"></i>`;
-        if (n >= 4) ticks += `<span class="cr-tk mo${ym === mesHoy ? " on" : ""}" style="left:${(i0 + n / 2) * wDay}%">${MES[+ym.slice(5, 7) - 1].slice(0, 3)}${+ym.slice(5, 7) === 1 ? " " + ym.slice(0, 4) : ""}</span>`;
+        const l = L0(R.dias[i0]), w = L1(R.dias[i0 + n - 1]) - l;
+        cols += `<i class="cr-col${k % 2 ? " odd" : ""}${ym === mesHoy ? " today" : ""}" style="left:${l}%;width:${w}%"></i>`;
+        if (w >= 4) tk(l + w / 2, `${MES[+ym.slice(5, 7) - 1].slice(0, 3)}${+ym.slice(5, 7) === 1 ? " " + ym.slice(0, 4) : ""}`, "mo" + (ym === mesHoy ? " on" : ""));
         i0 += n; k++;
       }
     } else R.dias.forEach((d, i) => {
-      const isT = d === hoy();
-      cols += `<i class="cr-col${i % 2 ? " odd" : ""}${isT ? " today" : ""}" style="left:${i * wDay}%;width:${wDay}%"></i>`;
+      const isT = d === hoy(), l = L0(d), w = L1(d) - l;
+      cols += `<i class="cr-col${i % 2 ? " odd" : ""}${isT ? " today" : ""}" style="left:${l}%;width:${w}%"></i>`;
       if (E === "h") { for (let h = 0; h <= H; h++) ticks += `<span class="cr-tk${h === 4 ? " lunch" : ""}" style="left:${h / H * 100}%">${reloj(h)}</span>`; }
-      else if (E === "d") { ticks += `<span class="cr-tk day${isT ? " on" : ""}" style="left:${(i + .5) * wDay}%"><b>${DIA[D(d).getDay()]}</b> ${+d.slice(8, 10)}</span>`; }
-      else if (i === 0 || lunes(d) !== lunes(R.dias[i - 1])) ticks += `<span class="cr-tk wk${isT ? " on" : ""}" style="left:${i * wDay}%">${fD(d)}</span>`;
+      else if (E === "d") tk(l + w / 2, `<b>${DIA[D(d).getDay()]}</b> ${+d.slice(8, 10)}`, "day" + (isT ? " on" : ""));
+      else if (i === 0 || lunes(d) !== lunes(R.dias[i - 1])) tk(l, fD(d), "wk" + (isT ? " on" : ""));
     });
-    if (E === "d") R.dias.forEach((d, i) => { for (let h = 2; h < H; h += 2) cols += `<i class="cr-hr${h === 4 ? " mid" : ""}" style="left:${(i + h / H) * wDay}%"></i>`; });
+    if (E === "d") R.dias.forEach((d) => { for (let h = 2; h < H; h += 2) cols += `<i class="cr-hr${h === 4 ? " mid" : ""}" style="left:${x(abs(d, h))}%"></i>`; });
     if (E === "h") for (let h = 1; h < H; h++) cols += `<i class="cr-hr${h === 4 ? " mid" : ""}" style="left:${h / H * 100}%"></i>`;
     // Filas visibles (las que tocan el rango)
     // v155 · En el proyecto se ven TODAS las etapas (en el orden en que empiezan); las que caen fuera del periodo muestran una flecha con su fecha
@@ -19174,17 +19261,20 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const nowH = nowIn ? `<i class="cr-nowh" style="left:${x(nowV)}%" aria-hidden="true"><em>${E === "h" || E === "d" ? reloj(ahoraH()) : "Hoy"}</em></i>` : "";
     // Inicio del proyecto: línea de color propio
     const iniV = opts.inicio ? abs(opts.inicio, 0) : null, iniIn = iniV != null && iniV >= A && iniV <= B;
-    const ini = iniIn ? `<i class="cr-ini" style="left:${x(iniV)}%" aria-hidden="true"></i>` : "", iniH = iniIn ? `<i class="cr-inih" style="left:${x(iniV)}%" data-tip="Inicio del proyecto · ${fD(opts.inicio)}"><em>Inicio</em></i>` : "";
+    const borde = (p) => p < 4 ? " edge-l" : p > 96 ? " edge-r" : "";
+    const ini = iniIn ? `<i class="cr-ini" style="left:${x(iniV)}%" aria-hidden="true"></i>` : "", iniH = iniIn ? `<i class="cr-inih${borde(x(iniV))}" style="left:${x(iniV)}%" data-tip="Inicio del proyecto · ${fD(opts.inicio)}"><em>Inicio</em></i>` : "";
+    const finV = opts.fin ? abs(opts.fin, H) : null, finIn = finV != null && finV >= A && finV <= B;
+    const fin = finIn ? `<i class="cr-fin" style="left:${x(finV)}%" aria-hidden="true"></i>` : "", finH = finIn ? `<i class="cr-finh${borde(x(finV))}" style="left:${x(finV)}%" data-tip="Entrega final${opts.finEst ? " estimada" : ""} · ${fD(opts.fin)}"><em>Entrega${opts.finEst ? " est." : ""}</em></i>` : "";
     const many = vis.length > 8, hayFr = vis.some(r => r.bars.some(b => b.fr));
-    return `<div class="cr${many ? " many" : ""}" id="cr-${esc(id.replace(/[^\w-]/g, "_"))}" data-id="${esc(id)}" data-a="${A}" data-b="${B}" data-m="${s.m}" data-esc="${E}">
+    return `<div class="cr${many ? " many" : ""}" id="cr-${esc(id.replace(/[^\w-]/g, "_"))}" data-id="${esc(id)}" data-a="${A}" data-b="${B}" data-m="${s.m}" data-esc="${E}"${R.pw ? ` data-pw="1"` : ""}>
       <div class="cr-top"><b class="cr-tt">${titulo}</b><span class="cr-rg">${esc(R.label)}</span>
-        <span class="cr-nav"><button type="button" onclick="pxpCrono('${ea(id)}','off',-1)" aria-label="Anterior">‹</button><button type="button" class="cr-hoy${s.off ? "" : " on"}" onclick="pxpCrono('${ea(id)}','off',0)">Hoy</button><button type="button" onclick="pxpCrono('${ea(id)}','off',1)" aria-label="Siguiente">›</button></span>
+        <span class="cr-nav"${R.pw ? " hidden" : ""}><button type="button" onclick="pxpCrono('${ea(id)}','off',-1)" aria-label="Anterior">‹</button><button type="button" class="cr-hoy${s.off ? "" : " on"}" onclick="pxpCrono('${ea(id)}','off',0)">Hoy</button><button type="button" onclick="pxpCrono('${ea(id)}','off',1)" aria-label="Siguiente">›</button></span>
         <span class="seg cr-seg" role="group" aria-label="Vista del cronograma">${seg}</span></div>
       <div class="cr-g">
-        <div class="cr-row cr-h"><div class="cr-l">${many ? `<small class="cr-cnt">${vis.length} filas</small>` : ""}</div><div class="cr-t">${ticks}${iniH}${nowH}</div></div>
-        <div class="cr-body"><div class="cr-in"><div class="cr-bg"><div class="cr-l"></div><div class="cr-t">${cols}${ini}${now}</div></div>${body || `<p class="cr-empty">${esc(opts.empty || "Nada programado en este periodo.")}</p>`}</div></div>
+        <div class="cr-row cr-h"><div class="cr-l">${many ? `<small class="cr-cnt">${vis.length} filas</small>` : ""}</div><div class="cr-t">${ticks}${iniH}${finH}${nowH}</div></div>
+        <div class="cr-body"><div class="cr-in"><div class="cr-bg"><div class="cr-l"></div><div class="cr-t">${cols}${ini}${fin}${now}</div></div>${body || `<p class="cr-empty">${esc(opts.empty || "Nada programado en este periodo.")}</p>`}</div></div>
       </div>
-      <div class="cr-leg">${[["pendiente", "Pendiente"], ["en_curso", "En curso"], ["revision", "Ajustes · revisión"], ["bloqueada", "Bloqueada"], ["listo", "Listo"], ["late", "Vencida"]].map(([k, l]) => `<span class="lg ${k}"><i></i>${l}</span>`).join("")}${hayFr && (E === "w" || E === "m") ? `<span class="lg am"><i></i>Mañana</span><span class="lg pm"><i></i>Tarde</span>` : ""}${iniIn ? `<span class="lg ini"><i></i>Inicio del proyecto</span>` : ""}${opts.leg || ""}</div>
+      <div class="cr-leg">${[["pendiente", "Pendiente"], ["en_curso", "En curso"], ["revision", "Ajustes · revisión"], ["bloqueada", "Bloqueada"], ["listo", "Listo"], ["late", "Vencida"]].map(([k, l]) => `<span class="lg ${k}"><i></i>${l}</span>`).join("")}${hayFr && (E === "w" || E === "m") ? `<span class="lg am"><i></i>Mañana</span><span class="lg pm"><i></i>Tarde</span>` : ""}${iniIn ? `<span class="lg ini"><i></i>Inicio del proyecto</span>` : ""}${finIn ? `<span class="lg fin"><i></i>Entrega final${opts.finEst ? " (estimada)" : ""}</span>` : ""}${opts.leg || ""}</div>
     </div>`;
   }
 
@@ -19213,7 +19303,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       ((PROJECTS[k] || {}).bloqueos || []).filter(b => b.inicio).forEach(b => rows.push({ l: "Bloqueo · " + (b.tipo || ""), sub: b.desc || "", c: "var(--red)", bars: [{ a: abs(b.inicio, 0), b: b.fin ? abs(b.fin, J()) : ahoraAbs(), dIni: b.inicio, dFin: b.fin || hoy(), st: "bloqueada", cls: "blk" + (b.fin ? "" : " open"), txt: b.fin ? "" : "activo", tip: `<b>Bloqueo · ${esc(b.tipo || "")}</b>${b.desc ? "<br>" + esc(b.desc) : ""}` }] }));
       const ent = (PROJECTS[k] || {}).entregaFinal;
       if (ent) rows.push({ l: "Entrega final", sub: fD(ent), c: "var(--brand)", bars: [{ a: abs(ent, J()) - .35, b: abs(ent, J()), dIni: ent, dFin: ent, st: "listo", cls: "goal", tip: `<b>Entrega final</b><br>${fD(ent)}` }] });
-      return render(id, "Cronograma", rows, { def: "todo", todas: true, inicio: (PROJECTS[k] || {}).fechaInicio || "", empty: "Sin etapas con fecha todavía." });
+      return render(id, "Cronograma", rows, { def: "todo", todas: true, inicio: (PROJECTS[k] || {}).fechaInicio || "", fin: (PROJECTS[k] || {}).entregaFinal || "", finEst: !!(PROJECTS[k] || {}).entregaEst, empty: "Sin etapas con fecha todavía." });
     };
     return P_OK(k) ? BUILD[id]() : "";
   };
@@ -19253,7 +19343,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     document.querySelectorAll(".cr").forEach(c => {
       const A = +c.dataset.a, B = +c.dataset.b, n = c.querySelector(".cr-now"), nh = c.querySelector(".cr-nowh"); if (!n) return;
       if (v < A || v > B) { n.remove(); if (nh) nh.remove(); return; }
-      n.style.left = ((v - A) / (B - A) * 100) + "%"; if (nh) { nh.style.left = n.style.left; const em = nh.querySelector("em"); if (em && (c.dataset.esc === "h" || c.dataset.esc === "d")) em.textContent = reloj(ahoraH()); }
+      if (c.dataset.pw !== "1") n.style.left = ((v - A) / (B - A) * 100) + "%"; if (nh) { nh.style.left = n.style.left; const em = nh.querySelector("em"); if (em && (c.dataset.esc === "h" || c.dataset.esc === "d")) em.textContent = reloj(ahoraH()); }
       c.querySelectorAll(".cr-bar").forEach(b => {
         const a = +b.dataset.a, z = +b.dataset.b, done = b.classList.contains("listo");
         b.classList.toggle("live", !done && v > a && v < z);
