@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v181** · 10 oct 2026 · Responsable: Bastián Torres
+Versión: **v182** · 10 oct 2026 · Responsable: Bastián Torres
 
 ## Cómo está armado ahora
 - **Una sola fuente:** `src/app.html`, con todo el CSS y las capas JS.
@@ -196,6 +196,8 @@ Versión: **v181** · 10 oct 2026 · Responsable: Bastián Torres
 - **v180:** time table y reporte de proyecto en inglés traducen los nombres de las etapas (pxpEtapaEN, diccionario de términos de producción). pxpRepEN hace una copia solo para el PDF con el mismo plan (p.__plan), la misma clase, fase y peso: el proyecto guardado no cambia.
 
 - **v181:** inglés completo de la interfaz: catálogo de logros (FAM_EN en la capa 37; f.n y f.d cambian con window.pxpLang), "Cómo lograrlo" de cada logro, notas de ayuda de Capacidad, Horas, Reportes, Repositorio y Logros, fechas con año, "hace N d" y avisos. Solo quedan en español los textos que escriben las personas (notas, nombres, logros especiales).
+
+- **v182:** limpieza y optimización. Se borraron 92 reglas CSS sin uso (tools/css_unused.py las detecta; tools/shots.mjs + tools/shots_diff.py comparan capturas de las 12 pestañas y 5 ventanas en claro y oscuro: sin cambios visibles). El index de Netlify sale minificado con esbuild (tools/minify.py, desde build.py): 1,9 MB → 1,65 MB; el bloque de datos con las marcas ⟦STATE⟧ no se toca. Prueba de punta a punta del modo Netlify: python3 tools/netlify-e2e-prep.py && node tools/netlify-e2e.mjs /tmp/nfmock (servidor local con las funciones reales y Blobs simulado: carga, guardado simultáneo de dos personas, 403 desde otro sitio, reporte PDF, permiso de reportes). Se dejó el editor viejo de fichas (saveFicha): está entrelazado con otras capas y quitarlo ahorra menos del 1 %.
 
 ## No cambiar sin consultar
 - El ZIP de Netlify va sin datos, y no se guarda nada antes de cargar los datos del servidor.

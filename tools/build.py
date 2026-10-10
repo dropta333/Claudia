@@ -24,6 +24,13 @@ pdf_block = ('<script type="text/plain" id="pxp-jspdf">\n' + jspdf + "</script>\
 preview = app.replace("/*@state*/", state).replace("<!--@pdf-->", pdf_block)
 net = app.replace("/*@state*/", EMPTY).replace("<!--@pdf-->", "")
 net = net.replace("<head>\n", '<head>\n<script>window.PXP_BACKEND="netlify";</script>\n', 1)
+# v182 · El index de Netlify sale minificado (esbuild: espacios, comentarios y sintaxis; sin renombrar).
+# Requiere esbuild: npm i --prefix /tmp/esb esbuild@0.24.0  (o la variable ESBUILD). Si no está, sale sin minificar.
+try:
+    sys.path.insert(0, str(R / "tools")); import minify as _mn, os as _os
+    if _os.path.exists(_mn.ESB): net = _mn.minify(net)
+    else: print("aviso: esbuild no está instalado; el index de Netlify sale sin minificar")
+except Exception as e: print("aviso: no se pudo minificar:", e)
 pdfjs = "\n" + jspdf + "\n\n" + fonts + "\n"
 D = R / "dist"; D.mkdir(exist_ok=True)
 (D / "preview.html").write_text(preview, encoding="utf-8")

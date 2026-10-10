@@ -1,9 +1,11 @@
-# Tráfico Post · v181 — cómo publicar
+# Tráfico Post · v182 — cómo publicar
 
 1. En el tablero actual toca **Descargar copia** (pie de página) para tener un respaldo de hoy.
 2. En Netlify, abre tu sitio → **Deploys** y arrastra este ZIP (o la carpeta descomprimida) a la zona de despliegue.
 3. Los datos del equipo **no se tocan**: viven en Netlify Blobs y el tablero los carga al abrir.
 4. Entra primero como Administración y espera el aviso **"Tablero optimizado"** (mueve las imágenes viejas a archivos).
+
+Novedades v182: CSS sin uso eliminado e index minificado (más liviano). Mismo funcionamiento.
 
 Novedades v181: la plataforma queda completa en inglés (logros y notas de ayuda incluidos).
 
