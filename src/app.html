@@ -6240,6 +6240,72 @@ body:not(.trf-tabla) #main-grid > .card:not(.span-all){padding:16px 16px 14px!im
 #lg-tt .tt-how em,#lg-tt .tt-why em{display:block;font:700 10.5px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;font-style:normal}
 .lg-c[data-lgt]{cursor:help}
 .lg-c.cargo .lg-c-b h4::after{content:"Tu cargo";display:inline-block;white-space:nowrap;margin-left:8px;padding:2px 6px;border-radius:99px;font:700 9.5px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;vertical-align:2px;background:color-mix(in srgb,var(--brand) 35%,transparent);color:var(--text)}
+/* v168 · Tráfico: sin complejidad; la carga es un semáforo */
+#main-grid > .card .ch-right{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr)!important}
+#main-grid > .card .dc-carga{flex-wrap:wrap!important;align-items:center!important;column-gap:10px!important}
+#main-grid > .card .dc-carga .semaf,#main-grid > .card .dc-carga .semaf-l{flex:0 0 auto!important;flex-basis:auto!important;width:auto!important}
+.semaf{display:inline-flex;align-items:center;gap:6px;padding:4px 7px;border-radius:99px;background:#1B1B22;box-shadow:inset 0 1px 2px rgba(0,0,0,.5),0 1px 0 rgba(255,255,255,.06)}
+.semaf .sdot{width:14px!important;height:14px!important;border-radius:50%!important;border:0!important;opacity:.32;filter:saturate(.7);box-shadow:none!important;outline:none;cursor:pointer;transition:opacity .15s,box-shadow .15s,transform .15s;margin:0!important}
+.semaf .sdot:hover{opacity:.55}
+.semaf .sdot.active{opacity:1;filter:none;box-shadow:0 0 0 1.5px rgba(255,255,255,.18),0 0 10px 2px currentColor!important;transform:scale(1.06)}
+.semaf .sdot:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.semaf-l{font:700 11px/1 var(--display);letter-spacing:.1em;text-transform:uppercase}
+.semaf-l.s-saturado{color:var(--red)}.semaf-l.s-cargado{color:#B98900}.semaf-l.s-libre{color:var(--green)}
+[data-theme="dark"] .semaf{background:#0B0B0F}
+/* v168 · Notas: tarjeta con la foto integrada */
+#pxp-proj .pj-note{display:block!important;grid-template-columns:none!important}
+#pxp-proj .pj-note .pn-b{position:relative;padding:14px 16px 12px!important;border-radius:16px!important;border:1px solid var(--border)!important;background:var(--surface)!important;box-shadow:0 1px 0 rgba(0,0,0,.02),0 8px 22px -18px rgba(0,0,0,.35)}
+#pxp-proj .pj-note.mine .pn-b{background:color-mix(in srgb,var(--pc,var(--brand)) 7%,var(--surface))!important;border-color:color-mix(in srgb,var(--pc,var(--brand)) 30%,var(--border))!important}
+#pxp-proj .pj-note .pn-b::before{content:"";position:absolute;left:0;top:16px;bottom:16px;width:3px;border-radius:0 3px 3px 0;background:color-mix(in srgb,var(--text) 14%,transparent)}
+#pxp-proj .pj-note.mine .pn-b::before{background:var(--pc,var(--brand))}
+#pxp-proj .pn-m{display:flex!important;align-items:center!important;gap:12px!important;margin-bottom:10px!important}
+#pxp-proj .pn-av{flex:none;display:grid;place-items:center}
+#pxp-proj .pn-av .av{--s:42px!important;width:42px!important;height:42px!important}
+#pxp-proj .pn-who{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+#pxp-proj .pn-who b{font:700 15px/1.1 var(--sans);color:var(--text)}
+#pxp-proj .pn-who small{font:500 12.5px/1.2 var(--sans);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pxp-proj .pn-t{font-size:15px!important;line-height:1.55!important;padding-left:54px}
+#pxp-proj .pj-note .adj-list,#pxp-proj .pj-note .rx-bar{margin-left:54px}
+#pxp-proj .pj-note .xbtn{align-self:flex-start}
+@media (max-width:640px){#pxp-proj .pn-t{padding-left:0}#pxp-proj .pj-note .adj-list,#pxp-proj .pj-note .rx-bar{margin-left:0}}
+#pxp-proj .pj-newnote{grid-template-columns:42px minmax(0,1fr) auto!important;align-items:start}
+#pxp-proj .pj-newnote > .av{--s:42px!important;width:42px!important;height:42px!important}
+#pxp-proj .pj-newnote textarea{border-radius:14px!important}
+@media (max-width:640px){#pxp-proj .pj-newnote{grid-template-columns:42px minmax(0,1fr)!important}}
+/* v168 · Filas de inicio y entrega final en el avance por etapas */
+.et-hito{display:flex;align-items:center;gap:10px;min-height:34px;padding:4px 14px;margin:0 0 10px;border-radius:10px;border:1px dashed color-mix(in srgb,var(--hc) 45%,var(--border));background:color-mix(in srgb,var(--hc) 6%,transparent)}
+.et-hito.h-ini{--hc:#00A3C4}
+.et-hito.h-fin{--hc:var(--text);margin:10px 0 0}
+.et-hito .eh-m{width:10px;height:10px;transform:rotate(45deg);border-radius:2px;background:var(--hc);flex:none}
+.et-hito.auto .eh-m{background:transparent;border:2px solid var(--hc);box-sizing:border-box}
+.et-hito .eh-l{font:700 11.5px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--hc)}
+.et-hito .eh-d{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:8px;cursor:pointer;font:700 14px/1 var(--sans);color:var(--text)}
+.et-hito span.eh-d{cursor:default}
+.et-hito .eh-d .i{width:14px;height:14px;color:var(--muted)}
+.et-hito button.eh-d:hover{background:color-mix(in srgb,var(--hc) 14%,transparent)}
+.et-hito button.eh-d:focus-visible{outline:2px solid var(--hc)}
+.et-hito .eh-n{font:500 12.5px/1 var(--sans);color:var(--muted)}
+.et-hito .eh-r{margin-left:auto;font:600 12px/1 var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+/* v168 · Cronograma: Inicio, Hoy y Entrega con su fecha, en su propia fila (sin tapar la escala) */
+.cr-mk .cr-t{position:relative;height:26px}
+.cr-mk .cr-l{border:0!important;background:none!important}
+.cr-mk{border-bottom:0!important;min-height:0!important}
+.cr .mk{position:absolute;top:3px;bottom:0;width:2px;margin-left:-1px;background:var(--mc);font-style:normal;z-index:4}
+.cr .mk em{position:absolute;top:0;font:700 11.5px/1 var(--display);letter-spacing:.06em;text-transform:uppercase;padding:5px 8px;border-radius:99px;white-space:nowrap;background:var(--mc);color:#fff;font-style:normal}
+.cr .mk.al-c em{left:50%;transform:translateX(-50%)}
+.cr .mk.al-l em{left:-1px;border-bottom-left-radius:3px}
+.cr .mk.al-r em{right:-1px;border-bottom-right-radius:3px}
+.cr .mk-ini{--mc:#00A3C4}.cr .mk-hoy{--mc:var(--crn,#624AFF)}.cr .mk-fin{--mc:#7B61FF}
+.cr .mk-fin{--mc:#17171C}
+.cr .cr-fin{border-left-color:#17171C!important}
+[data-theme="dark"] .cr .mk-fin{--mc:#EDEDF2}
+[data-theme="dark"] .cr .cr-fin{border-left-color:#EDEDF2!important}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .cr .mk-fin{--mc:#EDEDF2}:root:not([data-theme="light"]) .cr .mk-fin em{color:#0B0B0F}:root:not([data-theme="light"]) .cr .cr-fin{border-left-color:#EDEDF2!important}}
+[data-theme="dark"] .cr .mk-fin em{color:#0B0B0F}
+.cr .mk-ln{position:absolute;top:0;bottom:0;width:0;border-left:2px solid var(--mc);z-index:3;opacity:.9}
+.cr .mk-ln.mk-ini,.cr .mk-ln.mk-fin{border-left-style:dashed}
+.cr .cr-h .cr-nowh,.cr .cr-h .cr-inih,.cr .cr-h .cr-finh{display:none}
+.cr-leg .fin i{border-left-color:var(--text)!important}
 </style>
 </head>
 <body>
@@ -7374,8 +7440,7 @@ function buildGroupCard(list, idx, groupKey, w) {
       <div class="ch-role">${person.role||""} <button class="edit-inline-btn" onclick="openEdit('${groupKey}',${idx})" title="Editar nombre/cargo"><svg class='i' viewBox='0 0 24 24' aria-hidden='true'><path d='M4 20h4L19 9l-4-4L4 16z'/><path d='m13.5 6.5 4 4'/></svg></button></div>
     </div>
     <div class="ch-right">
-      <div class="dotcol"><div class="dotcol-label">Carga</div>${dotsHtml("toggleSemaforo", groupKey, idx, pxpCargaPersona(person, w), CARGA_DOTS)}</div>
-      <div class="dotcol"><div class="dotcol-label">Compl.</div>${dotsHtml("toggleComplejidadPersona", groupKey, idx, pxpCpxPersona(person, w), COMPLEJIDAD_DOTS)}</div>
+      <div class="dotcol dc-carga"><div class="dotcol-label">Carga</div><span class="semaf" role="group" aria-label="Semáforo de carga">${dotsHtml("toggleSemaforo", groupKey, idx, pxpCargaPersona(person, w), CARGA_DOTS)}</span><span class="semaf-l s-${pxpCargaPersona(person, w)}">${({ saturado: "Sobrecarga", cargado: "Ocupado", libre: "Libre" })[pxpCargaPersona(person, w)] || ""}</span></div>
       <div class="dotcol">
         <div class="dotcol-label">Ausencia</div>
         <select class="ausencia-select ${ausenciaActual||''}${ausenciaActual?' tiene-ausencia':''}" onchange="setAusencia('${groupKey}',${idx},this.value)">
@@ -12328,8 +12393,10 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
 
     const hist = (p.historial || []).map((h, i) => ({ ...h, i })).reverse();
     const notas = hist.filter(isNote), act = hist.filter(h => !isNote(h));
-    const noteRow = (h) => `<div class="pj-note${norm(h.usuario) === norm(currentUser) ? " mine" : ""}">${av("person", h.usuario || "?", 30)}
-      <div class="pn-b"><div class="pn-m"><b>${esc(h.usuario || "—")}</b><span>${esc(rel(h.ts))}</span>${norm(h.usuario) === norm(currentUser) ? `<button class="xbtn" onclick="pxpNoteDel(${h.i})" title="Borrar nota">${confirmDelNote === h.i ? "¿Borrar?" : I.trash}</button>` : ""}</div>${h.texto ? `<div class="pn-t">${window.pxpNoteTextHtml ? pxpNoteTextHtml(h.texto) : esc(h.texto)}</div>` : ""}${window.pxpAdjuntosHtml ? pxpAdjuntosHtml(h.adjuntos, ea(k + "|" + h.i)) : ""}${window.pxpReacHtml ? pxpReacHtml(k, h) : ""}</div></div>`;
+    // v168 · La nota es una tarjeta: la foto va adentro, junto al nombre, el cargo y la hora
+    const rolDe = (n) => { const f = window.pxpFindPerson && pxpFindPerson(n); return f && f.p ? (f.p.alias || f.p.role || "") : ""; };
+    const noteRow = (h) => `<div class="pj-note${norm(h.usuario) === norm(currentUser) ? " mine" : ""}">
+      <div class="pn-b"><div class="pn-m"><span class="pn-av">${av("person", h.usuario || "?", 42)}</span><span class="pn-who"><b>${esc(h.usuario || "—")}</b><small>${esc([rolDe(h.usuario), rel(h.ts)].filter(Boolean).join(" · "))}</small></span>${norm(h.usuario) === norm(currentUser) ? `<button class="xbtn" onclick="pxpNoteDel(${h.i})" title="Borrar nota">${confirmDelNote === h.i ? "¿Borrar?" : I.trash}</button>` : ""}</div>${h.texto ? `<div class="pn-t">${window.pxpNoteTextHtml ? pxpNoteTextHtml(h.texto) : esc(h.texto)}</div>` : ""}${window.pxpAdjuntosHtml ? pxpAdjuntosHtml(h.adjuntos, ea(k + "|" + h.i)) : ""}${window.pxpReacHtml ? pxpReacHtml(k, h) : ""}</div></div>`;
 
     pmBox.style.setProperty("--pc", col);
     pmBox.innerHTML = `
@@ -12349,7 +12416,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
         <section class="pj-sec"><h3>Equipo <span class="cnt">${ms.length} persona${ms.length !== 1 ? "s" : ""}</span></h3>${mindMap(k, p)}</section>
         <section class="pj-sec"><h3>Avance por etapas</h3>${window.pxpEtapasHtml ? pxpEtapasHtml(k) : etapas + timelineHtml(p, col, et)}</section>
         ${p._borrador ? `<p class="pj-new-tip">Notas, enlaces de revisión, ruta en el share y bloqueadores se habilitan al crear el proyecto.</p>` : `<div class="pj-two"><section class="pj-sec pj-notas"><h3>Notas <span class="cnt">${notas.length}</span></h3>
-          <div class="pj-newnote">${av("person", currentUser || "?", 30)}<textarea id="pj-note" rows="2" placeholder="Escribe una nota para el equipo… (Ctrl + Enter para guardar)" onkeydown="if((event.ctrlKey||event.metaKey)&&event.key==='Enter'){event.preventDefault();pxpNoteAdd()}"></textarea><div class="pj-nbtns"><label class="btn-ghost pj-attach" title="Adjuntar imágenes, audios, documentos…"><svg class='i' viewBox='0 0 24 24' aria-hidden='true'><path d='M20 11.5 12.3 19.2a5 5 0 0 1-7-7l8.3-8.3a3.4 3.4 0 0 1 4.8 4.8l-8.2 8.2a1.7 1.7 0 0 1-2.4-2.4l7.4-7.4'/></svg><span>Adjuntar</span><input type="file" multiple onchange="pxpAdjSel(this)" aria-label="Adjuntar archivos"></label><button class="btn-add" onclick="pxpNoteAdd()">Agregar</button></div></div>
+          <div class="pj-newnote">${av("person", currentUser || "?", 42)}<textarea id="pj-note" rows="2" placeholder="Escribe una nota para el equipo… (Ctrl + Enter para guardar)" onkeydown="if((event.ctrlKey||event.metaKey)&&event.key==='Enter'){event.preventDefault();pxpNoteAdd()}"></textarea><div class="pj-nbtns"><label class="btn-ghost pj-attach" title="Adjuntar imágenes, audios, documentos…"><svg class='i' viewBox='0 0 24 24' aria-hidden='true'><path d='M20 11.5 12.3 19.2a5 5 0 0 1-7-7l8.3-8.3a3.4 3.4 0 0 1 4.8 4.8l-8.2 8.2a1.7 1.7 0 0 1-2.4-2.4l7.4-7.4'/></svg><span>Adjuntar</span><input type="file" multiple onchange="pxpAdjSel(this)" aria-label="Adjuntar archivos"></label><button class="btn-add" onclick="pxpNoteAdd()">Agregar</button></div></div>
           <div class="pj-pend" id="pj-pend" hidden></div>
           ${notas.length ? `<div class="pj-notes">${notas.slice(0, 6).map(noteRow).join("")}</div>${notas.length > 6 ? `<details class="tl-more"><summary>Ver ${notas.length - 6} notas anteriores</summary><div class="pj-notes">${notas.slice(6).map(noteRow).join("")}</div></details>` : ""}` : `<p class="note" style="margin:6px 0 0">Aún no hay notas. Úsalas para dejar indicaciones, acuerdos con el cliente o pendientes.</p>`}
           ${act.length ? `<details class="tl-more pj-act"><summary>Actividad del proyecto (${act.length} cambios)</summary>${act.slice(0, 40).map(h => `<div class="pj-log"><span>${esc(rel(h.ts))}</span><b>${esc(h.usuario || "—")}</b> ${esc(h.texto)}</div>`).join("")}</details>` : ""}
@@ -14163,6 +14230,18 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const r = grpResumen(P, t);
     return [`${r.ok} de ${r.n} etapas listas`, r.nx ? `Próxima: ${r.nx.e.nombre || "Etapa"}${r.nx.fin ? ", " + fmtD(r.nx.fin) : ""}` : "Todo listo", r.venc ? `${r.venc} vencida${r.venc !== 1 ? "s" : ""}` : ""].filter(Boolean).join(" · ");
   };
+  // v168 · Filas delgadas: inicio del proyecto (arriba) y entrega final (abajo). Se marcan solas y se pueden cambiar.
+  function hitoFila(k, p, P, cual, ed) {
+    const t = today(), pri = P.map(x => x.ini).filter(Boolean).sort()[0] || "", ult = P.map(x => x.fin).filter(Boolean).sort().pop() || "";
+    const ini = cual === "ini", fecha = ini ? (p.fechaInicio || pri) : (p.entregaFinal || ult), propia = ini ? !!p.fechaInicio : !!p.entregaFinal;
+    const est = ini ? !!p.inicioEst : !!p.entregaEst, dias = fecha ? Math.round((D(fecha) - D(t)) / 86400000) : null;
+    const rel = dias == null ? "" : dias === 0 ? "hoy" : dias > 0 ? `en ${dias} día${dias !== 1 ? "s" : ""}` : `hace ${-dias} día${dias !== -1 ? "s" : ""}`;
+    const nota = !fecha ? (ini ? "Sin fecha" : "Sin definir") : !propia ? (ini ? "automático · primera etapa" : "automático · fin de la última etapa") : est ? "estimada" : "";
+    const lbl = ini ? "Inicio del proyecto" : "Entrega final", fn = ini ? "pxpInicioPick" : "pxpEntregaPick";
+    return `<div class="et-hito ${ini ? "h-ini" : "h-fin"}${propia ? "" : " auto"}"><i class="eh-m" aria-hidden="true"></i><span class="eh-l">${lbl}</span>
+      ${ed ? `<button type="button" class="eh-d" onclick="${fn}(this,'${ea(k)}')" aria-haspopup="dialog" aria-label="${lbl}: ${fecha ? fmtD(fecha) : "sin fecha"}. Toca para cambiarla">` : `<span class="eh-d">`}<b>${fecha ? fmtD(fecha) : (ini ? "Marcar inicio" : "Marcar entrega")}</b>${ed ? `<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14.5" rx="2"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/></svg></button>` : "</span>"}
+      ${nota ? `<span class="eh-n">${nota}</span>` : ""}${rel ? `<span class="eh-r">${rel}</span>` : ""}</div>`;
+  }
   let ultimaSug = null;   // { k, ids, fase, ts } · para "Deshacer"
   function etapasHtml(k) {
     ivC = new Map(); ivT = Date.now();
@@ -14195,7 +14274,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     return `<div class="et-wrap" id="et-wrap" data-k="${esc(k)}">
       ${P.length ? `<div class="et-sum"><span><b>${P.length}</b> etapa${P.length !== 1 ? "s" : ""} · <b>${fH(H)}</b> h (${fH(H / 8)} d) · ${fmtD(first)} → ${fmtD(last)} · <b>${Math.round(listos / P.length * 100)}%</b> listo</span>
         <span class="et-leg" aria-label="Tipos de etapa">${Object.entries(PXP_CLASES).map(([c, [l]]) => `<span class="cl-${c}">${CLI[c]}${l}</span>`).join("")}</span></div>` : ""}
-      ${P.length ? `<div class="et-grps">${grupos}</div>` : `<div class="empty-cta"><b>Sin etapas todavía</b>Agrega las etapas o tareas en el orden en que se hacen, o toca <b>+ Agregar etapa</b> para pedir una sugerencia por fase según el equipo.</div>`}
+      ${P.length ? `<div class="et-grps">${hitoFila(k, p, P, "ini", ed)}${grupos}${hitoFila(k, p, P, "fin", ed)}</div>` : `<div class="empty-cta"><b>Sin etapas todavía</b>Agrega las etapas o tareas en el orden en que se hacen, o toca <b>+ Agregar etapa</b> para pedir una sugerencia por fase según el equipo.</div>`}
       ${!ed && enProyecto(k) ? `<div class="et-actions"><button type="button" class="btn-ghost sm" onclick="pxpEt('proponer')">+ Agregar mi etapa</button>${P.some(x => !x.e.resp && x.e.estado !== "listo") ? `<span class="note">o toma una etapa sin responsable con <b>Tomar</b></span>` : ""}</div>` : ""}
       ${ed ? `<div class="et-actions"><button type="button" class="et-addb2" onclick="pxpEtAdd(this)" aria-haspopup="dialog"><span>+</span>Agregar etapa<small>o sugerir</small></button>${undo}</div>` : (P.some(x => pxpEsResp(x.e, meN)) ? `<p class="note et-own-note">Puedes cambiar el estado de las etapas marcadas como <b>Tuya</b>. El resto lo ajusta Administración.</p>` : "")}
       ${P.length ? `<p class="note">Van en orden y por horas (jornada de 8:30 a 17:30, almuerzo de 12:30 a 13:30): cada etapa empieza donde termina la anterior, salvo que elijas Mañana, Tarde u Hora exacta, o le fijes una fecha. Revisiones y entregas son hitos: eliges quién la recibe (equipo, cliente, agencia o externo), cuándo se entrega (fecha y hora) y, en las revisiones, cuánto tarda.</p>` : ""}
@@ -19873,7 +19952,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     // Columnas y escala (posiciones calculadas con la misma escala de las barras)
     let cols = "", ticks = "", ult = -99;
     // Las fechas de la escala no se esconden detrás de las etiquetas de Hoy, Inicio y Entrega
-    const marcas = [nowIn ? x(nowV) : null, opts.inicio ? x(abs(opts.inicio, 0)) : null, opts.fin ? x(abs(opts.fin, H)) : null].filter(v => v != null && v >= 0 && v <= 100);
+    const marcas = [];   // v168 · Inicio, Hoy y Entrega van en su propia fila: ya no tapan las fechas de la escala
     const tk = (pos, html, cls) => { if ((R.pw && pos - ult < 5.5) || marcas.some(m => Math.abs(m - pos) < (m > 96 || m < 4 ? 9 : 4.5))) return; ult = pos; ticks += `<span class="cr-tk ${cls}" style="left:${pos}%">${html}</span>`; };
     if (E === "m") {   // meses: un bloque por mes
       const mesHoy = hoy().slice(0, 7); let i0 = 0, k = 0;
@@ -19920,12 +19999,22 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const finV = opts.fin ? abs(opts.fin, H) : null, finIn = finV != null && finV >= A && finV <= B;
     const fin = finIn ? `<i class="cr-fin" style="left:${x(finV)}%" aria-hidden="true"></i>` : "", finH = finIn ? `<i class="cr-finh${borde(x(finV))}" style="left:${x(finV)}%" data-tip="Entrega final${opts.finEst ? " estimada" : ""} · ${fD(opts.fin)}"><em>Entrega${opts.finEst ? " est." : ""}</em></i>` : "";
     const many = vis.length > 8, hayFr = vis.some(r => r.bars.some(b => b.fr));
+    // v168 · Fila de marcas con su fecha: Inicio (azul), Hoy (violeta) y Entrega final; si dos quedan muy cerca, se abren hacia lados distintos
+    const MK = [];
+    if (iniIn) MK.push({ c: "ini", p: x(iniV), t: `Inicio · ${fD(opts.inicio)}`, tip: `Inicio del proyecto · ${fD(opts.inicio)}` });
+    if (nowIn) MK.push({ c: "hoy", p: x(nowV), t: E === "h" || E === "d" ? `Hoy · ${reloj(ahoraH())}` : `Hoy · ${fD(hoy())}`, tip: "Hoy" });
+    if (finIn) MK.push({ c: "fin", p: x(finV), t: `Entrega${opts.finEst ? " est." : ""} · ${fD(opts.fin)}`, tip: `Entrega final${opts.finEst ? " estimada" : ""} · ${fD(opts.fin)}` });
+    MK.sort((a2, b2) => a2.p - b2.p);
+    MK.forEach((m, i) => { const prev = MK[i - 1], next = MK[i + 1]; m.al = m.p < 8 ? "l" : m.p > 92 ? "r" : next && next.p - m.p < 14 ? "r" : prev && m.p - prev.p < 14 ? "l" : "c"; });
+    const mkRow = MK.length ? `<div class="cr-row cr-mk"><div class="cr-l"></div><div class="cr-t">${MK.map(m => `<i class="mk mk-${m.c} al-${m.al}" style="left:${m.p}%" data-tip="${m.tip}"><em>${m.t}</em></i>`).join("")}</div></div>` : "";
+    const mkLn = MK.map(m => `<i class="mk-ln mk-${m.c}" style="left:${m.p}%" aria-hidden="true"></i>`).join("");
     return `<div class="cr${many ? " many" : ""}" id="cr-${esc(id.replace(/[^\w-]/g, "_"))}" data-id="${esc(id)}" data-a="${A}" data-b="${B}" data-m="${s.m}" data-esc="${E}"${R.pw ? ` data-pw="1"` : ""}>
       <div class="cr-top"><b class="cr-tt">${titulo}</b><span class="cr-rg">${esc(R.label)}</span>
         <span class="cr-nav"${R.pw ? " hidden" : ""}><button type="button" onclick="pxpCrono('${ea(id)}','off',-1)" aria-label="Anterior">‹</button><button type="button" class="cr-hoy${s.off ? "" : " on"}" onclick="pxpCrono('${ea(id)}','off',0)">Hoy</button><button type="button" onclick="pxpCrono('${ea(id)}','off',1)" aria-label="Siguiente">›</button></span>
         <span class="seg cr-seg" role="group" aria-label="Vista del cronograma">${seg}</span></div>
       <div class="cr-g">
-        <div class="cr-row cr-h"><div class="cr-l">${many ? `<small class="cr-cnt">${vis.length} filas</small>` : ""}</div><div class="cr-t">${ticks}${iniH}${finH}${nowH}</div></div>
+        ${mkRow}
+        <div class="cr-row cr-h"><div class="cr-l">${many ? `<small class="cr-cnt">${vis.length} filas</small>` : ""}</div><div class="cr-t">${ticks}${mkLn}</div></div>
         <div class="cr-body"><div class="cr-in"><div class="cr-bg"><div class="cr-l"></div><div class="cr-t">${cols}${ini}${fin}${now}</div></div>${body || `<p class="cr-empty">${esc(opts.empty || "Nada programado en este periodo.")}</p>`}</div></div>
       </div>
       <div class="cr-leg">${vis.some(r => r.g) ? [["pre", "Preproducción"], ["rodaje", "Rodaje"], ["post", "Postproducción"]].filter(([g]) => vis.some(r => r.g === g)).map(([g, l]) => `<span class="cr-gleg cr-row g-${g}"><i></i>${l}</span>`).join("") + `<i class="cr-sep" aria-hidden="true"></i>` : ""}${[["pendiente", "Pendiente"], ["en_curso", "En curso"], ["revision", "Ajustes · revisión"], ["bloqueada", "Bloqueada"], ["listo", "Listo"], ["late", "Vencida"]].map(([k, l]) => `<span class="lg ${k}"><i></i>${l}</span>`).join("")}${hayFr && (E === "w" || E === "m") ? `<span class="lg am"><i></i>Mañana</span><span class="lg pm"><i></i>Tarde</span>` : ""}${iniIn ? `<span class="lg ini"><i></i>Inicio del proyecto</span>` : ""}${finIn ? `<span class="lg fin"><i></i>Entrega final${opts.finEst ? " (estimada)" : ""}</span>` : ""}${opts.leg || ""}</div>

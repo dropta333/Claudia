@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v167** · 10 oct 2026 · Responsable: Bastián Torres
+Versión: **v168** · 10 oct 2026 · Responsable: Bastián Torres
 
 ## Cómo está armado ahora
 - **Una sola fuente:** `src/app.html`, con todo el CSS y las capas JS.
@@ -161,6 +161,13 @@ Versión: **v167** · 10 oct 2026 · Responsable: Bastián Torres
   - Logros: tarjeta flotante al pasar el mouse (o tocar en celular) en la pestaña Logros, el Home y el perfil: qué mide, nivel actual con progreso, los 4 niveles con lo que falta y "Cómo lograrlo" (`COMO`).
   - Logros nuevos (capa 37): 6 generales (Viernes 5:29 pm, Fin de semana heroico, Madrugador, Cuatro manos, Emoji master, Desatascador oficial) y 3 por cargo (`c` = grupo; solo los ve y gana ese grupo). Métricas nuevas en `extras()`.
   - Pruebas: `node tools/test-v167.mjs`.
+
+- **v168:** notas, hitos de inicio y entrega, cronograma y Tráfico.
+  - Notas del proyecto: tarjeta con la foto adentro (42 px) junto al nombre, cargo y hora; la mía con el color del proyecto. Foto del cuadro para escribir también a 42 px.
+  - Avance por etapas: fila delgada de **Inicio del proyecto** arriba (azul) y de **Entrega final** abajo (tinta), con fecha, "automático" si sale de las etapas, cuántos días faltan o pasaron, y se tocan para cambiarlas (`hitoFila`, usa `pxpInicioPick` / `pxpEntregaPick`).
+  - Cronograma: Inicio, Hoy y Entrega con su fecha en una fila propia sobre la escala (`.cr-mk`), sin tapar las fechas; si quedan cerca se abren hacia lados distintos. La entrega final pasa a color tinta.
+  - Tráfico: sin la columna de complejidad; la carga es un semáforo (`.semaf`) con su estado escrito; la ausencia ocupa más espacio.
+  - Pruebas: `node tools/test-v168.mjs`.
 
 ## No cambiar sin consultar
 - El ZIP de Netlify va sin datos, y no se guarda nada antes de cargar los datos del servidor.
