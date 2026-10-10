@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v168** · 10 oct 2026 · Responsable: Bastián Torres
+Versión: **v169** · 10 oct 2026 · Responsable: Bastián Torres
 
 ## Cómo está armado ahora
 - **Una sola fuente:** `src/app.html`, con todo el CSS y las capas JS.
@@ -168,6 +168,12 @@ Versión: **v168** · 10 oct 2026 · Responsable: Bastián Torres
   - Cronograma: Inicio, Hoy y Entrega con su fecha en una fila propia sobre la escala (`.cr-mk`), sin tapar las fechas; si quedan cerca se abren hacia lados distintos. La entrega final pasa a color tinta.
   - Tráfico: sin la columna de complejidad; la carga es un semáforo (`.semaf`) con su estado escrito; la ausencia ocupa más espacio.
   - Pruebas: `node tools/test-v168.mjs`.
+
+- **v169:** Tráfico, notas, cronograma y logros del Home.
+  - Ficha de Tráfico: nombre y cargo más grandes; a la derecha un **semáforo vertical** grande con su estado escrito; debajo del nombre, estados en íconos (`pxpEstadosIco`): Disponible (sí/parcial/no), Proyectos, Horas de etapas de la semana, Vencidas y Ausencia (el ícono tiene el selector y un botón de fechas). El bloque viejo de ausencia queda oculto.
+  - Notas: foto de 60 px alineada con el nombre (18,5 px, con su @usuario) y el cargo; el comentario va debajo a todo el ancho.
+  - Cronograma: Entrega final en violeta (#7B61FF, igual que su fila en las etapas); Hoy en negro (amarillo en tema oscuro).
+  - Logros en la tarjeta de perfil del Home: tarjeta corta (nombre, nivel y progreso); la completa queda en la pestaña Logros.
 
 ## No cambiar sin consultar
 - El ZIP de Netlify va sin datos, y no se guarda nada antes de cargar los datos del servidor.

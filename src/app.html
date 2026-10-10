@@ -6306,6 +6306,97 @@ body:not(.trf-tabla) #main-grid > .card:not(.span-all){padding:16px 16px 14px!im
 .cr .mk-ln.mk-ini,.cr .mk-ln.mk-fin{border-left-style:dashed}
 .cr .cr-h .cr-nowh,.cr .cr-h .cr-inih,.cr .cr-h .cr-finh{display:none}
 .cr-leg .fin i{border-left-color:var(--text)!important}
+/* ═════ v169 ═════ */
+/* Notas: la foto en su columna, centrada con todo el texto de la nota; escala tipográfica */
+#pxp-proj .pj-note .pn-b{display:grid!important;grid-template-columns:60px minmax(0,1fr) auto;column-gap:16px;row-gap:6px;align-items:start;padding:16px 18px 14px!important}
+#pxp-proj .pj-note .pn-m{display:contents!important}
+#pxp-proj .pj-note .pn-av{grid-column:1;grid-row:1 / span 4;align-self:center}
+#pxp-proj .pj-note .pn-av .av{--s:60px!important;width:60px!important;height:60px!important}
+#pxp-proj .pj-note .pn-who{grid-column:2;grid-row:1;gap:4px}
+#pxp-proj .pj-note .xbtn{grid-column:3;grid-row:1}
+#pxp-proj .pj-note .pn-t,#pxp-proj .pj-note .adj-list,#pxp-proj .pj-note .rx-bar{grid-column:2 / span 2;padding-left:0!important;margin-left:0!important}
+#pxp-proj .pj-note .pn-who b{font:700 16.5px/1.1 var(--sans);letter-spacing:-.01em}
+#pxp-proj .pj-note .pn-who small{display:flex;align-items:baseline;gap:8px;white-space:normal}
+#pxp-proj .pj-note .pn-rol{font:600 11px/1.1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+#pxp-proj .pj-note .pn-time{font:500 12px/1.1 var(--sans);color:var(--muted2,var(--muted))}
+#pxp-proj .pj-note .pn-rol + .pn-time::before{content:"·";margin-right:8px;color:var(--muted)}
+#pxp-proj .pj-note .pn-t{font:400 15.5px/1.55 var(--sans)!important;color:var(--text)}
+@media (max-width:640px){#pxp-proj .pj-note .pn-b{grid-template-columns:44px minmax(0,1fr) auto;column-gap:12px}#pxp-proj .pj-note .pn-av .av{--s:44px!important;width:44px!important;height:44px!important}}
+/* Logros del Home: tarjeta corta */
+#lg-tt.corto{width:240px!important;padding:12px 14px 10px!important}
+#lg-tt.corto .tt-h b{font-size:15px!important}
+#lg-tt.corto .tt-prog{margin:8px 0 0}
+/* Cronograma: entrega en violeta (como su fila en las etapas) y Hoy en negro (amarillo en tema oscuro) */
+.cr .mk-fin{--mc:#7B61FF!important}
+.cr .cr-fin{border-left-color:#7B61FF!important}
+.cr .mk-fin em{color:#fff!important}
+.cr-leg .fin i{border-left-color:#7B61FF!important}
+.et-hito.h-fin{--hc:#7B61FF!important}
+[data-theme="light"] .cr,.cr{--crn:#17171C}
+[data-theme="dark"] .cr{--crn:var(--lime,#F3FF57)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .cr{--crn:var(--lime,#F3FF57)}}
+[data-theme="dark"] .cr .mk-hoy em{color:#0B0B0F}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .cr .mk-hoy em{color:#0B0B0F}}
+/* Tráfico: semáforo vertical a la derecha, separado de la ausencia */
+#main-grid > .card.tcard .ch-top{display:grid!important;grid-template-columns:minmax(0,1fr) auto;column-gap:12px;row-gap:12px}
+#main-grid > .card.tcard .ch-left{grid-column:1;grid-row:1}
+#main-grid > .card.tcard .ch-right{display:contents!important}
+#main-grid > .card.tcard .dc-carga{grid-column:2;grid-row:1;align-self:start;display:flex!important;flex-direction:column!important;align-items:center!important;gap:5px!important;padding:0!important;border:0!important;background:none!important;margin-top:2px}
+#main-grid > .card.tcard .dc-carga .dotcol-label{display:none!important}
+#main-grid > .card.tcard .ch-right > .dotcol:not(.dc-carga){grid-column:1 / -1;grid-row:2;border:1px solid var(--border)!important;border-radius:12px;background:var(--surface2);padding:9px 12px!important}
+#main-grid > .card.tcard .semaf{flex-direction:column;gap:6px;padding:7px 6px;border-radius:14px}
+#main-grid > .card.tcard .semaf .sdot{width:17px!important;height:17px!important}
+#main-grid > .card.tcard .semaf-l{font-size:10px;letter-spacing:.1em}
+#main-grid > .card.tcard .card-x{top:6px!important;right:auto!important;left:6px!important;z-index:2}
+#main-grid > .card.tcard .ch-right .dotcol.dc-carga{flex-direction:column!important;flex-wrap:nowrap!important;align-items:center!important;gap:6px!important;padding:0!important;border:0!important;background:none!important}
+#main-grid > .card.tcard .ch-right .dotcol.dc-carga .semaf-l{text-align:center}
+#main-grid > .card.tcard .ausencia-select{height:34px!important;line-height:normal!important;padding-top:0!important;padding-bottom:0!important}
+.cr .cr-trail{opacity:.35}
+/* v169 · Semáforo: columna propia a la derecha (centrado, más grande, a lo alto de nombre + ausencia); ausencia más angosta */
+#main-grid > .card.tcard .ch-top{grid-template-columns:minmax(0,1.55fr) minmax(0,1fr)!important;align-items:center}
+#main-grid > .card.tcard .ch-left{grid-column:1!important;grid-row:1!important}
+#main-grid > .card.tcard .ch-right > .dotcol:not(.dc-carga){grid-column:1!important;grid-row:2!important}
+#main-grid > .card.tcard .ch-right .dotcol.dc-carga{grid-column:2!important;grid-row:1 / span 2!important;justify-self:center!important;align-self:center!important;margin:0!important}
+#main-grid > .card.tcard .semaf{gap:8px!important;padding:9px 8px!important;border-radius:18px!important}
+#main-grid > .card.tcard .semaf .sdot{width:24px!important;height:24px!important}
+#main-grid > .card.tcard .semaf-l{font-size:11px!important;margin-top:2px}
+.cr .cr-trail{opacity:.35}
+/* v169 · Ficha de Tráfico: nombre más grande, estados en íconos y semáforo a la derecha */
+#main-grid > .card.tcard .ch-name{font:400 24px/1.1 var(--serif)!important}
+#main-grid > .card.tcard .ch-name .av{--s:42px!important;width:42px!important;height:42px!important}
+#main-grid > .card.tcard .ch-role{font-size:14px!important;margin-left:52px!important}
+#main-grid > .card.tcard .ch-right > .dc-aus-old{display:none!important}
+#main-grid > .card.tcard .ch-right .dotcol.dc-ico{grid-column:1!important;grid-row:2!important;display:flex!important;flex-wrap:nowrap!important;gap:6px!important;padding:0!important;border:0!important;background:none!important;align-items:stretch!important}
+#main-grid > .card.tcard .ch-right .dotcol.dc-carga{justify-self:end!important;margin-right:6px!important}
+.ei{position:relative;flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px 7px;border-radius:12px;background:var(--surface2);border:1px solid var(--border);color:var(--text)}
+.ei .i{width:18px;height:18px;color:var(--ec,var(--muted))}
+.ei b{font:700 14px/1 var(--display);letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.ei b i{font-style:normal;font-size:11px;color:var(--muted);margin-left:1px}
+.ei small{font:600 9.5px/1 var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.ei-disp b{color:var(--ec)}
+.ei-venc{--ec:var(--red);background:color-mix(in srgb,var(--red) 8%,var(--surface2));border-color:color-mix(in srgb,var(--red) 30%,var(--border))}
+.ei-venc b{color:var(--red)}
+.ei-ok{--ec:var(--green)}
+.ei-aus{cursor:pointer}
+.ei-aus select{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.ei-aus.on{--ec:#0E9AA7;background:color-mix(in srgb,#0E9AA7 10%,var(--surface2));border-color:color-mix(in srgb,#0E9AA7 35%,var(--border))}
+.ei-aus.on b{color:#0E9AA7}
+.ei-aus:hover{border-color:var(--text)}
+.ei-aus:focus-within{outline:2px solid var(--brand);outline-offset:1px}
+.ei-fch{align-self:center;flex:none;width:28px;height:28px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--muted);display:grid;place-items:center;cursor:pointer;padding:0}
+.ei-fch .i{width:15px;height:15px}
+#main-grid > .card.tcard .ch-right .dotcol.dc-ico{justify-self:stretch!important;width:100%!important}
+#main-grid > .card.tcard .ch-right .dotcol.dc-ico > .ei{flex:1 1 0!important;flex-basis:0!important;width:auto!important}
+#main-grid > .card.tcard .ch-right .dotcol.dc-ico > .ei-fch{flex:0 0 28px!important;flex-basis:28px!important;width:28px!important}
+#main-grid > .card.tcard .ch-top{grid-template-columns:minmax(0,1fr) auto!important;column-gap:20px!important}
+#main-grid > .card.tcard .ch-right .dotcol.dc-carga{margin-right:8px!important}
+/* v169 · Notas: la foto se alinea con el nombre y el cargo; el comentario va debajo */
+#pxp-proj .pj-note .pn-av{grid-row:1!important;align-self:center!important}
+#pxp-proj .pj-note .pn-who{align-self:center}
+#pxp-proj .pj-note .pn-b{row-gap:10px!important}
+#pxp-proj .pj-note .pn-who b{font:700 18.5px/1.15 var(--sans)!important;display:flex;align-items:baseline;flex-wrap:wrap;column-gap:8px}
+#pxp-proj .pj-note .pn-hd{font:500 13px/1 var(--sans);font-style:normal;color:var(--muted)}
+#pxp-proj .pj-note .pn-t,#pxp-proj .pj-note .adj-list,#pxp-proj .pj-note .rx-bar{grid-column:1 / -1!important}
 </style>
 </head>
 <body>
@@ -7253,6 +7344,27 @@ function pxpPuntosCarga(person, w) {
   det.sort((a, b) => b.pts - a.pts);
   return { n: keys.length, p: Math.round(p * 10) / 10, keys, modo: "etapas", h: Math.round(h * 10) / 10, sup: sup.length, det };
 }
+// ── v169 · Estados de la persona en íconos (ficha de Tráfico): disponibilidad, proyectos, horas, vencidas y ausencia ──
+window.pxpEstadosIco = function (person, w, aus, ausObj, ausKey) {
+  try {
+    const sv = (d) => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`, esc = (x) => String(x == null ? "" : x).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    const cp = pxpPuntosCarga(person, w), disp = pxpDisponibilidad(person, w), hoy = new Date().toISOString().slice(0, 10);
+    let venc = 0; (cp.keys || []).forEach(k => { const q = PROJECTS[k]; if (!q || !window.pxpPlanEtapas) return; pxpPlanEtapas(q).forEach(x => { if (x.fin && x.fin < hoy && x.e.estado !== "listo" && pxpEsResp(x.e, person.name)) venc++; }); });
+    const DI = { si: ["Sí", "var(--green)", "<circle cx='12' cy='12' r='8.5'/><path d='m8 12.3 2.8 2.8 5.2-5.6'/>"], parcial: ["Parcial", "#C99400", "<circle cx='12' cy='12' r='8.5'/><path d='M12 3.5a8.5 8.5 0 0 1 0 17z' fill='currentColor' stroke='none'/>"], no: ["No", "var(--red)", "<circle cx='12' cy='12' r='8.5'/><path d='m6 6 12 12'/>"] }[disp.k] || ["—", "var(--muted)", "<circle cx='12' cy='12' r='8.5'/>"];
+    const tile = (cls, ic, val, lbl, tip, extra) => `<span class="ei ${cls}" data-tip="${tip}"${extra || ""}>${sv(ic)}<b>${val}</b><small>${lbl}</small></span>`;
+    const ausL = aus ? ((typeof AUSENCIA_LABELS !== "undefined" && AUSENCIA_LABELS[aus]) || aus) : "";
+    const opts = [["", "Ninguna"], ["vacaciones", "Vacaciones"], ["compensatorio", "Compensatorio"], ["permiso", "Permiso"], ["enfermedad", "Enfermedad"], ["off", "Off"], ["licencia_paternidad", "Licencia de paternidad"], ["licencia_maternidad", "Licencia de maternidad"]];
+    const g = AUDIO.includes(person) ? "audio" : "team", idx = (g === "audio" ? AUDIO : TEAM).indexOf(person);
+    const ausTile = `<label class="ei ei-aus${aus ? " on" : ""}" data-tip="${aus ? "Ausencia: " + ausL + (ausObj && ausObj.fechaInicio ? " · " + ausObj.fechaInicio + " → " + (ausObj.fechaFin || "?") : "") + "<br>Toca para cambiarla" : "Sin ausencia · toca para registrar una"}">${sv("<path d='M3 20h18'/><path d='M12 20V9'/><path d='M12 9c-1-3.5-4-5-7.5-4 2 .5 3.5 1.8 4 3.5M12 9c1-3.5 4-5 7.5-4-2 .5-3.5 1.8-4 3.5M12 9c-2.5-1.5-6-.5-7.5 2M12 9c2.5-1.5 6-.5 7.5 2'/>")}<b>${aus ? esc(({ vacaciones: "Vacac.", compensatorio: "Comp.", permiso: "Permiso", enfermedad: "Incap.", off: "Off", licencia_paternidad: "Licencia", licencia_maternidad: "Licencia" })[aus] || ausL) : "—"}</b><small>Ausencia</small>
+      <select aria-label="Ausencia" onchange="setAusencia('${g}',${idx},this.value)">${opts.map(([v, l]) => `<option value="${v}" ${v === (aus || "") ? "selected" : ""}>${l}</option>`).join("")}</select></label>${aus ? `<button type="button" class="ei-fch" onclick="toggleAusenciaFechas('${ausKey}')" data-tip="Elegir días o fechas de la ausencia">${sv("<rect x='3.5' y='5' width='17' height='15.5' rx='2'/><path d='M3.5 10h17M8 3v4M16 3v4'/>")}</button>` : ""}`;
+    return `<div class="dotcol dc-ico">
+      ${tile("ei-disp", DI[2], DI[0], "Disponible", `${esc(disp.l || "")}${disp.why ? " · " + esc(disp.why) : ""}`, ` style="--ec:${DI[1]}"`)}
+      ${tile("", "<path d='M3.5 7.5h6l2 2h9v9a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z'/>", cp.n || 0, "Proyectos", `${cp.n || 0} proyecto${cp.n === 1 ? "" : "s"} activos esta semana`)}
+      ${tile("", "<circle cx='12' cy='12' r='8.5'/><path d='M12 7v5l3 2'/>", cp.modo === "etapas" ? (cp.h || 0) + "<i>h</i>" : "—", "Horas", cp.modo === "etapas" ? `${cp.h || 0} h de etapas esta semana` : "Se mide por proyectos")}
+      ${tile(venc ? "ei-venc" : "ei-ok", venc ? "<path d='M12 3.5 21 19.5H3z'/><path d='M12 10v4M12 17v.5'/>" : "<path d='m5 12.5 4.5 4.5L19 7.5'/>", venc || "0", "Vencidas", venc ? `${venc} etapa${venc === 1 ? "" : "s"} vencida${venc === 1 ? "" : "s"} a su nombre` : "Sin etapas vencidas")}
+      ${ausTile}</div>`;
+  } catch (e) { console.error(e); return ""; }
+};
 // ── Carga latente: proyectos que pueden volver (pausados 35 %, en rodaje 5 %) ──
 const PXP_LATENTE = { standby: 0.35, rodaje: 0.05 };
 function pxpLatente(person, w) {
@@ -7441,7 +7553,8 @@ function buildGroupCard(list, idx, groupKey, w) {
     </div>
     <div class="ch-right">
       <div class="dotcol dc-carga"><div class="dotcol-label">Carga</div><span class="semaf" role="group" aria-label="Semáforo de carga">${dotsHtml("toggleSemaforo", groupKey, idx, pxpCargaPersona(person, w), CARGA_DOTS)}</span><span class="semaf-l s-${pxpCargaPersona(person, w)}">${({ saturado: "Sobrecarga", cargado: "Ocupado", libre: "Libre" })[pxpCargaPersona(person, w)] || ""}</span></div>
-      <div class="dotcol">
+      ${(window.pxpEstadosIco ? pxpEstadosIco(person, w, ausenciaActual, ausenciaObj, ausKey) : "")}
+      <div class="dotcol dc-aus-old">
         <div class="dotcol-label">Ausencia</div>
         <select class="ausencia-select ${ausenciaActual||''}${ausenciaActual?' tiene-ausencia':''}" onchange="setAusencia('${groupKey}',${idx},this.value)">
           <option value="">— Ninguna —</option>
@@ -12396,7 +12509,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     // v168 · La nota es una tarjeta: la foto va adentro, junto al nombre, el cargo y la hora
     const rolDe = (n) => { const f = window.pxpFindPerson && pxpFindPerson(n); return f && f.p ? (f.p.alias || f.p.role || "") : ""; };
     const noteRow = (h) => `<div class="pj-note${norm(h.usuario) === norm(currentUser) ? " mine" : ""}">
-      <div class="pn-b"><div class="pn-m"><span class="pn-av">${av("person", h.usuario || "?", 42)}</span><span class="pn-who"><b>${esc(h.usuario || "—")}</b><small>${esc([rolDe(h.usuario), rel(h.ts)].filter(Boolean).join(" · "))}</small></span>${norm(h.usuario) === norm(currentUser) ? `<button class="xbtn" onclick="pxpNoteDel(${h.i})" title="Borrar nota">${confirmDelNote === h.i ? "¿Borrar?" : I.trash}</button>` : ""}</div>${h.texto ? `<div class="pn-t">${window.pxpNoteTextHtml ? pxpNoteTextHtml(h.texto) : esc(h.texto)}</div>` : ""}${window.pxpAdjuntosHtml ? pxpAdjuntosHtml(h.adjuntos, ea(k + "|" + h.i)) : ""}${window.pxpReacHtml ? pxpReacHtml(k, h) : ""}</div></div>`;
+      <div class="pn-b"><div class="pn-m"><span class="pn-av">${av("person", h.usuario || "?", 60)}</span><span class="pn-who"><b>${esc(h.usuario || "—")}${window.pxpHandleDe && pxpHandleDe(h.usuario) ? `<em class="pn-hd">@${esc(pxpHandleDe(h.usuario))}</em>` : ""}</b><small>${rolDe(h.usuario) ? `<span class="pn-rol">${esc(rolDe(h.usuario))}</span>` : ""}<span class="pn-time">${esc(rel(h.ts))}</span></small></span>${norm(h.usuario) === norm(currentUser) ? `<button class="xbtn" onclick="pxpNoteDel(${h.i})" title="Borrar nota">${confirmDelNote === h.i ? "¿Borrar?" : I.trash}</button>` : ""}</div>${h.texto ? `<div class="pn-t">${window.pxpNoteTextHtml ? pxpNoteTextHtml(h.texto) : esc(h.texto)}</div>` : ""}${window.pxpAdjuntosHtml ? pxpAdjuntosHtml(h.adjuntos, ea(k + "|" + h.i)) : ""}${window.pxpReacHtml ? pxpReacHtml(k, h) : ""}</div></div>`;
 
     pmBox.style.setProperty("--pc", col);
     pmBox.innerHTML = `
@@ -19819,6 +19932,13 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const G = (meta().logros && meta().logros.ganados) || {}, un = UNI[f.m] ? " " + UNI[f.m] : "";
     const pct = sig ? Math.min(100, Math.round(v / sig * 100)) : 100;
     tt.style.setProperty("--tc", T.c);
+    // v169 · En el Home (tarjeta de perfil) va una versión corta; la completa queda en la pestaña Logros
+    tt.classList.toggle("corto", el.classList.contains("lg-h-i"));
+    if (el.classList.contains("lg-h-i")) {
+      tt.innerHTML = `<div class="tt-h">${embN(f.s, cur, f.i, 34, !t, "", 0)}<div><b>${esc(f.n)}</b><span class="tt-t"><i></i>${t ? T.n : "Sin desbloquear"}</span></div></div>
+        <div class="tt-prog"><div class="tt-pb"><i style="width:${pct}%"></i></div><span>${sig ? `<b>${Math.round(v * 10) / 10}${un}</b> de ${sig}${un} para ${TIERS[t].n}` : "<b>Nivel máximo</b>"}</span></div>`;
+      return colocarTT(el);
+    }
     const lvl = f.g.map((g, i) => { const gk = G[`${f.s}|${suj}|${f.id}|${i}`], ok = i < t, now = i === t;
       return `<li class="${ok ? "ok" : now ? "now" : ""}" style="--lc:${TIERS[i].c}"><i></i><b>${TIERS[i].n}</b><span>${g}${un}</span><em>${ok ? (gk && !gk.b ? "✓ " + hace(gk.ts) : "✓ logrado") : now ? `faltan ${Math.max(0, Math.round((g - v) * 10) / 10)}${un}` : "bloqueado"}</em></li>`; }).join("");
     tt.innerHTML = `<div class="tt-h">${embN(f.s, cur, f.i, 44, !t, "", 0)}<div><b>${esc(f.n)}</b><span class="tt-t"><i></i>${t ? T.n : "Sin desbloquear"} · ${S_LBL[f.s] || ""}${f.s === "grp" && suj ? " · " + esc(GL(suj)) : ""}${f.c ? " · de tu cargo" : ""}</span></div></div>
