@@ -20134,7 +20134,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   const corto = (n) => { n = String(n || "").trim(); const m = /^(Cliente|Agencia|Externo):\s*(.*)$/i.exec(n); if (m) return m[2]; const w = n.split(/\s+/); return w[0] ? w[0][0] + w[0].slice(1).toLowerCase() : ""; };
   // Diagonales dentro de un rectángulo (festivos y fines de semana)
   // v166 · Festivos (y domingos): rayas más marcadas
-  const FEST_C = "#BDBDC8", FEST_LW = .7;
+  const FEST_C = "#BDBDC8", FEST_LW = .7, MES_LN = "#8C8C9A", MES_LW = 1;
   function rayas(rec, x, y, w, h, step, color, lw) {
     for (let k = -h; k < w; k += step) {
       let x1 = x + k, y1 = y + h, x2 = x + k + h, y2 = y;
@@ -20286,6 +20286,12 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
           else { pila(A, innerY, half); pila(B, innerY + half + gap, half); }
         }
         rec.line({ x1: X0, y1: y + rowH, x2: X1, y2: y + rowH, stroke: LINE, lw: .5 });
+        // v166 · Borde sutil que sigue el contorno de cada mes
+        for (let i = 0; i < nd; i++) {
+          const d = addD(m, i), mk = d.slice(0, 7);
+          if (i && addD(m, i - 1).slice(0, 7) !== mk) rec.line({ x1: cx(i), y1: y, x2: cx(i), y2: y + rowH, stroke: MES_LN, lw: MES_LW });
+          if (wi && addD(d, -7).slice(0, 7) !== mk) rec.line({ x1: cx(i), y1: y, x2: cx(i) + cw(i), y2: y, stroke: MES_LN, lw: MES_LW });
+        }
       });
     }
     await ttPie(rec, W, H, s, D0, pg, s.franja ? "AM / PM  " + T.ampm : "");
@@ -20305,7 +20311,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       // Encabezado de días
       const m0 = dias[0], m1 = dias[N - 1];
       rec.text({ s: (m0.slice(0, 7) === m1.slice(0, 7) ? `${T.m[+m0.slice(5, 7) - 1]} ${m0.slice(0, 4)}` : `${T.m[+m0.slice(5, 7) - 1]} – ${T.m[+m1.slice(5, 7) - 1]} ${m1.slice(0, 4)}`).toUpperCase(), x: X0, y: Y0 + 24, font: "cond", size: 7, color: MUTED, cs: 1.3 });
-      meses.forEach(mm => { const x = gx + mm.i0 * dx, w = mm.n * dx; rec.rect({ x, y: Y0, w, h: HH, fill: MES_BG(mm.k + "-01", false) }); const ml = `${T.m[+mm.k.slice(5, 7) - 1]}${mm.k.slice(0, 4) !== hoy().slice(0, 4) ? " " + mm.k.slice(0, 4) : ""}`.toUpperCase(); if (w > tw(ml, "cond", 6.8) + 8) rec.text({ s: ml, x: x + 4, y: Y0 + 8, font: "cond", size: 6.8, color: INK, cs: 1.2 }); if (mm.i0) rec.line({ x1: x, y1: Y0, x2: x, y2: Y0 + HH, stroke: INK, lw: .8 }); });
+      meses.forEach(mm => { const x = gx + mm.i0 * dx, w = mm.n * dx; rec.rect({ x, y: Y0, w, h: HH, fill: MES_BG(mm.k + "-01", false) }); const ml = `${T.m[+mm.k.slice(5, 7) - 1]}${mm.k.slice(0, 4) !== hoy().slice(0, 4) ? " " + mm.k.slice(0, 4) : ""}`.toUpperCase(); if (w > tw(ml, "cond", 6.8) + 8) rec.text({ s: ml, x: x + 4, y: Y0 + 8, font: "cond", size: 6.8, color: INK, cs: 1.2 }); if (mm.i0) rec.line({ x1: x, y1: Y0, x2: x, y2: Y0 + HH, stroke: MES_LN, lw: MES_LW }); });
       const paso = dx < 9 ? Math.ceil(9 / dx) : 1;
       dias.forEach((d, i) => {
         const x = gx + i * dx, wd = D(d).getDay(), we = wd === 0 || wd === 6, hoyD = d === hoy();
@@ -20320,7 +20326,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       while (i0 < filas.length && y + (filas[i0].ph ? PH + RH : RH) <= YB) { y += filas[i0].ph ? PH : RH; i0++; }
       const yEnd = y;
       // Columnas: fines de semana y festivos
-      dias.forEach((d, i) => { const x = gx + i * dx, wd = D(d).getDay(), we = wd === 0 || wd === 6; rec.rect({ x, y: yR, w: dx, h: yEnd - yR, fill: MES_BG(d, we) }); if (wd === 0 || (!we && !habil(d))) rayas(rec, x, yR, dx, yEnd - yR, 3.6, FEST_C, FEST_LW); rec.line({ x1: x, y1: yR, x2: x, y2: yEnd, stroke: d.slice(8) === "01" && i ? INK : LINE, lw: d.slice(8) === "01" && i ? .8 : .35 }); });
+      dias.forEach((d, i) => { const x = gx + i * dx, wd = D(d).getDay(), we = wd === 0 || wd === 6; rec.rect({ x, y: yR, w: dx, h: yEnd - yR, fill: MES_BG(d, we) }); if (wd === 0 || (!we && !habil(d))) rayas(rec, x, yR, dx, yEnd - yR, 3.6, FEST_C, FEST_LW); rec.line({ x1: x, y1: yR, x2: x, y2: yEnd, stroke: d.slice(8) === "01" && i ? MES_LN : LINE, lw: d.slice(8) === "01" && i ? MES_LW : .35 }); });
       y = yR;
       for (let r = ini; r < i0; r++) {
         const f = filas[r];
