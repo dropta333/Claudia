@@ -1,9 +1,11 @@
-# Tráfico Post · v155 — cómo publicar
+# Tráfico Post · v156 — cómo publicar
 
 1. En el tablero actual toca **Descargar copia** (pie de página) para tener un respaldo de hoy.
 2. En Netlify, abre tu sitio → **Deploys** y arrastra este ZIP (o la carpeta descomprimida) a la zona de despliegue.
 3. Los datos del equipo **no se tocan**: viven en Netlify Blobs y el tablero los carga al abrir.
 4. Entra primero como Administración y espera el aviso **"Tablero optimizado"** (mueve las imágenes viejas a archivos).
+
+Novedades v156 (solo el tablero): etapas sugeridas, una por integrante y con fechas desde hoy que caben antes de la entrega final; ventana de proyecto más ancha; cronograma sin desplazamiento horizontal, con hoy siempre al centro y la vista "Todo" que se ajusta a las fechas.
 
 Novedades v155 (solo el tablero): filas de etapa más bajas; Revisión y Entrega compactas y con su color, con menos horas y exigencia liviana por defecto; selectores de horario y exigencia con estilo de calendario; sugerencia de bloqueador en las revisiones; etapas sugeridas por fase en un clic (con Deshacer); cronograma con todas las etapas, altura controlada, vista Año, mañana/tarde e inicio del proyecto; fecha de inicio del proyecto en la barra de resumen.
 

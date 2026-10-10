@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v155** · 10 oct 2026 · Responsable: Bastián Torres
+Versión: **v156** · 10 oct 2026 · Responsable: Bastián Torres
 
 ## Cómo está armado ahora
 - **Una sola fuente:** `src/app.html`, con todo el CSS y las capas JS.
@@ -73,6 +73,11 @@ Versión: **v155** · 10 oct 2026 · Responsable: Bastián Torres
   - Cronograma: en el proyecto se ven todas las etapas por fecha de inicio (flechas con fecha si caen fuera del periodo), altura máxima con desplazamiento desde 9 filas, vista **Año** (en persona, una fila por proyecto), mañana/tarde en Mes y Año, y línea de **Inicio del proyecto**.
   - Fecha de inicio del proyecto (`fechaInicio`, `inicioEst`) junto a la entrega final, primera en la barra de resumen con color turquesa y días hábiles de ejecución.
   - Pruebas: `node tools/test-etapas.mjs [carpeta-capturas]`.
+
+- **v156:** sugerencias y cronograma más sensatos.
+  - Etapas sugeridas: **una por integrante** por fase (al azar entre las de su cargo). Empiezan hoy (o en el inicio del proyecto si es futuro) y, si hay entrega final, las horas se reducen para caber antes de ella; avisa si igual se pasan.
+  - Cronograma con **hoy siempre al centro** (pasado a la izquierda, futuro a la derecha). Vistas: **Todo** (por defecto, se ajusta a las fechas de las etapas), Día, Semana (±2 días hábiles), Mes (±10) y Año (±130). La escala cambia sola (días, semanas o meses) y nunca hay desplazamiento horizontal. Preferencia guardada en `pxp_crono2_*`.
+  - Ventana de proyecto más ancha: hasta 1320 px.
 
 ## No cambiar sin consultar
 - El ZIP de Netlify va sin datos, y no se guarda nada antes de cargar los datos del servidor.

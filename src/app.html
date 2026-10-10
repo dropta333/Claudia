@@ -5726,9 +5726,15 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;tr
 .cr-out.l{left:6px}.cr-out.r{right:6px}
 .cr-out.listo{opacity:.6}
 .cr-tk.mo{transform:translate(-50%,-50%)!important;text-transform:capitalize;font-weight:600}
-.cr[data-m=anio] .cr-bar{min-width:3px;border-radius:4px}
-.cr[data-m=mes] .cr-bar.am,.cr[data-m=anio] .cr-bar.am{bottom:50%;border-radius:5px}
-.cr[data-m=mes] .cr-bar.pm,.cr[data-m=anio] .cr-bar.pm{top:50%;border-radius:5px}
+.cr[data-esc=m] .cr-bar{min-width:3px;border-radius:4px}
+.cr[data-esc=w] .cr-bar.am,.cr[data-esc=m] .cr-bar.am{bottom:50%;border-radius:5px}
+.cr[data-esc=w] .cr-bar.pm,.cr[data-esc=m] .cr-bar.pm{top:50%;border-radius:5px}
+/* v156 · El cronograma nunca se desplaza a lo ancho: la escala se ajusta al espacio */
+.cr-g{overflow-x:hidden!important}
+.cr-row,.cr-bg{grid-template-columns:var(--lw) minmax(0,1fr)!important}
+@media (max-width:720px){.cr{--lw:118px}.cr-l .av{display:none}.cr-tk{font-size:12px}}
+/* v156 · La ventana de proyecto es más ancha */
+@media (min-width:721px){#pxp-proj .pj-box{max-width:min(1320px,calc(100vw - 40px))!important}}
 .cr-leg .am i{background:linear-gradient(var(--muted) 0 50%,transparent 50%)}
 .cr-leg .pm i{background:linear-gradient(transparent 0 50%,var(--muted) 50%)}
 /* v155 · Inicio del proyecto en la barra de resumen (primero, color propio) */
@@ -13718,11 +13724,19 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     add("post", ["Entrega final", "Entrega de masters al cliente"], PM.length ? PM : MA.slice(0, 1), [1], "entrega", "liviana");
     return T;
   }
+  // v156 · Una sola etapa por integrante (para no saturar el proyecto), elegida al azar entre las de su cargo
   function sugerir(k, fase) {
-    const p = getProjectDisplay(k), T = plantillas(p)[fase] || [];
-    const ya = new Set((p.etapas || []).map(e => normName(e.nombre || "")));
-    return T.filter(t => !t.nombres.some(n => ya.has(normName(n)))).filter(t => !t.opc || Math.random() < 0.6)
-      .map(t => ({ nombre: rnd(t.nombres), hp: rnd(t.horas), clase: t.clase, peso: t.peso, resps: t.resps, fase }));
+    const p = getProjectDisplay(k), T = (plantillas(p)[fase] || []).map((t, j) => Object.assign({ j }, t));
+    const ya = new Set((p.etapas || []).map(e => normName(e.nombre || ""))), libre = T.filter(t => !t.nombres.some(n => ya.has(normName(n))));
+    const gente = []; T.forEach(t => t.resps.forEach(r => { if (!gente.some(g => normName(g) === normName(r))) gente.push(r); }));
+    const usadas = new Set(), out = [];
+    gente.forEach(m => {
+      const c = libre.filter(t => !usadas.has(t.j) && t.resps.some(r => normName(r) === normName(m))), base = c.filter(t => !t.opc);
+      const t = rnd(base.length ? base : c); if (!t) return; usadas.add(t.j);
+      out.push({ j: t.j, nombre: rnd(t.nombres), hp: rnd(t.horas), clase: t.clase, peso: t.peso, resps: [m], fase });
+    });
+    if (!gente.length) libre.filter(t => !t.opc).slice(0, 2).forEach(t => out.push({ j: t.j, nombre: rnd(t.nombres), hp: rnd(t.horas), clase: t.clase, peso: t.peso, resps: [], fase }));
+    return out.sort((a, b) => a.j - b.j);
   }
   window.pxpEtapasHtml = etapasHtml;
 
@@ -13778,6 +13792,15 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
           pxpSetResps(ne, x.resps); objs.push(ne);
           let at = E.findIndex(e => rk(pxpFaseEtapa(e)) > rk(x.fase)); if (at < 0) at = E.length; E.splice(at, 0, ne);
         });
+        // v156 · Fechas sensatas: empiezan hoy (o en el inicio del proyecto si es futuro) y las horas se ajustan para caber antes de la entrega final
+        const ini0 = nextWork(p.fechaInicio && p.fechaInicio > today() ? p.fechaInicio : today(), true), ent = p.entregaFinal || "";
+        if (ent && ent >= ini0) {
+          const disp = workBetween(ini0, ent) * 8, ocup = plan(p).filter(x => !objs.includes(x.e) && x.e.estado !== "listo" && x.fin && x.fin >= ini0).reduce((t, x) => t + (x.horas || 0), 0);
+          const nuevas = objs.reduce((t, e) => t + e.hp, 0), libreH = Math.max(disp - ocup, objs.length);
+          if (nuevas > libreH) { const f = libreH / nuevas; objs.forEach(e => { e.hp = Math.max(1, Math.round(e.hp * f * 2) / 2); e.dias = Math.max(1, Math.ceil(e.hp / 8)); }); }
+        }
+        { const x0 = plan(p).find(x => x.e === objs[0]); if (x0 && x0.ini && x0.ini < ini0) { objs[0].inicio = ini0; objs[0].fija = true; } }
+        { const fin = plan(p).filter(x => objs.includes(x.e)).map(x => x.fin).filter(Boolean).sort().pop(); if (ent && fin && fin > ent && window.pxpToast) pxpToast("Ojo: con las etapas que ya había, algunas sugeridas terminan después de la entrega final."); }
         ultimaSug = { k, ids: objs, fase: v, ts: Date.now() };
         { const G = grpGet(); G[k + "|" + v] = 1; setPref(grpKey, JSON.stringify(G)); }
         log(`${L.length} etapas sugeridas de ${faseL(v)} según el equipo`); struct = true; break; }
@@ -19073,51 +19096,62 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   // ── Estado de cada cronograma (vista y desplazamiento), recordado por persona ──
   const userKey = () => normName((typeof currentUser !== "undefined" && currentUser) || "anon");
   const ST = {};
-  const st = (id, def) => { if (!ST[id]) { let m = def; try { m = localStorage.getItem("pxp_crono_" + id.split(":")[0] + "_" + userKey()) || def; } catch (e) { } ST[id] = { m, off: 0 }; } return ST[id]; };
+  const st = (id, def) => { if (!ST[id]) { let m = def; try { m = localStorage.getItem("pxp_crono2_" + id.split(":")[0] + "_" + userKey()) || def; } catch (e) { } ST[id] = { m, off: 0 }; } return ST[id]; };
   const BUILD = {};
 
-  // Días hábiles visibles según la vista
-  function rango(s) {
+  // v156 · Días hábiles visibles: HOY SIEMPRE AL CENTRO (pasado a la izquierda, futuro a la derecha).
+  //   Todo = se ajusta a las fechas de las etapas · Semana ±2 días · Mes ±10 · Año ±130 (días hábiles). ‹ › mueven el centro un periodo.
+  const HALF = { semana: 2, mes: 10, anio: 130 };
+  const habilesEntre = (a, b) => { let n = 0, d = a; const dir = b >= a ? 1 : -1; while (d !== b) { d = addD(d, dir); if (habil(d)) n++; } return n; };
+  function rango(s, ext) {
     const t = hoy(); let dias = [];
-    if (s.m === "dia") { let d = habil(t) ? t : addD(t, 1); while (!habil(d)) d = addD(d, 1); let n = s.off; while (n > 0) { d = addD(d, 1); if (habil(d)) n--; } while (n < 0) { d = addD(d, -1); if (habil(d)) n++; } dias = [d]; }
-    else if (s.m === "semana") { const lun = addD(t, -((D(t).getDay() + 6) % 7) + 7 * s.off); for (let i = 0; i < 5; i++) dias.push(addD(lun, i)); }
-    else if (s.m === "anio") { const y = D(t).getFullYear() + s.off, d = new Date(y, 0, 1); while (d.getFullYear() === y) { dias.push(iso(d)); d.setDate(d.getDate() + 1); } }
-    else { const d = D(t); d.setDate(1); d.setMonth(d.getMonth() + s.off); const m = d.getMonth(); while (d.getMonth() === m) { dias.push(iso(d)); d.setDate(d.getDate() + 1); } }
-    const work = dias.filter(habil);
-    let label;
-    if (s.m === "dia") label = `${DIA[D(dias[0]).getDay()]} ${fD(dias[0])}${dias[0] === t ? " · hoy" : ""}`;
-    else if (s.m === "semana") label = `${fD(dias[0])} – ${fD(dias[4])}`;
-    else if (s.m === "anio") label = String(D(dias[0]).getFullYear());
-    else label = MES[D(dias[0]).getMonth()] + " " + D(dias[0]).getFullYear();
-    return { dias: work.length ? work : [dias[0]], todos: dias, label };
+    if (s.m === "dia") {
+      let d = habil(t) ? t : addD(t, 1); while (!habil(d)) d = addD(d, 1); let n = s.off; while (n > 0) { d = addD(d, 1); if (habil(d)) n--; } while (n < 0) { d = addD(d, -1); if (habil(d)) n++; }
+      dias = [d];
+      return { dias, esc: "h", label: `${DIA[D(d).getDay()]} ${fD(d)}${d === t ? " · hoy" : ""}` };
+    }
+    let h = HALF[s.m];
+    if (!h) {   // Todo: la mitad más larga entre lo que ya pasó y lo que falta, con un pequeño margen
+      const a = ext && ext.a ? ext.a : t, b = ext && ext.b ? ext.b : t;
+      h = Math.max(3, Math.min(130, Math.max(a < t ? habilesEntre(t, a) : 0, b > t ? habilesEntre(t, b) : 0) + 2));
+    }
+    let c = habil(t) ? t : addD(t, 1); while (!habil(c)) c = addD(c, 1);
+    let mv = s.off * (2 * h + 1); while (mv > 0) { c = addD(c, 1); if (habil(c)) mv--; } while (mv < 0) { c = addD(c, -1); if (habil(c)) mv++; }
+    const antes = []; let d = c; while (antes.length < h) { d = addD(d, -1); if (habil(d)) antes.unshift(d); }
+    const desp = []; d = c; while (desp.length < h) { d = addD(d, 1); if (habil(d)) desp.push(d); }
+    dias = antes.concat([c], desp);
+    const N = dias.length, f = dias[0], l = dias[N - 1], y = (x) => +x.slice(0, 4) !== D(t).getFullYear() ? " " + x.slice(0, 4) : "";
+    return { dias, esc: N <= 7 ? "d" : N <= 45 ? "w" : "m", label: `${fD(f)}${y(f)} – ${fD(l)}${y(l)}` };
   }
 
-  // rows: [{ l, sub, c, av, bars:[{a,b,st,tip,txt,k,cls}] }]
+  // rows: [{ l, sub, c, av, bars:[{a,b,st,tip,txt,k,cls,dIni,dFin}] }]
   function render(id, titulo, rows, opts) {
-    const s = st(id, opts.def || "semana"), R = rango(s), H = J();
+    const s = st(id, opts.def || "todo");
+    const fechas = []; rows.forEach(r => r.bars.forEach(b => { if (b.dIni) fechas.push(b.dIni); if (b.dFin) fechas.push(b.dFin); })); if (opts.inicio) fechas.push(opts.inicio); fechas.sort();
+    const R = rango(s, { a: fechas[0], b: fechas[fechas.length - 1] }), H = J(), E = R.esc;
     const A = abs(R.dias[0], 0), B = abs(R.dias[R.dias.length - 1], H), span = Math.max(1, B - A);
     const x = (v) => (v - A) / span * 100;
     const nowV = ahoraAbs(), nowIn = nowV >= A && nowV <= B;
     // Columnas y escala
     let cols = "", ticks = "";
     const wDay = 100 / R.dias.length;
-    if (s.m === "anio") {   // v155 · un bloque por mes (ancho según sus días hábiles)
-      let i0 = 0; const mesHoy = hoy().slice(0, 7);
-      for (let m = 0; m < 12; m++) {
-        const n = R.dias.filter(d => +d.slice(5, 7) === m + 1).length, ym = R.dias[i0] ? R.dias[i0].slice(0, 7) : "";
-        cols += `<i class="cr-col${m % 2 ? " odd" : ""}${ym === mesHoy ? " today" : ""}" style="left:${i0 * wDay}%;width:${n * wDay}%"></i>`;
-        ticks += `<span class="cr-tk mo${ym === mesHoy ? " on" : ""}" style="left:${(i0 + n / 2) * wDay}%">${MES[m].slice(0, 3)}</span>`;
-        i0 += n;
+    if (E === "m") {   // meses (Año o un "Todo" largo): un bloque por mes
+      const mesHoy = hoy().slice(0, 7); let i0 = 0, k = 0;
+      while (i0 < R.dias.length) {
+        const ym = R.dias[i0].slice(0, 7); let n = 0; while (i0 + n < R.dias.length && R.dias[i0 + n].slice(0, 7) === ym) n++;
+        cols += `<i class="cr-col${k % 2 ? " odd" : ""}${ym === mesHoy ? " today" : ""}" style="left:${i0 * wDay}%;width:${n * wDay}%"></i>`;
+        if (n >= 4) ticks += `<span class="cr-tk mo${ym === mesHoy ? " on" : ""}" style="left:${(i0 + n / 2) * wDay}%">${MES[+ym.slice(5, 7) - 1].slice(0, 3)}${+ym.slice(5, 7) === 1 ? " " + ym.slice(0, 4) : ""}</span>`;
+        i0 += n; k++;
       }
     } else R.dias.forEach((d, i) => {
-      const fest = !habil(d), isT = d === hoy();
-      cols += `<i class="cr-col${i % 2 ? " odd" : ""}${isT ? " today" : ""}${fest ? " fest" : ""}" style="left:${i * wDay}%;width:${wDay}%"></i>`;
-      if (s.m === "dia") { for (let h = 0; h <= H; h++) ticks += `<span class="cr-tk${h === 4 ? " lunch" : ""}" style="left:${h / H * 100}%">${reloj(h)}</span>`; }
-      else if (s.m === "semana") { ticks += `<span class="cr-tk day${isT ? " on" : ""}" style="left:${(i + .5) * wDay}%"><b>${DIA[D(d).getDay()]}</b> ${+d.slice(8, 10)}</span>`; }
+      const isT = d === hoy();
+      cols += `<i class="cr-col${i % 2 ? " odd" : ""}${isT ? " today" : ""}" style="left:${i * wDay}%;width:${wDay}%"></i>`;
+      if (E === "h") { for (let h = 0; h <= H; h++) ticks += `<span class="cr-tk${h === 4 ? " lunch" : ""}" style="left:${h / H * 100}%">${reloj(h)}</span>`; }
+      else if (E === "d") { ticks += `<span class="cr-tk day${isT ? " on" : ""}" style="left:${(i + .5) * wDay}%"><b>${DIA[D(d).getDay()]}</b> ${+d.slice(8, 10)}</span>`; }
       else if (i === 0 || lunes(d) !== lunes(R.dias[i - 1])) ticks += `<span class="cr-tk wk${isT ? " on" : ""}" style="left:${i * wDay}%">${fD(d)}</span>`;
     });
-    if (s.m === "semana") R.dias.forEach((d, i) => { for (let h = 2; h < H; h += 2) cols += `<i class="cr-hr${h === 4 ? " mid" : ""}" style="left:${(i + h / H) * wDay}%"></i>`; });
-    if (s.m === "dia") for (let h = 1; h < H; h++) cols += `<i class="cr-hr${h === 4 ? " mid" : ""}" style="left:${h / H * 100}%"></i>`;
+    if (E === "d") R.dias.forEach((d, i) => { for (let h = 2; h < H; h += 2) cols += `<i class="cr-hr${h === 4 ? " mid" : ""}" style="left:${(i + h / H) * wDay}%"></i>`; });
+    if (E === "h") for (let h = 1; h < H; h++) cols += `<i class="cr-hr${h === 4 ? " mid" : ""}" style="left:${h / H * 100}%"></i>`;
     // Filas visibles (las que tocan el rango)
     // v155 · En el proyecto se ven TODAS las etapas (en el orden en que empiezan); las que caen fuera del periodo muestran una flecha con su fecha
     const vis = opts.todas ? rows : rows.map(r => Object.assign({}, r, { bars: r.bars.filter(b => b.b > A && b.a < B) })).filter(r => r.bars.length || opts.keepEmpty);
@@ -19130,19 +19164,19 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       }
       const bars = dentro.map(b => {
         const l = Math.max(0, x(b.a)), w = Math.max(.8, Math.min(100, x(b.b)) - l), live = nowIn && nowV > b.a && nowV < b.b && b.st !== "listo", late = b.b <= nowV && b.st !== "listo";
-        const tx = w > (s.m === "mes" ? 6 : 10) ? `<em>${esc(b.txt || "")}</em>` : "";
+        const tx = w > (E === "w" ? 6 : E === "m" ? 4 : 10) ? `<em>${esc(b.txt || "")}</em>` : "";
         return `<span class="cr-bar ${b.st || "pendiente"}${late ? " late" : ""}${live ? " live" : ""}${b.cls ? " " + b.cls : ""}${b.fr ? " " + b.fr : ""}" style="left:${l}%;width:${w}%;--c:${b.c || r.c || "var(--brand)"}" data-a="${b.a}" data-b="${b.b}" data-tip="${b.tip || ""}"${b.k ? ` role="button" tabindex="0" onclick="pxpOpenProject('${ea(b.k)}')"` : ""}>${tx}</span>`;
       }).join("");
       return `<div class="cr-row"><div class="cr-l">${r.av || ""}<span><b>${esc(r.l)}</b>${r.sub ? `<small>${esc(r.sub)}</small>` : ""}</span></div><div class="cr-t">${bars}</div></div>`;
     }).join("");
-    const seg = [["dia", "Día"], ["semana", "Semana"], ["mes", "Mes"], ["anio", "Año"]].map(([v, l]) => `<button type="button" class="${s.m === v ? "on" : ""}" aria-pressed="${s.m === v}" onclick="pxpCrono('${ea(id)}','m','${v}')">${l}</button>`).join("");
+    const seg = [["todo", "Todo", "Se ajusta a todas las fechas, con hoy al centro"], ["dia", "Día", ""], ["semana", "Semana", ""], ["mes", "Mes", ""], ["anio", "Año", ""]].map(([v, l, tp]) => `<button type="button" class="${s.m === v ? "on" : ""}" aria-pressed="${s.m === v}" onclick="pxpCrono('${ea(id)}','m','${v}')"${tp ? ` data-tip="${tp}"` : ""}>${l}</button>`).join("");
     const now = nowIn ? `<div class="cr-now" style="left:${x(nowV)}%" aria-hidden="true"><i class="cr-trail"></i><i class="cr-head"></i></div>` : "";
-    const nowH = nowIn ? `<i class="cr-nowh" style="left:${x(nowV)}%" aria-hidden="true"><em>${s.m === "mes" || s.m === "anio" ? "Hoy" : reloj(ahoraH())}</em></i>` : "";
+    const nowH = nowIn ? `<i class="cr-nowh" style="left:${x(nowV)}%" aria-hidden="true"><em>${E === "h" || E === "d" ? reloj(ahoraH()) : "Hoy"}</em></i>` : "";
     // Inicio del proyecto: línea de color propio
     const iniV = opts.inicio ? abs(opts.inicio, 0) : null, iniIn = iniV != null && iniV >= A && iniV <= B;
     const ini = iniIn ? `<i class="cr-ini" style="left:${x(iniV)}%" aria-hidden="true"></i>` : "", iniH = iniIn ? `<i class="cr-inih" style="left:${x(iniV)}%" data-tip="Inicio del proyecto · ${fD(opts.inicio)}"><em>Inicio</em></i>` : "";
     const many = vis.length > 8, hayFr = vis.some(r => r.bars.some(b => b.fr));
-    return `<div class="cr${many ? " many" : ""}" id="cr-${esc(id.replace(/[^\w-]/g, "_"))}" data-id="${esc(id)}" data-a="${A}" data-b="${B}" data-m="${s.m}">
+    return `<div class="cr${many ? " many" : ""}" id="cr-${esc(id.replace(/[^\w-]/g, "_"))}" data-id="${esc(id)}" data-a="${A}" data-b="${B}" data-m="${s.m}" data-esc="${E}">
       <div class="cr-top"><b class="cr-tt">${titulo}</b><span class="cr-rg">${esc(R.label)}</span>
         <span class="cr-nav"><button type="button" onclick="pxpCrono('${ea(id)}','off',-1)" aria-label="Anterior">‹</button><button type="button" class="cr-hoy${s.off ? "" : " on"}" onclick="pxpCrono('${ea(id)}','off',0)">Hoy</button><button type="button" onclick="pxpCrono('${ea(id)}','off',1)" aria-label="Siguiente">›</button></span>
         <span class="seg cr-seg" role="group" aria-label="Vista del cronograma">${seg}</span></div>
@@ -19150,13 +19184,13 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
         <div class="cr-row cr-h"><div class="cr-l">${many ? `<small class="cr-cnt">${vis.length} filas</small>` : ""}</div><div class="cr-t">${ticks}${iniH}${nowH}</div></div>
         <div class="cr-body"><div class="cr-in"><div class="cr-bg"><div class="cr-l"></div><div class="cr-t">${cols}${ini}${now}</div></div>${body || `<p class="cr-empty">${esc(opts.empty || "Nada programado en este periodo.")}</p>`}</div></div>
       </div>
-      <div class="cr-leg">${[["pendiente", "Pendiente"], ["en_curso", "En curso"], ["revision", "Ajustes · revisión"], ["bloqueada", "Bloqueada"], ["listo", "Listo"], ["late", "Vencida"]].map(([k, l]) => `<span class="lg ${k}"><i></i>${l}</span>`).join("")}${hayFr && (s.m === "mes" || s.m === "anio") ? `<span class="lg am"><i></i>Mañana</span><span class="lg pm"><i></i>Tarde</span>` : ""}${iniIn ? `<span class="lg ini"><i></i>Inicio del proyecto</span>` : ""}${opts.leg || ""}</div>
+      <div class="cr-leg">${[["pendiente", "Pendiente"], ["en_curso", "En curso"], ["revision", "Ajustes · revisión"], ["bloqueada", "Bloqueada"], ["listo", "Listo"], ["late", "Vencida"]].map(([k, l]) => `<span class="lg ${k}"><i></i>${l}</span>`).join("")}${hayFr && (E === "w" || E === "m") ? `<span class="lg am"><i></i>Mañana</span><span class="lg pm"><i></i>Tarde</span>` : ""}${iniIn ? `<span class="lg ini"><i></i>Inicio del proyecto</span>` : ""}${opts.leg || ""}</div>
     </div>`;
   }
 
   window.pxpCrono = function (id, a, v) {
     const s = ST[id]; if (!s) return;
-    if (a === "m") { s.m = v; s.off = 0; try { localStorage.setItem("pxp_crono_" + id.split(":")[0] + "_" + userKey(), v); } catch (e) { } }
+    if (a === "m") { s.m = v; s.off = 0; try { localStorage.setItem("pxp_crono2_" + id.split(":")[0] + "_" + userKey(), v); } catch (e) { } }
     else if (a === "off") s.off = v === 0 ? 0 : s.off + v;
     const el = document.querySelector(`.cr[data-id="${CSS.escape(id)}"]`); if (el && BUILD[id]) { const t = document.createElement("div"); t.innerHTML = BUILD[id](); el.replaceWith(t.firstElementChild); }
   };
@@ -19179,7 +19213,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       ((PROJECTS[k] || {}).bloqueos || []).filter(b => b.inicio).forEach(b => rows.push({ l: "Bloqueo · " + (b.tipo || ""), sub: b.desc || "", c: "var(--red)", bars: [{ a: abs(b.inicio, 0), b: b.fin ? abs(b.fin, J()) : ahoraAbs(), dIni: b.inicio, dFin: b.fin || hoy(), st: "bloqueada", cls: "blk" + (b.fin ? "" : " open"), txt: b.fin ? "" : "activo", tip: `<b>Bloqueo · ${esc(b.tipo || "")}</b>${b.desc ? "<br>" + esc(b.desc) : ""}` }] }));
       const ent = (PROJECTS[k] || {}).entregaFinal;
       if (ent) rows.push({ l: "Entrega final", sub: fD(ent), c: "var(--brand)", bars: [{ a: abs(ent, J()) - .35, b: abs(ent, J()), dIni: ent, dFin: ent, st: "listo", cls: "goal", tip: `<b>Entrega final</b><br>${fD(ent)}` }] });
-      return render(id, "Cronograma", rows, { def: "mes", todas: true, inicio: (PROJECTS[k] || {}).fechaInicio || "", empty: "Sin etapas con fecha todavía." });
+      return render(id, "Cronograma", rows, { def: "todo", todas: true, inicio: (PROJECTS[k] || {}).fechaInicio || "", empty: "Sin etapas con fecha todavía." });
     };
     return P_OK(k) ? BUILD[id]() : "";
   };
@@ -19196,19 +19230,19 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
           if (!x.ini || !x.fin || !pxpEsResp(x.e, n)) return;
           const nom = getProjectDisplay(k).nombre || k;
           rows.push({ l: x.e.nombre || "Etapa", sub: nom, g: k, c: window.pxpProjectColor ? pxpProjectColor(k) : "", _a: abs(x.ini, x.hi || 0),
-            bars: [{ a: abs(x.ini, x.hi || 0), b: abs(x.fin, x.hf == null ? J() : x.hf), fr: frDe(x), st: x.e.estado || "pendiente", k, txt: barTxt(x), tip: tipEtapa(x, esc(nom)) }] });
+            bars: [{ a: abs(x.ini, x.hi || 0), b: abs(x.fin, x.hf == null ? J() : x.hf), dIni: x.ini, dFin: x.fin, fr: frDe(x), st: x.e.estado || "pendiente", k, txt: barTxt(x), tip: tipEtapa(x, esc(nom)) }] });
         });
       });
       rows.sort((a, b) => a._a - b._a);
       // Cruces de horario
       const act = rows.filter(r => r.bars[0].st !== "listo");
       act.forEach((r, i) => act.slice(i + 1).forEach(o => { const a = r.bars[0], b = o.bars[0]; if (a.a < b.b - 1e-9 && b.a < a.b - 1e-9) { a.cls = b.cls = "cruce"; } }));
-      if (st(id, "semana").m === "anio") {   // v155 · Año: una fila por proyecto con todas sus etapas
+      if (st(id, "todo").m === "anio") {   // v155 · Año: una fila por proyecto con todas sus etapas
         const G = new Map(); rows.forEach(r => { if (!G.has(r.g)) G.set(r.g, { l: r.sub, sub: "", c: r.c, _a: r._a, bars: [], n: 0 }); const g = G.get(r.g); g.bars.push(...r.bars); g.n++; });
         const gr = Array.from(G.values()).map(g => Object.assign(g, { sub: g.n + " etapa" + (g.n !== 1 ? "s" : "") })).sort((a, b) => a._a - b._a);
-        return render(id, "Cronograma", gr, { def: "semana", empty: "Sin etapas este año." });
+        return render(id, "Cronograma", gr, { def: "todo", empty: "Sin etapas en este periodo." });
       }
-      return render(id, "Cronograma", rows, { def: "semana", empty: "Sin etapas en este periodo.", leg: rows.some(r => r.bars[0].cls === "cruce") ? `<span class="lg cruce"><i></i>Cruce de horario</span>` : "" });
+      return render(id, "Cronograma", rows, { def: "todo", empty: "Sin etapas en este periodo.", leg: rows.some(r => r.bars[0].cls === "cruce") ? `<span class="lg cruce"><i></i>Cruce de horario</span>` : "" });
     };
     return BUILD[id]();
   };
@@ -19219,7 +19253,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     document.querySelectorAll(".cr").forEach(c => {
       const A = +c.dataset.a, B = +c.dataset.b, n = c.querySelector(".cr-now"), nh = c.querySelector(".cr-nowh"); if (!n) return;
       if (v < A || v > B) { n.remove(); if (nh) nh.remove(); return; }
-      n.style.left = ((v - A) / (B - A) * 100) + "%"; if (nh) { nh.style.left = n.style.left; const em = nh.querySelector("em"); if (em && c.dataset.m !== "mes" && c.dataset.m !== "anio") em.textContent = reloj(ahoraH()); }
+      n.style.left = ((v - A) / (B - A) * 100) + "%"; if (nh) { nh.style.left = n.style.left; const em = nh.querySelector("em"); if (em && (c.dataset.esc === "h" || c.dataset.esc === "d")) em.textContent = reloj(ahoraH()); }
       c.querySelectorAll(".cr-bar").forEach(b => {
         const a = +b.dataset.a, z = +b.dataset.b, done = b.classList.contains("listo");
         b.classList.toggle("live", !done && v > a && v < z);
