@@ -20133,11 +20133,13 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   const reloj = (h) => { const r = h < 4 - 1e-9 ? 8.5 + h : 9.5 + h, hh = Math.floor(r + 1e-6), mm = Math.round((r - hh) * 60); return hh + ":" + String(mm).padStart(2, "0"); };
   const corto = (n) => { n = String(n || "").trim(); const m = /^(Cliente|Agencia|Externo):\s*(.*)$/i.exec(n); if (m) return m[2]; const w = n.split(/\s+/); return w[0] ? w[0][0] + w[0].slice(1).toLowerCase() : ""; };
   // Diagonales dentro de un rectángulo (festivos y fines de semana)
-  function rayas(rec, x, y, w, h, step, color) {
+  // v166 · Festivos (y domingos): rayas más marcadas
+  const FEST_C = "#BDBDC8", FEST_LW = .7;
+  function rayas(rec, x, y, w, h, step, color, lw) {
     for (let k = -h; k < w; k += step) {
       let x1 = x + k, y1 = y + h, x2 = x + k + h, y2 = y;
       if (x1 < x) { y1 -= (x - x1); x1 = x; } if (x2 > x + w) { y2 += (x2 - (x + w)); x2 = x + w; }
-      if (x2 - x1 > .3) rec.line({ x1, y1, x2, y2, stroke: color || "#E2E2E8", lw: .45 });
+      if (x2 - x1 > .3) rec.line({ x1, y1, x2, y2, stroke: color || "#E2E2E8", lw: lw || .45 });
     }
   }
   // v166 · Cada mes con su tono: alternan blanco y gris para ver en qué mes cae cada etapa
@@ -20204,7 +20206,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     sw((bx, by) => rec.rect({ x: bx, y: by, w: 12, h: 6.4, r: 2, fill: "#FFFFFF", stroke: AJC, lw: .8 }), T.aj);
     sw((bx, by) => diamante(rec, bx + 6, by + 3.2, 3.6, ENTC), T.ent);
     sw((bx, by) => diamante(rec, bx + 6, by + 3.2, 3.8, INK), T.ef);
-    sw((bx, by) => { rec.rect({ x: bx, y: by, w: 12, h: 6.4, fill: "#F3F3F6", stroke: "#DDDDE4", lw: .4 }); rayas(rec, bx, by, 12, 6.4, 2.2, "#C9C9D2"); }, T.fest);
+    sw((bx, by) => { rec.rect({ x: bx, y: by, w: 12, h: 6.4, fill: "#F3F3F6", stroke: "#DDDDE4", lw: .4 }); rayas(rec, bx, by, 12, 6.4, 2.4, FEST_C, .6); }, T.fest);
     if (extra) { rec.text({ s: extra, x, y, font: "semi", size: 6.8, color: INK }); }
     const logo = await logoImg("#17171C", 640).catch(() => null);
     let lx = W - 27;
@@ -20243,16 +20245,17 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       semanas.slice(pi * porPag, (pi + 1) * porPag).forEach((m, wi) => {
         const y = Y0 + YH + wi * rowH;
         for (let i = 0; i < nd; i++) {
-          const d = addD(m, i), x = cx(i), w = cw(i), we = i >= 5, fest = !we && !habil(d), fuera = d < D0.a || d > D0.z;
+          const d = addD(m, i), x = cx(i), w = cw(i), we = i >= 5, fest = i === 6 || (!we && !habil(d)), fuera = d < D0.a || d > D0.z;
           rec.rect({ x, y, w, h: rowH, fill: MES_BG(d, we) });
-          if (fest) { rayas(rec, x, y, w, rowH, 5, "#E6E6EC"); rec.text({ s: T.fest.toUpperCase(), x: x + w / 2, y: y + rowH / 2 + 2.5, font: "cond", size: 6.8, color: "#9A9AA6", cs: 1.6, align: "c" }); }
+          if (fest) { rayas(rec, x, y, w, rowH, 5, FEST_C, FEST_LW); if (!we && !(porDia[d] || []).length) { const fl = T.fest.toUpperCase(), fw = tw(fl, "cond", 6.8) + fl.length * 1.6 + 10; rec.rect({ x: x + w / 2 - fw / 2, y: y + rowH / 2 - 5.5, w: fw, h: 11, r: 2, fill: we ? "#ECECF1" : MES_BG(d, false) }); rec.text({ s: fl, x: x + w / 2, y: y + rowH / 2 + 2.5, font: "cond", size: 6.8, color: "#77778A", cs: 1.6, align: "c" }); } }
           if (i) rec.line({ x1: x, y1: y, x2: x, y2: y + rowH, stroke: LINE, lw: .5 });
           // Número del día, mes cuando cambia y hoy
           const num = String(+d.slice(8)), hoyD = d === hoy();
+          if (fest) rec.rect({ x: x + 2.5, y: y + 2.5, w: tw(num, "cond", 8) + 5.5 + (d.slice(8) === "01" ? tw(T.m[+d.slice(5, 7) - 1].toUpperCase(), "cond", 5.8) + 13 : 0), h: 11, r: 2, fill: we ? "#ECECF1" : MES_BG(d, false) });
           if (hoyD) { rec.circle({ x: x + 8.6, y: y + 8.2, r: 6.2, fill: VIOLET }); rec.text({ s: num, x: x + 8.6, y: y + 10.8, font: "cond", size: 7.6, color: "#FFFFFF", align: "c" }); }
           else rec.text({ s: num, x: x + 5, y: y + 10.8, font: "cond", size: 8, color: fuera ? "#C3C3CC" : INK });
           if (d.slice(8) === "01" || (wi === 0 && i === 0)) { const ml = T.m[+d.slice(5, 7) - 1].toUpperCase(), mw = tw(ml, "cond", 5.8) + 6, mx = x + 7 + tw(num, "cond", 8) + (hoyD ? 6 : 0); rec.rect({ x: mx, y: y + 3.6, w: mw, h: 8.4, r: 1.6, fill: INK }); rec.text({ s: ml, x: mx + mw / 2, y: y + 9.9, font: "cond", size: 5.8, color: "#FFFFFF", align: "c", cs: .5 }); }
-          if (fest) continue;
+          if (fest && !(porDia[d] || []).length) continue;
           // Eventos del día · v166: la celda se parte en mañana (arriba) y tarde (abajo) en mitades iguales;
           // las etapas de cada mitad se reparten su espacio por igual. La de todo el día ocupa ambas.
           const L = porDia[d] || [], innerY = y + 15, innerH = rowH - 17.5, iw = w - 8, gap = 2;
@@ -20317,7 +20320,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       while (i0 < filas.length && y + (filas[i0].ph ? PH + RH : RH) <= YB) { y += filas[i0].ph ? PH : RH; i0++; }
       const yEnd = y;
       // Columnas: fines de semana y festivos
-      dias.forEach((d, i) => { const x = gx + i * dx, wd = D(d).getDay(), we = wd === 0 || wd === 6; rec.rect({ x, y: yR, w: dx, h: yEnd - yR, fill: MES_BG(d, we) }); if (we) rayas(rec, x, yR, dx, yEnd - yR, 4, "#E4E4EA"); else if (!habil(d)) rayas(rec, x, yR, dx, yEnd - yR, 3, "#DEDEE5"); rec.line({ x1: x, y1: yR, x2: x, y2: yEnd, stroke: d.slice(8) === "01" && i ? INK : LINE, lw: d.slice(8) === "01" && i ? .8 : .35 }); });
+      dias.forEach((d, i) => { const x = gx + i * dx, wd = D(d).getDay(), we = wd === 0 || wd === 6; rec.rect({ x, y: yR, w: dx, h: yEnd - yR, fill: MES_BG(d, we) }); if (wd === 0 || (!we && !habil(d))) rayas(rec, x, yR, dx, yEnd - yR, 3.6, FEST_C, FEST_LW); rec.line({ x1: x, y1: yR, x2: x, y2: yEnd, stroke: d.slice(8) === "01" && i ? INK : LINE, lw: d.slice(8) === "01" && i ? .8 : .35 }); });
       y = yR;
       for (let r = ini; r < i0; r++) {
         const f = filas[r];
