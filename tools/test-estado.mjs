@@ -21,8 +21,17 @@ const et = async (i, v) => { await page.evaluate(([i, v]) => pxpEt("estado", i, 
 await et(1, "en_curso"); check("rodaje en curso → En rodaje", await est() === "rodaje");
 await et(1, "listo"); await et(2, "en_curso"); check("offline en curso → En postproducción", await est() === "en_produccion");
 await et(2, "listo"); await et(3, "en_curso"); check("feedback en curso → En revisión", await est() === "revision");
-await et(3, "listo"); await et(4, "listo"); check("entrega final lista → Entregado", await est() === "entregado");
+await et(3, "listo"); await et(4, "listo"); check("entrega final lista → Entregado (automático)", await est() === "entregado");
+check("aviso para confirmar Aprobado", await page.$("#pxp-proj .ent-conf") !== null);
+await page.locator("#pxp-proj .ent-conf").screenshot({ path: shots + "/t-aprobado.png" });
+await page.click("#pxp-proj .ent-conf .btn-ghost"); await page.waitForTimeout(300);
+check("Todavía no oculta el aviso hoy", await page.$("#pxp-proj .ent-conf") === null);
 await et(4, "pendiente"); check("entrega reabierta → sale de Entregado", await est() !== "entregado");
+await et(4, "listo"); await page.evaluate(k => { Object.keys(localStorage).filter(x => x.startsWith("pxp_aprobconf_")).forEach(x => localStorage.removeItem(x)); pxpRenderProj(); }, K); await page.waitForTimeout(300);
+await page.click("#pxp-proj .ent-conf .ficha-save"); await page.waitForTimeout(500);
+check("confirmar → Aprobado (Repositorio)", await est() === "aprobado" && await page.evaluate(k => !!PROJECTS[k].archivadoEn, K));
+await et(2, "en_curso"); check("Aprobado no cambia solo", await est() === "aprobado");
+await page.evaluate(k => { setEstadoGeneral(k, "en_produccion"); if (!document.querySelector("#pxp-proj.open")) openProjectFicha(k); }, K); await page.waitForTimeout(400); await et(2, "listo"); await et(4, "pendiente");
 // a mano: queda fijado y no se mueve; volver a automático
 await page.evaluate(k => setEstadoGeneral(k, "rodaje"), K); await page.waitForTimeout(250);
 check("cambio a mano distinto → fijado", await page.evaluate(k => !!PROJECTS[k].estadoFijo, K));

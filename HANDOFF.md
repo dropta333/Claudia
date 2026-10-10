@@ -81,7 +81,7 @@ Versión: **v157** · 10 oct 2026 · Responsable: Bastián Torres
 
 - **v157:** estado automático y cronograma de inicio a entrega.
   - Nuevo estado **En preproducción** (`preproduccion`) en todas las listas, filtros, colores, reportes y carga por proyectos.
-  - Estado automático (`pxpEstadoCalc`, `pxpEstadoAuto`): con la etapa actual (la marcada por el equipo; si no, la de hoy en el cronograma; si no, la próxima) → En preproducción, En rodaje, En postproducción o En revisión; **Entregado** cuando la última etapa de tipo Entrega queda en Listo. Cotizado, Standby y Aprobado son siempre a mano (`PXP_EST_MANUAL`).
+  - Estado automático (`pxpEstadoCalc`, `pxpEstadoAuto`): con la etapa actual (la marcada por el equipo; si no, la de hoy en el cronograma; si no, la próxima) → En preproducción, En rodaje, En postproducción o En revisión; **Entregado** cuando la última etapa de tipo Entrega queda en Listo. Cotizado, Standby y Aprobado son siempre a mano (`PXP_EST_MANUAL`). Cuando el proyecto queda Entregado aparece un aviso (`pxpAprobAviso`) para confirmar **Aprobado**; "Todavía no" lo oculta hasta el día siguiente.
   - Un cambio a mano distinto del calculado queda fijado (`estadoFijo`) hasta "Volver a automático". Cada cambio automático queda en la actividad.
   - Se recalcula en cada cambio de etapa y al abrir el proyecto (quien puede editar; en Netlify se guarda al momento, en la vista previa con el siguiente guardado).
   - Cronograma **Todo**: borde izquierdo = inicio del proyecto, derecho = entrega final (con su marca, "est." si es estimada), hoy al centro; cada mitad tiene su propia escala. Columna de etapas de 280 px y textos más grandes.

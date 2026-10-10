@@ -5769,6 +5769,11 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;tr
 .est-note{margin:0 2px 8px;font:500 13px/1.45 var(--sans);color:var(--muted)}
 .est-sug{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 10px;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--brand) 10%,transparent);border:1px dashed color-mix(in srgb,var(--brand) 45%,var(--border));font:500 13.5px/1.4 var(--sans)}
 .est-sug span{flex:1;min-width:180px}
+/* v157 · Confirmar la aprobación cuando el proyecto queda Entregado */
+.ent-conf{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 12px;padding:12px 14px;border-radius:14px;border:1px solid color-mix(in srgb,#7B61FF 45%,var(--border));background:color-mix(in srgb,#7B61FF 10%,var(--bg));animation:dlgIn .25s both}
+.ent-conf p{flex:1;min-width:220px;margin:0;font:500 14.5px/1.4 var(--sans)}
+.ent-conf-ic{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:#7B61FF;color:#fff;flex:none}
+.ent-conf-ic .i{width:18px;height:18px}
 </style>
 </head>
 <body>
@@ -7193,8 +7198,8 @@ function aplicarEstadoGeneral(key, value, before) {
 }
 
 // ── v157 · Estado automático del proyecto según sus etapas ─────────────────
-// Cotizado, Standby y Aprobado son siempre a mano. Los demás (En preproducción, En rodaje, En postproducción,
-// En revisión y Entregado) se calculan con la etapa actual: primero la que el equipo marcó (en curso, en ajustes,
+// Cotizado, Standby y Aprobado son siempre a mano (Aprobado se confirma con un aviso cuando el proyecto queda Entregado).
+// Los demás (En preproducción, En rodaje, En postproducción, En revisión y Entregado) se calculan con la etapa actual: primero la que el equipo marcó (en curso, en ajustes,
 // en revisión o bloqueada); si no hay, la que según el cronograma se hace hoy; si no, la próxima pendiente.
 // Si Administración elige otro estado a mano, queda "fijado a mano" (estadoFijo) hasta que vuelva a automático.
 const PXP_EST_MANUAL = new Set(["cotizado", "standby", "aprobado"]);
@@ -7202,6 +7207,7 @@ function pxpEstadoCalc(p) {
   if (!p || !window.pxpPlanEtapas) return null;
   const P = pxpPlanEtapas(p).filter(x => x.e && (x.e.nombre || x.ini)); if (!P.length) return null;
   const nom = (x) => `por la etapa "${x.e.nombre || "Etapa"}"`;
+  // Entregado: cuando la última etapa de tipo Entrega queda lista
   const ent = P.filter(x => pxpClaseEtapa(x.e) === "entrega" && x.fin).sort((a, b) => (a.fin + a.i).localeCompare(b.fin + b.i)).pop();
   if (ent && ent.e.estado === "listo") return { v: "entregado", por: nom(ent) };
   const vivos = P.filter(x => x.e.estado !== "listo"); if (!vivos.length) return null;
@@ -11820,7 +11826,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const ms = members(p);
     const due = (iso) => { if (!iso) return ""; const l = diasLabel(diffDays(iso)); return `<span class="due-pill ${l.cls}">${esc(l.txt)}</span>`; };
 
-    const kpis = `<div class="pj-kpis">
+    const kpis = `${window.pxpAprobAviso ? pxpAprobAviso(k) : ""}<div class="pj-kpis">
       ${window.pxpInicioKpi ? pxpInicioKpi(k, p) : ""}
       <div><span class="kl">Próxima etapa</span>${next ? `<b>${esc(next.nombre || "Etapa")}</b><span class="ks">${fmtD(next.fecha)} ${due(next.fecha)}</span>` : `<b class="muted">Sin fechas</b><span class="ks">Agrega etapas abajo</span>`}</div>
       <div><span class="kl">Avance</span><b>${et.length ? pct + "%" : "—"}</b><span class="ks">${et.length ? `${listos} de ${et.length} etapas listas` : "sin etapas"}</span></div>
@@ -19760,6 +19766,19 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     return { k: n <= ROJO ? "near" : "ok", n, txt: n === 1 ? "Falta 1 día hábil" : `Faltan ${n} días hábiles`, c: `hsl(${hue} ${n <= ROJO ? 78 : 64}% ${n <= ROJO ? 52 : 44}%)` };
   }
   window.pxpEntregaEstado = estado;
+  // v157 · Cuando el proyecto queda Entregado se pide confirmar la aprobación del cliente (Aprobado lo lleva al Repositorio)
+  const avisoKey = (k, d) => "pxp_aprobconf_" + normName(k) + "_" + d;
+  window.pxpAprobAviso = function (k) {
+    const p = PROJECTS[k] || {}, t = hoy();
+    if ((p.estadoGeneral || "") !== "entregado" || (window.pxpPuedeEditar && !pxpPuedeEditar())) return "";
+    try { if (localStorage.getItem(avisoKey(k, t))) return ""; } catch (e) { }
+    return `<div class="ent-conf" role="status"><span class="ent-conf-ic" aria-hidden="true"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m8.5 12.3 2.4 2.4 4.6-5"/></svg></span><p><b>Se hizo la entrega final.</b> ¿El cliente ya aprobó? Al confirmarlo, el proyecto pasa a Aprobado y se mueve al Repositorio.</p><button type="button" class="ficha-save sm" onclick="pxpAprobConfirmar('${ea(k)}',1)">Sí, marcar Aprobado</button><button type="button" class="btn-ghost sm" onclick="pxpAprobConfirmar('${ea(k)}',0)">Todavía no</button></div>`;
+  };
+  window.pxpAprobConfirmar = async function (k, si) {
+    if (si) await setEstadoGeneral(k, "aprobado");
+    else { try { localStorage.setItem(avisoKey(k, hoy()), "1"); } catch (e) { } }   // se vuelve a preguntar mañana
+    if (window.pxpRenderProj) pxpRenderProj();
+  };
   // v155 · Inicio del proyecto: primero en la barra de resumen, con su propio color, y los días hábiles de ejecución
   window.pxpInicioKpi = function (k, p) {
     const q = PROJECTS[k] || p || {}, fi = q.fechaInicio || "", t = hoy(), ef = q.entregaFinal || "";
