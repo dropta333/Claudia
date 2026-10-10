@@ -5804,6 +5804,38 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;tr
   #pxp-proj .cfg.ro .cfg-sum:not(:has(.cs-pd,.cs-adb)){grid-template-columns:minmax(0,1fr) minmax(0,2fr);grid-template-areas:"a g" "p g"}
   #pxp-proj .cfg.ro .cfg-sum:not(:has(.cs-pd,.cs-adb)) .cs-grid{grid-template-columns:1fr 1fr!important;padding-left:24px!important;border-left:1px solid var(--border)!important}
 }
+/* ═════ v160 · Reacciones en las notas ═════ */
+.rx-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px}
+.rx-chip{display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 10px 0 7px;border-radius:99px;border:1px solid color-mix(in srgb,var(--rc) 35%,var(--border));background:color-mix(in srgb,var(--rc) 9%,var(--surface));color:var(--text);cursor:pointer;font:700 13px/1 var(--display);transition:transform .15s,background-color .15s,border-color .15s}
+.rx-chip .i{width:16px;height:16px;color:var(--rc)}
+.rx-chip:hover{transform:translateY(-1px);border-color:color-mix(in srgb,var(--rc) 60%,var(--border))}
+.rx-chip.on{background:color-mix(in srgb,var(--rc) 20%,var(--surface));border-color:var(--rc);box-shadow:0 0 0 1px var(--rc) inset}
+.rx-chip:focus-visible,.rx-add:focus-visible,.rx-op:focus-visible{outline:2px solid var(--rc,var(--brand));outline-offset:2px}
+.rx-add{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:99px;border:1px dashed var(--border2);background:transparent;color:var(--muted);cursor:pointer;opacity:.75;transition:opacity .15s,color .15s,border-color .15s,transform .15s}
+.rx-add .i{width:17px;height:17px}
+.pj-note:hover .rx-add,.rx-add:focus-visible{opacity:1}
+.rx-add:hover{color:var(--text);border-style:solid;border-color:var(--text);transform:scale(1.06)}
+.rx-pick{position:fixed;z-index:9700;display:flex;gap:4px;padding:6px;border-radius:99px;background:var(--surface);border:1px solid var(--border2);box-shadow:0 18px 40px -12px rgba(0,0,0,.45),0 2px 6px rgba(0,0,0,.08);animation:rxIn .18s cubic-bezier(.2,.9,.3,1.2) both}
+@keyframes rxIn{from{opacity:0;transform:translateY(6px) scale(.92)}to{opacity:1;transform:none}}
+.rx-op{position:relative;display:grid;place-items:center;width:42px;height:42px;border-radius:50%;border:0;background:transparent;color:var(--rc);cursor:pointer;animation:rxOp .26s both;animation-delay:var(--d);transition:transform .18s cubic-bezier(.2,.9,.3,1.4),background-color .15s}
+@keyframes rxOp{from{opacity:0;transform:translateY(8px) scale(.6)}to{opacity:1;transform:none}}
+.rx-op .i{width:22px;height:22px;stroke-width:1.8}
+.rx-op:hover,.rx-op:focus-visible{transform:translateY(-4px) scale(1.18);background:color-mix(in srgb,var(--rc) 14%,transparent)}
+.rx-op.on{background:color-mix(in srgb,var(--rc) 20%,transparent);box-shadow:0 0 0 1.5px var(--rc) inset}
+.rx-op::after{content:attr(data-l);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(4px);padding:4px 8px;border-radius:7px;background:var(--text);color:var(--bg);font:600 12px/1 var(--sans);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .12s,transform .12s}
+.rx-op:hover::after,.rx-op:focus-visible::after{opacity:1;transform:translateX(-50%)}
+.rx-card{position:fixed;z-index:9700;min-width:230px;max-width:300px;padding:10px 12px;border-radius:14px;background:var(--surface);border:1px solid var(--border2);box-shadow:0 18px 40px -12px rgba(0,0,0,.45);animation:rxIn .14s both;pointer-events:none}
+.rx-ch{display:flex;align-items:center;gap:7px;padding-bottom:8px;margin-bottom:6px;border-bottom:1px solid var(--border)}
+.rx-ch .i{width:18px;height:18px;color:var(--rc)}
+.rx-ch b{font:700 14px/1 var(--sans);flex:1}
+.rx-ch span{font:700 12px/1 var(--display);padding:3px 8px;border-radius:99px;background:color-mix(in srgb,var(--rc) 16%,transparent)}
+.rx-card ul{list-style:none;margin:0;padding:0;display:grid;gap:6px;max-height:240px;overflow:hidden}
+.rx-card li{display:flex;align-items:center;gap:9px;font:500 13.5px/1.2 var(--sans)}
+.rx-card li .av{--s:26px!important;width:26px!important;height:26px!important;flex:none;overflow:hidden}
+.rx-card li span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rx-card li em{font-style:normal;color:var(--muted)}
+.rx-card li small{color:var(--muted);font-size:12px}
+@media (prefers-reduced-motion:reduce){.rx-pick,.rx-op,.rx-card{animation:none}.rx-op,.rx-chip,.rx-add{transition:none}}
 </style>
 </head>
 <body>
@@ -11877,7 +11909,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const hist = (p.historial || []).map((h, i) => ({ ...h, i })).reverse();
     const notas = hist.filter(isNote), act = hist.filter(h => !isNote(h));
     const noteRow = (h) => `<div class="pj-note${norm(h.usuario) === norm(currentUser) ? " mine" : ""}">${av("person", h.usuario || "?", 30)}
-      <div class="pn-b"><div class="pn-m"><b>${esc(h.usuario || "—")}</b><span>${esc(rel(h.ts))}</span>${norm(h.usuario) === norm(currentUser) ? `<button class="xbtn" onclick="pxpNoteDel(${h.i})" title="Borrar nota">${confirmDelNote === h.i ? "¿Borrar?" : I.trash}</button>` : ""}</div>${h.texto ? `<div class="pn-t">${window.pxpNoteTextHtml ? pxpNoteTextHtml(h.texto) : esc(h.texto)}</div>` : ""}${window.pxpAdjuntosHtml ? pxpAdjuntosHtml(h.adjuntos, ea(k + "|" + h.i)) : ""}</div></div>`;
+      <div class="pn-b"><div class="pn-m"><b>${esc(h.usuario || "—")}</b><span>${esc(rel(h.ts))}</span>${norm(h.usuario) === norm(currentUser) ? `<button class="xbtn" onclick="pxpNoteDel(${h.i})" title="Borrar nota">${confirmDelNote === h.i ? "¿Borrar?" : I.trash}</button>` : ""}</div>${h.texto ? `<div class="pn-t">${window.pxpNoteTextHtml ? pxpNoteTextHtml(h.texto) : esc(h.texto)}</div>` : ""}${window.pxpAdjuntosHtml ? pxpAdjuntosHtml(h.adjuntos, ea(k + "|" + h.i)) : ""}${window.pxpReacHtml ? pxpReacHtml(k, h) : ""}</div></div>`;
 
     pmBox.style.setProperty("--pc", col);
     pmBox.innerHTML = `
@@ -14790,6 +14822,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       if (fin && p.estadoGeneral !== "standby") { const d = Math.round((D(fin) - D(t0)) / 864e5); if (d <= 7 && d >= -3) items.due.push({ id: `d|${k}|${fin}`, k, nm, fecha: fin, d }); }
       items.asg.push({ id: `a|${k}`, k, nm, est: p.estadoGeneral });
     });
+    // v160 · Reacciones de otras personas a mis notas (últimos 30 días)
+    Object.keys(PROJECTS).forEach(k => { const p = PROJECTS[k] || {}; (p.historial || []).forEach(h => { if (h.tipo !== "nota" || !isMe(h.usuario) || !h.reac) return; Object.values(h.reac).forEach(r => { if (!r || !r.ts || isMe(r.n) || Date.now() - new Date(r.ts).getTime() > 30 * 864e5) return; items.com.push({ id: `r|${k}|${h.ts}|${normName(r.n)}`, k, nm: p.nombre || k, ts: r.ts, who: r.n, txt: `Reaccionó ${(window.pxpReacLabel ? "«" + pxpReacLabel(r.r) + "»" : "")} a tu nota: ${String(h.texto || "").slice(0, 70)}` }); }); }); });
     // Menciones con @ en notas de proyectos donde la persona no está asignada
     Object.keys(PROJECTS).forEach(k => { if (mine.has(k)) return; const p = PROJECTS[k] || {}; (p.historial || []).forEach(h => { if (h.tipo === "nota" && h.ts && !isMe(h.usuario) && (h.menciones || []).some(isMe) && Date.now() - new Date(h.ts).getTime() < 30 * 864e5) items.com.push({ id: `c|${k}|${h.ts}`, k, nm: p.nombre || k, ts: h.ts, who: h.usuario, txt: h.texto || "", adj: (h.adjuntos || []).length, men: true }); }); });
     (p0.tareas || []).filter(t => !t.hecho).forEach(t => items.task.push({ id: `t|${t.id || t.texto}|${t.fecha || ""}`, k: t.proyecto ? projectKey(t.proyecto) : "", nm: t.proyecto || "", txt: t.texto, fecha: t.fecha || "", tarea: true }));
@@ -19979,6 +20013,101 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   const root = document.getElementById("pxp-proj");
   if (root) new MutationObserver(pedir).observe(root, { childList: true, subtree: true });
   pedir();
+})();
+</script>
+<script>
+// ═════════════════════════════════════════════════════════════════
+// CAPA 49 — v160 · Reacciones en las notas de los proyectos
+//   Seis reacciones de línea (Visto · De acuerdo · Aprobado · Atención · Me encanta · Gracias).
+//   Una por persona y nota (otra la reemplaza; la misma la quita). Todo el equipo puede reaccionar.
+//   Se guardan en la nota: reac = { NOMBRE_NORMALIZADO: { r, n, ts } } → la mezcla a tres vías suma las de varias personas.
+//   Al pasar el mouse (o mantener presionado en el celular) se ve quién reaccionó y con qué.
+// ═════════════════════════════════════════════════════════════════
+(function () {
+  "use strict";
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const ea = (s) => esc(String(s).replace(/\\/g, "\\\\").replace(/'/g, "\\'"));
+  const ic = (d) => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
+  const RX = [
+    ["visto", "Visto", "#61B3FF", "<path d='M2.5 12s3.5-6.5 9.5-6.5S21.5 12 21.5 12s-3.5 6.5-9.5 6.5S2.5 12 2.5 12z'/><circle cx='12' cy='12' r='2.6'/>"],
+    ["ok", "De acuerdo", "#E5A800", "<path d='M7 10.5V20H4v-9.5z'/><path d='M7 10.5 10.8 4a2 2 0 0 1 3.7 1.3L13.8 9h5.4a2 2 0 0 1 2 2.4l-1.5 6.9A2.2 2.2 0 0 1 17.5 20H7'/>"],
+    ["aprobado", "Aprobado", "#1FB58F", "<circle cx='12' cy='12' r='8.5'/><path d='m8.5 12.3 2.4 2.4 4.6-5'/>"],
+    ["atencion", "Atención", "#FF8A3D", "<path d='M12 3.8 21 19.5H3z'/><path d='M12 10v4.2M12 16.9v.2'/>"],
+    ["encanta", "Me encanta", "#F0476B", "<path d='M12 20s-7.5-4.6-7.5-10.1A4.3 4.3 0 0 1 12 7.3a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z'/>"],
+    ["gracias", "Gracias", "#9B7BFF", "<path d='M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z'/><path d='M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z'/>"],
+  ];
+  const BY = Object.fromEntries(RX.map(x => [x[0], x]));
+  window.pxpReacLabel = (r) => (BY[r] || [, r])[1];
+  const ADD = "<circle cx='11' cy='12' r='8'/><path d='M8 14.2a3.6 3.6 0 0 0 6 0'/><path d='M8.6 9.6v.2M13.4 9.6v.2'/><path d='M20 3.5v5M17.5 6h5'/>";
+  const yo = () => (typeof currentUser !== "undefined" && currentUser) || "";
+  const nota = (k, ts) => ((PROJECTS[k] || {}).historial || []).find(h => h.tipo === "nota" && h.ts === ts);
+  const nombre = (n) => { try { const f = window.pxpFindPerson && pxpFindPerson(n); return f && f.p ? f.p.name : n; } catch (e) { return n; } };
+  const tit = (t) => String(t || "").toLowerCase().replace(/(^|\s)\S/g, m => m.toUpperCase());
+  const grupos = (h) => { const g = {}; Object.values(h.reac || {}).forEach(r => { if (r && BY[r.r]) (g[r.r] = g[r.r] || []).push(r); }); return g; };
+
+  window.pxpReacHtml = function (k, h) {
+    if (!h || !h.ts) return "";
+    const g = grupos(h), mine = (h.reac || {})[normName(yo())], kk = ea(k), tt = ea(h.ts);
+    const chips = RX.filter(x => g[x[0]]).map(([r, l, c, d]) => { const on = mine && mine.r === r, n = g[r].length;
+      return `<button type="button" class="rx-chip${on ? " on" : ""}" style="--rc:${c}" data-k="${esc(k)}" data-ts="${esc(h.ts)}" data-r="${r}" onclick="pxpReac('${kk}','${tt}','${r}')" aria-pressed="${on}" aria-label="${l}: ${n} ${n === 1 ? "persona" : "personas"}${on ? ", incluida tú" : ""}. Toca para ${on ? "quitar" : "reaccionar"}">${ic(d)}<b>${n}</b></button>`; }).join("");
+    return `<div class="rx-bar">${chips}<button type="button" class="rx-add" onclick="pxpReacPick(this,'${kk}','${tt}')" aria-haspopup="menu" aria-label="Reaccionar a esta nota" data-tip="Reaccionar">${ic(ADD)}</button></div>`;
+  };
+
+  // ── Guardar ──
+  const repintar = () => { try { const m = document.getElementById("pxp-proj"), y = m ? m.scrollTop : 0; if (window.pxpRenderProj) pxpRenderProj(); if (m) m.scrollTop = y; } catch (e) { console.error(e); } };
+  window.pxpReac = async function (k, ts, r) {
+    const h = nota(k, ts); if (!h || !BY[r] || !yo()) return;
+    const me = normName(yo()); h.reac = Object.assign({}, h.reac || {});
+    if (h.reac[me] && h.reac[me].r === r) delete h.reac[me]; else h.reac[me] = { r, n: yo(), ts: new Date().toISOString() };
+    if (!Object.keys(h.reac).length) delete h.reac;
+    cerrarPick(); cerrarCard(); repintar();
+    try { await saveState(); } catch (e) { console.error(e); }   // Netlify: se guarda solo en segundos · vista previa: al cerrar la ventana
+  };
+
+  // ── Selector (una píldora con las seis reacciones) ──
+  let pick = null;
+  const cerrarPick = () => { if (pick) { pick.remove(); pick = null; } };
+  window.pxpReacPick = function (btn, k, ts) {
+    if (pick && pick.dataset.ts === ts) { cerrarPick(); return; }
+    cerrarPick(); cerrarCard();
+    const h = nota(k, ts); if (!h) return; const mine = (h.reac || {})[normName(yo())];
+    pick = document.createElement("div"); pick.className = "rx-pick"; pick.dataset.ts = ts; pick.setAttribute("role", "menu"); pick.setAttribute("aria-label", "Elegir reacción");
+    pick.innerHTML = RX.map(([r, l, c, d], i) => `<button type="button" role="menuitemradio" aria-checked="${!!(mine && mine.r === r)}" class="rx-op${mine && mine.r === r ? " on" : ""}" style="--rc:${c};--d:${i * 28}ms" data-l="${l}" aria-label="${l}" onclick="pxpReac('${ea(k)}','${ea(ts)}','${r}')">${ic(d)}</button>`).join("");
+    document.body.appendChild(pick); pick._t = Date.now();
+    const R = btn.getBoundingClientRect(), W = pick.offsetWidth, H = pick.offsetHeight;
+    pick.style.left = Math.max(8, Math.min(R.left - 6, innerWidth - W - 8)) + "px";
+    pick.style.top = (R.top - H - 10 > 8 ? R.top - H - 10 : R.bottom + 10) + "px";
+    const f = pick.querySelector(".on") || pick.querySelector(".rx-op"); setTimeout(() => f && f.focus(), 0);
+  };
+  document.addEventListener("pointerdown", (e) => { if (pick && !pick.contains(e.target) && !(e.target.closest && e.target.closest(".rx-add"))) cerrarPick(); }, true);
+  document.addEventListener("keydown", (e) => {
+    if (!pick) return;
+    if (e.key === "Escape") { e.stopImmediatePropagation(); cerrarPick(); return; }
+    if (e.key === "ArrowRight" || e.key === "ArrowLeft") { const b = [...pick.querySelectorAll(".rx-op")], i = b.indexOf(document.activeElement); if (i >= 0) { e.preventDefault(); b[(i + (e.key === "ArrowRight" ? 1 : b.length - 1)) % b.length].focus(); } }
+  }, true);
+  document.addEventListener("scroll", (e) => { if (pick && !pick.contains(e.target) && Date.now() - (pick._t || 0) > 350) cerrarPick(); }, true);
+
+  // ── Quién reaccionó (al pasar el mouse o manteniendo presionado) ──
+  let card = null, cardFor = null, holdT = null, held = false;
+  const cerrarCard = () => { if (card) { card.remove(); card = null; cardFor = null; } };
+  function mostrarCard(chip) {
+    if (cardFor === chip) return; cerrarCard();
+    const h = nota(chip.dataset.k, chip.dataset.ts); if (!h) return; const r = chip.dataset.r, X = BY[r], L = (grupos(h)[r] || []).slice().sort((a, b) => (a.ts || "").localeCompare(b.ts || ""));
+    if (!X || !L.length) return;
+    card = document.createElement("div"); card.className = "rx-card"; card.style.setProperty("--rc", X[2]); card.setAttribute("role", "tooltip");
+    card.innerHTML = `<div class="rx-ch">${ic(X[3])}<b>${X[1]}</b><span>${L.length}</span></div><ul>${L.map(x => `<li>${window.pxpAvatar ? pxpAvatar("person", nombre(x.n), 24) : ""}<span>${esc(tit(nombre(x.n)))}${normName(x.n) === normName(yo()) ? " <em>(tú)</em>" : ""}</span><small>${x.ts ? new Date(x.ts).toLocaleDateString("es-CO", { day: "numeric", month: "short" }).replace(".", "").replace(" de ", " ") : ""}</small></li>`).join("")}</ul>`;
+    document.body.appendChild(card); cardFor = chip;
+    const R = chip.getBoundingClientRect(), W = card.offsetWidth, H = card.offsetHeight;
+    card.style.left = Math.max(8, Math.min(R.left + R.width / 2 - W / 2, innerWidth - W - 8)) + "px";
+    card.style.top = (R.top - H - 8 > 8 ? R.top - H - 8 : R.bottom + 8) + "px";
+  }
+  document.addEventListener("mouseover", (e) => { const c = e.target.closest && e.target.closest(".rx-chip"); if (c) mostrarCard(c); else if (card && !(e.target.closest && e.target.closest(".rx-card"))) cerrarCard(); });
+  document.addEventListener("focusin", (e) => { const c = e.target.closest && e.target.closest(".rx-chip"); if (c) mostrarCard(c); else cerrarCard(); });
+  // Celular: mantener presionado muestra quién reaccionó (y no cambia la reacción)
+  document.addEventListener("pointerdown", (e) => { const c = e.target.closest && e.target.closest(".rx-chip"); if (!c || e.pointerType === "mouse") return; held = false; clearTimeout(holdT); holdT = setTimeout(() => { held = true; mostrarCard(c); }, 420); });
+  document.addEventListener("pointerup", () => clearTimeout(holdT));
+  document.addEventListener("click", (e) => { if (held && e.target.closest && e.target.closest(".rx-chip")) { e.preventDefault(); e.stopImmediatePropagation(); held = false; } }, true);
+  document.addEventListener("scroll", () => cerrarCard(), true);
 })();
 </script>
 </body>

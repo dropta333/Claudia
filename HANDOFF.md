@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v159** · 10 oct 2026 · Responsable: Bastián Torres
+Versión: **v160** · 10 oct 2026 · Responsable: Bastián Torres
 
 ## Cómo está armado ahora
 - **Una sola fuente:** `src/app.html`, con todo el CSS y las capas JS.
@@ -98,6 +98,13 @@ Versión: **v159** · 10 oct 2026 · Responsable: Bastián Torres
   - "+ Agregar etapa" pregunta la fase (`pxpEtAdd`); cada grupo abierto tiene "+ Agregar etapa a …". La etapa se inserta al final de su fase.
   - Ficha de resumen: Tipo, Complejidad, Inicio, Entrega final, Duración (días hábiles) y Agencia en dos columnas que ocupan todo el alto; en modo consulta, los datos usan el espacio libre en dos columnas.
   - Cronograma: Todo / Día / Semana / Mes / Año siempre a la derecha; las barras nunca pasan del borde y el cuerpo no se desplaza a lo ancho.
+
+- **v160:** reacciones en las notas (capa 49).
+  - Seis reacciones de línea con color: Visto, De acuerdo, Aprobado, Atención, Me encanta y Gracias. Una por persona y nota (otra la reemplaza; la misma la quita). Todo el equipo puede reaccionar, también en modo consulta.
+  - Datos: `nota.reac = { NOMBRE_NORMALIZADO: { r, n, ts } }`. Como es un objeto por persona, la mezcla a tres vías suma las reacciones simultáneas.
+  - Selector flotante en forma de píldora (flechas y Esc); al pasar el mouse por una reacción (o mantener presionado en el celular) se ve quién reaccionó y cuándo.
+  - Notificaciones: quien escribió la nota recibe las reacciones de los demás (últimos 30 días).
+  - Pruebas: `node tools/test-reacciones.mjs [carpeta-capturas]`.
 
 ## No cambiar sin consultar
 - El ZIP de Netlify va sin datos, y no se guarda nada antes de cargar los datos del servidor.
