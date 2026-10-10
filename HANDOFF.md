@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v164** · 10 oct 2026 · Responsable: Bastián Torres
+Versión: **v165** · 10 oct 2026 · Responsable: Bastián Torres
 
 ## Cómo está armado ahora
 - **Una sola fuente:** `src/app.html`, con todo el CSS y las capas JS.
@@ -137,6 +137,13 @@ Versión: **v164** · 10 oct 2026 · Responsable: Bastián Torres
   - La ficha resumen guarda su alto con los desplegables abiertos (`fijaFicha`, capa 50).
   - Piezas: menús propios de tipo, derivada "Variación", duraciones y formatos típicos al tocar la casilla, "+ Otra pieza" que no depende del Hero.
   - Pruebas: `node tools/test-v164.mjs [carpeta-capturas]`.
+
+- **v165:** ajustes de etapas y piezas.
+  - Hitos: nombre a 22 px como las de proceso; estados con la misma píldora de íconos (Pendiente · Revisado/Entregado · Solicitud de ajustes · Aprobado). "¿Bloquea lo que sigue?" vuelve a la fila superior como ícono.
+  - "+ Agregar etapa" (`pxpEtAdd(btn, fase)`, `pxpEtAddSel`): tipo + fase con el lenguaje del menú de tipo; las sugerencias por fase viven solo aquí (`pxpEt('add',0,'fase|tipo')`). El menú de tipo ya no trae exigencia (sigue en su casilla). "+ Agregar etapa a …" del grupo abre el mismo menú con la fase puesta.
+  - Cronograma: leyenda de grupos y de estados en una sola fila.
+  - Piezas: "Reformato" pasa a "Adaptación de formato" (el mantenimiento convierte las guardadas) y se suma "Adaptación de región".
+  - Bocetos del time table v2 en `bocetos/bocetos-v2.html`: cabecera oscura sobre hoja clara y dos vistas, Calendario (semanas, mañana/tarde, festivos) y Gantt.
 
 ## No cambiar sin consultar
 - El ZIP de Netlify va sin datos, y no se guarda nada antes de cargar los datos del servidor.
