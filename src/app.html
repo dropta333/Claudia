@@ -6148,6 +6148,16 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;tr
 #rp-prev{cursor:grab}
 #rp-prev.panning{cursor:grabbing;user-select:none}
 .rp-zoom .rz-100{font-weight:700}
+.tt-roles{display:grid;gap:6px}
+.tt-rol{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);transition:border-color .15s,background-color .15s}
+.tt-rol i{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;flex:none;font:700 12px/1 var(--sans);font-style:normal;background:var(--surface2);color:var(--muted)}
+.tt-rol span{display:flex;flex-direction:column;gap:2px;min-width:0}
+.tt-rol b{font:600 13.5px/1.1 var(--sans)}
+.tt-rol small{font:500 12px/1.2 var(--sans);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tt-rol:hover{border-color:var(--text)}
+.tt-rol.on{border-color:var(--text);background:color-mix(in srgb,var(--text) 4%,var(--surface))}
+.tt-rol.on i{background:var(--text);color:var(--bg)}
+.tt-rol:focus-visible{outline:2px solid var(--brand)}
 </style>
 </head>
 <body>
@@ -20116,7 +20126,11 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     }
   }
   // v166 · Cada mes con su tono: alternan blanco y gris para ver en qué mes cae cada etapa
-  const MES_BG = (d, finde) => (+d.slice(5, 7)) % 2 ? (finde ? "#E9E9EF" : "#F1F1F5") : (finde ? "#F6F6F9" : "#FFFFFF");
+  const MES_BG = (d, finde) => finde ? "#ECECF1" : (+d.slice(5, 7)) % 2 ? "#F3F3F6" : "#FFFFFF";   // sábados y domingos: siempre el mismo gris
+  // Integrantes del equipo que pueden ir en la cabecera (solo los roles que tienen a alguien)
+  const ROLES_TT = [["ep", "Productor(a) ejecutivo(a)", "Executive producer"], ["pm", "Project Manager", "Project manager"], ["directorPost", "Director de post", "Post director"], ["editor", "Editor", "Editor"], ["color", "Color", "Colorist"], ["compo", "Compo", "Compositing"], ["tresD", "3D", "3D"], ["ia", "IA", "AI"], ["master", "Master", "Mastering"], ["casaAudio", "Casa de audio", "Audio house"]];
+  const ttRoles = (p) => ROLES_TT.map(([k2, es, en]) => { const rp = (key) => (window.pxpRolePeople ? pxpRolePeople(p, key) : []).filter(Boolean); let n = k2 === "pm" ? (p.pms || []).concat(rp("coordinador")) : rp(k2); n = n.filter((x, i) => n.findIndex(y => normName(y) === normName(x)) === i); return { k: k2, es, en, n }; }).filter(r => r.n.length);
+  window.pxpTTRol = (k2) => { const S = window.pxpRepS && pxpRepS(); if (!S) return; const L = S.roles || []; S.roles = L.includes(k2) ? L.filter(x => x !== k2) : L.concat(k2); window.pxpRepRepaint(); window.pxpRepRegen(60); };
   const diamante = (rec, cx, cy, r, fill, stroke, lw) => rec.poly({ pts: [[cx, cy - r], [cx + r, cy], [cx, cy + r], [cx - r, cy]], fill: fill || "none", stroke: stroke || "none", lw: lw || .9 });
   // Eventos del proyecto: etapas de proceso (barras) e hitos de revisión y entrega (con su hora)
   function ttDatos(s) {
@@ -20144,13 +20158,14 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const cli = [p.cliente, p.marca].filter(Boolean).join(" · ");
     if (cli) { rec.circle({ x: 30.5, y: 97.2, r: 3, fill: window.pxpClientColor && p.cliente ? pxpClientColor(p.cliente) : VIOLET }); rec.text({ s: clip(cli, "semi", 8, 210), x: 38, y: 100, font: "semi", size: 8, color: "#C9C9D2" }); }
     // Ficha: roles del proyecto y entregables
-    const rp = (key) => (window.pxpRolePeople ? pxpRolePeople(p, key) : []).filter(Boolean);
-    const F = (s.gente ? [[T.ep, rp("ep")], [T.dp, rp("directorPost")], [T.pm, (p.pms || []).concat(rp("coordinador"))]] : []).concat([[T.ag, p.agencia ? [p.agencia] : []]]).filter(f => f[1].length).slice(0, 4);
+    const F = ttRoles(p).filter(r => (s.roles || []).includes(r.k)).map(r => [s.lang === "en" ? r.en : r.es, r.n]).concat(p.agencia ? [[T.ag, [p.agencia]]] : []);
     if (!F.length) F.push([T.ref, [p.nombre || k]]);
     const det = p.piezasDet || [], entr = det.map(x => `${+x.cant || 1} × ${x.hero ? "Hero " + (x.tipo || "") : x.deriv || x.tipo || ""}${x.dur ? " " + x.dur : ""}${x.formato ? " " + x.formato : ""}`.replace(/\s+/g, " ").trim()).join(" · ");
-    const mx = 266; rec.line({ x1: mx - 16, y1: 18, x2: mx - 16, y2: 100, stroke: "#26262E", lw: .8 });
-    F.forEach(([l, v], i) => { const cx = mx + (i % 2) * 182, cy = 24 + Math.floor(i / 2) * 27; rec.text({ s: l.toUpperCase(), x: cx, y: cy, font: "cond", size: 6.2, color: "#8A8A96", cs: 1.2 }); rec.text({ s: clip(v.join(", "), "semi", 9, 172), x: cx, y: cy + 11.5, font: "semi", size: 9, color: "#FFFFFF" }); });
-    if (entr) { const cy = 24 + Math.ceil(F.length / 2) * 27; rec.text({ s: T.entreg.toUpperCase(), x: mx, y: cy, font: "cond", size: 6.2, color: "#8A8A96", cs: 1.2 }); rec.text({ s: clip(entr, "semi", 9, 355), x: mx, y: cy + 11.5, font: "semi", size: 9, color: LIME }); }
+    // La ficha se acomoda: 2 columnas hasta 4 nombres, 3 columnas si hay más; las filas se compactan si hace falta
+    const mx = 266, MW = 380; rec.line({ x1: mx - 16, y1: 18, x2: mx - 16, y2: 100, stroke: "#26262E", lw: .8 });
+    const cols = F.length > 4 ? 3 : 2, eR = entr ? 1 : 0, maxF = cols * (4 - eR), FF = F.slice(0, maxF), rows = Math.ceil(FF.length / cols), gapY = rows + eR <= 3 ? 27 : 21.5, vs = rows + eR <= 3 ? 9 : 8.2, colW = MW / cols;
+    FF.forEach(([l, v], i) => { const cx = mx + (i % cols) * colW, cy = 22 + Math.floor(i / cols) * gapY; rec.text({ s: l.toUpperCase(), x: cx, y: cy, font: "cond", size: 6, color: "#8A8A96", cs: 1.1 }); rec.text({ s: clip(v.join(", "), "semi", vs, colW - 10), x: cx, y: cy + 10.6, font: "semi", size: vs, color: "#FFFFFF" }); });
+    if (entr) { const cy = 22 + rows * gapY; rec.text({ s: T.entreg.toUpperCase(), x: mx, y: cy, font: "cond", size: 6, color: "#8A8A96", cs: 1.1 }); rec.text({ s: clip(entr, "semi", vs, MW - 10), x: mx, y: cy + 10.6, font: "semi", size: vs, color: LIME }); }
     // Fechas y avance
     const fd = (d) => `${+d.slice(8, 10)} ${T.m[+d.slice(5, 7) - 1]}`, R = W - 27;
     rec.text({ s: T.rng.toUpperCase(), x: R, y: 24, font: "cond", size: 6.2, color: "#8A8A96", cs: 1.2, align: "r" });
@@ -20327,7 +20342,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     }
   }
   B.custom.tt = {
-    init: (k) => ({ fines: true, vista: "cal", color: "grupo", franja: true, gente: true }),
+    init: (k) => ({ fines: true, vista: "cal", color: "grupo", franja: true, roles: ["ep", "directorPost", "pm"] }),
     title: (s) => (PROJECTS[s.key] || {}).nombre || s.key,
     kicker: () => "Time table",
     file: (s) => `TT_${slug(((PROJECTS[s.key] || {}).cliente || "").toUpperCase())}_${slug((PROJECTS[s.key] || {}).nombre || s.key)}_${hoy().split("-").reverse().join("_")}`,
@@ -20337,7 +20352,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
         <div class="rp-og"><h4>Idioma</h4>${u.seg("pxpTTo_lang", s.lang, [["es", "Español"], ["en", "English"]])}</div>
         <div class="rp-og"><h4>Color por</h4>${u.seg("pxpTTo_color", s.color, [["grupo", "Grupo de etapas"], ["tipo", "Tipo de etapa"]])}</div>
         ${s.vista === "cal" ? `<div class="rp-og"><h4>Mostrar</h4>${u.seg("pxpTTo_franja", s.franja ? "1" : "0", [["1", "Mañana y tarde"], ["0", "Día completo"]])}${u.tog("fines", s.fines, "Sábados y domingos", "Columnas angostas")}</div>` : ""}
-        <div class="rp-og"><h4>Incluir</h4>${u.tog("gente", s.gente, "Nombres del equipo", "Productor(a) ejecutivo(a), director de post y PM en la cabecera")}<p class="rp-note">Los colores salen del grupo y el tipo de cada etapa en el proyecto. La hora de revisiones y entregas es la que se eligió en cada hito.</p></div>`;
+        <div class="rp-og"><h4>Equipo en la cabecera</h4>${(() => { const R2 = ttRoles(getProjectDisplay(s.key)); return R2.length ? `<div class="tt-roles">${R2.map(r => { const on = (s.roles || []).includes(r.k); return `<button type="button" class="tt-rol${on ? " on" : ""}" aria-pressed="${on}" onclick="pxpTTRol('${r.k}')"><i aria-hidden="true">${on ? "✓" : "+"}</i><span><b>${esc(r.es)}</b><small>${esc(r.n.join(", "))}</small></span></button>`; }).join("")}</div>` : `<p class="rp-note" style="margin-top:0">El proyecto aún no tiene equipo asignado.</p>`; })()}<p class="rp-note">Los colores salen del grupo y el tipo de cada etapa en el proyecto. La hora de revisiones y entregas es la que se eligió en cada hito.</p></div>`;
     },
     async build(s) {
       const W = 841.89, H = 595.28, rec = new Rec(); rec.size = [W, H]; rec.add();
