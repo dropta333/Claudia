@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v182** · 10 oct 2026 · Responsable: Bastián Torres
+Versión: **v183** · 10 oct 2026 · Responsable: Bastián Torres
 
 ## Cómo está armado ahora
 - **Una sola fuente:** `src/app.html`, con todo el CSS y las capas JS.
@@ -198,6 +198,8 @@ Versión: **v182** · 10 oct 2026 · Responsable: Bastián Torres
 - **v181:** inglés completo de la interfaz: catálogo de logros (FAM_EN en la capa 37; f.n y f.d cambian con window.pxpLang), "Cómo lograrlo" de cada logro, notas de ayuda de Capacidad, Horas, Reportes, Repositorio y Logros, fechas con año, "hace N d" y avisos. Solo quedan en español los textos que escriben las personas (notas, nombres, logros especiales).
 
 - **v182:** limpieza y optimización. Se borraron 92 reglas CSS sin uso (tools/css_unused.py las detecta; tools/shots.mjs + tools/shots_diff.py comparan capturas de las 12 pestañas y 5 ventanas en claro y oscuro: sin cambios visibles). El index de Netlify sale minificado con esbuild (tools/minify.py, desde build.py): 1,9 MB → 1,65 MB; el bloque de datos con las marcas ⟦STATE⟧ no se toca. Prueba de punta a punta del modo Netlify: python3 tools/netlify-e2e-prep.py && node tools/netlify-e2e.mjs /tmp/nfmock (servidor local con las funciones reales y Blobs simulado: carga, guardado simultáneo de dos personas, 403 desde otro sitio, reporte PDF, permiso de reportes). Se dejó el editor viejo de fichas (saveFicha): está entrelazado con otras capas y quitarlo ahorra menos del 1 %.
+
+- **v183:** perfil de persona: balancearPerfil arma arriba Sus proyectos (izq.) y Etapas (der.), debajo el resto en dos columnas parejas (.pp-b) y el cronograma a todo el ancho (.pp-full). Notas del proyecto: se ven 2 y el resto en "Ver N notas más" (recuerda si estaba abierto por proyecto). Grupos: 5 formas nuevas (hepta, kite, para, burst, arch: CSS --sh, pxpShapeSvg, PDF) y 3 colores (#E11D48, #9CA33A, #B07A4A) en las tres paletas de grupo. Home personal: tarjeta "Mi carga · próximas semanas" (horas de mis etapas pendientes por semana, 6 semanas, línea de 40 h).
 
 ## No cambiar sin consultar
 - El ZIP de Netlify va sin datos, y no se guarda nada antes de cargar los datos del servidor.

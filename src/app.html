@@ -790,6 +790,17 @@ tr.is-standby td{opacity:.72}
 .hb .vl small{font-weight:400;font-size:13.5px;color:var(--muted)}
 .tl-g.late{opacity:.85}
 details.tl-more{margin-top:6px}
+.ps-carga .ps-b.over i{background:#FF9F43!important}
+/* v183 · Notas: se ven 2 y el resto con "Ver más" */
+details.pj-nmore{margin-top:8px}
+details.pj-nmore summary{display:inline-flex;align-items:center;gap:6px;padding:7px 14px!important;border:1px solid var(--border);border-radius:99px;background:var(--surface2);font:600 13px/1 var(--sans)!important;color:var(--text)!important}
+details.pj-nmore summary::before{content:"+"!important;font-weight:700;color:var(--brand)}
+details.pj-nmore[open] summary::before{content:"−"!important}
+details.pj-nmore summary:hover{border-color:var(--border2)}
+details.pj-nmore .nm-o,details.pj-nmore[open] .nm-c{display:none}
+details.pj-nmore[open] .nm-o{display:inline}
+details.pj-nmore > .pj-notes{margin-top:10px}
+
 details.tl-more summary{cursor:pointer;font-size:14px;color:var(--muted);padding:6px 4px;list-style:none}
 details.tl-more summary::-webkit-details-marker{display:none}
 details.tl-more summary::before{content:"+ "}
@@ -4586,6 +4597,11 @@ body.trf-tabla #main-grid > .section-label{display:none!important}
 .av[data-sh="shield"]{--sh:polygon(50% 0,95% 16%,91% 61%,50% 100%,9% 61%,5% 16%)}
 .av[data-sh="leaf"]{--sh:inset(2% round 50% 8% 50% 8%)}
 .av[data-sh="drop"]{--sh:inset(2% round 50% 50% 6% 50%)}
+.av[data-sh="hepta"]{--sh:polygon(50.0% 0.0%,89.1% 18.8%,98.7% 61.1%,71.7% 95.0%,28.3% 95.0%,1.3% 61.1%,10.9% 18.8%)}
+.av[data-sh="kite"]{--sh:polygon(50% 0,92% 40%,50% 100%,8% 40%)}
+.av[data-sh="para"]{--sh:polygon(24% 10%,100% 10%,76% 90%,0 90%)}
+.av[data-sh="burst"]{--sh:polygon(50.0% 0.0%,60.4% 11.4%,75.0% 6.7%,78.3% 21.7%,93.3% 25.0%,88.6% 39.6%,100.0% 50.0%,88.6% 60.4%,93.3% 75.0%,78.3% 78.3%,75.0% 93.3%,60.4% 88.6%,50.0% 100.0%,39.6% 88.6%,25.0% 93.3%,21.7% 78.3%,6.7% 75.0%,11.4% 60.4%,0.0% 50.0%,11.4% 39.6%,6.7% 25.0%,21.7% 21.7%,25.0% 6.7%,39.6% 11.4%)}
+.av[data-sh="arch"]{--sh:inset(2% round 50% 50% 8% 8%)}
 .av[data-sh="cross"]{--sh:polygon(32% 0,68% 0,68% 32%,100% 32%,100% 68%,68% 68%,68% 100%,32% 100%,32% 68%,0 68%,0 32%,32% 32%)}
 .av[data-sh="hexh"] > .avi,.av[data-sh="shield"] > .avi{font-size:calc(var(--s)*.34)!important}
 .av[data-sh="cross"] > .avi{font-size:calc(var(--s)*.26)!important}
@@ -5157,6 +5173,8 @@ body.trf-tabla #main-grid > .section-label{display:none!important}
 .plant[style*="--fl:"] .pc{fill:color-mix(in srgb,var(--fl) 80%,#000)}
 /* ═════ v137 · Perfil: cronograma personal (sobrio) ═════ */
 
+#pxp-person .pm-body > .pp-full{grid-column:1/-1!important;grid-row:auto!important;margin-top:4px}
+#pxp-person .pm-body > .pp-cols.pp-b{margin-top:2px}
 #pxp-person .pm-body > .pxn-sec,#pxp-person .pm-body > .ret-sec,#pxp-person .pm-body > .pp-cols{grid-column:1/-1!important;grid-row:auto!important}
 
 /* ═════ v138 · Proyecto: ficha a la izquierda, selectores a la derecha; flor grande en el encabezado ═════ */
@@ -12241,7 +12259,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   };
   const roleStyle = (label) => { const r = ROLE_STYLE[label] || { cat: "Otros", shape: "circle" }; return { ...r, color: (window.pxpCargoColor ? window.pxpCargoColor(r.cat) : "#8E8E96") }; };
   function poly(n, cx, cy, r, rot) { const pts = []; for (let i = 0; i < n; i++) { const a = rot + i * Math.PI * 2 / n; pts.push((cx + r * Math.cos(a)).toFixed(1) + "," + (cy + r * Math.sin(a)).toFixed(1)); } return pts.join(" "); }
-  const EXT = { hex: 1.1, square: 1, diamond: 1.22, tri: 1.3, trid: 1.3, penta: 1.14, octa: 1.08, star: 1.3, ring: 1.12, circle: 1, hexh: 1.1, shield: 1.12, leaf: 1, drop: 1.05, cross: 1.08 };
+  const EXT = { hex: 1.1, square: 1, diamond: 1.22, tri: 1.3, trid: 1.3, penta: 1.14, octa: 1.08, star: 1.3, ring: 1.12, circle: 1, hexh: 1.1, shield: 1.12, leaf: 1, drop: 1.05, cross: 1.08, hepta: 1.1, kite: 1.2, para: 1.1, burst: 1.18, arch: 1 };
   // Rectángulo con radios distintos por esquina (hoja, gota)
   const rr = (x, y, w, h, [a, b, c, d], at) => `<path d="M${x + a},${y}H${x + w - b}A${b},${b} 0 0 1 ${x + w},${y + b}V${y + h - c}A${c},${c} 0 0 1 ${x + w - c},${y + h}H${x + d}A${d},${d} 0 0 1 ${x},${y + h - d}V${y + a}A${a},${a} 0 0 1 ${x + a},${y}Z" ${at}/>`;
   function shapeSvg(shape, x, y, r, cls, style) {
@@ -12260,6 +12278,11 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       case "leaf": { const s = r * 1.8, k = r * .9; return rr(+(x - k).toFixed(1), +(y - k).toFixed(1), +s.toFixed(1), +s.toFixed(1), [+(s * .5).toFixed(1), +(s * .1).toFixed(1), +(s * .5).toFixed(1), +(s * .1).toFixed(1)], at); }
       case "drop": { const s = r * 1.84, k = r * .92; return rr(+(x - k).toFixed(1), +(y - k).toFixed(1), +s.toFixed(1), +s.toFixed(1), [+(s * .5).toFixed(1), +(s * .5).toFixed(1), +(s * .08).toFixed(1), +(s * .5).toFixed(1)], at); }
       case "cross": { const R = r * 1.08, t = .36, p = [[-t, -1], [t, -1], [t, -t], [1, -t], [1, t], [t, t], [t, 1], [-t, 1], [-t, t], [-1, t], [-1, -t], [-t, -t]]; return `<polygon points="${p.map(([u, v]) => (x + u * R).toFixed(1) + "," + (y + v * R).toFixed(1)).join(" ")}" ${at} stroke-linejoin="round"/>`; }
+      case "hepta": return `<polygon points="${poly(7, x, y, r * 1.1, -Math.PI / 2)}" ${at}/>`;
+      case "kite": { const R = r * 1.22, p = [[0, -1], [.84, -.2], [0, 1], [-.84, -.2]]; return `<polygon points="${p.map(([u, v]) => (x + u * R).toFixed(1) + "," + (y + v * R).toFixed(1)).join(" ")}" ${at}/>`; }
+      case "para": { const R = r * 1.1, p = [[-.52, -.8], [1, -.8], [.52, .8], [-1, .8]]; return `<polygon points="${p.map(([u, v]) => (x + u * R).toFixed(1) + "," + (y + v * R).toFixed(1)).join(" ")}" ${at}/>`; }
+      case "burst": { const pts = []; for (let i = 0; i < 24; i++) { const a = -Math.PI / 2 + i * Math.PI / 12, q = i % 2 ? r * .98 : r * 1.2; pts.push((x + q * Math.cos(a)).toFixed(1) + "," + (y + q * Math.sin(a)).toFixed(1)); } return `<polygon points="${pts.join(" ")}" ${at}/>`; }
+      case "arch": { const s = r * 1.8, k = r * .9; return rr(+(x - k).toFixed(1), +(y - k).toFixed(1), +s.toFixed(1), +s.toFixed(1), [+(s * .5).toFixed(1), +(s * .5).toFixed(1), +(s * .08).toFixed(1), +(s * .08).toFixed(1)], at); }
       case "ring": return `<circle cx="${x}" cy="${y}" r="${(r * 1.12).toFixed(1)}" ${at}/><circle cx="${x}" cy="${y}" r="${(r * .82).toFixed(1)}" class="${cls} inner" style="${style}"/>`;
       default: return `<circle cx="${x}" cy="${y}" r="${r}" ${at}/>`;
     }
@@ -12498,7 +12521,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
         ${p._borrador ? `<p class="pj-new-tip">Notas, enlaces de revisión, ruta en el share y bloqueadores se habilitan al crear el proyecto.</p>` : `<div class="pj-two"><section class="pj-sec pj-notas"><h3>Notas <span class="cnt">${notas.length}</span></h3>
           <div class="pj-newnote">${av("person", currentUser || "?", 42)}<textarea id="pj-note" rows="2" placeholder="Escribe una nota para el equipo… (Ctrl + Enter para guardar)" onkeydown="if((event.ctrlKey||event.metaKey)&&event.key==='Enter'){event.preventDefault();pxpNoteAdd()}"></textarea><div class="pj-nbtns"><label class="btn-ghost pj-attach" title="Adjuntar imágenes, audios, documentos…"><svg class='i' viewBox='0 0 24 24' aria-hidden='true'><path d='M20 11.5 12.3 19.2a5 5 0 0 1-7-7l8.3-8.3a3.4 3.4 0 0 1 4.8 4.8l-8.2 8.2a1.7 1.7 0 0 1-2.4-2.4l7.4-7.4'/></svg><span>Adjuntar</span><input type="file" multiple onchange="pxpAdjSel(this)" aria-label="Adjuntar archivos"></label><button class="btn-add" onclick="pxpNoteAdd()">Agregar</button></div></div>
           <div class="pj-pend" id="pj-pend" hidden></div>
-          ${notas.length ? `<div class="pj-notes">${notas.slice(0, 6).map(noteRow).join("")}</div>${notas.length > 6 ? `<details class="tl-more"><summary>Ver ${notas.length - 6} notas anteriores</summary><div class="pj-notes">${notas.slice(6).map(noteRow).join("")}</div></details>` : ""}` : `<p class="note" style="margin:6px 0 0">Aún no hay notas. Úsalas para dejar indicaciones, acuerdos con el cliente o pendientes.</p>`}
+          ${notas.length ? `<div class="pj-notes">${notas.slice(0, 2).map(noteRow).join("")}</div>${notas.length > 2 ? `<details class="tl-more pj-nmore"${(window.__pjNotasAbiertas || {})[k] ? " open" : ""} ontoggle="(window.__pjNotasAbiertas=window.__pjNotasAbiertas||{})['${ea(k)}']=this.open"><summary><span class="nm-c">Ver ${notas.length - 2} ${notas.length - 2 === 1 ? "nota más" : "notas más"}</span><span class="nm-o">Ver menos</span></summary><div class="pj-notes">${notas.slice(2).map(noteRow).join("")}</div></details>` : ""}` : `<p class="note" style="margin:6px 0 0">Aún no hay notas. Úsalas para dejar indicaciones, acuerdos con el cliente o pendientes.</p>`}
           ${act.length ? `<details class="tl-more pj-act"><summary>Actividad del proyecto (${act.length} cambios)</summary>${act.slice(0, 40).map(h => `<div class="pj-log"><span>${esc(rel(h.ts))}</span><b>${esc(h.usuario || "—")}</b> ${esc(h.texto)}</div>`).join("")}</details>` : ""}
         </section>
         <div class="pj-col">${window.pxpLinksHtml ? pxpLinksHtml(k) : ""}${window.pxpShareHtml ? pxpShareHtml(k) : ""}${window.pxpTaxoHtml ? pxpTaxoHtml(k) : ""}${window.pxpBloqHtml ? pxpBloqHtml(k) : ""}</div></div>`}
@@ -15200,7 +15223,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   // ═════════ Grupos: nombre y color editables ═════════
   const meta = () => (META = META || {});
   window.pxpGL = (k) => ((META && META.gruposRen) || {})[k] || k;
-  const PAL = ["#624AFF", "#8F80FF", "#DE7BFF", "#F63DA9", "#FF644A", "#FB8847", "#FFC800", "#F3FF57", "#64FF61", "#7EE0C3", "#61FFFF", "#61B3FF", "#FFADBF", "#8E8E96"];
+  const PAL = ["#624AFF", "#8F80FF", "#DE7BFF", "#F63DA9", "#FF644A", "#FB8847", "#FFC800", "#F3FF57", "#64FF61", "#7EE0C3", "#61FFFF", "#61B3FF", "#FFADBF", "#E11D48", "#9CA33A", "#B07A4A", "#8E8E96"];   // v183 · +3 colores
   const miembrosDe = (key) => [...TEAM.map(p => ({ p, g: "team" })), ...AUDIO.map(p => ({ p, g: "audio" }))].filter(f => (key === "Audio" ? (f.g === "audio" || pxpGrupo(f.p) === "Audio") : pxpGrupo(f.p) === key));
   window.pxpGrupoEdit = function (key) {
     if (!can()) { toast(NOPERM); return; }
@@ -16240,6 +16263,17 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const SL = [["sana", "Sanos", "var(--green)"], ["bien", "Bien", "#7EE0C3"], ["decaida", "Decaídos", "var(--yellow)"], ["marchita", "Marchitos", "#FB8847"], ["critica", "Críticos", "var(--red)"], ["none", "Sin datos", "var(--muted2)"]];
     const g4 = act.length ? `<div class="ps-seg">${Object.entries(tp).map(([t2, n]) => `<i style="flex:${n};--c:${(window.pxpTipoColor || {})[t2] || "var(--muted)"}" data-tip="${esc(t2)} · ${n}"></i>`).join("")}</div><ul class="ps-leg">${Object.entries(tp).map(([t2, n]) => `<li><span style="background:${(window.pxpTipoColor || {})[t2]}"></span>${esc(t2)}<b>${n}</b></li>`).join("")}</ul>
       <div class="ps-salud">${SL.filter(x => sl[x[0]]).map(([v, l, c]) => `<span style="--c:${c}"><b>${sl[v]}</b>${l}</span>`).join("")}</div>` : `<p class="note">Sin proyectos activos.</p>`;
+    // 5 · v183 · mi carga en las próximas semanas: horas de mis etapas pendientes repartidas en sus días hábiles
+    const fw = []; for (let i = w; i < Math.min(WEEKS.length, w + 6); i++) fw.push(i);
+    const habil = (d) => { const g = D(d).getDay(); return g !== 0 && g !== 6; };
+    const carga = fw.map(i => { const a = D(weekDates(i)[0]), b = new Date(a); b.setDate(b.getDate() + 6); return { i, ini: iso(a), fin: iso(b), h: 0, n: 0 }; });
+    et.filter(x => x.e.estado !== "listo" && x.ini && x.fin).forEach(x => {
+      const hrs = +x.horas || 0, dias = []; for (let d = D(x.ini); iso(d) <= x.fin; d.setDate(d.getDate() + 1)) if (habil(iso(d))) dias.push(iso(d));
+      const por = dias.length ? hrs / dias.length : 0;
+      carga.forEach(c => { const dd2 = dias.filter(d => d >= c.ini && d <= c.fin); if (dd2.length) { c.h += por * dd2.length; c.n++; } });
+    });
+    const mc = Math.max(40, ...carga.map(c => c.h));
+    const g5 = et.some(x => x.e.estado !== "listo") ? `<div class="ps-bars ps-carga">${carga.map(c => `<div class="ps-b${c.i === w ? " cur" : ""}${c.h > 40 ? " over" : ""}" data-tip="${esc(WEEKS[c.i].label)} · ${n1(c.h)} h · ${c.n} etapa${c.n !== 1 ? "s" : ""}"><i style="height:${c.h / mc * 100}%"></i><span>${esc(WEEKS[c.i].label.split(" ")[0])}</span></div>`).join("")}<em class="ps-line" style="bottom:calc(${40 / mc * 100}% + 18px)" aria-hidden="true">40 h</em></div>` : `<p class="note">Cuando tengas etapas asignadas verás aquí cuántas horas te esperan cada semana.</p>`;
     const totH = E.reduce((s, x) => s + (+x.h.h || 0), 0);
     return `<section class="home-panel ps-panel" id="mis-stats"><div class="hp-title">Mis estadísticas<span class="hp-extra">solo tu trabajo · ${n1(totH)} h registradas en total</span></div>
       <div class="ps-grid">
@@ -16247,6 +16281,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
         <div class="ps-card"><h4>Mis horas por proyecto</h4>${g2}</div>
         <div class="ps-card"><h4>Mis etapas</h4>${g3}</div>
         <div class="ps-card"><h4>Mis proyectos activos <b>${act.length}</b></h4>${g4}</div>
+        <div class="ps-card"><h4>Mi carga · próximas semanas</h4>${g5}</div>
       </div></section>`;
   }
   // Home en mosaico: las cajas se reparten en columnas parejas, sin huecos ni página interminable
@@ -17485,7 +17520,9 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       const forma = (rec, f, x0, y0, r, o) => { const pg = (n, rot) => rec.poly(Object.assign({ pts: Array.from({ length: n }, (_, i) => { const t = rot + i * 2 * Math.PI / n; return [x0 + r * Math.cos(t), y0 + r * Math.sin(t)]; }) }, o));
         if (f === "square") rec.rect(Object.assign({ x: x0 - r * .85, y: y0 - r * .85, w: r * 1.7, h: r * 1.7, r: 3 }, o)); else if (f === "hex" || f === "hexh") pg(6, f === "hex" ? 0 : Math.PI / 6); else if (f === "diamond") pg(4, -Math.PI / 2);
         else if (f === "tri") pg(3, -Math.PI / 2); else if (f === "trid") pg(3, Math.PI / 2); else if (f === "penta" || f === "shield") pg(5, -Math.PI / 2); else if (f === "octa") pg(8, Math.PI / 8);
-        else if (f === "star") rec.poly(Object.assign({ pts: Array.from({ length: 10 }, (_, i) => { const t = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * .5 : r * 1.1; return [x0 + rr * Math.cos(t), y0 + rr * Math.sin(t)]; }) }, o)); else rec.circle(Object.assign({ x: x0, y: y0, r }, o)); };
+        else if (f === "hepta") pg(7, -Math.PI / 2); else if (f === "burst") rec.poly(Object.assign({ pts: Array.from({ length: 24 }, (_, i) => { const t = -Math.PI / 2 + i * Math.PI / 12, rr = i % 2 ? r * .82 : r; return [x0 + rr * Math.cos(t), y0 + rr * Math.sin(t)]; }) }, o));
+        else if (f === "kite") rec.poly(Object.assign({ pts: [[x0, y0 - r * 1.1], [x0 + r * .9, y0 - r * .2], [x0, y0 + r * 1.1], [x0 - r * .9, y0 - r * .2]] }, o)); else if (f === "para") rec.poly(Object.assign({ pts: [[x0 - r * .5, y0 - r * .8], [x0 + r * 1.05, y0 - r * .8], [x0 + r * .5, y0 + r * .8], [x0 - r * 1.05, y0 + r * .8]] }, o));
+        else if (f === "arch") rec.rect(Object.assign({ x: x0 - r * .85, y: y0 - r * .85, w: r * 1.7, h: r * 1.7, r: r * .6 }, o)); else if (f === "star") rec.poly(Object.assign({ pts: Array.from({ length: 10 }, (_, i) => { const t = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * .5 : r * 1.1; return [x0 + rr * Math.cos(t), y0 + rr * Math.sin(t)]; }) }, o)); else rec.circle(Object.assign({ x: x0, y: y0, r }, o)); };
       return { h: hR0, fill: true, draw(rec, x, y, w) { const hR = this.h;
         card(rec, x, y, w, hR); title(rec, tr(lang, "team"), x + 12, y + 20, w - 24); rec.text({ s: `${nodos.length} ${LgS(lang, nodos.length === 1 ? "persona" : "personas", nodos.length === 1 ? "person" : "people")}`, x: x + w - 12, y: y + 14, font: "semi", size: 7, color: VIOLET, align: "r", cs: .6 });
         const nar = w < 340, NN = nodos.slice(0, nar ? 8 : 12), lw2 = nar ? 78 : 120, cx = x + w / 2, cy = y + 34 + (hR - 34) / 2, rx = w / 2 - (nar ? 46 : 90), ry = Math.max(0, (hR - 34) / 2 - 32);
@@ -18015,6 +18052,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     "Para el equipo de post": "For the post team", "no se comparten con el cliente": "not shared with the client", "Horas de etapas por persona, % de su capacidad y estado, agrupado por grupo.": "Stage hours per person, % of their capacity and status, by group.",
     "Calendario del proyecto a partir de su cronograma, en el formato de Publicis Production.": "Project calendar from its timeline, in the Publicis Production format.",
     "Se ganan solos con tu trabajo en el tablero: etapas cerradas, horas registradas, notas y proyectos entregados. Hay logros individuales, de tu grupo y de todo el equipo, en cuatro niveles.": "You earn them with your work on the board: closed stages, logged hours, notes and delivered projects. There are individual, group and whole-team achievements, in four levels.",
+    "Mi carga": "My load", "próximas semanas": "upcoming weeks", "Cuando tengas etapas asignadas verás aquí cuántas horas te esperan cada semana.": "When you have stages assigned, you'll see here how many hours await you each week.", "Ver menos": "Show less",
     "Otorgar logro": "Give achievement", "Míos": "Mine", "Mi grupo": "My group", "Especial": "Special", "Personal": "Personal", "Quitar": "Remove",
     ": quedan guardados aquí (no se borran) pero ya no aparecen en Traffic ni suman en los totales de \"proyectos\" del tablero.": ": they're kept here (not deleted) but no longer appear in Traffic or count in the board's \"projects\" totals.",
     "En el repositorio": "In the repository", "Línea de tiempo": "Timeline", "cuándo se trabajó cada proyecto y con quién": "when each project was worked on and with whom", "Por fecha": "By date",
@@ -18027,6 +18065,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     [/^Solo fecha de cierre \((\d+)\)$/, (m, n) => `Close date only (${n})`], [/^≈ (\d+) días?$/, (m, n) => `≈ ${n} day${n === "1" ? "" : "s"}`], [/^(\d+) etapas?$/, (m, n) => `${n} stage${n === "1" ? "" : "s"}`],
     [/^(\d+) personas de post$/, (m, n) => `${n} post people`], [/^Lograste (\d+) logros? nuevos?$/, (m, n) => `You earned ${n} new achievement${n === "1" ? "" : "s"}`], [/^Última actualización: (.+)$/, (m, a) => `Last update: ${a}`],
     [/^(.*)Todos los derechos reservados\.$/, (m, a) => `${a}All rights reserved.`], [/^(.+) \(cliente por confirmar\)$/, (m, a) => `${a} (client to be confirmed)`],
+    [/^Ver (\d+) notas? más$/, (m, n) => `Show ${n} more note${n === "1" ? "" : "s"}`], [/^Ver menos$/, () => "Show less"],
     [/^salió el (.+)$/, (m, d) => `left on ${trText(d) || d}`], [/^(.+?) Cuenta las asignaciones en Tráfico con el tipo elegido en cada proyecto; si no tiene, se deduce del nombre\.$/, (m, w) => `${/^Semana /.test(w) ? fecha(w.replace(/^Semana /, "Week ")) : w} Counts Traffic assignments with the type chosen in each project; if it has none, it's inferred from the name.`]
   );
   function trText(raw) {
@@ -18122,7 +18161,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
 
   // ═════════ 1 · Grupos: misma forma e ícono que en el mapa de Equipo ═════════
   const GSTYLE = { "Dirección de Post": ["hex", "Director de Post"], "Producción Ejecutiva": ["star", "Productor(a) Ejecutivo(a)"], "Project Manager": ["square", "Project Manager"], "Editores": ["circle", "Editor"], "Coloristas": ["diamond", "Color"], "Compositing / Motion": ["tri", "Compo"], "3D / CGI": ["penta", "3D"], "IA / Automatización": ["octa", "IA"], "Mastering / Data": ["trid", "Master"], "Audio": ["ring", "Casa de Audio"], "Producción": ["star", ""] };
-  const SHAPES = ["circle", "square", "hex", "hexh", "diamond", "tri", "trid", "penta", "octa", "star", "ring", "shield", "leaf", "drop", "cross"];
+  const SHAPES = ["circle", "square", "hex", "hexh", "diamond", "tri", "trid", "penta", "octa", "star", "ring", "shield", "leaf", "drop", "cross", "hepta", "kite", "para", "burst", "arch"];   // v183 · +5 formas
   const CLAP = "<path d='M4 10h16v9.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19.5z'/><path d='m4 10-.6-3.2 15.6-3 .6 3.2z'/>";
   const PEOPLE = "<circle cx='9' cy='9' r='3'/><path d='M3.5 19c.6-3 2.8-4.5 5.5-4.5s4.9 1.5 5.5 4.5'/><circle cx='17' cy='10' r='2.3'/><path d='M15.5 14.6c2.5-.3 4.3 1.1 5 4.4'/>";
   const formaDe = (g) => (META && META.grupoForma && META.grupoForma[g]) || (GSTYLE[g] || [])[0] || "circle";
@@ -18219,7 +18258,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   // Ventana del integrante: red arriba; a la izquierda carga, grupo y tareas; a la derecha sus proyectos y debajo skills
   function armarCols(body) {
     const prj = body.querySelector(".c-r"), sk = body.querySelector(".sk-sec"); if (!prj || !sk) return;
-    const pc = body.querySelector(":scope > .pp-cols"); if (pc && pc.contains(prj) && pc.contains(sk)) return;
+    const pc = body.querySelector(":scope > .pp-cols"); if (pc && (pc.contains(prj) || (pc.contains(prj) && pc.contains(sk)))) return;   // v183 · el orden final lo da balancearPerfil
     const w = document.createElement("div"); w.className = "pp-cols"; const L1 = document.createElement("div"), R1 = document.createElement("div"); L1.className = "ppc"; R1.className = "ppc";
     w.append(L1, R1); const net = body.querySelector(".pxn-sec"); if (net) net.after(w); else body.prepend(w);
     Array.from(body.querySelectorAll(".c-l")).filter(x => !x.classList.contains("sk-sec")).forEach(x => L1.appendChild(x)); R1.append(prj, sk);
@@ -18234,7 +18273,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   const refrescar = () => { try { if (currentView === "team") renderTeam(); if (currentView === "home") renderHome(); } catch (e) { } };
 
   // ═════════ 3 · Nuevo grupo y ventana de grupo ═════════
-  const COLORES = ["#624AFF", "#F63DA9", "#FF9AC8", "#64FF61", "#61B3FF", "#DE7BFF", "#61FFFF", "#FB8847", "#F3FF57", "#FF644A", "#3FD0C9", "#B9B9C4"];
+  const COLORES = ["#624AFF", "#F63DA9", "#FF9AC8", "#64FF61", "#61B3FF", "#DE7BFF", "#61FFFF", "#FB8847", "#F3FF57", "#FF644A", "#3FD0C9", "#E11D48", "#9CA33A", "#B07A4A", "#B9B9C4"];
   const gm = document.createElement("div"); gm.className = "pxp-modal gm-modal"; gm.id = "pxp-grupo"; gm.setAttribute("role", "dialog"); gm.setAttribute("aria-modal", "true"); document.body.appendChild(gm);
   window.pxpGrupoCerrar = () => { gm.classList.remove("open"); gm.innerHTML = ""; };
   window.addEventListener("keydown", (e) => { if (e.key === "Escape" && gm.classList.contains("open")) { e.stopImmediatePropagation(); window.pxpGrupoCerrar(); } }, true);
@@ -19491,8 +19530,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   window.addEventListener("scroll", () => { if (mn) mnClose(); }, true);
 
   // ═════════ Grupos: una sola ventana para crear y editar (nombre, color, forma e integrantes) ═════════
-  const G_SHAPES = ["circle", "square", "hex", "hexh", "diamond", "tri", "trid", "penta", "octa", "star", "ring", "shield", "leaf", "drop", "cross"];
-  const G_PAL = ["#624AFF", "#8F80FF", "#B794F6", "#DE7BFF", "#F63DA9", "#FF5B80", "#FF644A", "#FB8847", "#FFB547", "#FFC800", "#F3FF57", "#C6F432", "#64FF61", "#00E0A4", "#7EE0C3", "#3FD0C9", "#61FFFF", "#61B3FF", "#4F7BFF", "#FFADBF", "#D4B996", "#B9B9C4", "#8E8E96", "#FFFFFF"];
+  const G_SHAPES = ["circle", "square", "hex", "hexh", "diamond", "tri", "trid", "penta", "octa", "star", "ring", "shield", "leaf", "drop", "cross", "hepta", "kite", "para", "burst", "arch"];
+  const G_PAL = ["#624AFF", "#8F80FF", "#B794F6", "#DE7BFF", "#F63DA9", "#FF5B80", "#FF644A", "#FB8847", "#FFB547", "#FFC800", "#F3FF57", "#C6F432", "#64FF61", "#00E0A4", "#7EE0C3", "#3FD0C9", "#61FFFF", "#61B3FF", "#4F7BFF", "#FFADBF", "#D4B996", "#E11D48", "#9CA33A", "#B07A4A", "#B9B9C4", "#8E8E96", "#FFFFFF"];
   const gf = document.createElement("div"); gf.className = "pxp-modal"; gf.id = "pxp-gform"; gf.style.zIndex = 1265;
   gf.innerHTML = `<div class="pm-box gf-box" role="dialog" aria-modal="true" aria-labelledby="gf-t"></div>`; document.body.appendChild(gf);
   gf.addEventListener("click", (e) => { if (e.target === gf) gfCerrar(); });
@@ -20155,25 +20194,35 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   }
   // Reparte las cajas del perfil entre las dos columnas para que no queden huecos (la lista de proyectos puede crecer)
   const RANK = (e) => (e.classList.contains("c-r") ? 0 : e.classList.contains("r1") ? 1 : e.classList.contains("pc-sec") ? 2.5 : e.classList.contains("r3") ? 2 : e.classList.contains("r2") ? 3 : e.classList.contains("sk-sec") ? 4 : e.classList.contains("lg-psec") ? 5 : 6);
+  // v183 · Orden del perfil: arriba sus proyectos (izquierda) y etapas (derecha); debajo el resto en dos columnas parejas;
+  //   al final el cronograma a todo el ancho. En celular, todo en una columna con ese mismo orden.
   function balancearPerfil() {
     const m = $("pxp-person"); if (!m || !m.classList.contains("open")) return;
     const body = m.querySelector(".pm-body"); if (!body) return;
-    // Cajas sueltas (por ejemplo, recién dibujadas tras un guardado) se meten en las columnas; la red y "Retirar" van a todo el ancho
-    const sueltas = Array.from(body.children).filter((e) => e.classList.contains("pm-sec") && !e.classList.contains("pxn-sec") && !e.classList.contains("ret-sec"));
-    let w = body.querySelector(":scope > .pp-cols");
-    if (!w && sueltas.length < 2) return;
-    if (!w) { w = document.createElement("div"); w.className = "pp-cols"; w.dataset.lay = "1"; w.innerHTML = '<div class="ppc"></div><div class="ppc"></div>'; const net = body.querySelector(":scope > .pxn-sec"); if (net) net.after(w); else body.prepend(w); }
-    const cols = w.querySelectorAll(":scope > .ppc"); if (cols.length < 2) return;
-    sueltas.forEach((e) => cols[0].appendChild(e));
-    const ret = body.querySelector(":scope > .ret-sec"); if (ret && ret !== body.lastElementChild) body.appendChild(ret);
+    const mk = (cls) => { const d = document.createElement("div"); d.className = "pp-cols " + cls; d.dataset.lay = "1"; d.innerHTML = '<div class="ppc"></div><div class="ppc"></div>'; return d; };
+    let w = body.querySelector(":scope > .pp-cols:not(.pp-b)");
+    const secs = Array.from(body.querySelectorAll(":scope > .pm-sec, :scope > .pp-cols > .ppc > .pm-sec")).filter((e) => !e.classList.contains("pxn-sec") && !e.classList.contains("ret-sec"));
+    if (!w && secs.length < 2) return;
+    if (!w) { w = mk("pp-a"); const net = body.querySelector(":scope > .pxn-sec"); if (net) net.after(w); else body.prepend(w); }
+    let w2 = body.querySelector(":scope > .pp-cols.pp-b"); if (!w2) { w2 = mk("pp-b"); w.after(w2); }
+    const c1 = w.querySelectorAll(":scope > .ppc"), c2 = w2.querySelectorAll(":scope > .ppc"); if (c1.length < 2 || c2.length < 2) return;
+    const prj = secs.find((e) => e.classList.contains("c-r")), et = secs.find((e) => e.classList.contains("pe-sec")), cr = secs.find((e) => e.classList.contains("pc-sec"));
+    const resto = secs.filter((e) => e !== prj && e !== et && e !== cr).sort((a, b) => RANK(a) - RANK(b));
     const una = getComputedStyle(w).gridTemplateColumns.split(" ").length < 2;
-    const all = [...cols[0].children, ...cols[1].children].map((e, i) => [e, i]).sort((a, b) => RANK(a[0]) - RANK(b[0]) || a[1] - b[1]).map((x) => x[0]);
-    // Orden de lectura (proyectos, carga, tareas, grupo, skills, logros): baja por la izquierda y sigue por la derecha, cortando donde las columnas queden más parejas
-    const hs = all.map((e) => e.offsetHeight + 16), tot = hs.reduce((q, x) => q + x, 0); let corte = 1, mejor = Infinity, acc = 0;
-    hs.forEach((x, i) => { acc += x; const d = Math.abs(acc - (tot - acc)); if (i < hs.length - 1 && !all[i + 1].classList.contains("pc-sec") && d < mejor - 0.5) { mejor = d; corte = i + 1; } });
-    const dest = una ? [all, []] : [all.slice(0, corte), all.slice(corte)];   // en celular todo en una columna, en el mismo orden
-    if (dest.every((d, i) => d.length === cols[i].children.length && d.every((e, j) => cols[i].children[j] === e))) return;
-    dest.forEach((d, i) => d.forEach((e) => cols[i].appendChild(e)));
+    let L = [], R = [];
+    if (!una && resto.length) {   // reparte el resto para que las dos columnas queden parejas, sin cambiar el orden de lectura
+      const hs = resto.map((e) => e.offsetHeight + 16), tot = hs.reduce((q, x) => q + x, 0); let corte = 1, mejor = Infinity, acc = 0;
+      hs.forEach((x, i) => { acc += x; const d = Math.abs(acc - (tot - acc)); if (i < hs.length - 1 && d < mejor - 0.5) { mejor = d; corte = i + 1; } });
+      L = resto.slice(0, corte); R = resto.slice(corte);
+    }
+    const plan = una ? [[c1[0], [prj, et, ...resto, cr].filter(Boolean)], [c1[1], []], [c2[0], []], [c2[1], []]] : [[c1[0], [prj].filter(Boolean)], [c1[1], [et].filter(Boolean)], [c2[0], L], [c2[1], R]];
+    const igual = plan.every(([col, d]) => d.length === col.children.length && d.every((e, j) => col.children[j] === e));
+    if (!igual) plan.forEach(([col, d]) => d.forEach((e) => col.appendChild(e)));
+    if (cr && !una) { cr.classList.add("pp-full"); if (cr.parentElement !== body || cr.previousElementSibling !== w2) w2.after(cr); }
+    else if (cr) cr.classList.remove("pp-full");
+    w2.hidden = !(c2[0].children.length || c2[1].children.length);
+    body.querySelectorAll(":scope > .pp-cols").forEach((x) => { if (x !== w && x !== w2 && !x.querySelector(".pm-sec")) x.remove(); });
+    const ret = body.querySelector(":scope > .ret-sec"); if (ret && ret !== body.lastElementChild) body.appendChild(ret);
   }
   if (window.pxpOnDom) pxpOnDom(() => { try { balancearPerfil(); } catch (e) { console.error(e); } }, { childList: true, subtree: true });
   // Tarjeta flotante al pasar el cursor (o tocar) un logro del perfil: qué es, en qué nivel y por qué se ganó
