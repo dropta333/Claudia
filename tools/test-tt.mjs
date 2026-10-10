@@ -1,0 +1,29 @@
+// Prueba v166: time table en PDF · vistas Calendario y Gantt, idioma, tonos por mes y logo
+import { createRequire } from "node:module"; import { execSync } from "node:child_process"; import path from "node:path";
+const req = createRequire(import.meta.url); let pw; try { pw = req("playwright"); } catch { pw = req(execSync("npm root -g").toString().trim() + "/playwright"); }
+const b = await pw.chromium.launch(); const page = await (await b.newContext({ viewport: { width: 1440, height: 1000 } })).newPage();
+const errs = []; page.on("pageerror", e => errs.push(e.message)); page.on("console", m => { if (m.type() === "error") errs.push(m.text()); });
+await page.goto("file://" + path.resolve("dist/preview.html")); await page.waitForTimeout(700);
+await page.evaluate(() => { window.pxpSaveBase = function () { }; try { localStorage.setItem("pxp_lg_off", "1"); } catch (e) { } enterApp({ name: "Bastián Torres" }, "preview"); });
+await page.waitForTimeout(1500); await page.evaluate(() => { for (let i = 0; i < 4; i++) try { pxpLogroCerrar(); } catch (e) { } });
+const ok = [], fail = []; const check = (n, c) => (c ? ok : fail).push(n);
+const K = "CASO OREO SABORES";
+await page.evaluate(k => { PROJECTS[k].entregaFinal = "2026-11-09"; pxpRepOpen("tt", k); }, K); await page.waitForTimeout(2500);
+const ops = () => page.evaluate(() => { const S = pxpRepS(); return S && S.rec ? S.rec.pages.map(p => p.map(o => o.t === "text" ? o.s : o.t === "img" ? "IMG" : o.t === "rect" ? "R:" + o.fill : "").join("|")).join("§") : ""; });
+let t = await ops();
+check("calendario con días de la semana", /LUNES/.test(t) && /MIÉRCOLES/.test(t));
+check("título y cabecera", /TIME TABLE · CRONOGRAMA DE PRODUCCIÓN/.test(t) && /CASO OREO/.test(t));
+check("logo en el pie", (await page.evaluate(() => { const S = pxpRepS(), p = S.rec.pages[0], H = S.rec.size[1]; return p.some(o => o.t === "img" && o.y > H - 40 && o.x > S.rec.size[0] - 120); })));
+check("meses con su tono de gris", /R:#f1f1f5|R:#F1F1F5/.test(t) && /R:#FFFFFF/.test(t));
+check("panel con Calendario y Gantt", await page.$$eval("#rp-opts .tt-v", x => x.length) === 2);
+await page.click("#rp-opts .tt-v:nth-child(2)"); await page.waitForTimeout(2500);
+t = await ops();
+check("vista Gantt con grupos", /PREPRODUCCIÓN|POSTPRODUCCIÓN/.test(t) && !/LUNES/.test(t));
+await page.click("#rp-opts .seg button:has-text('English')"); await page.waitForTimeout(2500);
+t = await ops();
+check("en inglés", /PRODUCTION SCHEDULE/.test(t) && /POST-PRODUCTION/.test(t));
+check("vista previa con 100 % y arrastre", await page.$("#rp-prev .rz-100") !== null);
+await page.click("#rp-prev .rz-100"); await page.waitForTimeout(300);
+check("100 % agranda la hoja", await page.evaluate(() => (window.__rpZ || 1) > 1));
+console.log(JSON.stringify({ ok: ok.length, fail, errs: errs.slice(0, 5) }, null, 1));
+await b.close(); process.exit(fail.length || errs.length ? 1 : 0);

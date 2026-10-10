@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v165** · 10 oct 2026 · Responsable: Bastián Torres
+Versión: **v166** · 10 oct 2026 · Responsable: Bastián Torres
 
 ## Cómo está armado ahora
 - **Una sola fuente:** `src/app.html`, con todo el CSS y las capas JS.
@@ -144,6 +144,14 @@ Versión: **v165** · 10 oct 2026 · Responsable: Bastián Torres
   - Cronograma: leyenda de grupos y de estados en una sola fila.
   - Piezas: "Reformato" pasa a "Adaptación de formato" (el mantenimiento convierte las guardadas) y se suma "Adaptación de región".
   - Bocetos del time table v2 en `bocetos/bocetos-v2.html`: cabecera oscura sobre hoja clara y dos vistas, Calendario (semanas, mañana/tarde, festivos) y Gantt.
+
+- **v166:** time table en PDF nuevo (capa 45, `B.custom.tt`).
+  - Cabecera oscura (título en Barlow Black, ficha con roles y entregables, fechas y avance) sobre hoja clara; logo de Publicis Production abajo a la derecha (`logoImg`).
+  - Dos vistas: **Calendario** (semanas lunes–domingo, mañana/tarde, festivos rayados, mes marcado) y **Gantt** (filas por grupo, barras y hitos con hora, hoy y entrega final).
+  - Cada mes con su tono de fondo (alterna blanco y gris, `MES_BG`) en las dos vistas.
+  - Panel: vista, idioma (es/en), color por grupo o tipo, mañana y tarde o día completo, sábados y domingos, responsables. Vista previa con −/+, Ajustar, **100 %** (tamaño real) y arrastrar para moverse (sirve para todos los reportes).
+  - Fuentes del PDF: se sumó `black` (Barlow Black, subconjunto latino, licencia OFL) en `src/vendor-fonts.js`.
+  - Pruebas: `node tools/test-tt.mjs`.
 
 ## No cambiar sin consultar
 - El ZIP de Netlify va sin datos, y no se guarda nada antes de cargar los datos del servidor.

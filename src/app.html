@@ -6135,6 +6135,19 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;tr
 .add-sg-h .i{width:16px;height:16px;color:#C79A00}
 .add-sg .em-note{margin:6px 0 10px!important}
 .add-sg .em-fs.sg{background:var(--surface)}
+/* ═════ v166 · Time table ═════ */
+.tt-views{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tt-v{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);transition:border-color .15s,box-shadow .15s}
+.tt-v .i{width:22px;height:22px;color:var(--muted);margin-bottom:4px}
+.tt-v b{font:700 14px/1 var(--sans)}
+.tt-v small{font:500 12px/1.3 var(--sans);color:var(--muted)}
+.tt-v:hover{border-color:var(--text)}
+.tt-v.on{border-color:var(--text);box-shadow:inset 0 0 0 1px var(--text)}
+.tt-v.on .i{color:var(--text)}
+.tt-v:focus-visible{outline:2px solid var(--brand)}
+#rp-prev{cursor:grab}
+#rp-prev.panning{cursor:grabbing;user-select:none}
+.rp-zoom .rz-100{font-weight:700}
 </style>
 </head>
 <body>
@@ -13912,6 +13925,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   const absH = (s, h) => ordHabil(nextWork(s, true)) * JOR + (isWork(s) ? h : 0);
   window.pxpEtJornada = JOR;
   window.pxpHorasAbs = absH;
+  window.pxpReloj = reloj;
   window.pxpEsHabil = isWork;
   const fH = (h) => String(Math.round(h * 10) / 10).replace(".", ",");
   const durTxt = (H) => H < JOR ? fH(H) + " h" : H % JOR ? fH(H) + " h · " + fH(H / JOR) + " d" : fH(H / JOR) + " d · " + fH(H) + " h";
@@ -16748,9 +16762,9 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   const fshort = (s, lang) => { if (!s) return "—"; const d = D(s); return lang === "en" ? `${RT.en.mshort[d.getMonth()]} ${d.getDate()}` : `${d.getDate()} ${RT.es.mshort[d.getMonth()]}`; };
 
   // ═════════ Medición de texto y grabadora de dibujo (una sola composición → PDF y vista previa) ═════════
-  const FONTS = { light: "BLight", reg: "BReg", semi: "BSemi", cond: "BCond", serif: "DMSerif" };
-  const SVGF = { light: ["Barlow", 300], reg: ["Barlow", 400], semi: ["Barlow", 600], cond: ["Barlow Condensed", 600], serif: ["DM Serif Display", 400] };
-  const regFonts = (d) => Object.keys(FONTS).forEach(k => { d.addFileToVFS(k + ".ttf", window.PXP_FONTS[k]); d.addFont(k + ".ttf", FONTS[k], "normal", "normal", "Identity-H"); });
+  const FONTS = { light: "BLight", reg: "BReg", semi: "BSemi", cond: "BCond", serif: "DMSerif", black: "BBlack" };
+  const SVGF = { light: ["Barlow", 300], reg: ["Barlow", 400], semi: ["Barlow", 600], cond: ["Barlow Condensed", 600], serif: ["DM Serif Display", 400], black: ["Barlow", 900] };
+  const regFonts = (d) => Object.keys(FONTS).filter(k => window.PXP_FONTS[k]).forEach(k => { d.addFileToVFS(k + ".ttf", window.PXP_FONTS[k]); d.addFont(k + ".ttf", FONTS[k], "normal", "normal", "Identity-H"); });
   let MD = null;
   const meas = () => { if (!MD) { MD = new window.jspdf.jsPDF({ unit: "pt", format: "a4" }); regFonts(MD); } return MD; };
   const tw = (s, font, size) => { const d = meas(); d.setFont(FONTS[font]); d.setFontSize(size); return d.getTextWidth(String(s)); };
@@ -17320,10 +17334,16 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   const ZS = [.6, .75, 1, 1.25, 1.5, 2, 2.5, 3];
   window.pxpRpZoom = (d) => {
     const z = window.__rpZ || 1, i = ZS.findIndex(v => v >= z - 1e-6);
-    window.__rpZ = d === 0 ? 1 : ZS[Math.max(0, Math.min(ZS.length - 1, (i < 0 ? 2 : i) + d))];
+    if (d === "real") { const pg = document.querySelector("#rp-prev .rp-page"); if (!pg) return; const fit = pg.getBoundingClientRect().width / z, real = (pg.classList.contains("land") ? 841.89 : 595.28) * 96 / 72; window.__rpZ = Math.round(real / fit * 100) / 100; }
+    else window.__rpZ = d === 0 ? 1 : ZS[Math.max(0, Math.min(ZS.length - 1, (i < 0 ? 2 : i) + d))];
     const g = document.querySelector("#rp-prev .rp-pgs"), v = document.querySelector("#rp-prev .rz-v");
     if (g) g.style.setProperty("--rpz", window.__rpZ); if (v) v.textContent = Math.round(window.__rpZ * 100) + "%";
   };
+  // v166 · Arrastrar la hoja para moverse (como una mano)
+  let pan = null;
+  document.addEventListener("pointerdown", (e) => { const pv = e.target.closest && e.target.closest("#rp-prev"); if (!pv || e.button !== 0 || e.target.closest("button,.rp-zoom") || (pv.scrollWidth <= pv.clientWidth && pv.scrollHeight <= pv.clientHeight)) return; pan = { pv, x: e.clientX, y: e.clientY, l: pv.scrollLeft, t: pv.scrollTop }; pv.classList.add("panning"); e.preventDefault(); });
+  document.addEventListener("pointermove", (e) => { if (!pan) return; pan.pv.scrollLeft = pan.l - (e.clientX - pan.x); pan.pv.scrollTop = pan.t - (e.clientY - pan.y); });
+  document.addEventListener("pointerup", () => { if (pan) { pan.pv.classList.remove("panning"); pan = null; } });
   document.addEventListener("wheel", (e) => { if (!(e.ctrlKey || e.metaKey) || !e.target.closest || !e.target.closest("#rp-prev")) return; e.preventDefault(); window.pxpRpZoom(e.deltaY < 0 ? 1 : -1); }, { passive: false });
   window.pxpRepRepaint = () => { const o = $("rp-opts"); if (o) o.innerHTML = optsHtml(); };
   window.pxpRepRegen = (d) => regen(d || 60);
@@ -17369,7 +17389,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
         if (my !== seq || S !== s) return; s.rec = res.rec; s.res = res;
         const pv = $("rp-prev"); if (!pv) return; const n = res.rec.pages.length;
         pv.innerHTML = (res.omitted && res.omitted.length && s.kind === "project" ? `<div class="rp-warn">${esc(tr(s.lang, "omitted", { x: res.omitted.join(", ") }))}</div>` : "") + (s.kind === "client" && res.omitted && res.omitted.length ? `<div class="rp-warn">${esc(L(`Para mantener 2 páginas, ${res.omitted[0]} proyectos se resumen en una línea.`, `To keep it to 2 pages, ${res.omitted[0]} projects are summarized in one line.`))}</div>` : "")
-          + `<div class="rp-zoom" role="group" aria-label="Zoom de la vista previa"><button type="button" onclick="pxpRpZoom(-1)" aria-label="Alejar">−</button><button type="button" class="rz-v" onclick="pxpRpZoom(0)" title="Ajustar al ancho">${Math.round((window.__rpZ || 1) * 100)}%</button><button type="button" onclick="pxpRpZoom(1)" aria-label="Acercar">+</button><button type="button" class="rz-fit" onclick="pxpRpZoom(0)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4M8.5 11h5M11 8.5v5"/></svg>Ajustar</button></div><div class="rp-pgs" style="--rpz:${window.__rpZ || 1}">${res.rec.pages.map(ops => pageSVG(ops, res.rec.size)).join("")}</div><p class="rp-pn">${n} ${L(n === 1 ? "página" : "páginas", n === 1 ? "page" : "pages")} · A4${res.rec.size && res.rec.size[0] > res.rec.size[1] ? " " + L("horizontal", "landscape") : ""}</p>`;
+          + `<div class="rp-zoom" role="group" aria-label="Zoom de la vista previa"><button type="button" onclick="pxpRpZoom(-1)" aria-label="Alejar">−</button><button type="button" class="rz-v" onclick="pxpRpZoom(0)" title="Ajustar al ancho">${Math.round((window.__rpZ || 1) * 100)}%</button><button type="button" onclick="pxpRpZoom(1)" aria-label="Acercar">+</button><button type="button" class="rz-fit" onclick="pxpRpZoom(0)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4M8.5 11h5M11 8.5v5"/></svg>Ajustar</button><button type="button" class="rz-100" onclick="pxpRpZoom('real')" title="Tamaño real">100 %</button></div><div class="rp-pgs" style="--rpz:${window.__rpZ || 1}">${res.rec.pages.map(ops => pageSVG(ops, res.rec.size)).join("")}</div><p class="rp-pn">${n} ${L(n === 1 ? "página" : "páginas", n === 1 ? "page" : "pages")} · A4${res.rec.size && res.rec.size[0] > res.rec.size[1] ? " " + L("horizontal", "landscape") : ""}</p>`;
         const b = $("rp-dl"); if (b) b.disabled = false;
       } catch (e) { console.error(e); const pv = $("rp-prev"); if (pv && my === seq) pv.innerHTML = `<div class="rp-load err">${L("No se pudo preparar el reporte. Intenta de nuevo.", "The report could not be prepared. Please try again.")}</div>`; }
     }, delay || 0);
@@ -20078,69 +20098,264 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   const ttTipo = (e) => e.tt === "global" ? "revision" : e.tt && TT[e.tt] ? e.tt : ({ proceso: "proceso", revision: "revision", entrega: "envio" })[pxpClaseEtapa(e)];
   window.pxpTTTipo = ttTipo;
   window.pxpTTSet = async (k, i, v) => { const p = PROJECTS[k]; if (!p || !p.etapas[i]) return; const e = p.etapas[i]; delete e.tt; if (v === "auto") delete e.clase; else e.clase = ({ proceso: "proceso", revision: "revision", envio: "entrega" })[v] || "proceso"; pxpRepRepaint(); pxpRepRegen(); await saveState(); };
+  // v166 · Time table: cabecera oscura sobre hoja clara · vistas Calendario (semanas, mañana/tarde) y Gantt · logo abajo a la derecha
+  const TTX = {
+    es: { kick: "Time table · Cronograma de producción", rng: "Del · al", gen: "Generado el", wd: ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sáb", "Dom"], wd1: ["D", "L", "M", "M", "J", "V", "S"], m: ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sept", "oct", "nov", "dic"], fest: "Festivo", ef: "Entrega final", pre: "Preproducción", rodaje: "Rodaje", post: "Postproducción", proc: "Proceso", rev: "Revisión", aj: "Ajustes", ent: "Entrega", ampm: "mañana · tarde", etapas: "etapas", etapa: "etapa", more: "más", ep: "Productor(a) ejecutivo(a)", dp: "Director de post", pm: "Project Manager", ag: "Agencia", entreg: "Entregables", ref: "Referencia", empty: "Este proyecto aún no tiene etapas con fechas.", listo: "listo", de: "de", d: "d", hoy: "Hoy" },
+    en: { kick: "Time table · Production schedule", rng: "From · to", gen: "Generated on", wd: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Sat", "Sun"], wd1: ["S", "M", "T", "W", "T", "F", "S"], m: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], fest: "Holiday", ef: "Final delivery", pre: "Pre-production", rodaje: "Shoot", post: "Post-production", proc: "Process", rev: "Review", aj: "Changes", ent: "Delivery", ampm: "morning · afternoon", etapas: "stages", etapa: "stage", more: "more", ep: "Executive producer", dp: "Post director", pm: "Project manager", ag: "Agency", entreg: "Deliverables", ref: "Reference", empty: "This project has no dated stages yet.", listo: "done", de: "of", d: "d", hoy: "Today" },
+  };
+  const GC = { pre: "#1FB58F", rodaje: "#FB8847", post: VIOLET }, REVC = "#1E88E5", AJC = "#E5483A", ENTC = "#E0A100";
+  const mix = (c, t, base) => { const a = String(c).replace("#", ""), b = String(base || "#FFFFFF").replace("#", ""); const p = (s, i) => parseInt(s.slice(i, i + 2), 16); return "#" + [0, 2, 4].map(i => Math.round(p(a, i) * t + p(b, i) * (1 - t)).toString(16).padStart(2, "0")).join(""); };
+  const reloj = (h) => { const r = h < 4 - 1e-9 ? 8.5 + h : 9.5 + h, hh = Math.floor(r + 1e-6), mm = Math.round((r - hh) * 60); return hh + ":" + String(mm).padStart(2, "0"); };
+  const corto = (n) => { n = String(n || "").trim(); const m = /^(Cliente|Agencia|Externo):\s*(.*)$/i.exec(n); if (m) return m[2]; const w = n.split(/\s+/); return w[0] ? w[0][0] + w[0].slice(1).toLowerCase() : ""; };
+  // Diagonales dentro de un rectángulo (festivos y fines de semana)
+  function rayas(rec, x, y, w, h, step, color) {
+    for (let k = -h; k < w; k += step) {
+      let x1 = x + k, y1 = y + h, x2 = x + k + h, y2 = y;
+      if (x1 < x) { y1 -= (x - x1); x1 = x; } if (x2 > x + w) { y2 += (x2 - (x + w)); x2 = x + w; }
+      if (x2 - x1 > .3) rec.line({ x1, y1, x2, y2, stroke: color || "#E2E2E8", lw: .45 });
+    }
+  }
+  // v166 · Cada mes con su tono: alternan blanco y gris para ver en qué mes cae cada etapa
+  const MES_BG = (d, finde) => (+d.slice(5, 7)) % 2 ? (finde ? "#E9E9EF" : "#F1F1F5") : (finde ? "#F6F6F9" : "#FFFFFF");
+  const diamante = (rec, cx, cy, r, fill, stroke, lw) => rec.poly({ pts: [[cx, cy - r], [cx + r, cy], [cx, cy + r], [cx - r, cy]], fill: fill || "none", stroke: stroke || "none", lw: lw || .9 });
+  // Eventos del proyecto: etapas de proceso (barras) e hitos de revisión y entrega (con su hora)
+  function ttDatos(s) {
+    const k = s.key, p = getProjectDisplay(k), T = TTX[s.lang] || TTX.es;
+    const P = (window.pxpPlanEtapas ? pxpPlanEtapas(p) : []).filter(x => x.ini && x.fin);
+    const ent = (PROJECTS[k] || {}).entregaFinal || "";
+    const iEnts = P.filter(x => pxpClaseEtapa(x.e) === "entrega").map(x => x.i), ultEnt = iEnts[iEnts.length - 1];
+    const ev = P.map((x, n) => {
+      const cl = pxpClaseEtapa(x.e), g = pxpFaseEtapa(x.e), nm = x.e.nombre || T.etapa, st = x.e.estado || "pendiente";
+      let kind = cl === "proceso" ? (/ajuste/i.test(nm) || st === "ajustes" ? "aj" : "proc") : cl === "revision" ? (st === "ajustes" ? "aj" : "rev") : ((x.i === ultEnt && (!ent || x.ini >= ent || /final/i.test(nm))) || /final/i.test(nm) ? "fin" : "ent");
+      const col = kind === "proc" ? (s.color === "tipo" ? VIOLET : GC[g] || VIOLET) : kind === "aj" ? AJC : kind === "rev" ? REVC : kind === "ent" ? ENTC : INK;
+      return { x, n: n + 1, nm, g, cl, kind, col, mile: cl !== "proceso", done: st === "listo", who: pxpResps(x.e).map(corto).filter(Boolean).join(", ") };
+    });
+    if (ent && !ev.some(e => e.kind === "fin" && e.x.ini === ent)) ev.push({ x: { ini: ent, fin: ent, hi: 7, hf: 8, horas: 1 }, n: ev.length + 1, nm: T.ef, g: "post", cl: "entrega", kind: "fin", col: INK, mile: true, extra: true, who: "" });
+    let a = [P.map(x => x.ini).sort()[0], p.fechaInicio].filter(Boolean).sort()[0] || hoy(), z = [P.map(x => x.fin).sort().pop(), ent].filter(Boolean).sort().pop() || hoy();
+    return { p, P, ev, ent, a, z, T };
+  }
+  async function ttCabecera(rec, W, s, D0) {
+    const { p, P, a, z, T } = D0, k = s.key, HB = 111;
+    rec.rect({ x: 0, y: 0, w: W, h: HB, fill: BAND });
+    rec.rect({ x: 0, y: HB, w: W, h: 2.4, fill: VIOLET }); rec.rect({ x: 0, y: HB, w: 82, h: 2.4, fill: LIME });
+    rec.text({ s: T.kick.toUpperCase(), x: 27, y: 25, font: "cond", size: 7.8, color: LIME, cs: 1.5 });
+    const tl = wrap(String(p.nombre || k).toUpperCase(), "black", 26, 222, 2);
+    tl.forEach((l, i) => rec.text({ s: l, x: 26, y: (tl.length > 1 ? 55 : 66) + i * 23.5, font: "black", size: 26, color: "#FFFFFF" }));
+    const cli = [p.cliente, p.marca].filter(Boolean).join(" · ");
+    if (cli) { rec.circle({ x: 30.5, y: 97.2, r: 3, fill: window.pxpClientColor && p.cliente ? pxpClientColor(p.cliente) : VIOLET }); rec.text({ s: clip(cli, "semi", 8, 210), x: 38, y: 100, font: "semi", size: 8, color: "#C9C9D2" }); }
+    // Ficha: roles del proyecto y entregables
+    const rp = (key) => (window.pxpRolePeople ? pxpRolePeople(p, key) : []).filter(Boolean);
+    const F = [[T.ep, rp("ep")], [T.dp, rp("directorPost")], [T.pm, (p.pms || []).concat(rp("coordinador"))], [T.ag, p.agencia ? [p.agencia] : []]].filter(f => f[1].length).slice(0, 4);
+    if (!F.length) F.push([T.ref, [p.nombre || k]]);
+    const det = p.piezasDet || [], entr = det.map(x => `${+x.cant || 1} × ${x.hero ? "Hero " + (x.tipo || "") : x.deriv || x.tipo || ""}${x.dur ? " " + x.dur : ""}${x.formato ? " " + x.formato : ""}`.replace(/\s+/g, " ").trim()).join(" · ");
+    const mx = 266; rec.line({ x1: mx - 16, y1: 18, x2: mx - 16, y2: 100, stroke: "#26262E", lw: .8 });
+    F.forEach(([l, v], i) => { const cx = mx + (i % 2) * 182, cy = 24 + Math.floor(i / 2) * 27; rec.text({ s: l.toUpperCase(), x: cx, y: cy, font: "cond", size: 6.2, color: "#8A8A96", cs: 1.2 }); rec.text({ s: clip(v.join(", "), "semi", 9, 172), x: cx, y: cy + 11.5, font: "semi", size: 9, color: "#FFFFFF" }); });
+    if (entr) { const cy = 24 + Math.ceil(F.length / 2) * 27; rec.text({ s: T.entreg.toUpperCase(), x: mx, y: cy, font: "cond", size: 6.2, color: "#8A8A96", cs: 1.2 }); rec.text({ s: clip(entr, "semi", 9, 355), x: mx, y: cy + 11.5, font: "semi", size: 9, color: LIME }); }
+    // Fechas y avance
+    const fd = (d) => `${+d.slice(8, 10)} ${T.m[+d.slice(5, 7) - 1]}`, R = W - 27;
+    rec.text({ s: T.rng.toUpperCase(), x: R, y: 24, font: "cond", size: 6.2, color: "#8A8A96", cs: 1.2, align: "r" });
+    const e2 = fd(z), e1 = fd(a), w2 = tw(e2, "cond", 19), ax = R - w2 - 8;
+    rec.text({ s: e2, x: R, y: 46, font: "cond", size: 19, color: LIME, align: "r" });
+    rec.line({ x1: ax - 12, y1: 40, x2: ax, y2: 40, stroke: "#FFFFFF", lw: 1.1 }); rec.line({ x1: ax - 3.5, y1: 36.6, x2: ax, y2: 40, stroke: "#FFFFFF", lw: 1.1 }); rec.line({ x1: ax - 3.5, y1: 43.4, x2: ax, y2: 40, stroke: "#FFFFFF", lw: 1.1 });
+    rec.text({ s: e1, x: ax - 19, y: 46, font: "cond", size: 19, color: "#FFFFFF", align: "r" });
+    const gl = s.lang === "en" ? `${T.gen} ${T.m[+hoy().slice(5, 7) - 1]} ${+hoy().slice(8)}, ${hoy().slice(0, 4)}` : `${T.gen} ${fLargo(hoy())}`;
+    rec.text({ s: gl, x: R, y: 59, font: "light", size: 7, color: "#8A8A96", align: "r" });
+    if (P.length) { const ok = P.filter(x => x.e.estado === "listo").length, pct = Math.round(ok / P.length * 100), bw = 120; rec.rect({ x: R - bw, y: 86, w: bw, h: 3.4, r: 1.7, fill: "#2A2A33" }); if (pct) rec.rect({ x: R - bw, y: 86, w: Math.max(3.4, bw * pct / 100), h: 3.4, r: 1.7, fill: LIME }); rec.text({ s: `${pct} % ${T.listo} · ${ok} ${T.de} ${P.length} ${T.etapas}`, x: R, y: 100, font: "semi", size: 7.4, color: "#C9C9D2", align: "r" }); }
+    return HB + 2.4;
+  }
+  async function ttPie(rec, W, H, s, D0, pg, extra) {
+    const T = D0.T, y = H - 18;
+    rec.line({ x1: 27, y1: H - 34, x2: W - 27, y2: H - 34, stroke: LINE, lw: .6 });
+    let x = 27; const sw = (draw, label) => { draw(x, y - 5.6); x += 17; rec.text({ s: label, x, y, font: "reg", size: 6.8, color: MUTED }); x += tw(label, "reg", 6.8) + 11; };
+    const barra = (c) => (bx, by) => rec.rect({ x: bx, y: by, w: 12, h: 6.4, r: 2, fill: c });
+    if (s.color !== "tipo") [["pre", T.pre], ["rodaje", T.rodaje], ["post", T.post]].forEach(([g, l]) => sw(barra(GC[g]), l)); else sw(barra(VIOLET), T.proc);
+    rec.line({ x1: x - 4, y1: y - 7, x2: x - 4, y2: y + 1, stroke: LINE, lw: .6 }); x += 5;
+    sw((bx, by) => diamante(rec, bx + 6, by + 3.2, 3.6, "#FFFFFF", REVC, 1), T.rev);
+    sw((bx, by) => rec.rect({ x: bx, y: by, w: 12, h: 6.4, r: 2, fill: "#FFFFFF", stroke: AJC, lw: .8 }), T.aj);
+    sw((bx, by) => diamante(rec, bx + 6, by + 3.2, 3.6, ENTC), T.ent);
+    sw((bx, by) => diamante(rec, bx + 6, by + 3.2, 3.8, INK), T.ef);
+    sw((bx, by) => { rec.rect({ x: bx, y: by, w: 12, h: 6.4, fill: "#F3F3F6", stroke: "#DDDDE4", lw: .4 }); rayas(rec, bx, by, 12, 6.4, 2.2, "#C9C9D2"); }, T.fest);
+    if (extra) { rec.text({ s: extra, x, y, font: "semi", size: 6.8, color: INK }); }
+    const logo = await logoImg("#17171C", 640).catch(() => null);
+    let lx = W - 27;
+    if (logo) { const lh = 28, lw = lh * logo.ratio; lx = W - 27 - lw; rec.img({ src: logo.src, fmt: "PNG", x: lx, y: H - 32, w: lw, h: lh }); }
+    rec.text({ s: `${pg}/{n}`, x: lx - 12, y, font: "semi", size: 6.8, color: MUTED, align: "r" });
+  }
+  // ── Vista Calendario ──
+  async function ttCalendario(rec, W, H, s, D0) {
+    const { ev, ent, T } = D0, nd = s.fines ? 7 : 5, wk = s.fines ? .5 : 0, X0 = 27, X1 = W - 27, unit = (X1 - X0) / (5 + 2 * wk);
+    const cw = (i) => i >= 5 ? unit * wk : unit, cx = (i) => X0 + (i < 5 ? i * unit : 5 * unit + (i - 5) * unit * wk);
+    let a = addD(D0.a, -((D(D0.a).getDay() + 6) % 7)), z = addD(D0.z, 6 - ((D(D0.z).getDay() + 6) % 7));
+    const semanas = []; for (let m = a; m <= z; m = addD(m, 7)) semanas.push(m);
+    // Lo que pasa cada día, en la mañana, la tarde o todo el día
+    const porDia = {};
+    ev.forEach(o => {
+      const x = o.x;
+      if (o.mile) { const d = x.ini; (porDia[d] = porDia[d] || []).push({ o, slot: !s.franja || o.extra ? "full" : (x.hi || 0) < 4 - 1e-9 ? "am" : "pm", hora: o.extra ? "" : reloj(x.hi || 0) }); return; }
+      for (let d = x.ini; d <= x.fin; d = addD(d, 1)) {
+        if (!habil(d)) continue;
+        const h0 = d === x.ini ? x.hi || 0 : 0, h1 = d === x.fin ? (x.hf == null ? 8 : x.hf) : 8; if (h1 <= h0 + 1e-9) continue;
+        const slot = !s.franja ? "full" : h0 < 4 - 1e-9 && h1 > 4 + 1e-9 ? "full" : h0 < 4 - 1e-9 ? "am" : "pm";
+        (porDia[d] = porDia[d] || []).push({ o, slot, hora: "" });
+      }
+    });
+    const ord = { am: 0, full: 1, pm: 2 };
+    Object.values(porDia).forEach(L => L.sort((p, q) => ord[p.slot] - ord[q.slot] || p.o.n - q.o.n));
+    const Y0 = await ttCabecera(rec, W, s, D0) + 12, YH = 15, YB = H - 40;
+    const avail = YB - (Y0 + YH), porPag = Math.max(1, Math.min(semanas.length, Math.floor(avail / 54))), pags = Math.ceil(semanas.length / porPag);
+    const rowH = Math.min(132, avail / Math.min(porPag, semanas.length));
+    let pg = 1;
+    const fs = 6.5, lh = 7.6;
+    for (let pi = 0; pi < pags; pi++) {
+      if (pi) { await ttPie(rec, W, H, s, D0, pg, s.franja ? "AM / PM  " + T.ampm : ""); rec.add(); pg++; await ttCabecera(rec, W, s, D0); }
+      for (let i = 0; i < nd; i++) rec.text({ s: (i >= 5 ? T.wd[i] : T.wd[i]).toUpperCase(), x: cx(i) + 5, y: Y0 + 10, font: "cond", size: 6.6, color: MUTED, cs: 1.3 });
+      rec.line({ x1: X0, y1: Y0 + YH, x2: X1, y2: Y0 + YH, stroke: INK, lw: .9 });
+      semanas.slice(pi * porPag, (pi + 1) * porPag).forEach((m, wi) => {
+        const y = Y0 + YH + wi * rowH;
+        for (let i = 0; i < nd; i++) {
+          const d = addD(m, i), x = cx(i), w = cw(i), we = i >= 5, fest = !we && !habil(d), fuera = d < D0.a || d > D0.z;
+          rec.rect({ x, y, w, h: rowH, fill: MES_BG(d, we) });
+          if (fest) { rayas(rec, x, y, w, rowH, 5, "#E6E6EC"); rec.text({ s: T.fest.toUpperCase(), x: x + w / 2, y: y + rowH / 2 + 2.5, font: "cond", size: 6.8, color: "#9A9AA6", cs: 1.6, align: "c" }); }
+          if (i) rec.line({ x1: x, y1: y, x2: x, y2: y + rowH, stroke: LINE, lw: .5 });
+          // Número del día, mes cuando cambia y hoy
+          const num = String(+d.slice(8)), hoyD = d === hoy();
+          if (hoyD) { rec.circle({ x: x + 8.6, y: y + 8.2, r: 6.2, fill: VIOLET }); rec.text({ s: num, x: x + 8.6, y: y + 10.8, font: "cond", size: 7.6, color: "#FFFFFF", align: "c" }); }
+          else rec.text({ s: num, x: x + 5, y: y + 10.8, font: "cond", size: 8, color: fuera ? "#C3C3CC" : INK });
+          if (d.slice(8) === "01" || (wi === 0 && i === 0)) { const ml = T.m[+d.slice(5, 7) - 1].toUpperCase(), mw = tw(ml, "cond", 5.8) + 6, mx = x + 7 + tw(num, "cond", 8) + (hoyD ? 6 : 0); rec.rect({ x: mx, y: y + 3.6, w: mw, h: 8.4, r: 1.6, fill: INK }); rec.text({ s: ml, x: mx + mw / 2, y: y + 9.9, font: "cond", size: 5.8, color: "#FFFFFF", align: "c", cs: .5 }); }
+          if (fest) continue;
+          // Eventos del día
+          const L = porDia[d] || [], innerY = y + 15, innerH = rowH - 18, iw = w - 8;
+          let yy = innerY, shown = 0;
+          const caja = (it, hBox, lines) => {
+            const o = it.o, k = o.kind, bx = x + 4, txtC = k === "fin" ? "#FFFFFF" : k === "aj" ? AJC : INK;
+            const fill = k === "proc" ? mix(o.col, o.done ? .08 : .14) : k === "ent" ? mix(ENTC, .22) : k === "fin" ? INK : "#FFFFFF";
+            const stroke = k === "rev" ? mix(REVC, .7) : k === "aj" ? mix(AJC, .45) : null;
+            rec.rect({ x: bx, y: yy, w: iw, h: hBox, r: 2.4, fill, stroke: stroke || "none", lw: .6 });
+            rec.rect({ x: bx, y: yy, w: 1.9, h: hBox, fill: k === "fin" ? LIME : o.col });
+            let tx = bx + 5;
+            if (o.mile) { diamante(rec, tx + 2.6, yy + 5.6, 2.5, k === "rev" ? "#FFFFFF" : k === "fin" ? LIME : o.col, k === "rev" ? REVC : null, .8); tx += 7.5; }
+            lines.forEach((l, j) => rec.text({ s: l, x: tx, y: yy + 7.6 + j * lh, font: j < lines.nm ? "semi" : "light", size: j < lines.nm ? fs : 5.6, color: j < lines.nm ? txtC : (k === "fin" ? "#C9C9D2" : MUTED) }));
+            const tag = it.hora || (s.franja && it.slot !== "full" ? it.slot.toUpperCase() : "");
+            if (tag) rec.text({ s: tag, x: bx + iw - 3, y: yy + 7.6, font: "cond", size: 5.8, color: k === "fin" ? LIME : MUTED, align: "r" });
+          };
+          let conGente = !!s.gente;
+          const medir = (it) => {
+            const tag = it.hora || (s.franja && it.slot !== "full" ? it.slot.toUpperCase() : ""), tagW = tag ? tw(tag, "cond", 5.8) + 5 : 0;
+            const maxW = iw - 8 - (it.o.mile ? 7.5 : 0) - tagW, ls = wrap(it.o.nm, "semi", fs, maxW, w < 60 ? 2 : 3);
+            const who = conGente && it.o.who ? [clip(it.o.who, "light", 5.6, maxW)] : [];
+            const lines = ls.concat(who); lines.nm = ls.length; return { lines, h: lines.length * lh + 5 };
+          };
+          let ms = L.map(it => Object.assign(medir(it), { it }));
+          // Si no cabe todo, primero se quitan los nombres para que se vean todas las etapas del día
+          if (ms.length > 1 && ms.reduce((t, m) => t + m.h + 2.2, 0) > innerH + 1 && conGente) { conGente = false; ms = L.map(it => Object.assign(medir(it), { it })); }
+          // Un solo bloque de todo el día ocupa la celda
+          if (ms.length === 1 && ms[0].it.slot === "full" && !ms[0].it.o.mile) { const h1 = Math.max(ms[0].h, innerH - 1); caja(ms[0].it, Math.min(h1, innerH), ms[0].lines); continue; }
+          for (let j = 0; j < ms.length; j++) {
+            const rest = ms.length - j - 1, need = ms[j].h + (rest ? 9 : 0);
+            if (yy + need > innerY + innerH + 1 && j) { rec.text({ s: `+${ms.length - j} ${T.more}`, x: x + 6, y: Math.min(yy + 6.5, y + rowH - 2.5), font: "semi", size: 5.8, color: MUTED }); break; }
+            caja(ms[j].it, ms[j].h, ms[j].lines); yy += ms[j].h + 2.2; shown++;
+          }
+        }
+        rec.line({ x1: X0, y1: y + rowH, x2: X1, y2: y + rowH, stroke: LINE, lw: .5 });
+      });
+    }
+    await ttPie(rec, W, H, s, D0, pg, s.franja ? "AM / PM  " + T.ampm : "");
+  }
+  // ── Vista Gantt ──
+  async function ttGantt(rec, W, H, s, D0) {
+    const { ev, ent, T } = D0, X0 = 27, X1 = W - 27, LW = 168;
+    const dias = []; for (let d = D0.a; d <= D0.z; d = addD(d, 1)) dias.push(d);
+    const N = dias.length, dx = (X1 - X0 - LW) / N, gx = X0 + LW;
+    const pos = (d, h) => { let i = dias.indexOf(d); if (i < 0) i = d < D0.a ? 0 : N - 1; return gx + (i + (h || 0) / 8) * dx; };
+    const filas = []; [["pre", T.pre], ["rodaje", T.rodaje], ["post", T.post]].forEach(([g, l]) => { const L = ev.filter(o => o.g === g); if (!L.length) return; filas.push({ ph: g, l, n: L.length }); L.forEach(o => filas.push({ o })); });
+    const RH = 19.5, PH = 15, HH = 34, YB = H - 44;
+    const meses = []; dias.forEach((d, i) => { const k2 = d.slice(0, 7); if (!meses.length || meses[meses.length - 1].k !== k2) meses.push({ k: k2, i0: i, n: 0 }); meses[meses.length - 1].n++; });
+    let pg = 1, i0 = 0;
+    while (i0 < filas.length || pg === 1) {
+      const Y0 = await ttCabecera(rec, W, s, D0) + 12, yR = Y0 + HH;
+      // Encabezado de días
+      const m0 = dias[0], m1 = dias[N - 1];
+      rec.text({ s: (m0.slice(0, 7) === m1.slice(0, 7) ? `${T.m[+m0.slice(5, 7) - 1]} ${m0.slice(0, 4)}` : `${T.m[+m0.slice(5, 7) - 1]} – ${T.m[+m1.slice(5, 7) - 1]} ${m1.slice(0, 4)}`).toUpperCase(), x: X0, y: Y0 + 24, font: "cond", size: 7, color: MUTED, cs: 1.3 });
+      meses.forEach(mm => { const x = gx + mm.i0 * dx, w = mm.n * dx; rec.rect({ x, y: Y0, w, h: HH, fill: MES_BG(mm.k + "-01", false) }); const ml = `${T.m[+mm.k.slice(5, 7) - 1]}${mm.k.slice(0, 4) !== hoy().slice(0, 4) ? " " + mm.k.slice(0, 4) : ""}`.toUpperCase(); if (w > tw(ml, "cond", 6.8) + 8) rec.text({ s: ml, x: x + 4, y: Y0 + 8, font: "cond", size: 6.8, color: INK, cs: 1.2 }); if (mm.i0) rec.line({ x1: x, y1: Y0, x2: x, y2: Y0 + HH, stroke: INK, lw: .8 }); });
+      const paso = dx < 9 ? Math.ceil(9 / dx) : 1;
+      dias.forEach((d, i) => {
+        const x = gx + i * dx, wd = D(d).getDay(), we = wd === 0 || wd === 6, hoyD = d === hoy();
+        if (i % paso && !hoyD) return;
+        rec.text({ s: T.wd1[wd], x: x + dx / 2, y: Y0 + 17, font: "cond", size: 5.6, color: MUTED, align: "c" });
+        if (hoyD) { rec.rect({ x: x + dx / 2 - 7.5, y: Y0 + 20.5, w: 15, h: 10, r: 5, fill: VIOLET }); rec.text({ s: String(+d.slice(8)), x: x + dx / 2, y: Y0 + 28, font: "cond", size: 7.6, color: "#FFFFFF", align: "c" }); }
+        else rec.text({ s: String(+d.slice(8)), x: x + dx / 2, y: Y0 + 28, font: "cond", size: 8, color: we ? "#A9A9B4" : INK, align: "c" });
+      });
+      rec.line({ x1: X0, y1: yR, x2: X1, y2: yR, stroke: INK, lw: .9 });
+      // Filas de esta página
+      let y = yR; const ini = i0;
+      while (i0 < filas.length && y + (filas[i0].ph ? PH + RH : RH) <= YB) { y += filas[i0].ph ? PH : RH; i0++; }
+      const yEnd = y;
+      // Columnas: fines de semana y festivos
+      dias.forEach((d, i) => { const x = gx + i * dx, wd = D(d).getDay(), we = wd === 0 || wd === 6; rec.rect({ x, y: yR, w: dx, h: yEnd - yR, fill: MES_BG(d, we) }); if (we) rayas(rec, x, yR, dx, yEnd - yR, 4, "#E4E4EA"); else if (!habil(d)) rayas(rec, x, yR, dx, yEnd - yR, 3, "#DEDEE5"); rec.line({ x1: x, y1: yR, x2: x, y2: yEnd, stroke: d.slice(8) === "01" && i ? INK : LINE, lw: d.slice(8) === "01" && i ? .8 : .35 }); });
+      y = yR;
+      for (let r = ini; r < i0; r++) {
+        const f = filas[r];
+        if (f.ph) { rec.rect({ x: X0, y: y + 4.2, w: 6.4, h: 6.4, r: 1.3, fill: GC[f.ph] }); rec.text({ s: f.l.toUpperCase(), x: X0 + 11, y: y + 10.4, font: "cond", size: 7.4, color: INK, cs: 1.2 }); rec.text({ s: `${f.n} ${f.n === 1 ? T.etapa : T.etapas}`, x: X0 + 15 + tw(f.l.toUpperCase(), "cond", 7.4) + f.l.length * 1.2, y: y + 10.4, font: "light", size: 6.6, color: MUTED }); y += PH; continue; }
+        const o = f.o, x = o.x, gcol = GC[o.g] || VIOLET, bg = mix(INK, o.g === "pre" ? .018 : o.g === "rodaje" ? .04 : .065);
+        rec.rect({ x: X0, y, w: LW, h: RH, fill: bg }); rec.rect({ x: gx, y, w: X1 - gx, h: RH, fill: INK, a: o.g === "pre" ? .012 : o.g === "rodaje" ? .028 : .045 });
+        rec.line({ x1: X0, y1: y, x2: X1, y2: y, stroke: LINE, lw: .4 });
+        rec.rect({ x: X0, y, w: 2.2, h: RH, fill: gcol });
+        rec.text({ s: String(o.n).padStart(2, "0"), x: X0 + 7, y: y + 12.2, font: "cond", size: 6, color: MUTED });
+        const sub = [s.gente ? o.who : "", o.mile && !o.extra ? reloj(x.hi || 0) : ""].filter(Boolean).join(" · ");
+        rec.text({ s: clip(o.nm, "semi", 7.8, LW - 30), x: X0 + 20, y: y + (sub ? 9.2 : 12.4), font: "semi", size: 7.8, color: INK });
+        if (sub) rec.text({ s: clip(sub, "light", 6, LW - 30), x: X0 + 20, y: y + 16.2, font: "light", size: 6, color: MUTED });
+        const cy = y + RH / 2;
+        if (!o.mile) {
+          const a = pos(x.ini, x.hi || 0), b = Math.max(a + 3, pos(x.fin, x.hf == null ? 8 : x.hf)), bw = b - a;
+          const fill = o.kind === "aj" ? "#FFFFFF" : o.done ? mix(o.col, .3) : o.col;
+          rec.rect({ x: a + .5, y: cy - 5, w: bw - 1, h: 10, r: 3, fill, stroke: o.kind === "aj" ? AJC : "none", lw: .8 });
+          const dl = `${n1(Math.max(1, x.dias || 1))} ${T.d}`;
+          if (bw > tw(dl, "cond", 6.4) + 8) rec.text({ s: dl, x: a + 4, y: cy + 2.3, font: "cond", size: 6.4, color: o.kind === "aj" ? AJC : o.done ? INK : "#FFFFFF" });
+        } else {
+          const px = pos(x.ini, x.hi || 0), r = o.kind === "fin" ? 5 : 4.2;
+          if (o.kind === "fin") diamante(rec, px, cy, r + 1.6, "#FFFFFF", INK, .7);
+          diamante(rec, px, cy, r, o.kind === "rev" ? "#FFFFFF" : o.col, o.kind === "rev" || o.kind === "aj" ? o.col : null, 1.2);
+          const lab = o.nm.split(/\s+/)[0], hr = o.extra ? "" : reloj(x.hi || 0), lwid = tw(lab, "semi", 6.6) + (hr ? tw(hr, "cond", 6) + 4 : 0), izq = px + 8 + lwid > X1;
+          if (izq) { rec.text({ s: lab, x: px - 8 - (hr ? tw(hr, "cond", 6) + 4 : 0), y: cy + 2.3, font: "semi", size: 6.6, color: INK, align: "r" }); if (hr) rec.text({ s: hr, x: px - 8, y: cy + 2.3, font: "cond", size: 6, color: MUTED, align: "r" }); }
+          else { rec.text({ s: lab, x: px + 10, y: cy + 2.3, font: "semi", size: 6.6, color: INK }); if (hr) rec.text({ s: hr, x: px + 14 + tw(lab, "semi", 6.6), y: cy + 2.3, font: "cond", size: 6, color: MUTED }); }
+        }
+        y += RH;
+      }
+      rec.line({ x1: X0, y1: yEnd, x2: X1, y2: yEnd, stroke: LINE, lw: .4 });
+      // Hoy y entrega final
+      const th = hoy(); if (th >= D0.a && th <= D0.z) { const tx = pos(th, (window.pxpEsHabil && pxpEsHabil(th)) ? Math.max(0, Math.min(8, (new Date().getHours() + new Date().getMinutes() / 60) - (new Date().getHours() < 13 ? 8.5 : 9.5))) : 0); rec.line({ x1: tx, y1: yR - 3, x2: tx, y2: yEnd, stroke: VIOLET, lw: 1 }); }
+      if (ent && ent >= D0.a && ent <= D0.z) { const ex = pos(ent, 8); rec.line({ x1: ex, y1: yR, x2: ex, y2: yEnd + 3, stroke: INK, lw: .8, dash: [2.4, 1.8] }); const lb = T.ef.toUpperCase(), lw2 = tw(lb, "cond", 5.8) + 8; rec.rect({ x: Math.min(ex - lw2 / 2, X1 - lw2), y: yEnd + 3, w: lw2, h: 10, r: 1.6, fill: INK }); rec.text({ s: lb, x: Math.min(ex, X1 - lw2 / 2), y: yEnd + 10, font: "cond", size: 5.8, color: "#FFFFFF", align: "c", cs: .5 }); }
+      await ttPie(rec, W, H, s, D0, pg);
+      if (i0 >= filas.length) break;
+      rec.add(); pg++;
+    }
+  }
   B.custom.tt = {
-    init: (k) => ({ fines: true }),
+    init: (k) => ({ fines: true, vista: "cal", color: "grupo", franja: true, gente: true }),
     title: (s) => (PROJECTS[s.key] || {}).nombre || s.key,
     kicker: () => "Time table",
     file: (s) => `TT_${slug(((PROJECTS[s.key] || {}).cliente || "").toUpperCase())}_${slug((PROJECTS[s.key] || {}).nombre || s.key)}_${hoy().split("-").reverse().join("_")}`,
     opts(s, u) {
-      const p = getProjectDisplay(s.key), E = p.etapas || [];
-      return `<div class="rp-og"><h4>Incluir</h4>${u.tog("fines", s.fines, "Sábados y domingos", "Columnas angostas, como el formato original")}</div>
-        <div class="rp-og"><h4>Tipo de cada etapa</h4><p class="rp-note" style="margin-top:0">Define su color en el time table. Es el mismo tipo que se elige en cada etapa del proyecto; "Auto" lo decide por el nombre.</p>
-        <div class="tt-ops">${E.map((e, i) => `<div class="tt-op"><span title="${esc(e.nombre || "Etapa")}">${esc(e.nombre || "Etapa")}</span><select onchange="pxpTTSet('${ea(s.key)}',${i},this.value)" aria-label="Tipo"><option value="auto" ${!e.tt && !e.clase ? "selected" : ""}>Auto · ${({ proceso: "Proceso", envio: "Envío", revision: "Revisión" })[ttTipo({ nombre: e.nombre })]}</option>${Object.entries(TT).map(([v, [l]]) => `<option value="${v}" ${ttTipo(e) === v && (e.tt || e.clase) ? "selected" : ""}>${l}</option>`).join("")}</select></div>`).join("")}</div></div>`;
+      const V = [["cal", "Calendario", "Semanas, con mañana y tarde", "<rect x='3.5' y='5' width='17' height='15' rx='2'/><path d='M3.5 10h17M9 10v10M14.5 10v10M3.5 15h17M8 3v4M16 3v4'/>"], ["gantt", "Gantt", "Una fila por etapa, para ver el avance", "<path d='M4 6h7M7 11h9M11 16h9'/><path d='M4 3v18'/>"]];
+      return `<div class="rp-og"><h4>Vista</h4><div class="tt-views">${V.map(([v, l, sub, d]) => `<button type="button" class="tt-v${s.vista === v ? " on" : ""}" aria-pressed="${s.vista === v}" onclick="pxpTTo('vista','${v}')"><svg class="i" viewBox="0 0 24 24" aria-hidden="true">${d}</svg><b>${l}</b><small>${sub}</small></button>`).join("")}</div></div>
+        <div class="rp-og"><h4>Idioma</h4>${u.seg("pxpTTo_lang", s.lang, [["es", "Español"], ["en", "English"]])}</div>
+        <div class="rp-og"><h4>Color por</h4>${u.seg("pxpTTo_color", s.color, [["grupo", "Grupo de etapas"], ["tipo", "Tipo de etapa"]])}</div>
+        ${s.vista === "cal" ? `<div class="rp-og"><h4>Mostrar</h4>${u.seg("pxpTTo_franja", s.franja ? "1" : "0", [["1", "Mañana y tarde"], ["0", "Día completo"]])}${u.tog("fines", s.fines, "Sábados y domingos", "Columnas angostas")}</div>` : ""}
+        <div class="rp-og"><h4>Incluir</h4>${u.tog("gente", s.gente, "Responsables", "Quién hace o recibe cada etapa")}<p class="rp-note">Los colores salen del grupo y el tipo de cada etapa en el proyecto. La hora de revisiones y entregas es la que se eligió en cada hito.</p></div>`;
     },
     async build(s) {
       const W = 841.89, H = 595.28, rec = new Rec(); rec.size = [W, H]; rec.add();
-      const k = s.key, p = getProjectDisplay(k), P = (window.pxpPlanEtapas ? pxpPlanEtapas(p) : []).filter(x => x.ini && x.fin);
-      const ep = (window.pxpRolePeople ? pxpRolePeople(p, "ep") : [p.ep]).filter(Boolean).join(", ") || (p.pms || []).join(", ") || "—";
-      // Encabezado: banda + datos tipo Excel + convenciones
-      const logo = await logoImg("#FFFFFF", 600).catch(() => null);
-      const head = (first) => {
-        rec.rect({ x: 0, y: 0, w: W, h: 46, fill: BAND }); rec.rect({ x: 0, y: 46, w: W, h: 2, fill: VIOLET }); rec.rect({ x: 0, y: 46, w: 110, h: 2, fill: LIME });
-        if (logo) { const lh = 32, lw = lh * logo.ratio; rec.img({ src: logo.src, fmt: "PNG", x: 28, y: 7, w: lw, h: lh }); }
-        rec.text({ s: "TIME TABLE", x: W / 2, y: 31, font: "cond", size: 20, color: "#FFFFFF", align: "c", cs: 2 });
-        rec.text({ s: "Tráfico Post · Publicis Production", x: W - 28, y: 28, font: "light", size: 7.5, color: "#FFFFFF", align: "r", a: .7 });
-        if (!first) return 60;
-        const F = [["PRODUCTORA EJEC", ep], ["CLIENTE", p.cliente || "—"], ["REFERENCIA", p.nombre || k], ["FECHA", fLargo(hoy())]];
-        F.forEach(([l, v], i) => { const yy = 62 + i * 15; rec.rect({ x: 28, y: yy, w: 96, h: 13, fill: "#EFEFF4" }); rec.text({ s: l, x: 33, y: yy + 9.3, font: "semi", size: 7, color: MUTED, cs: .4 }); rec.rect({ x: 126, y: yy, w: 300, h: 13, stroke: LINE, lw: .5 }); rec.text({ s: clip(String(v).toUpperCase(), "semi", 8, 290), x: 131, y: yy + 9.5, font: "semi", size: 8, color: INK }); });
-        rec.text({ s: "CONVENCIONES", x: W - 28 - 230, y: 70, font: "semi", size: 7, color: MUTED, cs: .6 });
-        [...Object.values(TT), ["Festivo / fin de semana", "#EDEDF0", "#9A9AA5"]].forEach(([l, bg, bd], i) => { const yy = 76 + i * 12; rec.rect({ x: W - 28 - 230, y: yy, w: 22, h: 9, r: 2, fill: bg, stroke: bd, lw: .5 }); rec.text({ s: l.toUpperCase(), x: W - 28 - 202, y: yy + 7.3, font: "reg", size: 6.8, color: INK }); });
-        return 132;
-      };
-      // Días: desde el lunes de la primera etapa hasta el domingo de la última (o la entrega final)
-      const ent = (PROJECTS[k] || {}).entregaFinal;
-      let a = P.map(x => x.ini).sort()[0] || hoy(), z = [P.map(x => x.fin).sort().pop() || hoy(), ent || ""].filter(Boolean).sort().pop();
-      a = addD(a, -((D(a).getDay() + 6) % 7)); z = addD(z, 6 - ((D(z).getDay() + 6) % 7));
-      const semanas = []; for (let m = a; m <= z; m = addD(m, 7)) semanas.push(m);
-      const nd = s.fines ? 7 : 5, wWk = s.fines ? .55 : 0, unit = (W - 56) / (5 + 2 * wWk), cw = (i) => i >= 5 ? unit * wWk : unit, cx = (i) => 28 + [...Array(i)].reduce((t, _, j) => t + cw(j), 0);
-      const entradas = (d) => P.filter(x => x.ini <= d && x.fin >= d && habil(d)).map(x => ({ t: x.e.nombre || "Etapa", tipo: ttTipo(x.e), ent: ent && d === ent && false }));
-      const pad = 3, fs = 7.4, lh = 8.8;
-      const cajas = (d, i) => entradas(d).map(o => { const ls = wrap(o.t, "semi", fs, cw(i) - 2 * pad - 6, 3); return { o, ls, h: ls.length * lh + 6 }; });
-      let y = head(true), pg = 1, lastMes = "";
-      const diasHead = () => { for (let i = 0; i < nd; i++) { rec.rect({ x: cx(i), y, w: cw(i), h: 14, fill: i >= 5 ? "#3A3A44" : BAND }); rec.text({ s: i >= 5 ? DIAS[i].slice(0, 3) : DIAS[i], x: cx(i) + cw(i) / 2, y: y + 9.6, font: "semi", size: 7, color: "#FFFFFF", align: "c", cs: .5 }); } y += 16; };
-      diasHead();
-      semanas.forEach(m => {
-        const dias = [...Array(nd)].map((_, i) => addD(m, i)), cs = dias.map(cajas), alto = Math.max(34, 16 + Math.max(0, ...cs.map(c => c.reduce((t, b) => t + b.h + 2, 0))));
-        const mesKey = m.slice(0, 7) !== lastMes && (dias.find(d => d.slice(8) === "01") || !lastMes) ? (dias.find(d => d.slice(8) === "01") || m).slice(0, 7) : "";
-        const need = alto + (mesKey ? 16 : 0);
-        if (y + need > H - 34) { pie(rec, W, H, pg, "{n}", (p.nombre || k)); rec.add(); pg++; y = head(false); diasHead(); }
-        if (mesKey) { lastMes = mesKey; rec.text({ s: `${MES[+mesKey.slice(5) - 1].toUpperCase()} ${mesKey.slice(0, 4)}`, x: 28, y: y + 10, font: "cond", size: 10, color: VIOLET, cs: 1 }); y += 14; }
-        dias.forEach((d, i) => {
-          const we = i >= 5, fest = !we && !habil(d), x = cx(i), t = d === hoy();
-          rec.rect({ x, y, w: cw(i), h: alto, fill: we || fest ? "#EDEDF0" : "#FFFFFF", stroke: LINE, lw: .5 });
-          rec.text({ s: `${+d.slice(8)} ${MES[+d.slice(5, 7) - 1].slice(0, 3)}.${fest ? " · FESTIVO" : ""}`, x: x + cw(i) / 2, y: y + 10, font: t ? "semi" : "reg", size: 7, color: t ? VIOLET : fest ? RED : MUTED, align: "c" });
-          if (ent && d === ent) { rec.rect({ x: x + 1, y: y + 1, w: cw(i) - 2, h: alto - 2, stroke: VIOLET, lw: 1.2 }); rec.text({ s: "ENTREGA FINAL", x: x + cw(i) / 2, y: y + alto - 4, font: "semi", size: 5.8, color: VIOLET, align: "c", cs: .4 }); }
-          let yy = y + 15;
-          cs[i].forEach(b => { const [, bg, bd] = TT[b.o.tipo]; rec.rect({ x: x + pad, y: yy, w: cw(i) - 2 * pad, h: b.h, r: 3, fill: bg, stroke: bd, lw: .45 }); b.ls.forEach((l, j) => rec.text({ s: l, x: x + cw(i) / 2, y: yy + 7.6 + j * lh, font: "semi", size: fs, color: INK, align: "c" })); yy += b.h + 2; });
-        });
-        y += alto;
-      });
-      pie(rec, W, H, pg, pg, p.nombre || k);
+      const D0 = ttDatos(s);
+      if (s.vista === "gantt") await ttGantt(rec, W, H, s, D0); else await ttCalendario(rec, W, H, s, D0);
       rec.pages.forEach((ops, i) => ops.forEach(o => { if (o.t === "text" && o.s === `${i + 1}/{n}`) o.s = `${i + 1}/${rec.pages.length}`; }));
-      if (!P.length) rec.pages[0].push({ t: "text", s: "Este proyecto aún no tiene etapas con fechas.", x: W / 2, y: H / 2, font: "light", size: 12, color: MUTED, align: "c" });
+      if (!D0.P.length) rec.pages[0].push({ t: "text", s: D0.T.empty, x: W / 2, y: H / 2, font: "light", size: 12, color: MUTED, align: "c" });
       return { rec, omitted: [] };
     },
   };
+  window.pxpTTo = (k, v) => { const S = window.pxpRepS && pxpRepS(); if (!S) return; S[k] = v; window.pxpRepRepaint(); window.pxpRepRegen(60); };
+  window.pxpTTo_lang = (v) => window.pxpTTo("lang", v);
+  window.pxpTTo_color = (v) => window.pxpTTo("color", v);
+  window.pxpTTo_franja = (v) => window.pxpTTo("franja", v === "1");
 
   // ═════════ Tarjetas en la pestaña Reportes ═════════
   let ttSel = "";
