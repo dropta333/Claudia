@@ -20205,7 +20205,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const avail = YB - (Y0 + YH), porPag = Math.max(1, Math.min(semanas.length, Math.floor(avail / 54))), pags = Math.ceil(semanas.length / porPag);
     const rowH = Math.min(132, avail / Math.min(porPag, semanas.length));
     let pg = 1;
-    const fs = 8.2, lh = 9.4;
+    const fs = 9.5, lh = 10.8;   // v166 · nombre de la etapa a 9,5 pt
     for (let pi = 0; pi < pags; pi++) {
       if (pi) { await ttPie(rec, W, H, s, D0, pg, s.franja ? "AM / PM  " + T.ampm : ""); rec.add(); pg++; await ttCabecera(rec, W, s, D0); }
       for (let i = 0; i < nd; i++) rec.text({ s: (i >= 5 ? T.wd[i] : T.wd[i]).toUpperCase(), x: cx(i) + 5, y: Y0 + 10, font: "cond", size: 6.6, color: MUTED, cs: 1.3 });
@@ -20223,38 +20223,34 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
           else rec.text({ s: num, x: x + 5, y: y + 10.8, font: "cond", size: 8, color: fuera ? "#C3C3CC" : INK });
           if (d.slice(8) === "01" || (wi === 0 && i === 0)) { const ml = T.m[+d.slice(5, 7) - 1].toUpperCase(), mw = tw(ml, "cond", 5.8) + 6, mx = x + 7 + tw(num, "cond", 8) + (hoyD ? 6 : 0); rec.rect({ x: mx, y: y + 3.6, w: mw, h: 8.4, r: 1.6, fill: INK }); rec.text({ s: ml, x: mx + mw / 2, y: y + 9.9, font: "cond", size: 5.8, color: "#FFFFFF", align: "c", cs: .5 }); }
           if (fest) continue;
-          // Eventos del día
-          const L = porDia[d] || [], innerY = y + 15, innerH = rowH - 18, iw = w - 8;
-          let yy = innerY, shown = 0;
-          const caja = (it, hBox, lines) => {
+          // Eventos del día · v166: la celda se parte en mañana (arriba) y tarde (abajo) en mitades iguales;
+          // las etapas de cada mitad se reparten su espacio por igual. La de todo el día ocupa ambas.
+          const L = porDia[d] || [], innerY = y + 15, innerH = rowH - 17.5, iw = w - 8, gap = 2;
+          const caja = (it, by, hBox) => {
             const o = it.o, k = o.kind, bx = x + 4, txtC = k === "fin" ? "#FFFFFF" : k === "aj" ? AJC : INK;
             const fill = k === "proc" ? mix(o.col, o.done ? .08 : .14) : k === "ent" ? mix(ENTC, .22) : k === "fin" ? INK : "#FFFFFF";
             const stroke = k === "rev" ? mix(REVC, .7) : k === "aj" ? mix(AJC, .45) : null;
-            rec.rect({ x: bx, y: yy, w: iw, h: hBox, r: 2.4, fill, stroke: stroke || "none", lw: .6 });
-            rec.rect({ x: bx, y: yy, w: 1.9, h: hBox, fill: k === "fin" ? LIME : o.col });
+            rec.rect({ x: bx, y: by, w: iw, h: hBox, r: 2.4, fill, stroke: stroke || "none", lw: .6 });
+            rec.rect({ x: bx, y: by, w: 1.9, h: hBox, fill: k === "fin" ? LIME : o.col });
+            const tag = it.hora || (s.franja && it.slot !== "full" ? it.slot.toUpperCase() : ""), tagW = tag ? tw(tag, "cond", 6.6) + 6 : 0;
             let tx = bx + 5;
-            if (o.mile) { diamante(rec, tx + 2.8, yy + 6.2, 2.9, k === "rev" ? "#FFFFFF" : k === "fin" ? LIME : o.col, k === "rev" ? REVC : null, .8); tx += 8.5; }
-            lines.forEach((l, j) => rec.text({ s: l, x: tx, y: yy + 8.9 + j * lh, font: j < lines.nm ? "semi" : "light", size: j < lines.nm ? fs : 5.6, color: j < lines.nm ? txtC : (k === "fin" ? "#C9C9D2" : MUTED) }));
-            const tag = it.hora || (s.franja && it.slot !== "full" ? it.slot.toUpperCase() : "");
-            if (tag) rec.text({ s: tag, x: bx + iw - 3, y: yy + 8.7, font: "cond", size: 6.6, color: k === "fin" ? LIME : MUTED, align: "r" });
+            if (o.mile) { diamante(rec, tx + 2.8, (hBox < fs * 2.6 ? by + hBox / 2 : by + fs * .66 + 3.2), 2.9, k === "rev" ? "#FFFFFF" : k === "fin" ? LIME : o.col, k === "rev" ? REVC : null, .9); tx += 9; }
+            const maxL = Math.max(1, Math.floor((hBox - 3) / lh)), ls = wrap(o.nm, "semi", fs, iw - (tx - bx) - 4 - tagW, maxL);
+            const top = by + (hBox < fs * 2.6 ? (hBox + fs * .68) / 2 : fs + 3.2);
+            ls.forEach((l, j) => rec.text({ s: l, x: tx, y: top + j * lh, font: "semi", size: fs, color: txtC }));
+            if (tag) rec.text({ s: tag, x: bx + iw - 4, y: top, font: "cond", size: 6.6, color: k === "fin" ? LIME : MUTED, align: "r" });
           };
-          let conGente = false;   // v166 · en el calendario va solo el nombre de la etapa
-          const medir = (it) => {
-            const tag = it.hora || (s.franja && it.slot !== "full" ? it.slot.toUpperCase() : ""), tagW = tag ? tw(tag, "cond", 6.6) + 5 : 0;
-            const maxW = iw - 8 - (it.o.mile ? 8.5 : 0) - tagW, ls = wrap(it.o.nm, "semi", fs, maxW, w < 60 ? 2 : 3);
-            const who = conGente && it.o.who ? [clip(it.o.who, "light", 5.6, maxW)] : [];
-            const lines = ls.concat(who); lines.nm = ls.length; return { lines, h: lines.length * lh + 5.5 };
-          };
-          let ms = L.map(it => Object.assign(medir(it), { it }));
-          // Si no cabe todo, primero se quitan los nombres para que se vean todas las etapas del día
-          if (ms.length > 1 && ms.reduce((t, m) => t + m.h + 2.2, 0) > innerH + 1 && conGente) { conGente = false; ms = L.map(it => Object.assign(medir(it), { it })); }
-          // Un solo bloque de todo el día ocupa la celda
-          if (ms.length === 1 && ms[0].it.slot === "full" && !ms[0].it.o.mile) { const h1 = Math.max(ms[0].h, innerH - 1); caja(ms[0].it, Math.min(h1, innerH), ms[0].lines); continue; }
-          for (let j = 0; j < ms.length; j++) {
-            const rest = ms.length - j - 1, need = ms[j].h + (rest ? 9 : 0);
-            if (yy + need > innerY + innerH + 1 && j) { rec.text({ s: `+${ms.length - j} ${T.more}`, x: x + 6, y: Math.min(yy + 6.5, y + rowH - 2.5), font: "semi", size: 5.8, color: MUTED }); break; }
-            caja(ms[j].it, ms[j].h, ms[j].lines); yy += ms[j].h + 2.2; shown++;
-          }
+          const pila = (items, y0, h) => { if (!items.length) return; const n = items.length, hb = (h - gap * (n - 1)) / n; items.forEach((it, j) => caja(it, y0 + j * (hb + gap), hb)); };
+          if (!s.franja) { pila(L, innerY, innerH); continue; }
+          const A = L.filter(it => it.slot === "am"), B = L.filter(it => it.slot === "pm"), F = L.filter(it => it.slot === "full");
+          if (!A.length && !B.length) { pila(F, innerY, innerH); continue; }
+          // Las de todo el día van a la mitad que esté libre (o a la mañana)
+          F.forEach(it => (A.length <= B.length ? A : B).push(it));
+          const half = (innerH - gap) / 2;
+          // Si una mitad está vacía y la otra tiene 2 o más etapas, se usa toda la celda para que no queden aplastadas
+          if (!B.length && A.length > 1) pila(A, innerY, innerH);
+          else if (!A.length && B.length > 1) pila(B, innerY, innerH);
+          else { pila(A, innerY, half); pila(B, innerY + half + gap, half); }
         }
         rec.line({ x1: X0, y1: y + rowH, x2: X1, y2: y + rowH, stroke: LINE, lw: .5 });
       });
@@ -20268,7 +20264,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const N = dias.length, dx = (X1 - X0 - LW) / N, gx = X0 + LW;
     const pos = (d, h) => { let i = dias.indexOf(d); if (i < 0) i = d < D0.a ? 0 : N - 1; return gx + (i + (h || 0) / 8) * dx; };
     const filas = []; [["pre", T.pre], ["rodaje", T.rodaje], ["post", T.post]].forEach(([g, l]) => { const L = ev.filter(o => o.g === g); if (!L.length) return; filas.push({ ph: g, l, n: L.length }); L.forEach(o => filas.push({ o })); });
-    const RH = 19.5, PH = 15, HH = 34, YB = H - 44;
+    const RH = 20, PH = 15, HH = 34, YB = H - 44;
     const meses = []; dias.forEach((d, i) => { const k2 = d.slice(0, 7); if (!meses.length || meses[meses.length - 1].k !== k2) meses.push({ k: k2, i0: i, n: 0 }); meses[meses.length - 1].n++; });
     let pg = 1, i0 = 0;
     while (i0 < filas.length || pg === 1) {
@@ -20302,8 +20298,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
         rec.rect({ x: X0, y, w: 2.2, h: RH, fill: gcol });
         rec.text({ s: String(o.n).padStart(2, "0"), x: X0 + 7, y: y + 12.2, font: "cond", size: 6, color: MUTED });
         const sub = o.mile && !o.extra ? reloj(x.hi || 0) : "";
-        rec.text({ s: clip(o.nm, "semi", 7.8, LW - 30), x: X0 + 20, y: y + (sub ? 9.2 : 12.4), font: "semi", size: 7.8, color: INK });
-        if (sub) rec.text({ s: clip(sub, "light", 6, LW - 30), x: X0 + 20, y: y + 16.2, font: "light", size: 6, color: MUTED });
+        rec.text({ s: clip(o.nm, "semi", 9.5, LW - 30), x: X0 + 20, y: y + (sub ? 9.8 : 13.4), font: "semi", size: 9.5, color: INK });
+        if (sub) rec.text({ s: clip(sub, "light", 6.4, LW - 30), x: X0 + 20, y: y + 17.2, font: "light", size: 6, color: MUTED });
         const cy = y + RH / 2;
         if (!o.mile) {
           const a = pos(x.ini, x.hi || 0), b = Math.max(a + 3, pos(x.fin, x.hf == null ? 8 : x.hf)), bw = b - a;
