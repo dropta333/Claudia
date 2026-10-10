@@ -6173,6 +6173,73 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;tr
 .tt-dd .tt-rol i{border-radius:5px;border:1.5px solid var(--border2);background:none}
 .tt-dd .tt-rol.on{background:none}
 .tt-dd .tt-rol.on i{background:var(--text);border-color:var(--text);color:var(--bg)}
+/* v167 · Home: gráficas fijas + bloque plegable "Más gráficas" (solo Global) */
+.hm-fix{margin-bottom:16px}
+.hm-fix.home-tiles{align-items:stretch}
+.hm-fix .ht-col > .home-panel{height:100%}
+.hm-more{border:1px solid var(--border);border-radius:var(--r-lg,18px);background:var(--surface);margin-bottom:16px;overflow:hidden}
+.hm-more-b{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:14px;width:100%;padding:16px 20px}
+.hm-more-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.hm-more-t b{font:400 19px/1.2 var(--serif);color:var(--text)}
+.hm-more-t small{font:500 13px/1.3 var(--sans);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hm-more-a{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 14px;border-radius:99px;background:var(--surface2);font:600 13px/1 var(--sans);color:var(--text);flex:none}
+.hm-more-a .i{width:16px;height:16px;transition:transform .2s}
+.hm-more.open .hm-more-a .i{transform:rotate(180deg)}
+.hm-more-b:hover .hm-more-a{background:var(--text);color:var(--bg)}
+.hm-more-b:focus-visible{outline:2px solid var(--brand);outline-offset:-2px}
+.hm-more-c{padding:0 16px 16px}
+.hm-more:not(.open) .hm-more-c{display:none!important}
+/* ═════ v167 · Tráfico: fichas a 3 columnas, con el lenguaje de las fichas del Dashboard ═════ */
+body:not(.trf-tabla) #main-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important;align-items:start}
+@media (max-width:1180px){body:not(.trf-tabla) #main-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media (max-width:760px){body:not(.trf-tabla) #main-grid{grid-template-columns:1fr!important}}
+body:not(.trf-tabla) #main-grid > .span-all,body:not(.trf-tabla) #main-grid > .trf-grp,body:not(.trf-tabla) #main-grid > details,body:not(.trf-tabla) #main-grid > :not(.card){grid-column:1/-1}
+body:not(.trf-tabla) #main-grid > .card:not(.span-all){padding:16px 16px 14px!important;border-radius:18px!important;min-width:0}
+#main-grid > .card .ch-top{display:flex!important;flex-direction:column;gap:10px;margin-bottom:8px!important;padding:2px 0 0!important}
+#main-grid > .card .card-body-pills{padding:0!important}
+#main-grid > .card .ch-left{width:100%!important;min-width:0}
+#main-grid > .card .ch-name{font:400 21px/1.15 var(--serif)!important;gap:10px!important;padding-right:22px;min-width:0}
+#main-grid > .card .ch-name .av{--s:38px!important;width:38px!important;height:38px!important;flex:none}
+#main-grid > .card .ch-role{font-size:13px!important;margin:2px 0 0 48px!important;color:var(--muted)}
+#main-grid > .card .ch-right{width:100%!important;display:grid!important;grid-template-columns:auto auto minmax(0,1fr);gap:0!important;border:1px solid var(--border);border-radius:12px;background:var(--surface2);overflow:hidden;padding:0!important}
+#main-grid > .card .dotcol{width:auto!important;padding:8px 10px!important;border-left:1px solid var(--border);display:flex!important;flex-wrap:wrap;align-items:center;gap:5px!important;min-width:0}
+#main-grid > .card .dotcol:first-child{border-left:0}
+#main-grid > .card .dotcol-label{width:100%!important;font:600 10.5px/1 var(--display)!important;letter-spacing:.12em;margin-bottom:2px}
+#main-grid > .card .ausencia-select{width:100%!important;max-width:none!important;height:28px!important;font-size:12.5px!important}
+#main-grid > .card .card-body-pills{display:flex;flex-direction:column;gap:5px}
+#main-grid > .card .proj-row{display:flex!important;align-items:center;gap:6px!important;width:100%!important;min-width:0;padding:5px 6px 5px 8px!important;border-radius:10px;background:var(--surface2)}
+#main-grid > .card .proj-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px!important;width:auto!important}
+#main-grid > .card .proj-pill{font-size:10.5px!important;padding:3px 7px!important;flex:none}
+#main-grid > .card .status-pill{font-size:10.5px!important;padding:3px 18px 3px 7px!important;max-width:128px;flex:none;height:auto!important}
+#main-grid > .card .proj-x{flex:none;width:18px!important}
+#main-grid > .card .proj-add{width:100%!important;height:34px!important;font-size:13px!important}
+/* v167 · Dashboard: una fila con título, leyenda y Nuevo proyecto */
+#view-dashboard > .vh.vh-oculta{display:none!important}
+#dash-wrap .lb-panel .hp-title{align-items:center!important;justify-content:flex-start!important;column-gap:14px!important}
+#dash-wrap .lb-panel .hp-title > :nth-child(2){margin-left:0!important}
+#dash-wrap .lb-panel .hp-title > :nth-child(3){margin-left:auto!important}
+#dash-wrap .lb-panel .hp-title .btn-new.dash-new{margin:0 0 0 12px;flex:none;order:99}
+/* v167 · Tarjeta flotante de logros: resumen, nivel, siguientes niveles y cómo lograrlos */
+#lg-tt{width:310px!important}
+#lg-tt .tt-prog{margin:10px 0 8px}
+#lg-tt .tt-pb{height:6px;border-radius:99px;background:color-mix(in srgb,var(--text) 10%,transparent);overflow:hidden}
+#lg-tt .tt-pb i{display:block;height:100%;border-radius:99px;background:var(--tc)}
+#lg-tt .tt-prog span{display:block;margin-top:6px;font:500 12.5px/1.3 var(--sans);color:var(--muted)}
+#lg-tt .tt-prog b{color:var(--text)}
+#lg-tt .tt-lv{list-style:none;margin:0;padding:8px 0;border-top:1px solid color-mix(in srgb,var(--tc) 30%,var(--border));border-bottom:1px solid color-mix(in srgb,var(--tc) 30%,var(--border));display:grid;gap:5px}
+#lg-tt .tt-lv li{display:grid;grid-template-columns:12px 58px 1fr auto;align-items:center;gap:7px;font:500 12.5px/1.2 var(--sans);color:var(--muted)}
+#lg-tt .tt-lv li i{width:10px;height:10px;border-radius:50%;border:1.5px solid var(--lc);box-sizing:border-box}
+#lg-tt .tt-lv li.ok i{background:var(--lc)}
+#lg-tt .tt-lv li b{font:700 11px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--text)}
+#lg-tt .tt-lv li em{font-style:normal;font-size:11.5px}
+#lg-tt .tt-lv li.ok em{color:var(--green)}
+#lg-tt .tt-lv li.now{color:var(--text)}
+#lg-tt .tt-lv li.now em{color:var(--text);font-weight:700}
+#lg-tt .tt-lv li:not(.ok):not(.now){opacity:.6}
+#lg-tt .tt-how{margin:8px 0 0;font:500 12.5px/1.4 var(--sans);color:var(--text)}
+#lg-tt .tt-how em,#lg-tt .tt-why em{display:block;font:700 10.5px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;font-style:normal}
+.lg-c[data-lgt]{cursor:help}
+.lg-c.cargo .lg-c-b h4::after{content:"Tu cargo";display:inline-block;white-space:nowrap;margin-left:8px;padding:2px 6px;border-radius:99px;font:700 9.5px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;vertical-align:2px;background:color-mix(in srgb,var(--brand) 35%,transparent);color:var(--text)}
 </style>
 </head>
 <body>
@@ -16000,17 +16067,41 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   const ORDEN = ["Estado del equipo", "Próximas entregas", "Estado de los proyectos", "Proyectos por cliente", "Horas por proyecto", "Tipos de proyecto", "Trabajo por cliente", "Tipo de proyecto por semana"];
   function mosaico(wrap, personal) {
     const cols = wrap.querySelector(".home-cols"); if (!cols) return;
-    const W = wrap.clientWidth, n = personal ? (W >= 1100 ? 3 : W >= 700 ? 2 : 1) : (W >= 1360 ? 3 : 0);
-    if (!n) return;
+    const W = wrap.clientWidth, n = personal ? (W >= 1100 ? 3 : W >= 700 ? 2 : 1) : (W >= 1360 ? 3 : W >= 700 ? 2 : 1);
     const tit = (p) => ((p.querySelector(".hp-title") || {}).textContent || "").trim();
     let panels = Array.from(cols.querySelectorAll(".home-panel"));
     if (!personal) panels.sort((a, b) => { const ia = ORDEN.findIndex(t => tit(a).startsWith(t)), ib = ORDEN.findIndex(t => tit(b).startsWith(t)); return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib); });
     const st = $("mis-stats");
     if (personal && st) { st.querySelectorAll(".ps-card").forEach(c => { const h = c.querySelector("h4"), sec = document.createElement("section"); sec.className = "home-panel ps-tile"; sec.innerHTML = `<div class="hp-title">${h ? h.innerHTML : ""}</div>`; if (h) h.remove(); sec.appendChild(c); panels.push(sec); }); st.remove(); }
     if (personal) panels.sort((a, b) => (/^Estado de los proyectos/.test(tit(b)) ? 1 : 0) - (/^Estado de los proyectos/.test(tit(a)) ? 1 : 0));
-    const t = document.createElement("div"); t.className = "home-tiles g" + n; t.style.setProperty("--n", n);
+    // v167 · En Global quedan fijas tres gráficas; las demás van en el bloque plegable "Más gráficas"
+    if (!personal) {
+      const FIJ = ["Estado del equipo", "Estado de los proyectos", "Tipos de proyecto"];
+      const fij = FIJ.map(f => panels.find(p => tit(p).startsWith(f))).filter(Boolean), rest = panels.filter(p => !fij.includes(p));
+      const top = document.createElement("div"); cols.replaceWith(top); top.className = "hm-fix";
+      repartir(top, fij, n, true);
+      if (rest.length) {
+        const abierto = (() => { try { return localStorage.getItem("pxp_hm_more_" + normName((typeof currentUser !== "undefined" && currentUser) || "")) === "1"; } catch (e) { return false; } })();
+        const sec = document.createElement("section"); sec.className = "hm-more" + (abierto ? " open" : "");
+        const nombres = rest.map(p => { const h = p.querySelector(".hp-title"); return h ? ((h.childNodes[0] || {}).textContent || "").trim() : ""; }).filter(Boolean);
+        sec.innerHTML = `<button type="button" class="hm-more-b" aria-expanded="${abierto}" onclick="pxpHmMore(this)"><span class="hm-more-t"><b>Más gráficas</b><small>${rest.length} · ${esc(nombres.slice(0, 5).join(" · "))}</small></span><span class="hm-more-a">${abierto ? "Ocultar" : "Mostrar"}<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg></span></button><div class="hm-more-c"></div>`;
+        top.after(sec);
+        const c2 = sec.querySelector(".hm-more-c"); sec.classList.add("open"); repartir(c2, rest, n); if (!abierto) sec.classList.remove("open");
+      }
+      return;
+    }
+    const t = document.createElement("div"); cols.replaceWith(t); repartir(t, panels, n);
+  }
+  window.pxpHmMore = function (btn) {
+    const sec = btn.closest(".hm-more"); if (!sec) return; const on = !sec.classList.contains("open");
+    sec.classList.toggle("open", on); btn.setAttribute("aria-expanded", on); const a = btn.querySelector(".hm-more-a"); if (a) a.firstChild.textContent = on ? "Ocultar" : "Mostrar";
+    try { localStorage.setItem("pxp_hm_more_" + normName((typeof currentUser !== "undefined" && currentUser) || ""), on ? "1" : "0"); } catch (e) { }
+  };
+  // Reparte cajas en n columnas parejas (fijas: una por columna, en orden)
+  function repartir(t, panels, n, enOrden) {
+    t.classList.add("home-tiles", "g" + n); t.style.setProperty("--n", n);
     const C = Array.from({ length: n }, () => { const c = document.createElement("div"); c.className = "ht-col"; t.appendChild(c); return c; });
-    cols.replaceWith(t);
+    if (enOrden && panels.length <= n) { panels.forEach((p, i) => C[i].appendChild(p)); return; }
     // se mide cada caja al ancho de una columna y se busca el reparto más parejo posible (pocas cajas: se prueban todas las combinaciones)
     const H = panels.map(p => { C[0].appendChild(p); const h = p.offsetHeight; return h; }), gap = 16;
     let best = null, bestMax = Infinity;
@@ -16657,11 +16748,12 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const r = oDash.apply(this, arguments);
     try {
       const wrap = $("dash-wrap"); if (!wrap) return r;
-      const vista = pref("pxp_dash_vista", "paneles");
+      const vista = "paneles";   // v167 · el Dashboard queda solo en paneles (las fichas viven ahora en Tráfico)
       wrap.querySelectorAll(".lb-panel .lb-cols").forEach(c => { const n = Array.from(c.querySelectorAll(".lb-col")).map(x => Math.max(1, x.querySelectorAll(".lb-chip").length)); n.forEach((v, i) => c.style.setProperty("--f" + (i + 1), Math.max(1, v / Math.max(1, Math.min(...n))) > 4 ? "4fr" : (Math.max(1, v / Math.max(1, Math.min(...n)))).toFixed(2) + "fr")); });
-      const vh = document.querySelector("#view-dashboard > .vh"), bar = `<div class="vbar dash-vbar"><span class="vbar-l">Vista</span>${seg("pxpDashVista", vista, [["paneles", "Paneles", I.panel], ["fichas", "Fichas", I.grid]])}</div>`;
+      // v167 · "Nuevo proyecto" va en la misma fila de "Disponibilidad del equipo", a la derecha
+      const vh = document.querySelector("#view-dashboard > .vh"), ht = wrap.querySelector(".lb-panel .hp-title");
       document.querySelectorAll("#view-dashboard .dash-vbar").forEach(x => x.remove());
-      if (vh) { vh.classList.add("vh-dash"); vh.insertAdjacentHTML("afterbegin", bar); } else wrap.insertAdjacentHTML("afterbegin", bar);
+      if (vh && ht) { const nb = vh.querySelector(".btn-new"); if (nb && !ht.querySelector(".btn-new")) { const c = nb.cloneNode(true); c.classList.add("dash-new"); ht.appendChild(c); } vh.classList.add("vh-oculta"); }
       if (vista !== "fichas") { const g = wrap.querySelector(".pxp-grid"), rod = wrap.querySelector(":scope > .rod-panel"), aus = g && g.querySelector(".aus-wide"); if (g && rod && aus) aus.after(rod); return r; }
       const w = currentWeek, gente = TEAM.map(p => {
         const st = getStatus(p, w), d = window.pxpDisponibilidad ? pxpDisponibilidad(p, w) : { k: "si", l: "", why: "" }, aus = typeof getAusencia === "function" ? getAusencia(p, w) : null;
@@ -19233,8 +19325,74 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     { id: "t-compl", s: "team", n: "Cierres complejos", i: "crown", m: "compl", g: [20, 60, 140, 300], d: (n) => `El equipo cierra ${n} etapas en proyectos complejos.` },
     { id: "t-pleno", s: "team", n: "Pleno de equipo", i: "users", m: "ritmo10", g: [2, 4, 8, 14], d: (n) => `${n} semanas seguidas con al menos 10 personas registrando horas.` },
     { id: "t-orq", s: "team", n: "Orquesta completa", i: "users", m: "orq", g: [6, 15, 32, 65], d: (n) => `${n} proyectos entregados con 4 o más grupos trabajando juntos.` },
+    // v167 · Logros nuevos: generales con humor y especializados por cargo (c = grupo que puede ganarlos)
+    { id: "r-vie", s: "ind", n: "Viernes 5:29 pm", i: "clock", m: "viernes", g: [4, 10, 20, 40], d: (n) => `Registra horas ${n} viernes distintos (y aun así llegas al after).` },
+    { id: "r-ext", s: "ind", n: "Fin de semana heroico", i: "flame", m: "extra", g: [2, 5, 12, 25], d: (n) => `Registra horas ${n} veces en fin de semana o festivo.` },
+    { id: "r-mad", s: "ind", n: "Madrugador", i: "clock", m: "madru", g: [3, 10, 25, 60], d: (n) => `Registra horas antes de las 8 a. m. ${n} veces.` },
+    { id: "r-duo", s: "ind", n: "Cuatro manos", i: "users", m: "duo", g: [3, 10, 25, 60], d: (n) => `Cierra ${n} etapas compartidas con alguien más.` },
+    { id: "r-reac", s: "ind", n: "Emoji master", i: "heart", m: "reac", g: [10, 40, 120, 300], d: (n) => `Reacciona ${n} veces a notas del equipo.` },
+    { id: "r-bloq", s: "ind", n: "Desatascador oficial", i: "bolt", m: "bloq", g: [2, 6, 15, 35], d: (n) => `Reporta o resuelve ${n} bloqueadores.` },
+    { id: "r-ed1", s: "ind", c: /^Editores/, n: "Corte final, final, final_v3", i: "layers", m: "kw_ed", g: [3, 10, 25, 60], d: (n) => `Cierra ${n} etapas de offline, edición o montaje.` },
+    { id: "r-ed2", s: "ind", c: /^Editores/, n: "Reductor de tiempos", i: "bolt", m: "kw_ver", g: [2, 6, 15, 35], d: (n) => `Cierra ${n} etapas de versiones y reducciones (30″ → 15″ → 6″).` },
+    { id: "r-ed3", s: "ind", c: /^Editores/, n: "Timeline infinito", i: "clock", m: "inmer", g: [24, 60, 120, 240], d: (n) => `Registra ${n} horas en un solo proyecto.` },
+    { id: "r-co1", s: "ind", c: /^Colorist/, n: "50 sombras de LUT", i: "star", m: "kw_col", g: [3, 10, 25, 60], d: (n) => `Cierra ${n} etapas de color o gradación.` },
+    { id: "r-co2", s: "ind", c: /^Colorist/, n: "Piel de porcelana", i: "heart", m: "kw_ret", g: [2, 6, 15, 35], d: (n) => `Cierra ${n} etapas de retoque, beauty o limpieza.` },
+    { id: "r-co3", s: "ind", c: /^Colorist/, n: "Ojo de halcón calibrado", i: "crown", m: "compl", g: [3, 8, 20, 45], d: (n) => `Cierra ${n} etapas en proyectos complejos.` },
+    { id: "r-au1", s: "ind", c: /^Audio/, n: "Silencio en la sala", i: "chat", m: "kw_aud", g: [3, 10, 25, 60], d: (n) => `Cierra ${n} etapas de audio, mezcla o locución.` },
+    { id: "r-au2", s: "ind", c: /^Audio/, n: "Foley de cocina", i: "bolt", m: "kw_mus", g: [2, 6, 15, 35], d: (n) => `Cierra ${n} etapas de música, foley o efectos.` },
+    { id: "r-au3", s: "ind", c: /^Audio/, n: "Sin clipping", i: "flag", m: "entregas", g: [3, 8, 20, 45], d: (n) => `Participa en ${n} proyectos entregados sin que nada sature.` },
+    { id: "r-ia1", s: "ind", c: /^IA/, n: "Prompt whisperer", i: "bolt", m: "kw_ia", g: [3, 10, 25, 60], d: (n) => `Cierra ${n} etapas de generación con IA.` },
+    { id: "r-ia2", s: "ind", c: /^IA/, n: "Seis dedos no, gracias", i: "star", m: "kw_img", g: [2, 6, 15, 35], d: (n) => `Cierra ${n} etapas de imágenes y stills (con las manos correctas).` },
+    { id: "r-ia3", s: "ind", c: /^IA/, n: "Seed de la suerte", i: "layers", m: "explor", g: [3, 8, 16, 30], d: (n) => `Registra horas en ${n} proyectos distintos.` },
+    { id: "r-3d1", s: "ind", c: /^3D/, n: "Render nocturno", i: "layers", m: "kw_3d", g: [3, 10, 25, 60], d: (n) => `Cierra ${n} etapas de 3D, modelado o render.` },
+    { id: "r-3d2", s: "ind", c: /^3D/, n: "Física cuántica", i: "bolt", m: "kw_sim", g: [2, 6, 15, 35], d: (n) => `Cierra ${n} etapas de simulación, partículas o FX.` },
+    { id: "r-3d3", s: "ind", c: /^3D/, n: "Polígono a polígono", i: "clock", m: "inmer", g: [24, 60, 120, 240], d: (n) => `Registra ${n} horas en un solo proyecto.` },
+    { id: "r-cm1", s: "ind", c: /^Compositing/, n: "Roto-sapiens", i: "layers", m: "kw_comp", g: [3, 10, 25, 60], d: (n) => `Cierra ${n} etapas de compo, tracking, roto o VFX.` },
+    { id: "r-cm2", s: "ind", c: /^Compositing/, n: "Kerning perfecto", i: "star", m: "kw_gfx", g: [2, 6, 15, 35], d: (n) => `Cierra ${n} etapas de gráficas, supers o animación.` },
+    { id: "r-cm3", s: "ind", c: /^Compositing/, n: "Keyframe infinito", i: "clock", m: "inmer", g: [24, 60, 120, 240], d: (n) => `Registra ${n} horas en un solo proyecto.` },
+    { id: "r-ma1", s: "ind", c: /^Mastering/, n: "Checksum de la suerte", i: "check", m: "kw_mas", g: [3, 10, 25, 60], d: (n) => `Cierra ${n} etapas de master, export, QC o ingesta.` },
+    { id: "r-ma2", s: "ind", c: /^Mastering/, n: "Exportando… 99 %", i: "flag", m: "entregas", g: [3, 8, 20, 45], d: (n) => `Participa en ${n} proyectos entregados.` },
+    { id: "r-ma3", s: "ind", c: /^Mastering/, n: "QC de acero", i: "crown", m: "compl", g: [3, 8, 20, 45], d: (n) => `Cierra ${n} etapas en proyectos complejos.` },
+    { id: "r-pr1", s: "ind", c: /^Producción$/, n: "Claqueta de oro", i: "flag", m: "kw_rod", g: [2, 6, 15, 35], d: (n) => `Cierra ${n} etapas de rodaje.` },
+    { id: "r-pr2", s: "ind", c: /^Producción$/, n: "Catering aprobado", i: "heart", m: "entregas", g: [3, 8, 20, 45], d: (n) => `Participa en ${n} proyectos entregados.` },
+    { id: "r-pr3", s: "ind", c: /^Producción$/, n: "Plan B, C y D", i: "bolt", m: "bloq", g: [2, 6, 15, 35], d: (n) => `Reporta o resuelve ${n} bloqueadores.` },
+    { id: "r-ep1", s: "ind", c: /^Producción Ejecutiva/, n: "Cero sorpresas", i: "crown", m: "liderOk", g: [2, 6, 15, 35], d: (n) => `Lidera ${n} proyectos entregados a tiempo.` },
+    { id: "r-ep2", s: "ind", c: /^Producción Ejecutiva/, n: "Presupuesto zen", i: "star", m: "aprobP", g: [3, 8, 20, 45], d: (n) => `Participa en ${n} proyectos aprobados por el cliente.` },
+    { id: "r-ep3", s: "ind", c: /^Producción Ejecutiva/, n: "Cliente feliz", i: "heart", m: "fiel", g: [3, 6, 12, 24], d: (n) => `Entrega ${n} proyectos para un mismo cliente.` },
+    { id: "r-pm1", s: "ind", c: /^Project Manager/, n: "Domador de deadlines", i: "clock", m: "liderOk", g: [2, 6, 15, 35], d: (n) => `Lleva ${n} proyectos entregados a tiempo.` },
+    { id: "r-pm2", s: "ind", c: /^Project Manager/, n: "Excel con alma", i: "chat", m: "notas", g: [10, 30, 70, 150], d: (n) => `Deja ${n} notas que mantienen a todos al día.` },
+    { id: "r-pm3", s: "ind", c: /^Project Manager/, n: "Desbloqueador serial", i: "bolt", m: "bloq", g: [2, 6, 15, 35], d: (n) => `Reporta o resuelve ${n} bloqueadores.` },
+    { id: "r-dp1", s: "ind", c: /^Dirección de Post/, n: "Director de orquesta", i: "crown", m: "liderOk", g: [2, 6, 15, 35], d: (n) => `Dirige ${n} proyectos entregados a tiempo.` },
+    { id: "r-dp2", s: "ind", c: /^Dirección de Post/, n: "Ojo final", i: "star", m: "aprobP", g: [3, 8, 20, 45], d: (n) => `Participa en ${n} proyectos aprobados por el cliente.` },
+    { id: "r-dp3", s: "ind", c: /^Dirección de Post/, n: "Visión de conjunto", i: "brief", m: "clientes", g: [3, 5, 8, 12], d: (n) => `Entrega proyectos de ${n} clientes distintos.` },
   ];
   const famDe = (id) => FAM.find((f) => f.id === id);
+  const aplica = (f, nombre) => !f.c || f.c.test(grupoDe(nombre) || "");   // los de cargo solo los ve y los gana su grupo
+  // v167 · Métricas de los logros nuevos (horas de etapas y del registro, etapas por palabra clave, reacciones, bloqueadores)
+  const KW = { kw_ed: /offline|edici|montaje|corte|\bedit/i, kw_ver: /reducci|versi[oó]n|cutdown|adaptaci|bumper|formato/i, kw_col: /color|gradaci|grading|\blook\b|\blut/i, kw_ret: /retoq|beauty|limpieza|clean|piel/i,
+    kw_aud: /audio|mezcla|\bmix|sonido|locuci|\bvoz\b/i, kw_mus: /m[uú]sica|foley|efectos de sonido|\bsfx|jingle/i, kw_ia: /\bia\b|prompt|generaci|\bai\b/i, kw_img: /imagen|still|key ?visual|frames?\b/i,
+    kw_3d: /\b3d\b|render|model|\bcgi\b|lookdev|\brig/i, kw_sim: /simul|part[ií]cul|fluid|\bfx\b|din[aá]mica/i, kw_comp: /compo|motion|track|\broto|\bvfx|keying/i, kw_gfx: /gr[aá]fic|super|letter|t[ií]tulo|animaci|lower/i,
+    kw_mas: /master|export|ingest|backup|\bqc\b|conform|subida/i, kw_rod: /rodaje|shooting|\bset\b|\bdit\b|dailies|filmaci/i };
+  function extras() {
+    const K = normName, out = {}, q = (n) => out[K(n)] || (out[K(n)] = { viernes: new Set(), extra: 0, madru: 0, duo: 0, reac: 0, bloq: 0, liderOk: 0 }), finde = (d) => { const g = new Date(d + "T12:00").getDay(); return g === 0 || g === 6 || (window.pxpEsHabil && !pxpEsHabil(d)); };
+    const hora = (n, fecha, ts, ex, real) => { if (!n || !fecha) return; const o = q(n); if (new Date(fecha + "T12:00").getDay() === 5) o.viernes.add(fecha); if (ex || finde(fecha)) o.extra++; if (real && ts) { const h = new Date(ts).getHours(); if (h < 8) o.madru++; } };
+    Object.values(PROJECTS).forEach((p) => {
+      if (!p) return;
+      (p.horasLog || []).forEach((h) => hora(h.usuario || h.user, h.fecha, h.ts, false, false));
+      (p.etapas || []).forEach((e) => {
+        (e.horas || []).forEach((h) => hora(h.user, h.fecha, h.ts, h.extra, true));
+        if (e.estado !== "listo") return; const R2 = pxpResps(e).filter((r) => !/^(Cliente|Agencia|Externo):/i.test(r)), nm = e.nombre || "";
+        R2.forEach((r) => { const o = q(r); if (R2.length > 1) o.duo++; Object.keys(KW).forEach((k) => { if (KW[k].test(nm) || (k === "kw_rod" && e.fase === "rodaje")) o[k] = (o[k] || 0) + 1; }); });
+      });
+      (p.historial || []).forEach((h) => Object.keys(h.reac || {}).forEach((u) => { const pp = persona(u); if (pp) q(pp.name).reac++; }));
+      const lideres = new Set(["ep", "coordinador", "directorPost"].flatMap((f) => String(p[f] || "").split(/[\/,&+]/).map((x) => x.trim()).filter(Boolean)).concat(p.pms || []));
+      (p.bloqueos || []).forEach((b) => { if (b.por) q(b.por).bloq++; if (b.fin) lideres.forEach((l) => { if (!b.por || K(b.por) !== K(l)) q(l).bloq++; }); });
+      const hecho = p.estadoGeneral === "entregado" || p.estadoGeneral === "aprobado", aTiempo = !p.entregaFinal || !p.fechaFin || p.fechaFin <= p.entregaFinal;
+      if (hecho && aTiempo) lideres.forEach((l) => q(l).liderOk++);
+    });
+    Object.values(out).forEach((o) => { o.viernes = o.viernes.size; });
+    return out;
+  }
 
   // ───────── Emblemas (SVG por código) ─────────
   const mezcla = (hex, t, k) => { const n = parseInt(hex.slice(1), 16), tr = t === "w" ? 255 : 0, f = (c) => Math.round(c + (tr - c) * k); return "#" + [n >> 16, (n >> 8) & 255, n & 255].map((c) => f(c).toString(16).padStart(2, "0")).join(""); };
@@ -19321,6 +19479,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     todos.forEach((p) => { const q = per[K(p.name)], g = G(p.name); if (q.horas > 0) { team.activos = (team.activos || 0) + 1; if (g) g.act.add(K(p.name)); } if (q.skills >= 6) team.completos = (team.completos || 0) + 1; });
     const vp = (o) => ({ etapas: o.etapas, horas: Math.round(o.horas), notas: o.notas, men: o.men || 0, entregas: o.proy ? o.proy.size : 0, clientes: o.cli ? o.cli.size : 0, racha: o.sem ? rachaMax(o.sem) : 0, skills: o.skills || 0, menrec: o.menRec || 0, compl: o.compl || 0, inmer: o.inm && o.inm.size ? Math.max(...o.inm.values()) : 0, aprobP: o.aprobS ? o.aprobS.size : o.aprobP || 0, explor: o.proyH ? o.proyH.size : 0, semTot: o.semAll ? o.semAll.size : o.sem ? o.sem.size : 0, cliAprob: o.cliAprob ? o.cliAprob.size : 0, ritmo10: o.ritmo10V || 0, roles: o.roles ? o.roles.size : 0, full: o.full || 0, multi: o.multi || 0, ritmo: o.ritmoV != null ? o.ritmoV : o.sem ? rachaMax(o.sem) : 0, pesados: o.pesados || 0, orq: o.orq || 0, arch: o.arch || 0, lidera: o.lidera || 0, fiel: o.cliN && o.cliN.size ? Math.max(...o.cliN.values()) : 0, aprob: o.aprob || 0, activos: o.act ? o.act.size : o.activos || 0, completos: o.completos || 0 });
     const vi = {}; Object.keys(per).forEach((k) => (vi[k] = vp(per[k])));
+    try { const X = extras(); Object.keys(vi).forEach((k) => { const x = X[k]; if (x) Object.keys(x).forEach((m) => { if (typeof x[m] === "number") vi[k][m] = x[m]; }); }); } catch (e) { console.error(e); }
     const vg = {}; Object.keys(grp).forEach((k) => (vg[k] = vp(grp[k])));
     return { ind: vi, grp: vg, team: vp(team) };
   }
@@ -19328,7 +19487,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   function alcanzados(V) {
     const out = {};
     const sub = { ind: Object.keys(V.ind), grp: Object.keys(V.grp), team: ["EQUIPO"] };
-    FAM.forEach((f) => sub[f.s].forEach((s) => { const v = valor(V, f, s === "EQUIPO" ? "" : s); f.g.forEach((g, i) => { if (v >= g) out[`${f.s}|${s}|${f.id}|${i}`] = { s: f.s, sujeto: s, fam: f.id, tier: i }; }); }));
+    FAM.forEach((f) => sub[f.s].forEach((s) => { if (f.c && f.s === "ind" && !aplica(f, s)) return; const v = valor(V, f, s === "EQUIPO" ? "" : s); f.g.forEach((g, i) => { if (v >= g) out[`${f.s}|${s}|${f.id}|${i}`] = { s: f.s, sujeto: s, fam: f.id, tier: i }; }); }));
     return out;
   }
   const clave = (s, sujeto, fam, tier) => `${s}|${s === "ind" ? normName(sujeto) : sujeto}|${fam}|${tier}`;
@@ -19374,7 +19533,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     // Columnas por tipo (individual · grupo · equipo) y filas de lo más reciente
     const all = mios(u), por = ["ind", "grp", "team"].map((t) => all.filter((x) => x.s === t)), l = [];
     for (let r = 0; r < 2; r++) por.forEach((c) => l.push(c[r]));
-    const cel = Array.from({ length: 6 }, (_, i) => { const x = l[i]; return x ? `<span class="lg-h-i" title="${esc(x.nombre + " · " + TIERS[x.tier].n)}">${embN(x.s, x.tier, iconoDe(x), 52, false, imgDe(x), i)}</span>` : `<span class="lg-h-i vac">${embN(["ind", "grp", "team"][i % 3], 0, "star", 52, true, "", i)}</span>`; }).join("");
+    const cel = Array.from({ length: 6 }, (_, i) => { const x = l[i]; return x ? `<span class="lg-h-i" data-lgt="${esc(x.k)}">${embN(x.s, x.tier, iconoDe(x), 52, false, imgDe(x), i)}</span>` : `<span class="lg-h-i vac">${embN(["ind", "grp", "team"][i % 3], 0, "star", 52, true, "", i)}</span>`; }).join("");
     return `<button type="button" class="mr-lg" onclick="switchView('logros')" aria-label="Ver mis logros"><span class="mr-lg-t" aria-hidden="true"><svg viewBox="0 0 24 24">${IC.trophy}</svg></span><span class="mr-lg-g">${cel}</span></button>`;
   };
 
@@ -19386,13 +19545,13 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const w = $("lg-wrap"); if (!w) return; const u = yo(); if (!u) return;
     if (!CACHE) CACHE = calcular();
     const V = CACHE, g = grupoDe(u), mis = mios(u), G = (meta().logros && meta().logros.ganados) || {};
-    const sujetoDe = { ind: u, grp: g, team: "" }, fams = FAM.filter((f) => f.s === SEL);
+    const sujetoDe = { ind: u, grp: g, team: "" }, fams = FAM.filter((f) => f.s === SEL && aplica(f, u));
     const lista = mis.filter((x) => x.s === SEL), cnt = [0, 0, 0, 0]; lista.forEach((x) => cnt[x.tier]++);
-    const total = FAM.filter((f) => f.s === SEL).length * 4, ganados = lista.filter((x) => x.fam).length;
+    const total = fams.length * 4, ganados = lista.filter((x) => x.fam).length;
     const tarj = fams.map((f) => {
       const v = valor(V, f, sujetoDe[f.s]), t = f.g.filter((x) => v >= x).length, sig = f.g[t], pct = sig ? Math.min(100, Math.round(v / sig * 100)) : 100;
       const k0 = (i) => G[clave(f.s, sujetoDe[f.s], f.id, i)];
-      return `<article class="lg-c${t ? "" : " bloq"}" data-t="${t ? t - 1 : 0}" style="--tc:${TIERS[Math.max(0, t - 1)].c}">
+      return `<article class="lg-c${t ? "" : " bloq"}${f.c ? " cargo" : ""}" data-t="${t ? t - 1 : 0}" data-lgt="${esc(f.s + "|" + (f.s === "ind" ? normName(u) : f.s === "grp" ? g : "EQUIPO") + "|" + f.id + "|x")}" tabindex="0" style="--tc:${TIERS[Math.max(0, t - 1)].c}">
         <div class="lg-c-e">${emb(f.s, Math.max(0, t - 1), f.i, 76, !t)}</div>
         <div class="lg-c-b"><h4>${esc(f.n)}</h4><p>${esc(f.d(sig || f.g[3]))}</p>
           <div class="lg-bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div>
@@ -19554,21 +19713,55 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   // Tarjeta flotante al pasar el cursor (o tocar) un logro del perfil: qué es, en qué nivel y por qué se ganó
   const tt = document.createElement("div"); tt.id = "lg-tt"; tt.setAttribute("role", "tooltip"); tt.hidden = true; document.body.appendChild(tt);
   const S_LBL = { ind: "Logro individual", grp: "Logro de grupo", team: "Logro de todo el equipo" };
+  // v167 · Cómo se consigue cada métrica (para la tarjeta flotante)
+  const COMO = { etapas: "Marca como listas las etapas en las que eres responsable.", horas: "Registra tus horas en cada etapa con − N h + y ✓.", racha: "Registra horas todas las semanas, sin saltarte ninguna.",
+    entregas: "Participa en proyectos hasta que se entreguen.", notas: "Deja notas en los proyectos: acuerdos, avances, pendientes.", men: "Menciona a tus compañeros con @ en las notas.", clientes: "Trabaja en proyectos de clientes distintos hasta entregarlos.",
+    arch: "Adjunta referencias, frames o documentos a tus notas.", lidera: "Lidera proyectos (producción, PM o dirección) hasta la entrega.", fiel: "Sigue entregando proyectos para el mismo cliente.", roles: "Asume cargos distintos en los proyectos.",
+    full: "En un mismo proyecto: cierra etapas, registra horas y deja notas.", menrec: "Ayuda al equipo: te mencionarán cuando te necesiten.", compl: "Cierra etapas en proyectos marcados como complejos.", inmer: "Registra tus horas en el proyecto donde más trabajas.",
+    aprobP: "Participa en proyectos hasta que el cliente los apruebe.", explor: "Registra horas en proyectos distintos.", semTot: "Registra horas en semanas distintas.", viernes: "Registra tus horas los viernes, antes de cerrar la semana.",
+    extra: "Cuenta solo cuando registras horas un sábado, domingo o festivo. Mejor si es por gusto.", madru: "Registra horas antes de las 8 a. m. (cuenta la hora en que las registras).", duo: "Comparte etapas con alguien más (varios responsables) y ciérrenlas.",
+    reac: "Reacciona a las notas del equipo con un toque.", bloq: "Reporta lo que frena un proyecto y márcalo como resuelto cuando se destrabe.", liderOk: "Lidera proyectos y entrégalos en la fecha de entrega final o antes.",
+    kw_ed: "Cierra etapas con offline, edición o montaje en el nombre.", kw_ver: "Cierra etapas de versiones, reducciones o adaptaciones.", kw_col: "Cierra etapas de color o gradación.", kw_ret: "Cierra etapas de retoque, beauty o limpieza.",
+    kw_aud: "Cierra etapas de audio, mezcla o locución.", kw_mus: "Cierra etapas de música, foley o efectos.", kw_ia: "Cierra etapas de IA, prompts o generación.", kw_img: "Cierra etapas de imágenes, stills o key visuals.",
+    kw_3d: "Cierra etapas de 3D, modelado o render.", kw_sim: "Cierra etapas de simulación, partículas o FX.", kw_comp: "Cierra etapas de compo, tracking, roto o VFX.", kw_gfx: "Cierra etapas de gráficas, supers o animación.",
+    kw_mas: "Cierra etapas de master, export, QC o ingesta.", kw_rod: "Cierra etapas de rodaje (fase Rodaje)." };
+  const UNI = { horas: "h", inmer: "h" };
   function mostrarTT(el) {
-    const n = window.__pxpPersonaActual, x = n && mios(n).find((y) => y.k === el.dataset.lgt); if (!x) return;
-    const T = TIERS[x.tier], sig = x.fam && x.fam.g[x.tier + 1];
+    const k = el.dataset.lgt || "";
+    if (k.startsWith("esp|")) {   // logros especiales otorgados por Administración
+      const n = window.__pxpPersonaActual || yo(), x = mios(n).find((y) => y.k === k); if (!x) return; const T = TIERS[x.tier];
+      tt.style.setProperty("--tc", T.c);
+      tt.innerHTML = `<div class="tt-h">${embN(x.s, x.tier, iconoDe(x), 44, false, imgDe(x), 0)}<div><b>${esc(x.nombre)}</b><span class="tt-t"><i></i>${T.n} · ${S_LBL[x.s] || ""}</span></div></div><p class="tt-why"><em>Otorgado por ${esc(x.esp.por || "Administración")}</em>${esc(x.esp.msg || "")}</p>`;
+      return colocarTT(el);
+    }
+    const [s2, suj, fid] = k.split("|"), f = famDe(fid); if (!f) return;
+    if (!CACHE) CACHE = calcular();
+    const sujeto = s2 === "team" ? "" : suj, v = valor(CACHE, f, sujeto), t = f.g.filter((g) => v >= g).length, cur = Math.max(0, t - 1), T = TIERS[cur], sig = f.g[t];
+    const G = (meta().logros && meta().logros.ganados) || {}, un = UNI[f.m] ? " " + UNI[f.m] : "";
+    const pct = sig ? Math.min(100, Math.round(v / sig * 100)) : 100;
     tt.style.setProperty("--tc", T.c);
-    tt.innerHTML = `<div class="tt-h">${embN(x.s, x.tier, iconoDe(x), 40, false, imgDe(x), 0)}<div><b>${esc(x.nombre)}</b><span class="tt-t"><i></i>${T.n} · ${S_LBL[x.s] || ""}</span></div></div>
-      <p class="tt-why"><em>${x.esp ? "Otorgado por " + esc(x.esp.por || "Administración") : "Se ganó por"}</em>${esc(descDe(x) || "")}</p>
-      <div class="tt-f">${x.ts && !x.b ? `<span>Desbloqueado ${hace(x.ts)}</span>` : `<span>Ya lo tenía al activar los logros</span>`}${sig ? `<span>Siguiente nivel: ${sig}</span>` : x.fam ? `<span>Nivel máximo</span>` : ""}</div>`;
+    const lvl = f.g.map((g, i) => { const gk = G[`${f.s}|${suj}|${f.id}|${i}`], ok = i < t, now = i === t;
+      return `<li class="${ok ? "ok" : now ? "now" : ""}" style="--lc:${TIERS[i].c}"><i></i><b>${TIERS[i].n}</b><span>${g}${un}</span><em>${ok ? (gk && !gk.b ? "✓ " + hace(gk.ts) : "✓ logrado") : now ? `faltan ${Math.max(0, Math.round((g - v) * 10) / 10)}${un}` : "bloqueado"}</em></li>`; }).join("");
+    tt.innerHTML = `<div class="tt-h">${embN(f.s, cur, f.i, 44, !t, "", 0)}<div><b>${esc(f.n)}</b><span class="tt-t"><i></i>${t ? T.n : "Sin desbloquear"} · ${S_LBL[f.s] || ""}${f.s === "grp" && suj ? " · " + esc(GL(suj)) : ""}${f.c ? " · de tu cargo" : ""}</span></div></div>
+      <p class="tt-why"><em>Qué mide</em>${esc(f.d(sig || f.g[3]))}</p>
+      <div class="tt-prog"><div class="tt-pb"><i style="width:${pct}%"></i></div><span>${sig ? `<b>${Math.round(v * 10) / 10}${un}</b> de ${sig}${un} para ${TIERS[t].n}` : `<b>Nivel máximo</b> · ${Math.round(v * 10) / 10}${un}`}</span></div>
+      <ol class="tt-lv">${lvl}</ol>
+      <p class="tt-how"><em>Cómo lograrlo</em>${esc(COMO[f.m] || "Sigue sumando: se cuenta solo con lo que registras en el tablero.")}</p>`;
+    colocarTT(el);
+  }
+  function colocarTT(el) {
     tt.hidden = false;
     const r = el.getBoundingClientRect(), w = tt.offsetWidth, h = tt.offsetHeight;
     tt.style.left = Math.max(8, Math.min(r.left + r.width / 2 - w / 2, innerWidth - w - 8)) + "px";
-    tt.style.top = (r.top - h - 10 < 8 ? r.bottom + 10 : r.top - h - 10) + "px";
+    tt.style.top = (r.top - h - 10 < 8 ? Math.min(r.bottom + 10, innerHeight - h - 8) : r.top - h - 10) + "px";
   }
   const ocultarTT = () => { tt.hidden = true; };
-  document.addEventListener("mouseover", (e) => { const el = e.target.closest && e.target.closest(".lg-pi[data-lgt]"); if (el) mostrarTT(el); else if (!tt.hidden && !(e.target.closest && e.target.closest("#lg-tt"))) ocultarTT(); });
-  document.addEventListener("focusin", (e) => { const el = e.target.closest && e.target.closest(".lg-pi[data-lgt]"); if (el) mostrarTT(el); });
+  const SEL_TT = ".lg-pi[data-lgt],.lg-h-i[data-lgt],.lg-c[data-lgt]";
+  let ttEl = null;
+  document.addEventListener("mouseover", (e) => { const el = e.target.closest && e.target.closest(SEL_TT); if (el) { if (el !== ttEl) { ttEl = el; mostrarTT(el); } } else if (!tt.hidden && !(e.target.closest && e.target.closest("#lg-tt"))) { ttEl = null; ocultarTT(); } });
+  document.addEventListener("focusin", (e) => { const el = e.target.closest && e.target.closest(SEL_TT); if (el) { ttEl = el; mostrarTT(el); } });
+  // En celular: se abre con un toque sobre la tarjeta del logro
+  document.addEventListener("click", (e) => { const el = e.target.closest && e.target.closest(".lg-c[data-lgt]"); if (el && matchMedia("(hover: none)").matches) { ttEl = el; mostrarTT(el); } });
   document.addEventListener("focusout", ocultarTT);
   document.addEventListener("scroll", ocultarTT, true);
   if (window.pxpOnDom) pxpOnDom(() => { try { logrosPerfil(); } catch (e) { console.error(e); } }, { childList: true, subtree: true });

@@ -1,0 +1,30 @@
+// Prueba v167: Home con "Más gráficas" (Global), Dashboard sin fichas, Tráfico a 3 columnas, tarjeta de logros y logros por cargo
+import { createRequire } from "node:module"; import { execSync } from "node:child_process"; import path from "node:path";
+const req = createRequire(import.meta.url); let pw; try { pw = req("playwright"); } catch { pw = req(execSync("npm root -g").toString().trim() + "/playwright"); }
+const b = await pw.chromium.launch(); const page = await (await b.newContext({ viewport: { width: 1440, height: 1000 } })).newPage();
+const errs = []; page.on("pageerror", e => errs.push(e.message)); page.on("console", m => { if (m.type() === "error") errs.push(m.text()); });
+await page.goto("file://" + path.resolve("dist/preview.html")); await page.waitForTimeout(700);
+await page.evaluate(() => { window.pxpSaveBase = function () { }; try { localStorage.setItem("pxp_lg_off", "1"); } catch (e) { } enterApp({ name: "Bastián Torres" }, "preview"); });
+await page.waitForTimeout(1800); await page.evaluate(() => { for (let i = 0; i < 6; i++) try { pxpLogroCerrar(); } catch (e) { } switchView("home"); });
+await page.waitForTimeout(900);
+const ok = [], fail = []; const check = (n, c) => (c ? ok : fail).push(n);
+const fijas = await page.$$eval(".hm-fix .home-panel .hp-title", x => x.map(h => (h.childNodes[0] || {}).textContent.trim()));
+check("tres gráficas fijas", fijas.length === 3 && /Estado del equipo/.test(fijas.join()) && /Tipos de proyecto/.test(fijas.join()));
+check("bloque Más gráficas cerrado", await page.$(".hm-more:not(.open)") !== null && !(await page.isVisible(".hm-more-c")));
+await page.click(".hm-more-b"); await page.waitForTimeout(300);
+check("se despliega", await page.isVisible(".hm-more-c") && await page.$$eval(".hm-more-c .home-panel", x => x.length) >= 4);
+await page.evaluate(() => switchView("home")); await page.waitForTimeout(600);
+check("recuerda que quedó abierto", await page.$(".hm-more.open") !== null);
+await page.evaluate(() => switchView("dashboard")); await page.waitForTimeout(800);
+check("Dashboard sin selector de fichas", !(await page.$("#view-dashboard .dash-vbar")) && !(await page.$("#view-dashboard .pfc-wrap")));
+check("Nuevo proyecto en la fila de disponibilidad", await page.$("#dash-wrap .lb-panel .hp-title .btn-new") !== null);
+await page.evaluate(() => switchView("traffic")); await page.waitForTimeout(800);
+check("Tráfico en 3 columnas", (await page.$eval("#main-grid", g => getComputedStyle(g).gridTemplateColumns.split(" ").length)) === 3);
+await page.evaluate(() => switchView("logros")); await page.waitForTimeout(900);
+check("logros de su cargo (IA)", await page.$$eval(".lg-c.cargo h4", x => x.map(h => h.textContent).join("|")).then(t => /Prompt whisperer/.test(t) && !/50 sombras/.test(t)));
+check("logros generales nuevos", await page.$$eval(".lg-c h4", x => x.map(h => h.textContent).join("|")).then(t => /Viernes 5:29 pm/.test(t) && /Cuatro manos/.test(t)));
+await page.$eval(".lg-c[data-lgt]", e => e.scrollIntoView({ block: "center" })); await page.waitForTimeout(300); await page.mouse.move(5, 5); await page.hover(".lg-c[data-lgt]"); await page.waitForTimeout(300);
+check("tarjeta con niveles y cómo lograrlo", await page.evaluate(() => { const t = document.getElementById("lg-tt"); return !t.hidden && t.querySelectorAll(".tt-lv li").length === 4 && !!t.querySelector(".tt-how"); }));
+check("métricas nuevas calculadas", await page.evaluate(() => { const E = PROJECTS["CASO OREO SABORES"].etapas; E[0].estado = "listo"; E[0].nombre = "Offline / edición"; pxpSetResps(E[0], ["Andrea López", "Bastián Torres"]); return true; }));
+console.log(JSON.stringify({ ok: ok.length, fail, errs: errs.slice(0, 5) }, null, 1));
+await b.close(); process.exit(fail.length || errs.length ? 1 : 0);
