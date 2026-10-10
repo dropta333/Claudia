@@ -5615,14 +5615,6 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;tr
   #pxp-proj .et-grp .et-row{padding:12px 10px 10px!important}
   .et-who{max-width:100%!important}
 }
-.et-fr select,.et-fr2 select,.et-ext select{border:0;background:transparent;color:inherit;font:600 14px/1 var(--sans);padding:2px 0;cursor:pointer;max-width:100%}
-.et-fr.fr-am .i{color:#F5B400}.et-fr.fr-pm .i{color:#7B8CFF}.et-fr.fr-hora .i{color:var(--brand)}
-.et-fr2{font-size:13.5px!important;color:var(--muted)}
-.et-ext{display:inline-flex;align-items:center;gap:6px;font:500 13px/1.2 var(--sans);color:var(--muted)}
-.et-ext label{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
-.et-ext input{accent-color:#FF9F43;width:15px;height:15px;margin:0}
-.et-ext.on{color:#FF9F43;font-weight:600}
-.et-ext.on select{color:#FF9F43}
 /* Varios responsables */
 .et-avs{display:inline-flex}
 .et-avs .et-av + .et-av{margin-left:-9px}
@@ -5640,32 +5632,112 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;tr
 .ep-ft span{flex:1;font:500 13px var(--sans);color:var(--muted)}
 .et-pop{width:290px}
 
-/* Etapas sugeridas según el equipo */
-.et-sugbtn .i{width:16px;height:16px;color:var(--brand)}
-.sg{margin-top:12px;border:1px solid color-mix(in srgb,var(--brand) 45%,var(--border));border-radius:16px;background:var(--surface);padding:16px;animation:dlgIn .18s both}
-.sg-hd{display:flex;gap:12px;align-items:flex-start;margin-bottom:10px}
-.sg-hd > div{flex:1;display:grid;gap:4px}
-.sg-hd b{font:400 20px/1.2 var(--serif)}
-.sg-hd small{font:500 14px/1.45 var(--sans);color:var(--muted)}
-.sg-x{position:static!important}
-.sg-g{display:grid;gap:4px;margin-top:10px}
-.sg-gl{font:700 12.5px/1 var(--display);letter-spacing:.13em;text-transform:uppercase;color:var(--muted2);padding:4px 2px}
-.sg-it{display:grid;grid-template-columns:20px 26px minmax(0,1.4fr) minmax(0,1fr) 52px;align-items:center;gap:12px;padding:9px 10px;border-radius:12px;border:1px solid var(--border);background:var(--bg);cursor:pointer;transition:border-color .15s}
-.sg-it:hover{border-color:var(--border2)}
-.sg-it input{width:17px;height:17px;margin:0;accent-color:var(--brand)}
-.sg-it.ya{opacity:.55;cursor:default}
-.sg-cl{display:grid;place-items:center;width:26px;height:26px;border-radius:8px;background:color-mix(in srgb,var(--clc) 14%,transparent)}
-.sg-cl .i{width:16px;height:16px}
-.sg-n{display:grid;gap:3px;min-width:0}
-.sg-n b{font:600 14.5px/1.25 var(--sans);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sg-n small{font:500 13px/1.2 var(--sans);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sg-who{display:flex;align-items:center;gap:8px;min-width:0}
-.sg-who .et-av + .et-av{margin-left:-14px}
-.sg-wn{font:500 13.5px var(--sans);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sg-h{font:700 15px/1 var(--display);text-align:right}
-.sg-ft{display:flex;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap}
-.sg-ft .note{flex:1;margin:0}
-@media (max-width:720px){.sg-it{grid-template-columns:20px 26px minmax(0,1fr) 44px}.sg-who{grid-column:3/-1}.et-leg{margin-left:0}.et-gp{display:none}}
+/* ═════ v155 · Filas de etapa más bajas · Revisión y Entrega compactas · selectores con estilo de calendario ═════ */
+#pxp-proj .et-grp .et-row{padding:10px 14px!important;gap:0!important}
+#pxp-proj .et-grp .et-top{gap:10px!important;min-height:34px}
+#pxp-proj .et-grp .et-name{font:700 17px/1.2 var(--sans)!important;padding:3px 6px!important}
+#pxp-proj .et-grp .et-bot{margin-top:8px!important}
+#pxp-proj .et-grp .et-cell{padding:6px 12px;gap:3px}
+#pxp-proj .et-grp .et-cl{font-size:11.5px;letter-spacing:.12em}
+#pxp-proj .et-grp .et-cell .et-days input{font:800 16px/1 var(--display)!important}
+.et-cv{display:flex;align-items:center;gap:6px;min-width:0}
+.et-dd{margin-left:6px;font:500 12.5px/1 var(--sans);color:var(--muted);white-space:nowrap}
+.et-pick{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:8px;max-width:100%;margin-left:-6px;padding:3px 6px;border-radius:9px;color:var(--text);transition:background-color .15s}
+.et-pick:hover:not(:disabled){background:var(--surface2)}
+.et-pick:focus-visible{outline:2px solid var(--brand)}
+.et-pick:disabled{cursor:default}
+.et-pick > .i:first-child{width:17px;height:17px;flex:none;color:var(--muted)}
+.et-pick span{display:grid;min-width:0}
+.et-pick b{font:600 14px/1.2 var(--sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.et-pick small{font:500 12.5px/1.2 var(--sans);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.et-pick.ext small{color:#E8892B;font-weight:600}
+.fr-am > .i:first-child{color:#E5A800!important}.fr-pm > .i:first-child{color:#7B8CFF!important}.fr-hora > .i:first-child{color:var(--brand)!important}
+.pz-dot{width:9px;height:9px;border-radius:50%;flex:none;background:var(--muted)}
+.pz-liviana .pz-dot{background:var(--green)}.pz-media .pz-dot{background:var(--yellow)}.pz-pesada .pz-dot{background:var(--red)}
+/* Revisión y Entrega: fila compacta, teñida con el color de su tipo */
+#pxp-proj .et-grp .et-row.mini{padding:7px 12px!important;background:color-mix(in srgb,var(--clc) 6%,var(--bg));border-color:color-mix(in srgb,var(--clc) 28%,var(--border));border-left:3px solid var(--clc)!important}
+#pxp-proj .et-grp .et-row.mini.late{border-color:color-mix(in srgb,var(--red) 45%,var(--border))}
+#pxp-proj .et-grp .et-row.mini .et-top{min-height:30px}
+#pxp-proj .et-grp .et-row.mini .et-name{font:600 15.5px/1.2 var(--sans)!important}
+.et-row.mini .et-n{opacity:.75}
+.et-line{display:flex;flex-wrap:wrap;align-items:center;gap:4px 16px;margin-top:4px;padding-left:46px}
+.et-li{display:inline-flex;align-items:center;gap:10px;min-width:0;position:relative}
+.et-li + .et-li::before{content:"";position:absolute;left:-9px;top:50%;width:1px;height:16px;transform:translateY(-50%);background:var(--border)}
+.et-line .et-chip{border:0!important;background:none!important;padding:0!important;height:auto!important;min-height:0!important;box-shadow:none!important;gap:6px}
+.et-line .et-chip::before{display:none!important}
+.et-line .et-date input{font:600 14px/1.2 var(--sans)!important;width:62px!important;border:0;background:transparent;color:var(--text);padding:0;cursor:pointer}
+.et-line .et-days button{width:24px!important;height:24px!important;border:1px solid var(--border)!important;border-radius:7px!important;background:var(--surface);color:var(--text);cursor:pointer}
+.et-line .et-days input{width:28px;text-align:center;font:800 15px/1 var(--display);border:0;background:transparent;color:var(--text)}
+.et-line .et-days i{font-style:normal;font:600 13px/1 var(--display);color:var(--muted)}
+.et-row.mini .et-sts{transform:scale(.9);transform-origin:right center}
+.et-line .et-who .av{--s:22px!important}
+.et-line .et-who{height:28px!important}
+/* Selector flotante (Horario, Exigencia) con el lenguaje del calendario de cuadros */
+.pk-menu{width:286px!important;padding:12px!important;border-radius:16px;font-family:var(--sans)}
+.pk-menu .pk-h{margin-bottom:8px}
+.pk-ops{display:grid;gap:3px}
+.pk-op{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:11px;padding:8px 10px;border-radius:11px;border:1px solid transparent;transition:background-color .15s,border-color .15s}
+.pk-op:hover,.pk-op:focus-visible{background:var(--surface2)}
+.pk-op.on{background:color-mix(in srgb,var(--brand) 14%,transparent);border-color:color-mix(in srgb,var(--brand) 45%,transparent)}
+.pk-op > .i:first-child{width:18px;height:18px;flex:none;color:var(--muted)}
+.pk-op > .i:last-child:not(:first-child){width:16px;height:16px;margin-left:auto;color:var(--text);flex:none}
+.pk-op span{display:grid;gap:2px;min-width:0}
+.pk-op b{font:600 14px/1.2 var(--sans)}
+.pk-op small{font:500 12.5px/1.25 var(--sans);color:var(--muted)}
+.pk-sub{margin:12px 2px 6px;font:700 12px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--muted2)}
+.pk-hrs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.pk-hrs .pk-d{aspect-ratio:auto;height:32px;font:600 13px/1 var(--sans)}
+.pk-ext{display:flex;flex-wrap:wrap;gap:5px}
+.pk-ext .pk-q.on{background:#E8892B;border-color:#E8892B;color:#0A0A0A}
+.pk-ext .pk-q:first-child.on{background:var(--text);border-color:var(--text);color:var(--bg)}
+/* Sugerir etapas por fase (un clic) */
+.sg-bar{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px;margin-left:6px}
+.sg-l{display:inline-flex;align-items:center;gap:6px;font:600 13.5px var(--sans);color:var(--muted);margin-right:2px}
+.sg-l .i{width:16px;height:16px;color:var(--brand)}
+.sg-c{all:unset;box-sizing:border-box;cursor:pointer;padding:6px 12px;border-radius:99px;border:1px dashed color-mix(in srgb,var(--brand) 60%,var(--border));font:600 13.5px/1 var(--sans);color:var(--text);transition:background-color .15s}
+.sg-c:hover,.sg-c:focus-visible{background:color-mix(in srgb,var(--brand) 14%,transparent);border-style:solid}
+.sg-undo{display:inline-flex;align-items:center;gap:8px;margin-left:6px;font:500 13.5px var(--sans);color:var(--muted);animation:dlgIn .2s both}
+/* Revisión = feedback: sugerencia de bloqueador */
+.et-bq{flex:none;display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;border:1px dashed #F0476B;background:transparent;color:#F0476B;font:700 12px/1 var(--display);letter-spacing:.05em;text-transform:uppercase;cursor:pointer}
+.et-bq .i{width:13px;height:13px}
+.et-bq:hover{background:color-mix(in srgb,#F0476B 12%,transparent)}
+.et-bq.on{border-style:solid;background:color-mix(in srgb,#F0476B 14%,transparent);cursor:default}
+@media (max-width:720px){.et-leg{margin-left:0}.et-gp{display:none}.et-line{padding-left:0;gap:8px 16px}.et-row.mini .et-sts{transform:none}.sg-bar{margin-left:0}}
+/* ═════ v155 · Cronograma: todas las etapas, altura controlada, vista Año, mañana/tarde e inicio del proyecto ═════ */
+.cr-in{position:relative}
+.cr.many .cr-body{max-height:440px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+.cr.many .cr-row,.cr.many .cr-t{min-height:30px}
+.cr.many .cr-bar{top:5px;bottom:5px}
+.cr.many .cr-l b{font-size:13.5px}
+.cr.many .cr-l .av{--s:18px!important}
+.cr-cnt{font:600 12.5px var(--sans);color:var(--muted)}
+.cr-now{top:0!important}
+.cr-now .cr-trail,.cr-now::after{top:0!important}
+.cr-now .cr-head{top:-6px!important}
+.cr-nowh,.cr-inih{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;z-index:4;transition:left 1.2s cubic-bezier(.2,.8,.2,1)}
+.cr-nowh{background:var(--crn)}
+.cr-nowh em,.cr-inih em{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-style:normal;font:700 12.5px/1 var(--display);letter-spacing:.04em;padding:4px 7px;border-radius:99px;white-space:nowrap}
+.cr-nowh em{background:var(--crn);color:var(--bg)}
+.cr-ini{position:absolute;top:0;bottom:0;width:0;border-left:2px dashed #00A3C4;z-index:3}
+.cr-inih{background:#00A3C4;z-index:5}
+.cr-inih em{background:#00A3C4;color:#fff}
+.cr-leg .ini i{border:0;border-left:2px dashed #00A3C4;border-radius:0;background:none;width:4px}
+.cr-out{position:absolute;top:50%;transform:translateY(-50%);padding:3px 9px;border-radius:99px;border:1px dashed var(--c);background:color-mix(in srgb,var(--c) 10%,transparent);font:600 12.5px/1 var(--sans);color:color-mix(in srgb,var(--c) 65%,var(--text));white-space:nowrap}
+.cr-out.l{left:6px}.cr-out.r{right:6px}
+.cr-out.listo{opacity:.6}
+.cr-tk.mo{transform:translate(-50%,-50%)!important;text-transform:capitalize;font-weight:600}
+.cr[data-m=anio] .cr-bar{min-width:3px;border-radius:4px}
+.cr[data-m=mes] .cr-bar.am,.cr[data-m=anio] .cr-bar.am{bottom:50%;border-radius:5px}
+.cr[data-m=mes] .cr-bar.pm,.cr[data-m=anio] .cr-bar.pm{top:50%;border-radius:5px}
+.cr-leg .am i{background:linear-gradient(var(--muted) 0 50%,transparent 50%)}
+.cr-leg .pm i{background:linear-gradient(transparent 0 50%,var(--muted) 50%)}
+/* v155 · Inicio del proyecto en la barra de resumen (primero, color propio) */
+.pj-ini{position:relative;--ic:#00A3C4;background:color-mix(in srgb,var(--ic) 11%,var(--bg))!important;box-shadow:inset 0 -3px 0 var(--ic)}
+.pj-ini b{color:color-mix(in srgb,var(--ic) 80%,var(--text))}
+.pj-ini .ks{color:color-mix(in srgb,var(--ic) 60%,var(--text));font-weight:600}
+.pj-ini.none{--ic:var(--muted)}
+.pj-ini-dot{display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--ic);margin-right:6px;vertical-align:1px}
+.cfg-ini .cfg-l .pl{color:#00A3C4}
 </style>
 </head>
 <body>
@@ -6573,6 +6645,7 @@ function pxpClaseEtapa(e) {
 }
 function pxpTipoEtapa(e) {
   if (e && e.peso && PXP_EXIGENCIA[e.peso]) return e.peso;
+  if (e && pxpClaseEtapa(e) !== "proceso") return "liviana";   // v155 · revisiones y entregas: liviana por defecto
   const n = String((e && e.nombre) || "").toLowerCase();
   if (/3d|cgi|vfx|compo|(^|[^a-záéíóúñ])ia([^a-záéíóúñ]|$)|generaci|anima|render|rotoscop|tracking|modelad|motion/.test(n)) return "pesada";
   if (/master|export|entrega|env[ií]o|aprobaci|revisi|conform|subt[ií]t|legal|qc|ingesta|backup|presentaci|turno|toma de voz|feedback/.test(n)) return "liviana";
@@ -11635,6 +11708,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       ${field("ag", "Agencia creativa", PL.ag, agenciaV ? esc(agenciaV) : `<span class="cfg-nil">Sin agencia</span>`, panelAg)}
       ${window.pxpPDHtml ? field("pd", "Piezas · Hero y derivadas", PI("<rect x='3.5' y='4' width='17' height='5' rx='1.5'/><rect x='3.5' y='11' width='17' height='5' rx='1.5'/><path d='M7 20h10'/>", "pl"), (() => { const R = window.pxpPiezasResumen ? pxpPiezasResumen(p) : null; return !det.length ? `<span class="cfg-nil">Sin definir</span>` : R && R.hero ? `Hero${R.hero.dur ? " " + esc(R.hero.dur) : ""}${R.nD ? ` + ${R.nD} derivada${R.nD !== 1 ? "s" : ""}` : ""}` : `${nDet} pieza${nDet !== 1 ? "s" : ""} · <span class="cfg-req">sin Hero</span>`; })(), `<div class="pd">${pxpPDHtml(k)}</div>`) : ""}
       ${window.pxpADHtml ? field("ad", "Adaptaciones por país", PI("<circle cx='12' cy='12' r='8.5'/><path d='M3.5 12h17M12 3.5c2.5 2.6 2.5 14.4 0 17M12 3.5c-2.5 2.6-2.5 14.4 0 17'/>", "pl"), ad.length ? `${ad.length} país${ad.length !== 1 ? "es" : ""} · ${vers} versión${vers !== 1 ? "es" : ""}` : `<span class="cfg-nil">Ninguna</span>`, `<div class="pd">${pxpADHtml(k)}</div>`) : ""}
+      ${(() => { const fi = p.fechaInicio || "";
+        return `<div class="cfg-f cfg-ini"><button type="button" class="cfg-b ent-btn" onclick="pxpInicioPick(this,'${ea(k)}')" aria-haspopup="dialog"><span class="cfg-l">${PI("<path d='M5 21V4'/><path d='M5 4h9l-1.5 3.5L14 11H5'/><circle cx='18' cy='17' r='3'/>", "pl")}Inicio del proyecto</span><span class="cfg-v">${fi ? fmtD(fi) + (p.inicioEst ? ` <em class="cfg-tag">estimado</em>` : "") : `<span class="cfg-nil">Sin definir</span>`}</span>${PI("<rect x='4' y='5' width='16' height='15' rx='2'/><path d='M4 10h16M9 3v4M15 3v4'/>", "cfg-cal")}</button></div>`; })()}
       ${(() => { const ef = p.entregaFinal || "";
         return `<div class="cfg-f"><button type="button" class="cfg-b ent-btn" onclick="pxpEntregaPick(this,'${ea(k)}')" aria-haspopup="dialog"><span class="cfg-l">${PI("<path d='M6 21V4'/><path d='M6 4.5h11l-2 4 2 4H6'/>", "pl")}Entrega final</span><span class="cfg-v">${ef ? fmtD(ef) + (p.entregaEst ? ` <em class="cfg-tag">estimada</em>` : "") : `<span class="cfg-nil cfg-req">Falta · define la salud</span>`}</span>${PI("<rect x='4' y='5' width='16' height='15' rx='2'/><path d='M4 10h16M9 3v4M15 3v4'/>", "cfg-cal")}</button></div>`; })()}
       <div class="cfg-f cfg-st"><span class="cfg-l">${PL.cpx}Complejidad</span><div class="seg pj-cpx" role="group" aria-label="Complejidad">${CPX.map(([v, l], n) => `<button type="button" class="${cpx === v ? "on" : ""}" style="--sc:${["var(--green)", "var(--yellow)", "var(--red)"][n]}" onclick="pxpProjSet('cpx','${v}')" aria-pressed="${cpx === v}"><span class="ic">${PI(CPX_IC(n + 1), "bars")}</span><span class="tx">${l}</span></button>`).join("")}</div></div>
@@ -11644,6 +11719,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const right = `<aside class="cfg-sum" style="--sc:${E[2]};--tc:${TC[tipo] || "var(--muted)"};--cc:${cCol}">
       <div class="cs-a"><span class="cs-k">Estado</span><div class="cs-est"><span class="ic">${PI(ST_IC[est])}</span><b>${E[1]}</b></div></div>
       <div class="cs-grid"><div><span class="cs-k">Tipo</span><b class="cs-v cs-tp">${PI(TIPO_IC[tipo] || TAG_IC)}${esc(tipo)}</b></div><div><span class="cs-k">Complejidad</span><b class="cs-v cs-cx">${PI(CPX_IC(ci + 1), "bars")}${CPX[ci][1]}</b></div>
+        <div class="cs-wide"><span class="cs-k">Inicio del proyecto</span><b class="cs-v">${p.fechaInicio ? fmtD(p.fechaInicio) + (p.inicioEst ? ` <em class="cfg-tag">estimado</em>` : "") : `<span class="cfg-nil">Sin definir</span>`}</b></div>
         <div class="cs-wide"><span class="cs-k">Entrega final</span><b class="cs-v">${p.entregaFinal ? fmtD(p.entregaFinal) + (p.estadoGeneral === "entregado" ? "" : (() => { const l = diasLabel(diffDays(p.entregaFinal)); return ` <span class="due-pill ${l.cls}">${esc(l.txt)}</span>`; })()) : `<span class="cfg-nil cfg-req">Sin definir</span>`}</b></div>
         <div class="cs-wide"><span class="cs-k">Agencia creativa</span><b class="cs-v">${agenciaV ? esc(agenciaV) : `<span class="cfg-nil">Sin agencia</span>`}</b></div></div>
       <div class="cs-pz"><span class="cs-k">Piezas</span>${tot ? `<div class="cs-big"><b>${ok}</b><span>/ ${tot} entregadas</span><em>${pct}%</em></div><span class="cs-bar"><i style="width:${pct}%"></i></span>` : `<span class="cfg-nil">Sin definir</span>`}</div>
@@ -11661,14 +11737,14 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const et = (p.etapas || []).slice().filter(e => e.nombre || e.fecha).sort((a, b) => (a.fecha || "9999").localeCompare(b.fecha || "9999"));
     const listos = et.filter(e => e.estado === "listo").length, pct = et.length ? Math.round(listos / et.length * 100) : 0;
     const next = et.find(e => e.estado !== "listo" && e.fecha);
-    const dias = diasEjecucion(p), hReg = Math.round(horasRegistradas(p) * 10) / 10, hEst = parseFloat(p.horasEstimadas) || 0;
+    const hReg = Math.round(horasRegistradas(p) * 10) / 10, hEst = parseFloat(p.horasEstimadas) || 0;
     const ms = members(p);
     const due = (iso) => { if (!iso) return ""; const l = diasLabel(diffDays(iso)); return `<span class="due-pill ${l.cls}">${esc(l.txt)}</span>`; };
 
     const kpis = `<div class="pj-kpis">
+      ${window.pxpInicioKpi ? pxpInicioKpi(k, p) : ""}
       <div><span class="kl">Próxima etapa</span>${next ? `<b>${esc(next.nombre || "Etapa")}</b><span class="ks">${fmtD(next.fecha)} ${due(next.fecha)}</span>` : `<b class="muted">Sin fechas</b><span class="ks">Agrega etapas abajo</span>`}</div>
       <div><span class="kl">Avance</span><b>${et.length ? pct + "%" : "—"}</b><span class="ks">${et.length ? `${listos} de ${et.length} etapas listas` : "sin etapas"}</span></div>
-      <div><span class="kl">Días en ejecución</span><b>${dias == null ? "—" : dias}</b><span class="ks">${p.fechaInicio ? "desde " + fmtD(p.fechaInicio) : "sin fecha de inicio"}</span></div>
       <div><span class="kl">Horas</span><b>${hReg}${hEst ? `<small> / ${hEst}</small>` : ""}</b><span class="ks">${hEst ? (hReg > hEst ? `<span class="t-late">${Math.round(hReg - hEst)} h por encima</span>` : `${Math.round(hReg / hEst * 100)}% de lo estimado`) : "anotadas en la ficha"}</span></div>
       ${window.pxpEntregaKpi ? pxpEntregaKpi(k, p) : ""}
     </div>`;
@@ -11733,6 +11809,14 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       if (q.piezas && q.piezasOk > q.piezas) q.piezasOk = q.piezas;
       q.historial.push({ ts: new Date().toISOString(), usuario: currentUser, texto: what === "piezas" ? `Piezas → ${n}` : `Piezas entregadas → ${n}`, tipo: "cambio" });
       await saveP(); return;
+    }
+    if (what === "inicioEst") { const q = ensure(k); if (v) q.inicioEst = true; else delete q.inicioEst; q.historial = q.historial || []; q.historial.push({ ts: new Date().toISOString(), usuario: currentUser, texto: `Inicio del proyecto ${v ? "estimado" : "confirmado"}`, tipo: "cambio" }); await saveP(); renderProj(); return; }
+    if (what === "inicio") {   // v155 · la fecha de inicio también mueve la primera etapa encadenada
+      const q = ensure(k), nv = /^\d{4}-\d{2}-\d{2}$/.test(v || "") ? v : ""; if (nv === (q.fechaInicio || "")) return;
+      if (nv) q.fechaInicio = nv; else { delete q.fechaInicio; delete q.inicioEst; } cfgOpen = null;
+      if (window.pxpPlanEtapas) pxpPlanEtapas(q).forEach(x => { if (!x.legacy) { x.e.inicio = x.ini; x.e.fecha = x.fin; } });
+      q.historial = q.historial || []; q.historial.push({ ts: new Date().toISOString(), usuario: currentUser, texto: `Inicio del proyecto → ${nv || "sin fecha"}`, tipo: "cambio" });
+      await saveP(); renderProj(); return;
     }
     if (what === "entregaEst") { const q = ensure(k); if (v) q.entregaEst = true; else delete q.entregaEst; q.historial = q.historial || []; q.historial.push({ ts: new Date().toISOString(), usuario: currentUser, texto: `Entrega final ${v ? "estimada" : "confirmada"}`, tipo: "cambio" }); await saveP(); renderProj(); return; }
     if (what === "entrega") {
@@ -13412,7 +13496,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   }
   // v154 · Franja: "am" = 0 h (8:30) · "pm" = 4 h (13:30) · "hora" = e.hIni. Encadenada (sin franja) = null.
   const franjaH = (e) => e.franja === "am" ? 0 : e.franja === "pm" ? 4 : e.franja === "hora" ? Math.max(0, Math.min(JOR - 0.5, +e.hIni || 0)) : null;
-  const reloj = (h) => { const r = h <= 4 ? 8.5 + h : 9.5 + h, hh = Math.floor(r + 1e-6), mm = Math.round((r - hh) * 60); return hh + ":" + String(mm).padStart(2, "0"); };
+  // Hora del reloj para una posición de la jornada. A las 4 h es 12:30 si es un final y 13:30 si es un inicio (después del almuerzo).
+  const reloj = (h, ini) => { const r = (ini ? h < 4 - 1e-9 : h <= 4 + 1e-9) ? 8.5 + h : 9.5 + h, hh = Math.floor(r + 1e-6), mm = Math.round((r - hh) * 60); return hh + ":" + String(mm).padStart(2, "0"); };
   // Posición absoluta en horas laborales (para cruces entre proyectos y carga por semana)
   const ORD0 = "2025-01-01", ordC = new Map();
   const ordHabil = (s) => { if (ordC.has(s)) return ordC.get(s); let n = 0, d = D(ORD0); const t = D(s), dir = t >= d ? 1 : -1; while (iso(d) !== s) { if (dir > 0) { if (isWork(iso(d))) n++; d.setDate(d.getDate() + 1); } else { d.setDate(d.getDate() - 1); if (isWork(iso(d))) n--; } } ordC.set(s, n); return n; };
@@ -13453,64 +13538,84 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     return ROLE_FIELDS.some(rf => pxpRolePeople(p, rf.key).some(n => normName(n) === me)) || (p.pms || []).some(n => normName(n) === me) || (p.etapas || []).some(e => pxpEsResp(e, me)) || (window.pxpKeysDe && window.pxpFindPerson && (() => { const f = pxpFindPerson(currentUser); return f ? pxpKeysDe(f).includes(k) : false; })());
   }
   const PESOS = [["", "Auto"], ["liviana", "Liviana"], ["media", "Media"], ["pesada", "Pesada"]];
-  function pesoChip(i, e, ed) {
-    const auto = window.pxpTipoEtapa ? pxpTipoEtapa({ nombre: e.nombre }) : "media", v = e.peso || "";
-    const lb = v ? PESOS.find(p => p[0] === v)[1] : PESOS.find(p => p[0] === auto)[1] + " · auto";
-    return `<span class="et-chip et-peso pz-${v || auto}">${ed ? `<select onchange="pxpEt('peso',${i},this.value)" aria-label="Exigencia de la etapa">${PESOS.map(([k, l]) => `<option value="${k}" ${k === v ? "selected" : ""}>${k ? l : "Auto (" + PESOS.find(p => p[0] === auto)[1] + ")"}</option>`).join("")}</select>` : `<span>${lb}</span>`}</span>`;
-  }
-  // v154 · Íconos de clase (Proceso · Revisión · Entrega) y de fase
+  const PESO_X = { liviana: "×0,6", media: "×1", pesada: "×1,3" };
+  // v155 · Duración sugerida por tipo de etapa (se puede cambiar): proceso 8 h · revisión 4 h · entrega 1 h
+  const HP_DEF = { proceso: 8, revision: 4, entrega: 1 };
+  // v154 · Íconos de clase (Proceso · Revisión · Entrega)
   const CLI = {
     proceso: "<svg class='i' viewBox='0 0 24 24' aria-hidden='true'><path d='M4 12h10'/><path d='m11 7 5 5-5 5'/><path d='M20 5v14'/></svg>",
     revision: IC.revision,
     entrega: "<svg class='i' viewBox='0 0 24 24' aria-hidden='true'><path d='M4 12.5 20 4l-4.5 16-3.5-6.5z'/><path d='m12 13.5 8-9.5'/></svg>",
   };
-  const FRANJAS = [["", "Encadenada"], ["am", "Mañana"], ["pm", "Tarde"], ["hora", "Hora exacta"]];
+  const SVG = (d) => `<svg class='i' viewBox='0 0 24 24' aria-hidden='true'>${d}</svg>`;
+  const FR_IC = { "": SVG("<rect x='3' y='9' width='7' height='6' rx='1.5'/><rect x='14' y='9' width='7' height='6' rx='1.5'/><path d='M10 12h4'/>"), am: SVG("<circle cx='12' cy='12' r='4'/><path d='M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4'/>"), pm: SVG("<path d='M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z'/>"), hora: SVG("<circle cx='12' cy='12' r='8.5'/><path d='M12 7.5V12l3 2'/>") };
+  const FRANJAS = [["", "Encadenada", "Empieza al terminar la anterior"], ["am", "Mañana", "8:30 – 12:30"], ["pm", "Tarde", "13:30 – 17:30"], ["hora", "Hora exacta", "Elige la hora de inicio"]];
   const HORAS_OPC = []; for (let h = 0; h < JOR; h += 0.5) HORAS_OPC.push(h);
-  const HASTA_OPC = ["18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00", "22:00", "23:00"];
+  const HASTA_OPC = ["18:00", "18:30", "19:00", "19:30", "20:00", "21:00", "22:00", "23:00"];
   const faseL = (f) => (PXP_FASES.find(x => x[0] === f) || PXP_FASES[2])[1];
-  // Grupos abiertos o cerrados (por persona y proyecto); por defecto se abre el grupo con la próxima etapa pendiente
   const grpKey = "pxp_etg";
   const grpGet = () => { try { return JSON.parse(pref(grpKey, "{}")) || {}; } catch (e) { return {}; } };
-  let sugOpen = null;   // proyecto con el panel de "Etapas sugeridas" abierto
-  function respChip(i, e, ed) {
+
+  function respChip(i, e, ed, mini) {
     const R = pxpResps(e), n = R.length;
     const nm = n ? (R[0] || "").trim().split(/\s+/)[0] : "";
-    const avs = R.slice(0, 3).map(r => `<span class="et-av">${av(r, 24)}</span>`).join("");
-    return `<button type="button" class="et-chip et-who${n ? "" : " empty"}${n > 1 ? " multi" : ""}" ${ed ? `onclick="pxpEtWho(${i},this)"` : "disabled"} aria-haspopup="dialog" aria-label="${n ? "Responsables: " + esc(R.join(", ")) : "Asignar responsables"}" data-tip="${n ? esc(R.join("<br>")) + (n > 1 ? "<br>Las horas se reparten entre " + n : "") : (ed ? "Asignar responsables" : "Sin responsable")}">${n ? `<span class="et-avs">${avs}</span><span>${esc(nm)}${n > 1 ? ` <em>+${n - 1}</em>` : ""}</span>` : IC.user + `<span>Responsables</span>`}</button>`;
+    const avs = R.slice(0, 3).map(r => `<span class="et-av">${av(r, mini ? 22 : 24)}</span>`).join("");
+    return `<button type="button" class="et-chip et-who${n ? "" : " empty"}${n > 1 ? " multi" : ""}" ${ed ? `onclick="pxpEtWho(${i},this)"` : "disabled"} aria-haspopup="dialog" aria-label="${n ? "Responsables: " + esc(R.join(", ")) : "Asignar responsables"}" data-tip="${n ? esc(R.join("<br>")) + (n > 1 ? "<br>Las horas se reparten entre " + n : "") : (ed ? "Asignar responsables" : "Sin responsable")}">${n ? `<span class="et-avs">${avs}</span><span>${esc(nm)}${n > 1 ? ` <em>+${n - 1}</em>` : ""}</span>` : IC.user + `<span>${mini ? "Asignar" : "Responsables"}</span>`}</button>`;
   }
-  function franjaCell(i, e, x, ed) {
-    const v = e.franja || "", dis = ed ? "" : "disabled";
-    const rango = x.ini ? `${reloj(x.hi || 0)} → ${reloj(x.hf == null ? JOR : x.hf)}${x.fin && x.fin !== x.ini ? " +" + (x.dias - 1) + " d" : ""}` : "";
-    return `<div class="et-cell c-fr"><span class="et-cl">Horario</span>
-      <span class="et-chip et-fr fr-${v || "auto"}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true">${v === "pm" ? "<path d='M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z'/>" : v === "am" ? "<circle cx='12' cy='12' r='4'/><path d='M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4'/>" : "<circle cx='12' cy='12' r='8.5'/><path d='M12 7.5V12l3 2'/>"}</svg><select onchange="pxpEt('franja',${i},this.value)" aria-label="Horario de la etapa" ${dis}>${FRANJAS.map(([k, l]) => `<option value="${k}" ${k === v ? "selected" : ""}>${l}</option>`).join("")}</select></span>
-      ${v === "hora" ? `<span class="et-chip et-fr2"><span>Desde</span><select onchange="pxpEt('hIni',${i},this.value)" aria-label="Hora de inicio" ${dis}>${HORAS_OPC.map(h => `<option value="${h}" ${Math.abs(h - (+e.hIni || 0)) < 1e-6 ? "selected" : ""}>${reloj(h)}</option>`).join("")}</select></span>` : ""}
-      <small class="et-hint">${esc(rango)}</small>
-      ${!ed && !e.extiende ? "" : `<span class="et-ext${e.extiende ? " on" : ""}"><label><input type="checkbox" ${e.extiende ? "checked" : ""} onchange="pxpEt('extiende',${i},this.checked)" ${dis}>Se extiende</label>${e.extiende ? `<select onchange="pxpEt('hasta',${i},this.value)" aria-label="Se extiende hasta" ${dis}>${HASTA_OPC.map(h => `<option ${h === (e.hasta || "19:00") ? "selected" : ""}>${h}</option>`).join("")}</select>` : ""}</span>`}
-    </div>`;
+  // Botón de horario: muestra la franja y el rango; abre un selector con el estilo del calendario
+  function franjaBtn(i, e, x, ed) {
+    const v = e.franja || "", F = FRANJAS.find(f => f[0] === v) || FRANJAS[0];
+    const rango = x.ini ? `${reloj(x.hi || 0, true)}–${reloj(x.hf == null ? JOR : x.hf)}${x.fin && x.fin !== x.ini ? ` +${x.dias - 1}d` : ""}` : "";
+    return `<button type="button" class="et-pick fr-${v || "auto"}${e.extiende ? " ext" : ""}" ${ed ? `onclick="pxpEtPick('fr',${i},this)"` : "disabled"} aria-haspopup="dialog" aria-label="Horario: ${F[1]} ${rango}${e.extiende ? ", se extiende hasta " + (e.hasta || "19:00") : ""}">${FR_IC[v]}<span><b>${v === "hora" ? reloj(+e.hIni || 0, true) : F[1]}</b><small>${rango}${e.extiende ? ` · hasta ${esc(e.hasta || "19:00")}` : ""}</small></span></button>`;
+  }
+  function pesoBtn(i, e, ed) {
+    const v = e.peso || "", t = pxpTipoEtapa(e), L = PESOS.find(p => p[0] === t)[1];
+    return `<button type="button" class="et-pick pz pz-${t}" ${ed ? `onclick="pxpEtPick('pz',${i},this)"` : "disabled"} aria-haspopup="dialog" aria-label="Exigencia: ${L}${v ? "" : " (automática)"}"><i class="pz-dot" aria-hidden="true"></i><span><b>${L}</b><small>${PESO_X[t]}${v ? "" : " · auto"}</small></span></button>`;
+  }
+  // Sugerencia de bloqueador: una revisión es feedback y puede detener lo que sigue
+  function bloqSug(k, e, i, st, late) {
+    if (pxpClaseEtapa(e) !== "revision" || st === "listo" || !(st === "en_curso" || st === "revision" || st === "bloqueada" || late)) return "";
+    const act = ((PROJECTS[k] || {}).bloqueos || []).find(b => !b.fin && b.etapa === (e.nombre || ""));
+    if (act) return `<span class="et-bq on" data-tip="Bloqueador activo desde ${fmtD(act.inicio)}">${IC.bloqueada}Bloqueando lo que sigue</span>`;
+    return enProyecto(k) || can() ? `<button type="button" class="et-bq" onclick="pxpEt('bloquear',${i})" data-tip="El feedback puede detener las etapas siguientes. Repórtalo como bloqueador para medir los días perdidos.">${IC.bloqueada}¿Bloquea lo que sigue?</button>` : "";
   }
   function rowHtml(k, x, i, n, t, ed, meN) {
     const e = x.e, st = e.estado || "pendiente", late = x.fin && x.fin < t && st !== "listo";
     const due = x.fin && st !== "listo" ? (() => { const l = diasLabel(Math.round((D(x.fin) - D(t)) / 86400000)); return `<span class="due-pill ${l.cls}">${esc(l.txt)}</span>`; })() : (st === "listo" ? `<span class="due-pill ok">Listo</span>` : "");
     const own = pxpEsResp(e, meN), stOk = ed || own, prop = own && !!e.propuesta, nmOk = ed || prop;
     const cr = cruces(k, x), crTip = cr.map(o => `${esc((o.quien || "").split(/\s+/)[0])}: ${esc(o.nombre)} · ${esc(getProjectDisplay(o.k).nombre || o.k)}`).join("<br>");
-    const cl = pxpClaseEtapa(e), CL = PXP_CLASES[cl];
-    return `<li class="et-row ${st}${late ? " late" : ""}${own ? " own" : ""}" data-i="${i}" style="--sc:${ETS[st][1]};--clc:${CL[1]}">
-        <div class="et-top">
-          <button class="et-grip" type="button" aria-label="Arrastrar para cambiar el orden" data-tip="Arrastra para cambiar el orden">${IC.grip}</button>
+    const cl = pxpClaseEtapa(e), CL = PXP_CLASES[cl], mini = cl !== "proceso";
+    const hrsOk = ed || own;
+    const dur = `<span class="et-chip et-days et-hrs" data-tip="Horas de trabajo · jornada de 8 h"><button type="button" onclick="pxpEt('horas',${i},${x.horas}-${x.horas > 8 ? 4 : 1})" ${x.horas <= 1 || !hrsOk ? "disabled" : ""} aria-label="Menos horas">−</button><input type="text" inputmode="decimal" id="et-dias-${i}" value="${fH(x.horas)}" onchange="pxpEt('horas',${i},this.value)" aria-label="Horas de la etapa" ${hrsOk ? "" : "readonly"}><i>h</i><button type="button" onclick="pxpEt('horas',${i},${x.horas}+${x.horas >= 8 ? 4 : 1})" ${hrsOk ? "" : "disabled"} aria-label="Más horas">+</button>${x.horas >= 8 || pxpResps(e).length > 1 ? `<small class="et-dd">${[x.horas >= 8 ? fH(x.horas / 8) + " d" : "", pxpResps(e).length > 1 ? fH(x.horas / pxpResps(e).length) + " h c/u" : ""].filter(Boolean).join(" · ")}</small>` : ""}</span>`;
+    const fecha = (a, ic, lb, id, iso, fx) => `<span class="et-chip et-date${fx ? " fixed" : ""}${a === "fin" ? " et-end" : ""}">${ic}<input type="text" readonly class="et-dt" id="${id}" data-iso="${iso || ""}" value="${fmtL(iso)}" onclick="pxpCal(this,'${a}',${i})" aria-label="${lb}" ${ed ? "" : "disabled"}>${a === "inicio" ? `<button type="button" class="et-pin" onclick="pxpEt('${x.fija ? "auto" : "fix"}',${i})" aria-label="${x.fija ? "Fecha fija: toca para encadenarla a la anterior" : "Encadenada a la anterior: toca para fijar la fecha"}" data-tip="${x.fija ? "Fecha fija · toca para que empiece al terminar la anterior" : "Empieza al terminar la anterior · toca para fijar la fecha"}">${x.fija ? IC.pin : IC.link}</button>` : ""}</span>`;
+    const head = `<button class="et-grip" type="button" aria-label="Arrastrar para cambiar el orden" data-tip="Arrastra para cambiar el orden">${IC.grip}</button>
           <span class="et-n">${i + 1}</span>
-          <button type="button" class="et-cls cl-${cl}${e.clase ? "" : " auto"}" ${ed ? `onclick="pxpEtCls(${i},this)"` : "disabled"} aria-haspopup="menu" aria-label="Tipo: ${CL[0]}${e.clase ? "" : " (automático)"}. Fase: ${faseL(pxpFaseEtapa(e))}" data-tip="${CL[0]} · ${faseL(pxpFaseEtapa(e))}${ed ? "<br>Toca para cambiar el tipo o la fase" : ""}">${CLI[cl]}<span>${CL[0]}</span></button>
-          <input class="et-name" id="et-name-${i}" value="${esc(e.nombre || "")}" placeholder="Nombre de la etapa o tarea" onchange="pxpEt('name',${i},this.value)" aria-label="Nombre de la etapa ${i + 1}" ${nmOk ? "" : "readonly"}>${own && !ed ? `<span class="et-mine">Tuya</span>` : ""}${e.propuesta ? `<span class="et-prop" data-tip="La agregó ${esc(e.propuesta)}. Administración la confirma.">Propuesta${ed ? `<button type="button" onclick="pxpEt('confirmar',${i})">Confirmar</button>` : ""}</span>` : ""}${cr.length ? `<span class="et-cruce" data-tip="<b>Se cruza con</b><br>${crTip}">⚠ Cruce de horario</span>` : ""}${e.extiende ? `<span class="et-xt" data-tip="Esta etapa se extiende después de las 17:30">Hasta ${esc(e.hasta || "19:00")}</span>` : ""}${due ? `<span class="et-due">${due}</span>` : ""}
-          <span class="et-sts" role="group" aria-label="Estado de la etapa">${Object.entries(ETS).map(([v, [l, c]]) => `<button type="button" class="et-sb${v === st ? " on" : ""}" style="--c:${c}" onclick="pxpEt('estado',${i},'${v}')" aria-pressed="${v === st}" aria-label="${l}" data-tip="${stOk ? l : l + " · solo sus responsables o Administración"}" ${stOk ? "" : "disabled"}>${IC[v]}</button>`).join("")}</span>
-          <span class="et-moves"><button type="button" onclick="pxpEt('up',${i})" ${i === 0 ? "disabled" : ""} aria-label="Subir" data-tip="Subir">${IC.up}</button><button type="button" onclick="pxpEt('down',${i})" ${i === n - 1 ? "disabled" : ""} aria-label="Bajar" data-tip="Bajar">${IC.down}</button><button type="button" class="et-del${confirmDel === i ? " confirm" : ""}" onclick="pxpEt('del',${i})" aria-label="Borrar etapa" data-tip="${confirmDel === i ? "Toca otra vez para borrar" : "Borrar"}">${confirmDel === i ? "¿Borrar?" : IC.trash}</button></span>
-        </div>
+          <button type="button" class="et-cls cl-${cl}${e.clase ? "" : " auto"}" ${ed ? `onclick="pxpEtCls(${i},this)"` : "disabled"} aria-haspopup="menu" aria-label="Tipo: ${CL[0]}${e.clase ? "" : " (automático)"}. Fase: ${faseL(pxpFaseEtapa(e))}" data-tip="${CL[0]} · ${faseL(pxpFaseEtapa(e))}${ed ? "<br>Toca para cambiar tipo, fase o exigencia" : ""}">${CLI[cl]}<span>${CL[0]}</span></button>
+          <input class="et-name" id="et-name-${i}" value="${esc(e.nombre || "")}" placeholder="Nombre de la etapa o tarea" onchange="pxpEt('name',${i},this.value)" aria-label="Nombre de la etapa ${i + 1}" ${nmOk ? "" : "readonly"}>${own && !ed ? `<span class="et-mine">Tuya</span>` : ""}${e.propuesta ? `<span class="et-prop" data-tip="La agregó ${esc(e.propuesta)}. Administración la confirma.">Propuesta${ed ? `<button type="button" onclick="pxpEt('confirmar',${i})">Confirmar</button>` : ""}</span>` : ""}${cr.length ? `<span class="et-cruce" data-tip="<b>Se cruza con</b><br>${crTip}">⚠ Cruce</span>` : ""}${e.extiende && !mini ? `<span class="et-xt" data-tip="Esta etapa se extiende después de las 17:30">Hasta ${esc(e.hasta || "19:00")}</span>` : ""}${bloqSug(k, e, i, st, late)}${due ? `<span class="et-due">${due}</span>` : ""}`;
+    const sts = `<span class="et-sts" role="group" aria-label="Estado de la etapa">${Object.entries(ETS).map(([v, [l, c]]) => `<button type="button" class="et-sb${v === st ? " on" : ""}" style="--c:${c}" onclick="pxpEt('estado',${i},'${v}')" aria-pressed="${v === st}" aria-label="${l}" data-tip="${stOk ? l : l + " · solo sus responsables o Administración"}" ${stOk ? "" : "disabled"}>${IC[v]}</button>`).join("")}</span>`;
+    const moves = `<span class="et-moves"><button type="button" onclick="pxpEt('up',${i})" ${i === 0 ? "disabled" : ""} aria-label="Subir" data-tip="Subir">${IC.up}</button><button type="button" onclick="pxpEt('down',${i})" ${i === n - 1 ? "disabled" : ""} aria-label="Bajar" data-tip="Bajar">${IC.down}</button><button type="button" class="et-del${confirmDel === i ? " confirm" : ""}" onclick="pxpEt('del',${i})" aria-label="Borrar etapa" data-tip="${confirmDel === i ? "Toca otra vez para borrar" : "Borrar"}">${confirmDel === i ? "¿Borrar?" : IC.trash}</button></span>`;
+    const take = !e.resp && !ed && enProyecto(k) && st !== "listo" ? `<button type="button" class="et-take" onclick="pxpEt('tomar',${i})">Tomar</button>` : "";
+    const hrsChip = window.pxpEtHorasChip ? (pxpEtHorasChip(k, i, e) || '<span class="et-nil">—</span>') : "";
+    // Revisión y Entrega: fila compacta de una línea, con el color de su tipo
+    if (mini) return `<li class="et-row mini cl-${cl} ${st}${late ? " late" : ""}${own ? " own" : ""}" data-i="${i}" style="--sc:${ETS[st][1]}">
+        <div class="et-top">${head}${sts}${moves}</div>
+        <div class="et-line">
+          <span class="et-li c-who">${take}${respChip(i, e, ed, true)}</span>
+          <span class="et-li c-when">${fecha("inicio", IC.cal, "Fecha de inicio", "et-ini-" + i, x.ini, x.fija)}${franjaBtn(i, e, x, ed)}</span>
+          <span class="et-li c-dur">${dur}</span>
+          <span class="et-li c-end">${fecha("fin", IC.flag, "Fecha de fin", "et-fin-" + i, x.fin)}</span>
+          ${hrsChip ? `<span class="et-li c-hrs">${hrsChip}</span>` : ""}
+        </div></li>`;
+    return `<li class="et-row cl-${cl} ${st}${late ? " late" : ""}${own ? " own" : ""}" data-i="${i}" style="--sc:${ETS[st][1]}">
+        <div class="et-top">${head}${sts}${moves}</div>
         <div class="et-bot">
-          <div class="et-cell c-who"><span class="et-cl">Responsables</span>${!e.resp && !ed && enProyecto(k) && st !== "listo" ? `<button type="button" class="et-take" onclick="pxpEt('tomar',${i})">Tomar</button>` : ""}${respChip(i, e, ed)}</div>
-          <div class="et-cell c-ini"><span class="et-cl">Inicio</span><span class="et-chip et-date${x.fija ? " fixed" : ""}" data-tip="Inicio">${IC.cal}<input type="text" readonly class="et-dt" id="et-ini-${i}" data-iso="${x.ini || ""}" value="${fmtL(x.ini)}" onclick="pxpCal(this,'inicio',${i})" aria-label="Fecha de inicio" ${ed ? "" : "disabled"}><button type="button" class="et-pin" onclick="pxpEt('${x.fija ? "auto" : "fix"}',${i})" aria-label="${x.fija ? "Fecha fija: toca para encadenarla a la anterior" : "Encadenada a la anterior: toca para fijar la fecha"}" data-tip="${x.fija ? "Fecha fija · toca para que empiece al terminar la anterior" : "Empieza al terminar la anterior · toca para fijar la fecha"}">${x.fija ? IC.pin : IC.link}</button></span></div>
-          ${franjaCell(i, e, x, ed)}
-          <div class="et-cell c-dur"><span class="et-cl">Duración</span><span class="et-chip et-days et-hrs" data-tip="Horas de trabajo · jornada de 8 h"><button type="button" onclick="pxpEt('horas',${i},${x.horas}-${x.horas > 8 ? 4 : 1})" ${x.horas <= 1 || !(ed || own) ? "disabled" : ""} aria-label="Menos horas">−</button><input type="text" inputmode="decimal" id="et-dias-${i}" value="${fH(x.horas)}" onchange="pxpEt('horas',${i},this.value)" aria-label="Horas de la etapa" ${ed || own ? "" : "readonly"}><i>h</i><button type="button" onclick="pxpEt('horas',${i},${x.horas}+${x.horas >= 8 ? 4 : 1})" ${ed || own ? "" : "disabled"} aria-label="Más horas">+</button></span><small class="et-hint">${[x.horas >= 8 ? fH(x.horas / 8) + " d" : "", pxpResps(e).length > 1 ? fH(x.horas / pxpResps(e).length) + " h c/u" : ""].filter(Boolean).join(" · ")}</small></div>
-          <div class="et-cell c-peso"><span class="et-cl">Exigencia</span>${pesoChip(i, e, ed)}</div>
-          <div class="et-cell c-end"><span class="et-cl">Entrega</span><span class="et-chip et-end et-date" data-tip="Termina (cámbiala y se ajustan los días)">${IC.flag}<input type="text" readonly class="et-dt" id="et-fin-${i}" data-iso="${x.fin || ""}" value="${fmtL(x.fin)}" onclick="pxpCal(this,'fin',${i})" aria-label="Fecha de fin" ${ed ? "" : "disabled"}></span></div>
-          ${window.pxpEtHorasChip ? `<div class="et-cell c-hrs"><span class="et-cl">Horas</span>${pxpEtHorasChip(k, i, e) || '<span class="et-nil">—</span>'}</div>` : ""}
+          <div class="et-cell c-who"><span class="et-cl">Responsables</span><span class="et-cv">${take}${respChip(i, e, ed)}</span></div>
+          <div class="et-cell c-ini"><span class="et-cl">Inicio</span>${fecha("inicio", IC.cal, "Fecha de inicio", "et-ini-" + i, x.ini, x.fija)}</div>
+          <div class="et-cell c-fr"><span class="et-cl">Horario</span>${franjaBtn(i, e, x, ed)}</div>
+          <div class="et-cell c-dur"><span class="et-cl">Duración</span>${dur}</div>
+          <div class="et-cell c-peso"><span class="et-cl">Exigencia</span>${pesoBtn(i, e, ed)}</div>
+          <div class="et-cell c-end"><span class="et-cl">Entrega</span>${fecha("fin", IC.flag, "Fecha de fin", "et-fin-" + i, x.fin)}</div>
+          ${hrsChip ? `<div class="et-cell c-hrs"><span class="et-cl">Horas</span>${hrsChip}</div>` : ""}
         </div></li>`;
   }
   // Resumen de un grupo de etapas (se lee con el grupo cerrado)
@@ -13524,6 +13629,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const r = grpResumen(P, t);
     return [`${r.ok} de ${r.n} etapas listas`, r.nx ? `Próxima: ${r.nx.e.nombre || "Etapa"}${r.nx.fin ? ", " + fmtD(r.nx.fin) : ""}` : "Todo listo", r.venc ? `${r.venc} vencida${r.venc !== 1 ? "s" : ""}` : ""].filter(Boolean).join(" · ");
   };
+  let ultimaSug = null;   // { k, ids, fase, ts } · para "Deshacer"
   function etapasHtml(k) {
     ivC = new Map(); ivT = Date.now();
     const p = getProjectDisplay(k), P = plan(p), t = today();
@@ -13550,14 +13656,15 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       </section>`;
     }).join("");
     const H = P.reduce((s, x) => s + (x.horas || 0), 0);
+    const undo = ultimaSug && ultimaSug.k === k && Date.now() - ultimaSug.ts < 60000 ? `<span class="sg-undo" role="status">${ultimaSug.ids.length} etapa${ultimaSug.ids.length !== 1 ? "s" : ""} de ${faseL(ultimaSug.fase)} agregada${ultimaSug.ids.length !== 1 ? "s" : ""}<button type="button" class="linkbtn" onclick="pxpEt('deshacerSug')">Deshacer</button></span>` : "";
+    const sugBar = ed ? `<div class="sg-bar"><span class="sg-l"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>Sugerir etapas</span>${PXP_FASES.map(([f, l]) => `<button type="button" class="sg-c" onclick="pxpEt('sugerir',0,'${f}')" data-tip="Agrega etapas típicas de ${l.toLowerCase()} según quién está en el proyecto. Cada clic propone una combinación distinta.">${l}</button>`).join("")}${undo}</div>` : "";
     return `<div class="et-wrap" id="et-wrap" data-k="${esc(k)}">
       ${P.length ? `<div class="et-sum"><span><b>${P.length}</b> etapa${P.length !== 1 ? "s" : ""} · <b>${fH(H)}</b> h (${fH(H / 8)} d) · ${fmtD(first)} → ${fmtD(last)} · <b>${Math.round(listos / P.length * 100)}%</b> listo</span>
         <span class="et-leg" aria-label="Tipos de etapa">${Object.entries(PXP_CLASES).map(([c, [l]]) => `<span class="cl-${c}">${CLI[c]}${l}</span>`).join("")}</span></div>` : ""}
-      ${P.length ? `<div class="et-grps">${grupos}</div>` : `<div class="empty-cta"><b>Sin etapas todavía</b>Agrega las etapas o tareas en el orden en que se hacen; cada una dice quién la hace, en qué horario, cuántas horas toma y en qué estado va.</div>`}
-      ${ed && sugOpen === k ? sugHtml(k) : ""}
+      ${P.length ? `<div class="et-grps">${grupos}</div>` : `<div class="empty-cta"><b>Sin etapas todavía</b>Agrega las etapas o tareas en el orden en que se hacen, o pide una sugerencia por fase según el equipo del proyecto.</div>`}
       ${!ed && enProyecto(k) ? `<div class="et-actions"><button type="button" class="btn-ghost sm" onclick="pxpEt('proponer')">+ Agregar mi etapa</button>${P.some(x => !x.e.resp && x.e.estado !== "listo") ? `<span class="note">o toma una etapa sin responsable con <b>Tomar</b></span>` : ""}</div>` : ""}
-      ${ed ? `<div class="et-actions"><button type="button" class="btn-ghost sm" onclick="pxpEt('add')">+ Agregar etapa</button>${sugOpen === k ? "" : `<button type="button" class="btn-ghost sm et-sugbtn" onclick="pxpEtSug('${ea(k)}')"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>Etapas sugeridas según el equipo</button>`}</div>` : (P.some(x => pxpEsResp(x.e, meN)) ? `<p class="note et-own-note">Puedes cambiar el estado de las etapas marcadas como <b>Tuya</b>. El resto lo ajusta Administración.</p>` : "")}
-      ${P.length ? `<p class="note">Van en orden y por horas (jornada de 8:30 a 17:30, almuerzo de 12:30 a 13:30): cada etapa empieza donde termina la anterior, salvo que elijas <b>Mañana</b>, <b>Tarde</b> u <b>Hora exacta</b>, o le fijes una fecha. Con varios responsables, las horas se reparten entre ellos. Arrastra desde ⋮⋮ o usa ↑ ↓ para reordenar.</p>` : ""}
+      ${ed ? `<div class="et-actions"><button type="button" class="btn-ghost sm" onclick="pxpEt('add')">+ Agregar etapa</button>${sugBar}</div>` : (P.some(x => pxpEsResp(x.e, meN)) ? `<p class="note et-own-note">Puedes cambiar el estado de las etapas marcadas como <b>Tuya</b>. El resto lo ajusta Administración.</p>` : "")}
+      ${P.length ? `<p class="note">Van en orden y por horas (jornada de 8:30 a 17:30, almuerzo de 12:30 a 13:30): cada etapa empieza donde termina la anterior, salvo que elijas Mañana, Tarde u Hora exacta, o le fijes una fecha. Revisiones y entregas se ven más compactas y vienen con menos horas y exigencia liviana; puedes cambiarlas.</p>` : ""}
     </div><div id="et-gantt">${ganttHtml(k)}</div>${P.length && ed && window.pxpRepOpen ? `<div class="tt-act"><button type="button" class="linkbtn tt-btn" onclick="pxpRepOpen('tt','${ea(k)}')"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4M8 14h3M13 14h3M8 17h3"/></svg>Time table en PDF</button></div>` : ""}`;
   }
   window.pxpEtGrp = function (k, f, btn) {
@@ -13566,65 +13673,57 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     sec.classList.toggle("open", open); btn.setAttribute("aria-expanded", String(open));
   };
 
-  // ═════════ v154 · Etapas sugeridas según el equipo del proyecto ═════════
-  function tieneRodaje(p) {
-    if (p.estadoGeneral === "rodaje") return true;
-    const n = normName(p.nombre || ""); if (n.length < 3) return false;
-    try { return (RODAJES || []).some(w => (w || []).some(r => normName(r).includes(n))); } catch (e) { return false; }
-  }
-  function sugerencias(k) {
-    const p = getProjectDisplay(k), R = (key) => pxpRolePeople(p, key);
-    // Las etapas con el cliente las lleva el PM; si no hay, Producción Ejecutiva
-    const PM = R("coordinador").concat((p.pms || []).filter(Boolean), R("ep")).slice(0, 1), PMl = R("coordinador").length || (p.pms || []).filter(Boolean).length ? "Project Manager" : "Producción Ejecutiva", DP = R("directorPost"), ED = R("editor"), CO = R("color"), CP = R("compo"), TD = R("tresD"), IA = R("ia"), MA = R("master"), AU = R("casaAudio");
+  // ═════════ v155 · Etapas sugeridas por fase según el equipo (un clic, combinación al azar) ═════════
+  // Cada plantilla: [nombres posibles], [horas posibles], tipo, exigencia, opcional (se incluye a veces)
+  const rnd = (a) => a[Math.floor(Math.random() * a.length)];
+  function plantillas(p) {
+    const R = (key) => pxpRolePeople(p, key);
+    const PMx = R("coordinador").concat((p.pms || []).filter(Boolean)), EP = R("ep"), PM = PMx.concat(EP).slice(0, 1);
+    const DP = R("directorPost"), ED = R("editor"), CO = R("color"), CP = R("compo"), TD = R("tresD"), IA = R("ia"), MA = R("master"), AU = R("casaAudio");
     const rolDe = (n) => { const f = window.pxpFindPerson ? pxpFindPerson(n) : null; return String((f && f.p && f.p.role) || "").toLowerCase(); };
     const MO = ED.filter(n => /motion/.test(rolDe(n))), EDc = ED.filter(n => !MO.includes(n)).length ? ED.filter(n => !MO.includes(n)) : ED;
-    const L = [], add = (fase, nombre, resps, hp, clase, peso, por) => L.push({ fase, nombre, resps: resps.filter(Boolean), hp, clase, peso, por });
-    if (PM.length || DP.length) add("pre", "Kickoff y brief de post", PM.concat(DP.slice(0, 1)), 2, "proceso", "liviana", [PM.length ? PMl : "", DP.length ? "Dirección de Post" : ""].filter(Boolean).join(" y "));
-    if (PM.length) add("pre", "Plan de post y cronograma", PM, 2, "proceso", "liviana", PMl);
-    if (TD.length || IA.length || CP.length) add("pre", "Pruebas de look y referencias", TD.concat(IA, CP), 4, "proceso", "media", "3D, IA y Compo");
-    if (tieneRodaje(p)) {
-      if (DP.length) add("rodaje", "Supervisión de post en rodaje", DP.slice(0, 1), 8, "proceso", "media", "Dirección de Post");
-      if (MA.length || ED.length) add("rodaje", "Backup y verificación de material", (MA.length ? MA : ED).slice(0, 1), 4, "proceso", "liviana", MA.length ? "Master" : "Editor");
-    }
-    if (ED.length) { add("post", "Ingesta y organización de material", EDc.slice(0, 1), 4, "proceso", "liviana", "Editor"); add("post", "Offline · primer corte", EDc, 24, "proceso", "media", "Editor"); }
-    if (DP.length && ED.length) add("post", "Revisión interna del corte", DP.slice(0, 1), 2, "revision", "liviana", "Dirección de Post");
-    if (PM.length) add("post", "Envío del corte al cliente", PM, 1, "entrega", "liviana", PMl);
-    add("post", "Revisión del cliente", PM, 16, "revision", "liviana", PM.length ? PMl : "");
-    if (ED.length) add("post", "Ajustes del corte", EDc, 8, "revision", "media", "Editor");
-    if (TD.length) { add("post", "Modelado y animación 3D", TD, 24, "proceso", "pesada", "3D"); add("post", "Render 3D", TD, 8, "proceso", "media", "3D"); }
-    if (IA.length) add("post", "Generación de imagen y video con IA", IA, 16, "proceso", "pesada", "IA");
-    if (CP.length) add("post", "Composición y VFX", CP, 16, "proceso", "pesada", "Compo");
-    if (MO.length) add("post", "Motion graphics y textos animados", MO, 16, "proceso", "pesada", "Editor Motion");
-    if (CO.length) add("post", "Corrección de color", CO, 8, "proceso", "media", "Color");
-    if (AU.length) add("post", "Mezcla y diseño de audio", AU, 8, "proceso", "media", "Casa de audio");
-    if (MA.length || ED.length) add("post", "Online / finishing", (MA.length ? MA : EDc).slice(0, 1), 8, "proceso", "media", MA.length ? "Master" : "Editor");
-    if (DP.length) add("post", "Revisión final interna", DP.slice(0, 1), 2, "revision", "liviana", "Dirección de Post");
-    if (MA.length) { add("post", "Masterización y versiones", MA, 8, "proceso", "media", "Master"); add("post", "Control de calidad (QC)", MA, 2, "revision", "liviana", "Master"); }
-    add("post", "Entrega final", PM.length ? PM : MA.slice(0, 1), 1, "entrega", "liviana", PM.length ? PMl : (MA.length ? "Master" : ""));
+    const one = (...L) => (L.find(x => x.length) || []).slice(0, 1);
+    const T = { pre: [], rodaje: [], post: [] };
+    const add = (f, nombres, resps, horas, clase, peso, opc) => T[f].push({ nombres, resps: resps.filter(Boolean), horas, clase, peso, opc: !!opc });
+    // Preproducción
+    add("pre", ["Kickoff y brief de post", "Reunión de arranque de post", "Brief interno de post"], PM.concat(DP.slice(0, 1)), [1, 2], "proceso", "liviana");
+    add("pre", ["Plan de post y cronograma", "Cronograma y reparto de tareas"], PM, [2, 3], "proceso", "liviana");
+    if (DP.length) add("pre", ["Desglose técnico de post", "Lectura de guion y desglose de post", "Revisión de guion y storyboard"], DP.slice(0, 1), [2, 3, 4], "proceso", "liviana");
+    add("pre", ["Reunión de preproducción (PPM)", "PPM con agencia y cliente"], PM.concat(DP.slice(0, 1)), [2], "revision", "liviana", true);
+    if (TD.length || IA.length || CP.length) add("pre", ["Pruebas de look y referencias", "Previsualización y pruebas de estilo", "Moodboard y pruebas técnicas"], TD.concat(IA, CP), [4, 6, 8], "proceso", "media");
+    if (CO.length) add("pre", ["Definición de LUT y look de cámara", "Pruebas de color para rodaje"], CO, [2, 4], "proceso", "liviana", true);
+    if (ED.length) add("pre", ["Animatic", "Armado de animatic con storyboard"], EDc.slice(0, 1), [6, 8], "proceso", "media", true);
+    // Rodaje
+    add("rodaje", ["Supervisión de post en set", "Acompañamiento de post en rodaje"], DP.slice(0, 1), [8], "proceso", "media");
+    add("rodaje", ["DIT · backup y verificación de material", "Descarga y respaldo de material"], one(MA, EDc), [3, 4], "proceso", "liviana");
+    add("rodaje", ["Revisión de dailies", "Selección de tomas del día"], one(EDc, DP), [2, 4], "revision", "liviana");
+    if (CO.length) add("rodaje", ["Look en set y control de color", "Revisión de color en set"], CO.slice(0, 1), [4], "proceso", "liviana", true);
+    if (CP.length || TD.length) add("rodaje", ["Supervisión VFX en set (tracking y referencias)", "Toma de referencias HDRI y medidas"], CP.concat(TD).slice(0, 1), [4, 8], "proceso", "media");
+    add("rodaje", ["Reporte de rodaje y material recibido", "Logística y reporte de rodaje"], PM, [1, 2], "entrega", "liviana", true);
+    // Postproducción
+    if (ED.length) { add("post", ["Ingesta y organización de material", "Sincronización y organización"], EDc.slice(0, 1), [3, 4], "proceso", "liviana"); add("post", ["Offline · primer corte", "Armado del primer corte", "Edición offline"], EDc, [16, 24, 32], "proceso", "media"); }
+    if (DP.length && ED.length) add("post", ["Revisión interna del corte", "Visto bueno de Dirección de Post"], DP.slice(0, 1), [1, 2], "revision", "liviana");
+    add("post", ["Envío del corte al cliente", "Envío de V1 al cliente"], PM, [1], "entrega", "liviana");
+    add("post", ["Feedback del cliente", "Revisión del cliente"], PM, [4, 8], "revision", "liviana");
+    if (ED.length) add("post", ["Ajustes del corte", "Ajustes de offline"], EDc, [4, 8], "revision", "media");
+    if (TD.length) { add("post", ["Modelado y animación 3D", "Animación 3D"], TD, [16, 24, 32], "proceso", "pesada"); add("post", ["Render 3D", "Render y salida de pases 3D"], TD, [6, 8], "proceso", "media"); }
+    if (IA.length) add("post", ["Generación de imagen y video con IA", "Desarrollo de piezas con IA"], IA, [12, 16], "proceso", "pesada");
+    if (CP.length) add("post", ["Composición y VFX", "Clean-up y composición"], CP, [12, 16], "proceso", "pesada");
+    if (MO.length) add("post", ["Motion graphics y textos animados", "Animación de gráficas y supers"], MO, [8, 16], "proceso", "pesada");
+    if (CO.length) add("post", ["Corrección de color", "Etalonaje"], CO, [6, 8], "proceso", "media");
+    if (AU.length) add("post", ["Mezcla y diseño de audio", "Mezcla final de audio"], AU, [6, 8], "proceso", "media");
+    if (MA.length || ED.length) add("post", ["Online / finishing", "Conformado y finishing"], one(MA, EDc), [6, 8], "proceso", "media");
+    if (DP.length) add("post", ["Revisión final interna", "QC creativo de Dirección de Post"], DP.slice(0, 1), [1, 2], "revision", "liviana");
+    if (MA.length) { add("post", ["Masterización y versiones", "Versionado y masters"], MA, [6, 8], "proceso", "media"); add("post", ["Control de calidad (QC)", "QC técnico"], MA, [1, 2], "revision", "liviana"); }
+    add("post", ["Entrega final", "Entrega de masters al cliente"], PM.length ? PM : MA.slice(0, 1), [1], "entrega", "liviana");
+    return T;
+  }
+  function sugerir(k, fase) {
+    const p = getProjectDisplay(k), T = plantillas(p)[fase] || [];
     const ya = new Set((p.etapas || []).map(e => normName(e.nombre || "")));
-    L.forEach((x, j) => { x.j = j; x.existe = ya.has(normName(x.nombre)); });
-    return L;
+    return T.filter(t => !t.nombres.some(n => ya.has(normName(n)))).filter(t => !t.opc || Math.random() < 0.6)
+      .map(t => ({ nombre: rnd(t.nombres), hp: rnd(t.horas), clase: t.clase, peso: t.peso, resps: t.resps, fase }));
   }
-  let sugSel = null;
-  function sugHtml(k) {
-    const L = sugerencias(k), p = getProjectDisplay(k);
-    if (!sugSel) sugSel = new Set(L.filter(x => !x.existe).map(x => x.j));
-    const conEquipo = L.some(x => x.resps.length);
-    const it = (x) => `<label class="sg-it${x.existe ? " ya" : ""}"><input type="checkbox" ${sugSel.has(x.j) ? "checked" : ""} ${x.existe ? "disabled" : ""} onchange="pxpEtSugSel(${x.j},this.checked)">
-      <span class="sg-cl cl-${x.clase}" data-tip="${PXP_CLASES[x.clase][0]}">${CLI[x.clase]}</span>
-      <span class="sg-n"><b>${esc(x.nombre)}</b><small>${x.existe ? "Ya está en el proyecto" : esc(x.por || "Sin responsable sugerido")}</small></span>
-      <span class="sg-who">${x.resps.slice(0, 3).map(r => `<span class="et-av" data-tip="${esc(r)}">${av(r, 24)}</span>`).join("")}${x.resps.length ? `<span class="sg-wn">${esc(x.resps.map(r => r.split(/\s+/)[0]).join(", "))}</span>` : `<span class="sg-wn muted">—</span>`}</span>
-      <span class="sg-h">${fH(x.hp)} h</span></label>`;
-    const n = sugSel.size;
-    return `<div class="sg" role="region" aria-label="Etapas sugeridas">
-      <div class="sg-hd"><div><b>Etapas sugeridas según el equipo</b><small>${conEquipo ? `Armadas con los integrantes de ${esc(p.nombre || k)} y lo que cada uno suele hacer. Marca las que quieras; quedan con su responsable, tipo y horas.` : "Este proyecto aún no tiene integrantes: agrégalos en Equipo para que cada etapa llegue con su responsable."}</small></div>
-        <button type="button" class="ficha-close sg-x" onclick="pxpEtSug(null)" aria-label="Cerrar sugerencias">✕</button></div>
-      ${PXP_FASES.map(([f, l]) => { const G = L.filter(x => x.fase === f); return G.length ? `<div class="sg-g"><span class="sg-gl">${l}</span>${G.map(it).join("")}</div>` : ""; }).join("")}
-      <div class="sg-ft"><span class="note">${n} etapa${n !== 1 ? "s" : ""} · ${fH(L.filter(x => sugSel.has(x.j)).reduce((s, x) => s + x.hp, 0))} h</span><button type="button" class="btn-ghost sm" onclick="pxpEtSug(null)">Cancelar</button><button type="button" class="ficha-save sm" onclick="pxpEt('sugerir')" ${n ? "" : "disabled"}>Agregar ${n} etapa${n !== 1 ? "s" : ""}</button></div>
-    </div>`;
-  }
-  window.pxpEtSug = function (k) { sugOpen = k; sugSel = null; const w = $("et-wrap"); if (w) refresh(w.dataset.k); if (k) setTimeout(() => { const s = document.querySelector(".sg"); if (s) s.scrollIntoView({ block: "nearest", behavior: "smooth" }); }, 30); };
-  window.pxpEtSugSel = function (j, on) { if (!sugSel) return; if (on) sugSel.add(j); else sugSel.delete(j); const w = $("et-wrap"); if (w) refresh(w.dataset.k); };
   window.pxpEtapasHtml = etapasHtml;
 
   // ── Cronograma: una fila por etapa (nunca se encima) ──
@@ -13661,23 +13760,37 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
         if (!can()) return; const R0 = pxpResps(E[i]), ya = R0.some(r => normName(r) === normName(v));
         pxpSetResps(E[i], !v ? [] : ya ? R0.filter(r => normName(r) !== normName(v)) : R0.concat([v]));
         log(`Etapa "${nm(i)}": ${!v ? "sin responsables" : (ya ? "sale " : "se suma ") + v}`); if (pop) setTimeout(() => repaintPop(i), 0); break; }
-      case "clase": if (v) E[i].clase = v; else delete E[i].clase; closeMenu(); log(`Etapa "${nm(i)}": tipo → ${v ? PXP_CLASES[v][0] : "automático"}`); struct = true; break;
+      case "clase": {   // v155 · si la duración era la sugerida del tipo anterior, pasa a la sugerida del nuevo
+        const c0 = pxpClaseEtapa(E[i]), h0 = horasDe(E[i]);
+        if (v) E[i].clase = v; else delete E[i].clase;
+        const c1 = pxpClaseEtapa(E[i]); if (c1 !== c0 && (h0 == null || Math.abs(h0 - HP_DEF[c0]) < 1e-6)) { E[i].hp = HP_DEF[c1]; E[i].dias = Math.max(1, Math.ceil(HP_DEF[c1] / 8)); }
+        closeMenu(); } log(`Etapa "${nm(i)}": tipo → ${v ? PXP_CLASES[v][0] : "automático"}`); struct = true; break;
+      case "peso": if (v) E[i].peso = v; else delete E[i].peso; closeMenu(); break;
       case "fase": if (v) E[i].fase = v; else delete E[i].fase; closeMenu(); log(`Etapa "${nm(i)}": fase → ${v ? faseL(v) : "automática"}`); { const G = grpGet(); G[k + "|" + pxpFaseEtapa(E[i])] = 1; setPref(grpKey, JSON.stringify(G)); } struct = true; break;
       case "franja": if (v) E[i].franja = v; else delete E[i].franja; if (v === "hora" && E[i].hIni == null) E[i].hIni = cur[i].hi || 0; log(`Etapa "${nm(i)}": horario → ${(FRANJAS.find(f => f[0] === (v || "")) || ["", "Encadenada"])[1]}`); break;
       case "hIni": E[i].hIni = Math.max(0, Math.min(JOR - 0.5, parseFloat(v) || 0)); break;
-      case "extiende": if (v) { E[i].extiende = true; E[i].hasta = E[i].hasta || "19:00"; } else { delete E[i].extiende; delete E[i].hasta; } log(`Etapa "${nm(i)}": ${v ? "se extiende después de las 17:30" : "dentro del horario"}`); break;
-      case "hasta": E[i].hasta = String(v || "19:00"); break;
-      case "sugerir": {
-        const L = sugerencias(k).filter(x => sugSel && sugSel.has(x.j) && !x.existe); if (!L.length) break;
-        const rk = (f) => PXP_FASES.findIndex(z => z[0] === f);
+      case "hasta": if (v) { E[i].extiende = true; E[i].hasta = String(v); } else { delete E[i].extiende; delete E[i].hasta; } log(`Etapa "${nm(i)}": ${v ? "se extiende hasta las " + v : "dentro del horario"}`); break;
+      case "sugerir": {   // v155 · un clic: etapas típicas de esa fase según el equipo, combinación al azar
+        const L = sugerir(k, v); if (!L.length) { if (window.pxpToast) pxpToast(`Ya están las etapas típicas de ${faseL(v).toLowerCase()} para este equipo.`); return; }
+        const rk = (f) => PXP_FASES.findIndex(z => z[0] === f), objs = [];
         L.forEach(x => {
           const ne = { nombre: x.nombre, estado: "pendiente", hp: x.hp, dias: Math.max(1, Math.ceil(x.hp / 8)), resp: "", nota: "", fase: x.fase, clase: x.clase, peso: x.peso };
-          pxpSetResps(ne, x.resps);
+          pxpSetResps(ne, x.resps); objs.push(ne);
           let at = E.findIndex(e => rk(pxpFaseEtapa(e)) > rk(x.fase)); if (at < 0) at = E.length; E.splice(at, 0, ne);
         });
-        log(`${L.length} etapas sugeridas agregadas según el equipo`); sugOpen = null; sugSel = null; struct = true; break; }
+        ultimaSug = { k, ids: objs, fase: v, ts: Date.now() };
+        { const G = grpGet(); G[k + "|" + v] = 1; setPref(grpKey, JSON.stringify(G)); }
+        log(`${L.length} etapas sugeridas de ${faseL(v)} según el equipo`); struct = true; break; }
+      case "deshacerSug": {
+        if (!ultimaSug || ultimaSug.k !== k) return; const n0 = E.length;
+        ultimaSug.ids.forEach(o => { const j = E.indexOf(o); if (j >= 0) E.splice(j, 1); });
+        log(`Se deshicieron ${n0 - E.length} etapas sugeridas`); ultimaSug = null; struct = true; break; }
+      case "bloquear": {   // v155 · la revisión (feedback) detiene lo que sigue: se reporta como bloqueador
+        const e = E[i]; if (!e) return; p.bloqueos = p.bloqueos || [];
+        if (p.bloqueos.some(b => !b.fin && b.etapa === (e.nombre || ""))) return;
+        p.bloqueos.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), tipo: "Cliente", impacto: "medio", inicio: today(), resp: "Cliente", desc: `Feedback pendiente · ${e.nombre || "Revisión"}`, etapa: e.nombre || "", por: currentUser });
+        log(`Bloqueador reportado: feedback pendiente en "${nm(i)}"`); if (window.pxpToast) pxpToast("Bloqueador reportado. Márcalo como resuelto cuando llegue el feedback."); struct = true; break; }
       case "horas": { const t = String(v).trim().toLowerCase().replace(",", "."), n = parseFloat(t); if (!(n > 0)) break; const H = Math.max(0.5, Math.min(2000, Math.round((/d/.test(t) ? n * 8 : n) * 2) / 2)); E[i].hp = H; E[i].dias = Math.max(1, Math.ceil(H / 8)); if (cur[i].legacy) { E[i].inicio = cur[i].ini; E[i].fija = true; } log(`Etapa "${nm(i)}": ${durTxt(H)}`); break; }
-      case "peso": if (v) E[i].peso = v; else delete E[i].peso; break;
       case "proponer": E.push({ nombre: "", estado: "pendiente", hp: 8, dias: 1, resp: currentUser, propuesta: currentUser, inicio: today(), fija: true, nota: "" }); log(`${currentUser} agregó su etapa (propuesta)`); struct = true; focusId = "et-name-" + (E.length - 1); break;
       case "tomar": pxpSetResps(E[i], pxpResps(E[i]).concat([currentUser])); E[i].propuesta = currentUser; if (cur[i].fin && cur[i].fin < today()) { E[i].inicio = today(); E[i].fija = true; } log(`${currentUser} tomó la etapa "${nm(i)}"`); struct = true; break;
       case "confirmar": delete E[i].propuesta; log(`Etapa "${nm(i)}" confirmada`); struct = true; break;
@@ -13744,14 +13857,48 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       <div class="em-cls">${Object.entries(PXP_CLASES).map(([c, [l]]) => `<button type="button" role="menuitemradio" aria-checked="${c === cl}" class="em-c cl-${c}${c === cl ? " on" : ""}" onclick="pxpEt('clase',${i},'${c}')">${CLI[c]}<span>${l}</span></button>`).join("")}</div>
       ${e.clase ? `<button type="button" class="em-auto" onclick="pxpEt('clase',${i},'')">Volver a automático (según el nombre)</button>` : `<p class="em-note">Ahora es automático, según el nombre.</p>`}
       <div class="ep-h">Fase</div>
-      <div class="em-fs">${PXP_FASES.map(([f, l]) => `<button type="button" role="menuitemradio" aria-checked="${f === fa}" class="em-f${f === fa ? " on" : ""}" onclick="pxpEt('fase',${i},'${f}')">${l}</button>`).join("")}</div>`;
+      <div class="em-fs">${PXP_FASES.map(([f, l]) => `<button type="button" role="menuitemradio" aria-checked="${f === fa}" class="em-f${f === fa ? " on" : ""}" onclick="pxpEt('fase',${i},'${f}')">${l}</button>`).join("")}</div>
+      <div class="ep-h">Exigencia</div>${pesoOpts(i, e)}`;
     document.body.appendChild(menu); menu._t = Date.now();
     const r = btn.getBoundingClientRect(), H = menu.offsetHeight || 260;
     menu.style.left = Math.max(8, Math.min(r.left, innerWidth - 300)) + "px";
     menu.style.top = (r.bottom + 6 + H > innerHeight ? Math.max(8, r.top - 6 - H) : r.bottom + 6) + "px";
     const f0 = menu.querySelector(".on"); if (f0) setTimeout(() => f0.focus(), 0);
   };
-  document.addEventListener("pointerdown", (e) => { if (menu && !menu.contains(e.target) && !(e.target.closest && e.target.closest(".et-cls"))) closeMenu(); }, true);
+  // v155 · Selectores de Horario y Exigencia con el mismo lenguaje del calendario de cuadros
+  function pesoOpts(i, e) {
+    const v = e.peso || "", auto = pxpTipoEtapa(Object.assign({}, e, { peso: "" }));
+    return `<div class="pk-ops">${PESOS.map(([k, l]) => `<button type="button" role="menuitemradio" aria-checked="${k === v}" class="pk-op pz-${k || auto}${k === v ? " on" : ""}" onclick="pxpEt('peso',${i},'${k}')"><i class="pz-dot" aria-hidden="true"></i><span><b>${k ? l : "Automática"}</b><small>${k ? PESO_X[k] + " en la carga" : PESOS.find(z => z[0] === auto)[1] + " según el tipo y el nombre"}</small></span>${k === v ? IC.listo : ""}</button>`).join("")}</div>`;
+  }
+  function frHtml(i) {
+    const w = $("et-wrap"); if (!w) return ""; const e = (getProjectDisplay(w.dataset.k).etapas || [])[i] || {}, v = e.franja || "";
+    return `<div class="pk-h"><b>Horario</b></div>
+      <div class="pk-ops">${FRANJAS.map(([k, l, sub]) => `<button type="button" role="menuitemradio" aria-checked="${k === v}" class="pk-op fr-${k || "auto"}${k === v ? " on" : ""}" onclick="pxpEtFr(${i},'franja','${k}')">${FR_IC[k]}<span><b>${l}</b><small>${sub}</small></span>${k === v ? IC.listo : ""}</button>`).join("")}</div>
+      ${v === "hora" ? `<div class="pk-sub">Hora de inicio</div><div class="pk-hrs">${HORAS_OPC.map(h => `<button type="button" class="pk-d${Math.abs(h - (+e.hIni || 0)) < 1e-6 ? " sel" : ""}" onclick="pxpEtFr(${i},'hIni',${h})">${reloj(h, true)}</button>`).join("")}</div>` : ""}
+      <div class="pk-sub">¿Se extiende después de las 17:30?</div>
+      <div class="pk-ext"><button type="button" class="pk-q${!e.extiende ? " on" : ""}" onclick="pxpEtFr(${i},'hasta','')">No</button>${HASTA_OPC.map(h => `<button type="button" class="pk-q${e.extiende && (e.hasta || "19:00") === h ? " on" : ""}" onclick="pxpEtFr(${i},'hasta','${h}')">${h}</button>`).join("")}</div>`;
+  }
+  const abrir = (btn, i, cls, html) => {
+    closeMenu(); closePop();
+    menu = document.createElement("div"); menu.className = "et-pop et-menu pk-menu " + cls; menu.dataset.i = String(i); menu.setAttribute("role", "dialog"); menu.innerHTML = html;
+    document.body.appendChild(menu); menu._t = Date.now(); menu._a = btn; colocar();
+    const f0 = menu.querySelector(".on"); if (f0) setTimeout(() => f0.focus(), 0);
+  };
+  const colocar = () => { if (!menu || !menu._a) return; const btn = document.querySelector(`.et-row[data-i="${menu.dataset.i}"] .${menu._a.classList.contains("pz") ? "pz" : "et-pick:not(.pz)"}`) || menu._a, r = btn.getBoundingClientRect(), H = menu.offsetHeight, W = menu.offsetWidth; menu.style.left = Math.max(8, Math.min(r.left, innerWidth - W - 8)) + "px"; menu.style.top = (r.bottom + 6 + H > innerHeight ? Math.max(8, r.top - 6 - H) : r.bottom + 6) + "px"; };
+  window.pxpEtPick = function (kind, i, btn) {
+    if (menu && menu.dataset.i === String(i) && menu.classList.contains("pk-" + kind)) { closeMenu(); return; }
+    if (!can()) return; const w = $("et-wrap"); if (!w) return;
+    const e = (getProjectDisplay(w.dataset.k).etapas || [])[i] || {};
+    abrir(btn, i, "pk-" + kind, kind === "fr" ? frHtml(i) : `<div class="pk-h"><b>Exigencia</b></div>${pesoOpts(i, e)}<p class="em-note">Pesa en la carga del equipo: 40 h ponderadas = 100 %.</p>`);
+  };
+  // Cambiar el horario sin cerrar el selector (para elegir hora o extensión); Mañana, Tarde y Encadenada lo cierran
+  window.pxpEtFr = async function (i, a, v) {
+    const keep = (a === "franja" && v === "hora") || a === "hIni" || a === "hasta";
+    await window.pxpEt(a, i, v);
+    if (!keep) { closeMenu(); return; }
+    setTimeout(() => { if (menu && menu.classList.contains("pk-fr")) { menu.innerHTML = frHtml(i); colocar(); } }, 30);
+  };
+  document.addEventListener("pointerdown", (e) => { if (menu && !menu.contains(e.target) && !(e.target.closest && e.target.closest(".et-cls,.et-pick"))) closeMenu(); }, true);
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && menu) { e.stopImmediatePropagation(); closeMenu(); } }, true);
   document.addEventListener("scroll", (e) => { if (menu && !menu.contains(e.target) && Date.now() - (menu._t || 0) > 350) closeMenu(); }, true);
   document.addEventListener("pointerdown", (e) => { if (pop && !pop.contains(e.target) && !(e.target.closest && e.target.closest(".et-who"))) closePop(); }, true);
@@ -18916,7 +19063,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   const fD = (s) => +s.slice(8, 10) + " " + MES[+s.slice(5, 7) - 1].slice(0, 3);
   const n1 = (x) => String(Math.round(x * 10) / 10).replace(".", ",");
   // Jornada: 8:30–12:30 y 13:30–17:30 (la hora de almuerzo no cuenta)
-  const reloj = (h) => { const r = h <= 4 ? 8.5 + h : 9.5 + h, hh = Math.floor(r + 1e-6), mm = Math.round((r - hh) * 60); return hh + ":" + String(mm).padStart(2, "0"); };
+  const reloj = (h, ini) => { const r = (ini ? h < 4 - 1e-9 : h <= 4 + 1e-9) ? 8.5 + h : 9.5 + h, hh = Math.floor(r + 1e-6), mm = Math.round((r - hh) * 60); return hh + ":" + String(mm).padStart(2, "0"); };
   window.pxpReloj = reloj;
   const ahoraH = () => { const d = new Date(), h = d.getHours() + d.getMinutes() / 60; return Math.max(0, Math.min(8, h <= 12.5 ? h - 8.5 : h <= 13.5 ? 4 : h - 9.5)); };
   window.pxpAhoraH = ahoraH;
@@ -18934,11 +19081,13 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const t = hoy(); let dias = [];
     if (s.m === "dia") { let d = habil(t) ? t : addD(t, 1); while (!habil(d)) d = addD(d, 1); let n = s.off; while (n > 0) { d = addD(d, 1); if (habil(d)) n--; } while (n < 0) { d = addD(d, -1); if (habil(d)) n++; } dias = [d]; }
     else if (s.m === "semana") { const lun = addD(t, -((D(t).getDay() + 6) % 7) + 7 * s.off); for (let i = 0; i < 5; i++) dias.push(addD(lun, i)); }
+    else if (s.m === "anio") { const y = D(t).getFullYear() + s.off, d = new Date(y, 0, 1); while (d.getFullYear() === y) { dias.push(iso(d)); d.setDate(d.getDate() + 1); } }
     else { const d = D(t); d.setDate(1); d.setMonth(d.getMonth() + s.off); const m = d.getMonth(); while (d.getMonth() === m) { dias.push(iso(d)); d.setDate(d.getDate() + 1); } }
     const work = dias.filter(habil);
     let label;
     if (s.m === "dia") label = `${DIA[D(dias[0]).getDay()]} ${fD(dias[0])}${dias[0] === t ? " · hoy" : ""}`;
     else if (s.m === "semana") label = `${fD(dias[0])} – ${fD(dias[4])}`;
+    else if (s.m === "anio") label = String(D(dias[0]).getFullYear());
     else label = MES[D(dias[0]).getMonth()] + " " + D(dias[0]).getFullYear();
     return { dias: work.length ? work : [dias[0]], todos: dias, label };
   }
@@ -18952,7 +19101,15 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     // Columnas y escala
     let cols = "", ticks = "";
     const wDay = 100 / R.dias.length;
-    R.dias.forEach((d, i) => {
+    if (s.m === "anio") {   // v155 · un bloque por mes (ancho según sus días hábiles)
+      let i0 = 0; const mesHoy = hoy().slice(0, 7);
+      for (let m = 0; m < 12; m++) {
+        const n = R.dias.filter(d => +d.slice(5, 7) === m + 1).length, ym = R.dias[i0] ? R.dias[i0].slice(0, 7) : "";
+        cols += `<i class="cr-col${m % 2 ? " odd" : ""}${ym === mesHoy ? " today" : ""}" style="left:${i0 * wDay}%;width:${n * wDay}%"></i>`;
+        ticks += `<span class="cr-tk mo${ym === mesHoy ? " on" : ""}" style="left:${(i0 + n / 2) * wDay}%">${MES[m].slice(0, 3)}</span>`;
+        i0 += n;
+      }
+    } else R.dias.forEach((d, i) => {
       const fest = !habil(d), isT = d === hoy();
       cols += `<i class="cr-col${i % 2 ? " odd" : ""}${isT ? " today" : ""}${fest ? " fest" : ""}" style="left:${i * wDay}%;width:${wDay}%"></i>`;
       if (s.m === "dia") { for (let h = 0; h <= H; h++) ticks += `<span class="cr-tk${h === 4 ? " lunch" : ""}" style="left:${h / H * 100}%">${reloj(h)}</span>`; }
@@ -18962,26 +19119,38 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     if (s.m === "semana") R.dias.forEach((d, i) => { for (let h = 2; h < H; h += 2) cols += `<i class="cr-hr${h === 4 ? " mid" : ""}" style="left:${(i + h / H) * wDay}%"></i>`; });
     if (s.m === "dia") for (let h = 1; h < H; h++) cols += `<i class="cr-hr${h === 4 ? " mid" : ""}" style="left:${h / H * 100}%"></i>`;
     // Filas visibles (las que tocan el rango)
-    const vis = rows.map(r => Object.assign({}, r, { bars: r.bars.filter(b => b.b > A && b.a < B) })).filter(r => r.bars.length || opts.keepEmpty);
+    // v155 · En el proyecto se ven TODAS las etapas (en el orden en que empiezan); las que caen fuera del periodo muestran una flecha con su fecha
+    const vis = opts.todas ? rows : rows.map(r => Object.assign({}, r, { bars: r.bars.filter(b => b.b > A && b.a < B) })).filter(r => r.bars.length || opts.keepEmpty);
+    const fueraTxt = (b) => b.d ? fD(b.d) : "";
     const body = vis.map(r => {
-      const bars = r.bars.map(b => {
+      const dentro = r.bars.filter(b => b.b > A && b.a < B);
+      if (opts.todas && !dentro.length && r.bars.length) {
+        const b0 = r.bars[0], antes = b0.b <= A;
+        return `<div class="cr-row"><div class="cr-l">${r.av || ""}<span><b>${esc(r.l)}</b>${r.sub ? `<small>${esc(r.sub)}</small>` : ""}</span></div><div class="cr-t"><span class="cr-out ${antes ? "l" : "r"} ${b0.st || "pendiente"}" style="--c:${b0.c || r.c || "var(--brand)"}" data-tip="${b0.tip || ""}">${antes ? "‹ " + esc(fueraTxt({ d: b0.dFin })) : esc(fueraTxt({ d: b0.dIni })) + " ›"}</span></div></div>`;
+      }
+      const bars = dentro.map(b => {
         const l = Math.max(0, x(b.a)), w = Math.max(.8, Math.min(100, x(b.b)) - l), live = nowIn && nowV > b.a && nowV < b.b && b.st !== "listo", late = b.b <= nowV && b.st !== "listo";
         const tx = w > (s.m === "mes" ? 6 : 10) ? `<em>${esc(b.txt || "")}</em>` : "";
-        return `<span class="cr-bar ${b.st || "pendiente"}${late ? " late" : ""}${live ? " live" : ""}${b.cls ? " " + b.cls : ""}" style="left:${l}%;width:${w}%;--c:${b.c || r.c || "var(--brand)"}" data-a="${b.a}" data-b="${b.b}" data-tip="${b.tip || ""}"${b.k ? ` role="button" tabindex="0" onclick="pxpOpenProject('${ea(b.k)}')"` : ""}>${tx}</span>`;
+        return `<span class="cr-bar ${b.st || "pendiente"}${late ? " late" : ""}${live ? " live" : ""}${b.cls ? " " + b.cls : ""}${b.fr ? " " + b.fr : ""}" style="left:${l}%;width:${w}%;--c:${b.c || r.c || "var(--brand)"}" data-a="${b.a}" data-b="${b.b}" data-tip="${b.tip || ""}"${b.k ? ` role="button" tabindex="0" onclick="pxpOpenProject('${ea(b.k)}')"` : ""}>${tx}</span>`;
       }).join("");
       return `<div class="cr-row"><div class="cr-l">${r.av || ""}<span><b>${esc(r.l)}</b>${r.sub ? `<small>${esc(r.sub)}</small>` : ""}</span></div><div class="cr-t">${bars}</div></div>`;
     }).join("");
-    const seg = [["dia", "Día"], ["semana", "Semana"], ["mes", "Mes"]].map(([v, l]) => `<button type="button" class="${s.m === v ? "on" : ""}" aria-pressed="${s.m === v}" onclick="pxpCrono('${ea(id)}','m','${v}')">${l}</button>`).join("");
-    const now = nowIn ? `<div class="cr-now" style="left:${x(nowV)}%" aria-hidden="true"><i class="cr-trail"></i><i class="cr-head"></i><em>${s.m === "mes" ? "Hoy" : reloj(ahoraH())}</em></div>` : "";
-    return `<div class="cr" id="cr-${esc(id.replace(/[^\w-]/g, "_"))}" data-id="${esc(id)}" data-a="${A}" data-b="${B}" data-m="${s.m}">
+    const seg = [["dia", "Día"], ["semana", "Semana"], ["mes", "Mes"], ["anio", "Año"]].map(([v, l]) => `<button type="button" class="${s.m === v ? "on" : ""}" aria-pressed="${s.m === v}" onclick="pxpCrono('${ea(id)}','m','${v}')">${l}</button>`).join("");
+    const now = nowIn ? `<div class="cr-now" style="left:${x(nowV)}%" aria-hidden="true"><i class="cr-trail"></i><i class="cr-head"></i></div>` : "";
+    const nowH = nowIn ? `<i class="cr-nowh" style="left:${x(nowV)}%" aria-hidden="true"><em>${s.m === "mes" || s.m === "anio" ? "Hoy" : reloj(ahoraH())}</em></i>` : "";
+    // Inicio del proyecto: línea de color propio
+    const iniV = opts.inicio ? abs(opts.inicio, 0) : null, iniIn = iniV != null && iniV >= A && iniV <= B;
+    const ini = iniIn ? `<i class="cr-ini" style="left:${x(iniV)}%" aria-hidden="true"></i>` : "", iniH = iniIn ? `<i class="cr-inih" style="left:${x(iniV)}%" data-tip="Inicio del proyecto · ${fD(opts.inicio)}"><em>Inicio</em></i>` : "";
+    const many = vis.length > 8, hayFr = vis.some(r => r.bars.some(b => b.fr));
+    return `<div class="cr${many ? " many" : ""}" id="cr-${esc(id.replace(/[^\w-]/g, "_"))}" data-id="${esc(id)}" data-a="${A}" data-b="${B}" data-m="${s.m}">
       <div class="cr-top"><b class="cr-tt">${titulo}</b><span class="cr-rg">${esc(R.label)}</span>
         <span class="cr-nav"><button type="button" onclick="pxpCrono('${ea(id)}','off',-1)" aria-label="Anterior">‹</button><button type="button" class="cr-hoy${s.off ? "" : " on"}" onclick="pxpCrono('${ea(id)}','off',0)">Hoy</button><button type="button" onclick="pxpCrono('${ea(id)}','off',1)" aria-label="Siguiente">›</button></span>
         <span class="seg cr-seg" role="group" aria-label="Vista del cronograma">${seg}</span></div>
       <div class="cr-g">
-        <div class="cr-row cr-h"><div class="cr-l"></div><div class="cr-t">${ticks}</div></div>
-        <div class="cr-body"><div class="cr-bg"><div class="cr-l"></div><div class="cr-t">${cols}${now}</div></div>${body || `<p class="cr-empty">${esc(opts.empty || "Nada programado en este periodo.")}</p>`}</div>
+        <div class="cr-row cr-h"><div class="cr-l">${many ? `<small class="cr-cnt">${vis.length} filas</small>` : ""}</div><div class="cr-t">${ticks}${iniH}${nowH}</div></div>
+        <div class="cr-body"><div class="cr-in"><div class="cr-bg"><div class="cr-l"></div><div class="cr-t">${cols}${ini}${now}</div></div>${body || `<p class="cr-empty">${esc(opts.empty || "Nada programado en este periodo.")}</p>`}</div></div>
       </div>
-      <div class="cr-leg">${[["pendiente", "Pendiente"], ["en_curso", "En curso"], ["revision", "Ajustes · revisión"], ["bloqueada", "Bloqueada"], ["listo", "Listo"], ["late", "Vencida"]].map(([k, l]) => `<span class="lg ${k}"><i></i>${l}</span>`).join("")}${opts.leg || ""}</div>
+      <div class="cr-leg">${[["pendiente", "Pendiente"], ["en_curso", "En curso"], ["revision", "Ajustes · revisión"], ["bloqueada", "Bloqueada"], ["listo", "Listo"], ["late", "Vencida"]].map(([k, l]) => `<span class="lg ${k}"><i></i>${l}</span>`).join("")}${hayFr && (s.m === "mes" || s.m === "anio") ? `<span class="lg am"><i></i>Mañana</span><span class="lg pm"><i></i>Tarde</span>` : ""}${iniIn ? `<span class="lg ini"><i></i>Inicio del proyecto</span>` : ""}${opts.leg || ""}</div>
     </div>`;
   }
 
@@ -18992,8 +19161,11 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const el = document.querySelector(`.cr[data-id="${CSS.escape(id)}"]`); if (el && BUILD[id]) { const t = document.createElement("div"); t.innerHTML = BUILD[id](); el.replaceWith(t.firstElementChild); }
   };
 
-  const tipEtapa = (x, extra) => `<b>${esc(x.e.nombre || "Etapa")}</b>${extra ? "<br>" + extra : ""}<br>${fD(x.ini)} ${reloj(x.hi || 0)} → ${fD(x.fin)} ${reloj(x.hf == null ? J() : x.hf)}<br>${window.pxpDurTxt ? pxpDurTxt(x.horas) : n1(x.horas) + " h"} · ${ETS[x.e.estado || "pendiente"]}${x.e.resp ? " · " + esc(x.e.resp) : ""}`;
+  const tipEtapa = (x, extra) => `<b>${esc(x.e.nombre || "Etapa")}</b>${extra ? "<br>" + extra : ""}<br>${fD(x.ini)} ${reloj(x.hi || 0, true)} → ${fD(x.fin)} ${reloj(x.hf == null ? J() : x.hf)}<br>${window.pxpDurTxt ? pxpDurTxt(x.horas) : n1(x.horas) + " h"}${frTxt(x)}${x.e.extiende ? " · hasta " + esc(x.e.hasta || "19:00") : ""} · ${ETS[x.e.estado || "pendiente"]}${x.e.resp ? " · " + esc(pxpResps(x.e).join(", ")) : ""}`;
   const barTxt = (x) => x.horas < J() ? n1(x.horas) + " h" : n1(x.horas / J()) + " d";
+  // v155 · Etapas de un solo día: mañana (antes de las 12:30) o tarde (desde las 13:30)
+  const frDe = (x) => x.ini && x.ini === x.fin ? ((x.hf == null ? J() : x.hf) <= 4 + 1e-9 ? "am" : (x.hi || 0) >= 4 - 1e-9 ? "pm" : "") : "";
+  const frTxt = (x) => ({ am: " · mañana", pm: " · tarde" })[frDe(x)] || "";
   const av = (n, z) => (window.pxpAvatar && n ? pxpAvatar("person", n, z) : "");
 
   // ── Cronograma del proyecto: una fila por etapa (y los bloqueos) ──
@@ -19001,13 +19173,13 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const id = "p:" + k;
     BUILD[id] = () => {
       const p = getProjectDisplay(k), col = window.pxpProjectColor ? pxpProjectColor(k) : "var(--brand)";
-      const P = (window.pxpPlanEtapas ? pxpPlanEtapas(p) : []).filter(x => x.ini && x.fin);
+      const P = (window.pxpPlanEtapas ? pxpPlanEtapas(p) : []).filter(x => x.ini && x.fin).sort((a, b) => abs(a.ini, a.hi || 0) - abs(b.ini, b.hi || 0) || a.i - b.i);
       const rows = P.map(x => ({ l: `${x.i + 1}. ${x.e.nombre || "Etapa"}`, sub: pxpResps(x.e).join(", ") || "Sin responsable", av: av(x.e.resp, 22), c: col,
-        bars: [{ a: abs(x.ini, x.hi || 0), b: abs(x.fin, x.hf == null ? J() : x.hf), st: x.e.estado || "pendiente", txt: barTxt(x), tip: tipEtapa(x) }] }));
-      ((PROJECTS[k] || {}).bloqueos || []).filter(b => b.inicio).forEach(b => rows.push({ l: "Bloqueo · " + (b.tipo || ""), sub: b.desc || "", c: "var(--red)", bars: [{ a: abs(b.inicio, 0), b: b.fin ? abs(b.fin, J()) : ahoraAbs(), st: "bloqueada", cls: "blk" + (b.fin ? "" : " open"), txt: b.fin ? "" : "activo", tip: `<b>Bloqueo · ${esc(b.tipo || "")}</b>${b.desc ? "<br>" + esc(b.desc) : ""}` }] }));
+        bars: [{ a: abs(x.ini, x.hi || 0), b: abs(x.fin, x.hf == null ? J() : x.hf), dIni: x.ini, dFin: x.fin, fr: frDe(x), st: x.e.estado || "pendiente", txt: barTxt(x), tip: tipEtapa(x) }] }));
+      ((PROJECTS[k] || {}).bloqueos || []).filter(b => b.inicio).forEach(b => rows.push({ l: "Bloqueo · " + (b.tipo || ""), sub: b.desc || "", c: "var(--red)", bars: [{ a: abs(b.inicio, 0), b: b.fin ? abs(b.fin, J()) : ahoraAbs(), dIni: b.inicio, dFin: b.fin || hoy(), st: "bloqueada", cls: "blk" + (b.fin ? "" : " open"), txt: b.fin ? "" : "activo", tip: `<b>Bloqueo · ${esc(b.tipo || "")}</b>${b.desc ? "<br>" + esc(b.desc) : ""}` }] }));
       const ent = (PROJECTS[k] || {}).entregaFinal;
-      if (ent) rows.push({ l: "Entrega final", sub: fD(ent), c: "var(--brand)", bars: [{ a: abs(ent, J()) - .35, b: abs(ent, J()), st: "listo", cls: "goal", tip: `<b>Entrega final</b><br>${fD(ent)}` }] });
-      return render(id, "Cronograma", rows, { def: "mes", empty: "Ninguna etapa cae en este periodo. Usa ‹ › o cambia a Mes." });
+      if (ent) rows.push({ l: "Entrega final", sub: fD(ent), c: "var(--brand)", bars: [{ a: abs(ent, J()) - .35, b: abs(ent, J()), dIni: ent, dFin: ent, st: "listo", cls: "goal", tip: `<b>Entrega final</b><br>${fD(ent)}` }] });
+      return render(id, "Cronograma", rows, { def: "mes", todas: true, inicio: (PROJECTS[k] || {}).fechaInicio || "", empty: "Sin etapas con fecha todavía." });
     };
     return P_OK(k) ? BUILD[id]() : "";
   };
@@ -19023,14 +19195,19 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
         (window.pxpPlanEtapas ? pxpPlanEtapas(q) : []).forEach(x => {
           if (!x.ini || !x.fin || !pxpEsResp(x.e, n)) return;
           const nom = getProjectDisplay(k).nombre || k;
-          rows.push({ l: x.e.nombre || "Etapa", sub: nom, c: window.pxpProjectColor ? pxpProjectColor(k) : "", _a: abs(x.ini, x.hi || 0),
-            bars: [{ a: abs(x.ini, x.hi || 0), b: abs(x.fin, x.hf == null ? J() : x.hf), st: x.e.estado || "pendiente", k, txt: barTxt(x), tip: tipEtapa(x, esc(nom)) }] });
+          rows.push({ l: x.e.nombre || "Etapa", sub: nom, g: k, c: window.pxpProjectColor ? pxpProjectColor(k) : "", _a: abs(x.ini, x.hi || 0),
+            bars: [{ a: abs(x.ini, x.hi || 0), b: abs(x.fin, x.hf == null ? J() : x.hf), fr: frDe(x), st: x.e.estado || "pendiente", k, txt: barTxt(x), tip: tipEtapa(x, esc(nom)) }] });
         });
       });
       rows.sort((a, b) => a._a - b._a);
       // Cruces de horario
       const act = rows.filter(r => r.bars[0].st !== "listo");
       act.forEach((r, i) => act.slice(i + 1).forEach(o => { const a = r.bars[0], b = o.bars[0]; if (a.a < b.b - 1e-9 && b.a < a.b - 1e-9) { a.cls = b.cls = "cruce"; } }));
+      if (st(id, "semana").m === "anio") {   // v155 · Año: una fila por proyecto con todas sus etapas
+        const G = new Map(); rows.forEach(r => { if (!G.has(r.g)) G.set(r.g, { l: r.sub, sub: "", c: r.c, _a: r._a, bars: [], n: 0 }); const g = G.get(r.g); g.bars.push(...r.bars); g.n++; });
+        const gr = Array.from(G.values()).map(g => Object.assign(g, { sub: g.n + " etapa" + (g.n !== 1 ? "s" : "") })).sort((a, b) => a._a - b._a);
+        return render(id, "Cronograma", gr, { def: "semana", empty: "Sin etapas este año." });
+      }
       return render(id, "Cronograma", rows, { def: "semana", empty: "Sin etapas en este periodo.", leg: rows.some(r => r.bars[0].cls === "cruce") ? `<span class="lg cruce"><i></i>Cruce de horario</span>` : "" });
     };
     return BUILD[id]();
@@ -19040,9 +19217,9 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   setInterval(() => {
     const v = ahoraAbs();
     document.querySelectorAll(".cr").forEach(c => {
-      const A = +c.dataset.a, B = +c.dataset.b, n = c.querySelector(".cr-now"); if (!n) return;
-      if (v < A || v > B) { n.remove(); return; }
-      n.style.left = ((v - A) / (B - A) * 100) + "%"; const em = n.querySelector("em"); if (em && c.dataset.m !== "mes") em.textContent = reloj(ahoraH());
+      const A = +c.dataset.a, B = +c.dataset.b, n = c.querySelector(".cr-now"), nh = c.querySelector(".cr-nowh"); if (!n) return;
+      if (v < A || v > B) { n.remove(); if (nh) nh.remove(); return; }
+      n.style.left = ((v - A) / (B - A) * 100) + "%"; if (nh) { nh.style.left = n.style.left; const em = nh.querySelector("em"); if (em && c.dataset.m !== "mes" && c.dataset.m !== "anio") em.textContent = reloj(ahoraH()); }
       c.querySelectorAll(".cr-bar").forEach(b => {
         const a = +b.dataset.a, z = +b.dataset.b, done = b.classList.contains("listo");
         b.classList.toggle("live", !done && v > a && v < z);
@@ -19125,6 +19302,12 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     if (!can()) return;
     const w = $("et-wrap"); if (!w) return; const k = w.dataset.k, x = (window.pxpPlanEtapas ? pxpPlanEtapas(getProjectDisplay(k)) : [])[i]; if (!x) return;
     pxpCalOpen(inp.closest(".et-chip") || inp, "et:" + k + ":" + a + ":" + i, { sel: inp.dataset.iso || "", ini: x.ini, fin: x.fin, min: a === "fin" ? x.ini : "", hint: a === "inicio" ? "Inicio · empieza ese día hábil" : "Entrega · se ajustan las horas", onPick: (s) => window.pxpEt(a, i, s) });
+  };
+  // v155 · Inicio del proyecto: misma lógica que la entrega final (puede ser estimado)
+  window.pxpInicioPick = function (btn, k) {
+    if (!can()) return;
+    const p = PROJECTS[k] || {}, fi = p.fechaInicio || "", pri = (window.pxpPlanEtapas ? pxpPlanEtapas(p) : []).map(x => x.ini).filter(Boolean).sort()[0] || "";
+    pxpCalOpen(btn, "ini:" + k, { sel: fi, max: p.entregaFinal || "", hint: "Día en que arranca la postproducción", quick: [pri && pri !== fi ? ["Primera etapa", pri] : null, fi ? [p.inicioEst ? "Marcar confirmado" : "Marcar estimado", "__est"] : null, fi ? ["Quitar", "__del"] : null], onPick: (s) => s === "__est" ? window.pxpProjSet("inicioEst", !p.inicioEst) : window.pxpProjSet("inicio", s === "__del" ? "" : s) });
   };
   // Entrega final del proyecto: calendario flotante (no empuja los demás desplegables)
   window.pxpEntregaPick = function (btn, k) {
@@ -19453,6 +19636,16 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     return { k: n <= ROJO ? "near" : "ok", n, txt: n === 1 ? "Falta 1 día hábil" : `Faltan ${n} días hábiles`, c: `hsl(${hue} ${n <= ROJO ? 78 : 64}% ${n <= ROJO ? 52 : 44}%)` };
   }
   window.pxpEntregaEstado = estado;
+  // v155 · Inicio del proyecto: primero en la barra de resumen, con su propio color, y los días hábiles de ejecución
+  window.pxpInicioKpi = function (k, p) {
+    const q = PROJECTS[k] || p || {}, fi = q.fechaInicio || "", t = hoy(), ef = q.entregaFinal || "";
+    const can = !window.pxpPuedeEditar || pxpPuedeEditar();
+    if (!fi) return `<div class="pj-ini none"><span class="kl">Inicio</span><b class="muted">Sin definir</b><span class="ks">${can ? `<button type="button" class="linkbtn ent-btn" onclick="pxpInicioPick(this,'${ea(k)}')">Definir fecha</button>` : "pendiente de Administración"}</span></div>`;
+    const cerrado = ["entregado", "aprobado"].includes(q.estadoGeneral) && ef;
+    const sub = fi > t ? `Empieza en ${habiles(t, fi)} día${habiles(t, fi) !== 1 ? "s" : ""} hábil${habiles(t, fi) !== 1 ? "es" : ""}`
+      : cerrado ? `Duró ${habiles(fi, ef) + 1} días hábiles` : `${habiles(fi, t) + (habil(fi) ? 1 : 0)} días hábiles en ejecución`;
+    return `<div class="pj-ini"><span class="kl"><i class="pj-ini-dot"></i>Inicio${q.inicioEst ? ` <em class="pj-ent-est">estimado</em>` : ""}</span><b>${+fi.slice(8)} ${MES[+fi.slice(5, 7) - 1]}</b><span class="ks">${sub}</span></div>`;
+  };
   window.pxpEntregaKpi = function (k, p) {
     const ef = (PROJECTS[k] || p || {}).entregaFinal || "", e = estado(ef), est = (PROJECTS[k] || {}).entregaEst;
     const can = !window.pxpPuedeEditar || pxpPuedeEditar();

@@ -1,4 +1,4 @@
-// Prueba funcional v154: varios responsables, tipo/fase, horario, extensión, sugerencias y desplegables.
+// Prueba funcional de etapas (v154–v155): responsables, tipo/fase, horario, sugerencias por fase, bloqueador, cronograma, inicio y desplegables.
 import { createRequire } from "node:module"; import { execSync } from "node:child_process"; import path from "node:path";
 const req = createRequire(import.meta.url); let pw; try { pw = req("playwright"); } catch { pw = req(execSync("npm root -g").toString().trim() + "/playwright"); }
 const shots = process.argv[2] || ".";
@@ -29,24 +29,58 @@ await page.click('.et-menu .em-f:nth-child(1)'); await page.waitForTimeout(400);
 const e1 = await page.evaluate(k => PROJECTS[k].etapas[1], K);
 check("clase revisión", e1.clase === "revision"); check("fase pre", e1.fase === "pre");
 check("grupo Preproducción visible", await page.$('.et-grp[data-f="pre"]') !== null);
-// 3 · horario tarde + extensión
-await page.selectOption('.et-row[data-i="2"] .et-fr select', "pm"); await page.waitForTimeout(300);
+// 3 · horario con el selector (estilo calendario): Tarde, Hora exacta 10:30 y se extiende hasta 19:30
+await page.click('.et-row[data-i="2"] .et-pick:not(.pz)'); await page.waitForTimeout(250);
+await page.screenshot({ path: shots + "/t-fr.png" });
+await page.click('.pk-fr .pk-op.fr-pm'); await page.waitForTimeout(350);
 const pl = await page.evaluate(k => pxpPlanEtapas(PROJECTS[k]).find(x => x.i === 2), K);
 check("tarde empieza 13:30 (h=4)", pl.hi === 4);
-await page.check('.et-row[data-i="2"] .et-ext input'); await page.waitForTimeout(300);
-check("se extiende", await page.evaluate(k => !!PROJECTS[k].etapas[2].extiende, K));
-await page.selectOption('.et-row[data-i="3"] .et-fr select', "hora"); await page.waitForTimeout(300);
-await page.selectOption('.et-row[data-i="3"] .et-fr2 select', "2"); await page.waitForTimeout(300);
+await page.click('.et-row[data-i="3"] .et-pick:not(.pz)'); await page.waitForTimeout(250);
+await page.click('.pk-fr .pk-op.fr-hora'); await page.waitForTimeout(350);
+await page.click('.pk-fr .pk-hrs .pk-d:nth-child(5)'); await page.waitForTimeout(350);
+await page.click('.pk-fr .pk-ext .pk-q:nth-child(5)'); await page.waitForTimeout(350);
 const p3 = await page.evaluate(k => pxpPlanEtapas(PROJECTS[k]).find(x => x.i === 3), K);
 check("hora exacta 10:30 (h=2)", p3.hi === 2);
-// 4 · sugerencias
-await page.click(".et-sugbtn"); await page.waitForTimeout(400);
-const nS = await page.$$eval(".sg-it", x => x.length); check("hay sugerencias", nS > 0);
-await page.locator(".sg").screenshot({ path: shots + "/t-sug.png" });
+check("se extiende hasta 19:30", await page.evaluate(k => PROJECTS[k].etapas[3].hasta === "19:30", K));
+await page.click("#et-wrap .et-sum"); await page.waitForTimeout(200);
+// exigencia con el selector
+await page.click('.et-row[data-i="0"] .et-pick.pz'); await page.waitForTimeout(250);
+await page.click('.pk-pz .pk-op.pz-pesada'); await page.waitForTimeout(300);
+check("exigencia pesada", await page.evaluate(k => PROJECTS[k].etapas[0].peso === "pesada", K));
+// tipo revisión: fila compacta, liviana y 4 h si tenía la duración sugerida
+const idxR = await page.evaluate(k => { const E = PROJECTS[k].etapas; E.push({ nombre: "Etapa de prueba", estado: "pendiente", hp: 8, dias: 1, resp: "" }); pxpRenderProj(); return E.length - 1; }, K); await page.waitForTimeout(400);
+await page.click(`.et-row[data-i="${idxR}"] .et-cls`); await page.waitForTimeout(250);
+await page.click('.et-menu .em-c.cl-revision'); await page.waitForTimeout(400);
+const eR = await page.evaluate(([k, i]) => ({ e: PROJECTS[k].etapas[i], t: pxpTipoEtapa(PROJECTS[k].etapas[i]) }), [K, idxR]);
+check("revisión: 4 h y liviana", eR.e.hp === 4 && eR.t === "liviana");
+check("revisión: fila compacta", await page.$(`.et-row.mini[data-i="${idxR}"]`) !== null);
+// 4 · sugerir por fase (un clic) y deshacer
 const antes = await page.evaluate(k => PROJECTS[k].etapas.length, K);
-await page.click(".sg-ft .ficha-save"); await page.waitForTimeout(500);
+await page.click('.sg-c:nth-of-type(2)'); await page.waitForTimeout(500);
 const despues = await page.evaluate(k => PROJECTS[k].etapas.length, K);
-check("sugerencias agregadas", despues > antes);
+check("sugerir Rodaje agrega etapas", despues > antes);
+check("grupo Rodaje visible", await page.$('.et-grp[data-f="rodaje"]') !== null);
+await page.click('.sg-undo .linkbtn'); await page.waitForTimeout(500);
+check("deshacer quita las sugeridas", await page.evaluate(k => PROJECTS[k].etapas.length, K) === antes);
+await page.click('.sg-c:nth-of-type(3)'); await page.waitForTimeout(500);
+await page.locator("#et-wrap").screenshot({ path: shots + "/t-et.png" });
+// bloqueador sugerido en una revisión en curso
+const iRev = await page.evaluate(k => PROJECTS[k].etapas.findIndex(e => pxpClaseEtapa(e) === "revision" && e.estado !== "listo"), K);
+await page.evaluate(([k, i]) => pxpEt("estado", i, "en_curso"), [K, iRev]); await page.waitForTimeout(400);
+await page.click(`.et-row[data-i="${iRev}"] .et-bq`); await page.waitForTimeout(400);
+check("bloqueador por feedback", await page.evaluate(k => (PROJECTS[k].bloqueos || []).some(b => !b.fin && /Feedback/.test(b.desc)), K));
+// cronograma: todas las etapas y vista Año
+const nFilas = await page.$$eval("#et-gantt .cr-body .cr-row", r => r.length);
+const nEt = await page.evaluate(k => pxpPlanEtapas(PROJECTS[k]).filter(x => x.ini && x.fin).length, K);
+check("cronograma muestra todas las etapas", nFilas >= nEt);
+await page.click('#et-gantt .cr-seg button:nth-child(4)'); await page.waitForTimeout(400);
+check("vista Año", await page.$eval("#et-gantt .cr", c => c.dataset.m === "anio"));
+await page.locator("#et-gantt").screenshot({ path: shots + "/t-anio.png" });
+await page.click('#et-gantt .cr-seg button:nth-child(3)'); await page.waitForTimeout(300);
+// inicio del proyecto
+await page.evaluate(k => pxpProjSet("inicio", "2026-09-14"), K); await page.waitForTimeout(500);
+check("inicio guardado", await page.evaluate(k => PROJECTS[k].fechaInicio === "2026-09-14", K));
+check("KPI de inicio primero", await page.$eval("#pxp-proj .pj-kpis > :first-child", d => d.classList.contains("pj-ini")));
 // 5 · desplegables
 const rl = await page.$eval(".rl-sec", s => [s.classList.contains("pj-fold"), s.classList.contains("open"), s.querySelector(".fd-sum").textContent]);
 check("enlaces plegable y cerrado", rl[0] && !rl[1]);

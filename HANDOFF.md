@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v154** · 10 oct 2026 · Responsable: Bastián Torres
+Versión: **v155** · 10 oct 2026 · Responsable: Bastián Torres
 
 ## Cómo está armado ahora
 - **Una sola fuente:** `src/app.html`, con todo el CSS y las capas JS.
@@ -63,6 +63,16 @@ Versión: **v154** · 10 oct 2026 · Responsable: Bastián Torres
   - Varios responsables: `e.resps` (lista) y `e.resp` = el primero, por compatibilidad. Helpers globales `pxpResps`, `pxpEsResp`, `pxpSetResps`. La carga reparte las horas entre ellos.
   - "Etapas sugeridas según el equipo": arma etapas por cargo del proyecto (editor, color, compo, 3D, IA, master, casa de audio, Dirección de Post, PM o Producción Ejecutiva) con responsables, tipo, fase y horas.
   - Pruebas: `node tools/test-v154.mjs [carpeta-capturas]` y `node tools/shotproj.mjs salida.png [proyecto] [ancho] [usuario] [js] [selector]`.
+
+- **v155:** etapas más claras y cronograma completo.
+  - Filas más bajas. Revisión y Entrega usan una fila compacta (`.et-row.mini`) teñida con el color de su tipo.
+  - Valores por tipo: duración sugerida proceso 8 h · revisión 4 h · entrega 1 h (al cambiar el tipo, solo si tenía la sugerida); exigencia liviana por defecto en revisión y entrega (`pxpTipoEtapa`).
+  - Horario y Exigencia se eligen en selectores flotantes con el lenguaje del calendario (`pxpEtPick`). "Se extiende" va dentro del selector de horario.
+  - Revisión en curso o vencida: botón "¿Bloquea lo que sigue?" que crea un bloqueador de feedback (`bloqueos[].etapa`).
+  - Etapas sugeridas por fase en un clic (Preproducción · Rodaje · Postproducción), combinación al azar según los cargos del equipo, con Deshacer.
+  - Cronograma: en el proyecto se ven todas las etapas por fecha de inicio (flechas con fecha si caen fuera del periodo), altura máxima con desplazamiento desde 9 filas, vista **Año** (en persona, una fila por proyecto), mañana/tarde en Mes y Año, y línea de **Inicio del proyecto**.
+  - Fecha de inicio del proyecto (`fechaInicio`, `inicioEst`) junto a la entrega final, primera en la barra de resumen con color turquesa y días hábiles de ejecución.
+  - Pruebas: `node tools/test-etapas.mjs [carpeta-capturas]`.
 
 ## No cambiar sin consultar
 - El ZIP de Netlify va sin datos, y no se guarda nada antes de cargar los datos del servidor.
