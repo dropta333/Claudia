@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v153** · 8 oct 2026 · Responsable: Bastián Torres
+Versión: **v154** · 10 oct 2026 · Responsable: Bastián Torres
 
 ## Cómo está armado ahora
 - **Una sola fuente:** `src/app.html`, con todo el CSS y las capas JS.
@@ -54,6 +54,15 @@ Versión: **v153** · 8 oct 2026 · Responsable: Bastián Torres
   - Se quitaron 175 reglas CSS sin uso.
   - Mantenimiento de datos al cargar (capa 47): normaliza campos viejos y, en Netlify, sube a `/api/files` las imágenes que quedaron incrustadas en los datos.
   - Se corrigió el desborde horizontal de la ventana de proyecto en celular.
+
+- **v154:** ventana de proyecto más ordenada.
+  - Secciones plegables con resumen (capa 48): Avance por etapas, Revisiones y enlaces, Ruta en el share y Taxonomía sugerida. Cada persona recuerda cuáles dejó abiertas.
+  - Etapas agrupadas por fase en desplegables: **Preproducción · Rodaje · Postproducción** (`e.fase`, se deduce del nombre si no se elige).
+  - Tipo de etapa **Proceso · Revisión · Entrega** (`e.clase`, se deduce del nombre). El time table usa el mismo tipo.
+  - Horario de la etapa (`e.franja`: `am` 8:30 · `pm` 13:30 · `hora` con `e.hIni`) y "Se extiende" (`e.extiende`, `e.hasta`).
+  - Varios responsables: `e.resps` (lista) y `e.resp` = el primero, por compatibilidad. Helpers globales `pxpResps`, `pxpEsResp`, `pxpSetResps`. La carga reparte las horas entre ellos.
+  - "Etapas sugeridas según el equipo": arma etapas por cargo del proyecto (editor, color, compo, 3D, IA, master, casa de audio, Dirección de Post, PM o Producción Ejecutiva) con responsables, tipo, fase y horas.
+  - Pruebas: `node tools/test-v154.mjs [carpeta-capturas]` y `node tools/shotproj.mjs salida.png [proyecto] [ancho] [usuario] [js] [selector]`.
 
 ## No cambiar sin consultar
 - El ZIP de Netlify va sin datos, y no se guarda nada antes de cargar los datos del servidor.

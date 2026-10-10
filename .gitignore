@@ -1,3 +1,5 @@
 dist/
 node_modules/
 *.png
+tablero-preview-v*.html
+trafico-netlify-v*.zip
