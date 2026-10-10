@@ -30,6 +30,6 @@ t = await ops();
 check("en inglés", /PRODUCTION SCHEDULE/.test(t) && /POST-PRODUCTION/.test(t));
 check("vista previa con 100 % y arrastre", await page.$("#rp-prev .rz-100") !== null);
 await page.click("#rp-prev .rz-100"); await page.waitForTimeout(300);
-check("100 % agranda la hoja", await page.evaluate(() => (window.__rpZ || 1) > 1));
+check("tamaño real ≈ nuevo 100 %", await page.evaluate(() => Math.abs((window.__rpZ || 1) - 1) < .15));
 console.log(JSON.stringify({ ok: ok.length, fail, errs: errs.slice(0, 5) }, null, 1));
 await b.close(); process.exit(fail.length || errs.length ? 1 : 0);

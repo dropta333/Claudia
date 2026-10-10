@@ -5484,8 +5484,9 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;tr
 .rp-zoom .rz-fit{font:600 13.5px/1 var(--sans);border-left:1px solid var(--border);border-radius:0 8px 8px 0}
 .rp-zoom .i{width:16px;height:16px}
 .rp-pgs{--rpz:1}
-.rp-page{width:calc(min(100%,640px) * var(--rpz))!important;max-width:none}
-.rp-page.land{width:calc(min(100%,900px) * var(--rpz))!important}
+.rp-page{width:calc(min(100%,640px) * 1.25 * var(--rpz))!important;max-width:none}
+.rp-page.land{width:calc(min(100%,900px) * 1.25 * var(--rpz))!important}
+.rp-zoom .rz-c{font:600 13.5px/1 var(--sans);border-left:1px solid var(--border);border-radius:0}
 .rp-pgs{align-items:safe center}
 /* v151 · Legibilidad de los desplegables del proyecto */
 #pxp-proj .cfg-l{font-size:13px!important}
@@ -17646,14 +17647,17 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   const seg = (name, cur, opts) => `<div class="seg" role="group">${opts.map(([v, l]) => `<button type="button" class="${cur === v ? "on" : ""}" aria-pressed="${cur === v}" onclick="${name}('${v}')">${l}</button>`).join("")}</div>`;
   const tog = (id, on, label, hint) => `<label class="rp-t"><input type="checkbox" ${on ? "checked" : ""} onchange="pxpRepOpt('${id}',this.checked)"><span class="rp-sw" aria-hidden="true"></span><span class="rp-tl"><b>${label}</b>${hint ? `<small>${hint}</small>` : ""}</span></label>`;
   // v151 · Lupa: acercar / alejar la vista previa (también Ctrl + rueda del mouse)
-  const ZS = [.6, .75, 1, 1.25, 1.5, 2, 2.5, 3];
+  const ZS = [.5, .6, .8, 1, 1.25, 1.5, 2, 2.5];   // v172 · el 100 % es el antiguo 125 %; Ajustar = .8
   window.pxpRpZoom = (d) => {
     const z = window.__rpZ || 1, i = ZS.findIndex(v => v >= z - 1e-6);
     if (d === "real") { const pg = document.querySelector("#rp-prev .rp-page"); if (!pg) return; const fit = pg.getBoundingClientRect().width / z, real = (pg.classList.contains("land") ? 841.89 : 595.28) * 96 / 72; window.__rpZ = Math.round(real / fit * 100) / 100; }
-    else window.__rpZ = d === 0 ? 1 : ZS[Math.max(0, Math.min(ZS.length - 1, (i < 0 ? 2 : i) + d))];
+    else window.__rpZ = d === 0 ? .8 : ZS[Math.max(0, Math.min(ZS.length - 1, (i < 0 ? 3 : i) + d))];
     const g = document.querySelector("#rp-prev .rp-pgs"), v = document.querySelector("#rp-prev .rz-v");
     if (g) g.style.setProperty("--rpz", window.__rpZ); if (v) v.textContent = Math.round(window.__rpZ * 100) + "%";
+    requestAnimationFrame(window.pxpRpCentrar);
   };
+  // v172 · Centrar la hoja en la vista previa
+  window.pxpRpCentrar = () => { const pv = document.querySelector("#rp-prev"); if (!pv) return; pv.scrollLeft = Math.max(0, (pv.scrollWidth - pv.clientWidth) / 2); pv.scrollTop = 0; };
   // v166 · Arrastrar la hoja para moverse (como una mano)
   let pan = null;
   document.addEventListener("pointerdown", (e) => { const pv = e.target.closest && e.target.closest("#rp-prev"); if (!pv || e.button !== 0 || e.target.closest("button,.rp-zoom") || (pv.scrollWidth <= pv.clientWidth && pv.scrollHeight <= pv.clientHeight)) return; pan = { pv, x: e.clientX, y: e.clientY, l: pv.scrollLeft, t: pv.scrollTop }; pv.classList.add("panning"); e.preventDefault(); });
@@ -17704,8 +17708,9 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
         if (my !== seq || S !== s) return; s.rec = res.rec; s.res = res;
         const pv = $("rp-prev"); if (!pv) return; const n = res.rec.pages.length;
         pv.innerHTML = (res.omitted && res.omitted.length && s.kind === "project" ? `<div class="rp-warn">${esc(tr(s.lang, "omitted", { x: res.omitted.join(", ") }))}</div>` : "") + (s.kind === "client" && res.omitted && res.omitted.length ? `<div class="rp-warn">${esc(L(`Para mantener 2 páginas, ${res.omitted[0]} proyectos se resumen en una línea.`, `To keep it to 2 pages, ${res.omitted[0]} projects are summarized in one line.`))}</div>` : "")
-          + `<div class="rp-zoom" role="group" aria-label="Zoom de la vista previa"><button type="button" onclick="pxpRpZoom(-1)" aria-label="Alejar">−</button><button type="button" class="rz-v" onclick="pxpRpZoom(0)" title="Ajustar al ancho">${Math.round((window.__rpZ || 1) * 100)}%</button><button type="button" onclick="pxpRpZoom(1)" aria-label="Acercar">+</button><button type="button" class="rz-fit" onclick="pxpRpZoom(0)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4M8.5 11h5M11 8.5v5"/></svg>Ajustar</button><button type="button" class="rz-100" onclick="pxpRpZoom('real')" title="Tamaño real">100 %</button></div><div class="rp-pgs" style="--rpz:${window.__rpZ || 1}">${res.rec.pages.map(ops => pageSVG(ops, res.rec.size)).join("")}</div><p class="rp-pn">${n} ${L(n === 1 ? "página" : "páginas", n === 1 ? "page" : "pages")} · A4${res.rec.size && res.rec.size[0] > res.rec.size[1] ? " " + L("horizontal", "landscape") : ""}</p>`;
+          + `<div class="rp-zoom" role="group" aria-label="Zoom de la vista previa"><button type="button" onclick="pxpRpZoom(-1)" aria-label="Alejar">−</button><button type="button" class="rz-v" onclick="pxpRpZoom(0)" title="Ajustar al ancho">${Math.round((window.__rpZ || 1) * 100)}%</button><button type="button" onclick="pxpRpZoom(1)" aria-label="Acercar">+</button><button type="button" class="rz-fit" onclick="pxpRpZoom(0)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4M8.5 11h5M11 8.5v5"/></svg>Ajustar</button><button type="button" class="rz-c" onclick="pxpRpCentrar()" title="Centrar la hoja"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/></svg>Centrar</button><button type="button" class="rz-100" onclick="pxpRpZoom('real')" title="Tamaño real del A4">Real</button></div><div class="rp-pgs" style="--rpz:${window.__rpZ || 1}">${res.rec.pages.map(ops => pageSVG(ops, res.rec.size)).join("")}</div><p class="rp-pn">${n} ${L(n === 1 ? "página" : "páginas", n === 1 ? "page" : "pages")} · A4${res.rec.size && res.rec.size[0] > res.rec.size[1] ? " " + L("horizontal", "landscape") : ""}</p>`;
         const b = $("rp-dl"); if (b) b.disabled = false;
+        if (!s._ctr) { s._ctr = 1; requestAnimationFrame(window.pxpRpCentrar); }   // v172 · la primera vez la hoja abre centrada
       } catch (e) { console.error(e); const pv = $("rp-prev"); if (pv && my === seq) pv.innerHTML = `<div class="rp-load err">${L("No se pudo preparar el reporte. Intenta de nuevo.", "The report could not be prepared. Please try again.")}</div>`; }
     }, delay || 0);
   }
@@ -17780,7 +17785,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     "Generar reporte": "Generate report", "Reporte del cliente": "Client report", "Todos los clientes": "All clients", "Vista previa": "Preview", "Descargar PDF": "Download PDF",
   };
   // v170 · Textos de las versiones 163–169
-  Object.assign(DICT, { "Todavía no hay rodajes pasados.": "No past shoots yet.", "No hay rodajes en curso ni próximos. Agrégalos con “+ agregar rodaje esta semana”.": "No current or upcoming shoots. Add them with “+ add shoot this week”.", "Bloqueando lo que sigue": "Blocking what follows", "¿Bloquea lo que sigue?": "Blocks what follows?", "Desbloqueado. El bloqueador queda como resuelto.": "Unblocked. The blocker is marked as resolved.",
+  Object.assign(DICT, { "Centrar": "Center", "Real": "Actual size", "Tamaño real del A4": "Actual A4 size", "Centrar la hoja": "Center the page", "Todavía no hay rodajes pasados.": "No past shoots yet.", "No hay rodajes en curso ni próximos. Agrégalos con “+ agregar rodaje esta semana”.": "No current or upcoming shoots. Add them with “+ add shoot this week”.", "Bloqueando lo que sigue": "Blocking what follows", "¿Bloquea lo que sigue?": "Blocks what follows?", "Desbloqueado. El bloqueador queda como resuelto.": "Unblocked. The blocker is marked as resolved.",
     "Más gráficas": "More charts", "Mostrar": "Show", "Ocultar": "Hide", "Sin entregas próximas": "No upcoming deliveries", "Todavía no tienes proyectos activos asignados.": "You don't have active projects assigned yet.",
     "Hoy van": "So far today", "Horas estimadas": "Estimated hours", "Cargas del equipo": "Team load", "Proyectos de peso": "Heavy projects", "Duración del proyecto": "Project duration", "Equipo de Post": "Post team", "Proyectos con estado": "Projects with status",
     "Disponible": "Available", "Proyectos": "Projects", "Horas": "Hours", "Vencidas": "Overdue", "Ausencia": "Absence", "Sí": "Yes", "Parcial": "Partial", "No": "No", "Ocupado": "Busy", "Libre": "Free", "Sobrecarga": "Overload",
