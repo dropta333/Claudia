@@ -17525,7 +17525,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
 
   // ═════════ Reporte de proyecto (1 página) ═════════
   async function buildProject(k, opt) {
-    const lang = opt.lang, p = PROJECTS[k] || {}, rec = new Rec().add(), omitted = [];
+    const lang = opt.lang, p = lang === "en" && window.pxpRepEN ? pxpRepEN(PROJECTS[k] || {}) : (PROJECTS[k] || {}), rec = new Rec().add(), omitted = [];   // v180 · etapas en inglés
     const bandH = 156, bw = Math.round(W * .62), logo = await logoImg("#FFFFFF", 700).catch(() => null);
     const bsrc = window.pxpBannerSrc ? pxpBannerSrc(k) : "";
     const banner = bsrc ? await imgBox(bsrc, bw, bandH, { mode: "cover", bg: BAND, fade: true, scale: 3, q: .8 }).catch(() => null) : null;
@@ -17969,6 +17969,41 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
 
 </script>
 <script>
+// ════════════════════════════════════════════════════════════════
+// v180 · Nombres de etapas en inglés para el time table y los reportes en inglés
+//   Solo se traduce lo que sale en el PDF: el proyecto guardado no cambia.
+//   La copia conserva el tipo, la fase y el plan del original (no cambian fechas ni horas).
+// ════════════════════════════════════════════════════════════════
+(function () {
+  "use strict";
+  const FR = [
+    [/revisi[oó]n (del |de )?cliente/gi, "client review"], [/revisi[oó]n (de |con )?(la )?agencia/gi, "agency review"], [/revisi[oó]n interna/gi, "internal review"], [/revisi[oó]n final/gi, "final review"], [/revisi[oó]n/gi, "review"],
+    [/entrega final/gi, "final delivery"], [/entrega (de |del )?master/gi, "master delivery"], [/entrega/gi, "delivery"], [/env[ií]o/gi, "delivery"],
+    [/aprobaci[oó]n (del |de )?cliente/gi, "client approval"], [/aprobaci[oó]n/gi, "approval"], [/ajustes? (del |de )?cliente/gi, "client changes"], [/ajustes?/gi, "changes"], [/correcci[oó]n(es)?/gi, "corrections"], [/feedback/gi, "feedback"],
+    [/preproducci[oó]n/gi, "pre-production"], [/postproducci[oó]n/gi, "post-production"], [/producci[oó]n/gi, "production"], [/rodaje/gi, "shoot"], [/filmaci[oó]n/gi, "filming"], [/grabaci[oó]n/gi, "recording"],
+    [/gui[oó]n/gi, "script"], [/locaci[oó]n(es)?/gi, "locations"], [/planeaci[oó]n/gi, "planning"], [/cotizaci[oó]n/gi, "quote"], [/tratamiento/gi, "treatment"], [/referencias/gi, "references"], [/reuni[oó]n/gi, "meeting"],
+    [/corte final/gi, "final cut"], [/primer corte/gi, "first cut"], [/corte/gi, "cut"], [/edici[oó]n/gi, "editing"], [/montaje/gi, "assembly"], [/correcci[oó]n de color|colorizaci[oó]n/gi, "color grading"],
+    [/composici[oó]n|compositing/gi, "compositing"], [/animaci[oó]n/gi, "animation"], [/gr[aá]ficas?|gr[aá]ficos/gi, "graphics"], [/dise[nñ]o/gi, "design"], [/retoque/gi, "retouching"], [/efectos/gi, "effects"],
+    [/mezcla/gi, "mix"], [/musicalizaci[oó]n|m[uú]sica/gi, "music"], [/locuci[oó]n/gi, "voice-over"], [/sonido/gi, "sound"], [/subt[ií]tulos/gi, "subtitles"], [/masterizaci[oó]n/gi, "mastering"],
+    [/adaptaciones/gi, "adaptations"], [/adaptaci[oó]n/gi, "adaptation"], [/versiones/gi, "versions"], [/versi[oó]n/gi, "version"], [/piezas/gi, "pieces"], [/pieza/gi, "piece"], [/formatos/gi, "formats"], [/cierre/gi, "wrap-up"],
+    [/inicio/gi, "start"], [/del cliente/gi, "client"], [/cliente/gi, "client"], [/agencia/gi, "agency"], [/interna/gi, "internal"], [/final/gi, "final"], [/ y /g, " and "],
+  ];
+  window.pxpEtapaEN = function (n) {
+    let t = String(n || ""); if (!t) return t;
+    FR.forEach(([re, en]) => { t = t.replace(re, (m) => m[0] === m[0].toUpperCase() && m[0] !== m[0].toLowerCase() ? en[0].toUpperCase() + en.slice(1) : en); });
+    return t;
+  };
+  // Copia del proyecto para un reporte en inglés: etapas traducidas, mismo plan
+  window.pxpRepEN = function (p) {
+    if (!p || !Array.isArray(p.etapas) || !p.etapas.length) return p;
+    const plan = window.pxpPlanEtapas ? pxpPlanEtapas(p) : [], map = new Map();
+    const tE = (e) => { if (map.has(e)) return map.get(e); const c = Object.assign({}, e, { nombre: pxpEtapaEN(e.nombre || ""), clase: pxpClaseEtapa(e), fase: pxpFaseEtapa(e) }); if (!e.peso && window.pxpTipoEtapa) c.peso = pxpTipoEtapa(e); map.set(e, c); return c; };
+    return Object.assign({}, p, { etapas: p.etapas.map(tE), __plan: plan.map(x => Object.assign({}, x, { e: tE(x.e) })) });
+  };
+  const oPlan = window.pxpPlanEtapas;
+  if (typeof oPlan === "function") window.pxpPlanEtapas = function (p) { return p && p.__plan ? p.__plan : oPlan.apply(this, arguments); };
+})();
+
 // ═════════════════════════════════════════════════════════════════
 // CAPA 31 — Idioma de la plataforma: Español (por defecto) ⇄ English
 // ═════════════════════════════════════════════════════════════════
@@ -20818,7 +20853,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   const diamante = (rec, cx, cy, r, fill, stroke, lw) => rec.poly({ pts: [[cx, cy - r], [cx + r, cy], [cx, cy + r], [cx - r, cy]], fill: fill || "none", stroke: stroke || "none", lw: lw || .9 });
   // Eventos del proyecto: etapas de proceso (barras) e hitos de revisión y entrega (con su hora)
   function ttDatos(s) {
-    const k = s.key, p = getProjectDisplay(k), T = TTX[s.lang] || TTX.es;
+    const k = s.key, p0 = getProjectDisplay(k), p = s.lang === "en" && window.pxpRepEN ? pxpRepEN(p0) : p0, T = TTX[s.lang] || TTX.es;   // v180 · etapas en inglés
     const P = (window.pxpPlanEtapas ? pxpPlanEtapas(p) : []).filter(x => x.ini && x.fin);
     const ent = (PROJECTS[k] || {}).entregaFinal || "";
     const iEnts = P.filter(x => pxpClaseEtapa(x.e) === "entrega").map(x => x.i), ultEnt = iEnts[iEnts.length - 1];
