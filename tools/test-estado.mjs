@@ -42,7 +42,7 @@ check("volver a automático → En revisión", await est() === "revision" && awa
 await page.evaluate(k => setEstadoGeneral(k, "standby"), K); await page.waitForTimeout(250);
 await et(2, "en_curso"); check("Standby no cambia solo", await est() === "standby");
 await page.evaluate(k => { PROJECTS[k].estadoGeneral = "cotizado"; pxpRenderProj(); }, K); await page.waitForTimeout(300);
-await page.click("#pxp-proj .cfg-f button.cfg-b >> nth=0"); await page.waitForTimeout(300);
+await page.click("#pxp-proj button.cfg-b[onclick*=\"'est'\"]"); await page.waitForTimeout(300);
 check("Cotizado muestra sugerencia", await page.$("#pxp-proj .est-sug") !== null);
 await page.locator("#pxp-proj .cfg").screenshot({ path: shots + "/t-estado.png" });
 await page.click("#pxp-proj .est-sug .btn-ghost"); await page.waitForTimeout(400);
