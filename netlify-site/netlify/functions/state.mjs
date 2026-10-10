@@ -27,9 +27,12 @@ const leerEstado = async (store, meta) => {
   const c = await store.get("state", { type: "json" }); return (c && c.state) || null;
 };
 
+// v171 · Solo se aceptan cambios desde el propio tablero (otro sitio no puede escribir ni borrar)
+const ajeno = (req, url) => { if (req.method === "GET") return false; const o = req.headers.get("origin"); if (o) { try { return new URL(o).host !== url.host; } catch { return true; } } return req.headers.get("sec-fetch-site") === "cross-site"; };
 export default async (req) => {
   const store = getStore({ name: "trafico-post", consistency: "strong" });
   const url = new URL(req.url);
+  if (ajeno(req, url)) return new Response("Origen no permitido", { status: 403 });
   let meta = await store.get("state-meta", { type: "json" });
   if (!meta) { const c0 = await store.get("state", { type: "json" }); meta = c0 ? { version: c0.version || 0, updatedAt: c0.updatedAt || null, updatedBy: c0.updatedBy || null } : null; }
 

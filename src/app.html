@@ -5703,7 +5703,9 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;tr
 .et-bq{flex:none;display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;border:1px dashed #F0476B;background:transparent;color:#F0476B;font:700 12px/1 var(--display);letter-spacing:.05em;text-transform:uppercase;cursor:pointer}
 .et-bq .i{width:13px;height:13px}
 .et-bq:hover{background:color-mix(in srgb,#F0476B 12%,transparent)}
-.et-bq.on{border-style:solid;background:color-mix(in srgb,#F0476B 14%,transparent);cursor:default}
+.et-bq.on{border-style:solid;background:color-mix(in srgb,#F0476B 14%,transparent)}
+button.et-bq.on{cursor:pointer}
+button.et-bq.on:hover{background:color-mix(in srgb,#F0476B 24%,transparent)}
 @media (max-width:720px){.et-leg{margin-left:0}.et-gp{display:none}.et-line{padding-left:0;gap:8px 16px}.et-row.mini .et-sts{transform:none}.sg-bar{margin-left:0}}
 /* ═════ v155 · Cronograma: todas las etapas, altura controlada, vista Año, mañana/tarde e inicio del proyecto ═════ */
 .cr-in{position:relative}
@@ -14275,10 +14277,11 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   }
   // Sugerencia de bloqueador: una revisión es feedback y puede detener lo que sigue
   function bloqSug(k, e, i, st, late) {
-    if (pxpClaseEtapa(e) !== "revision" || st === "listo" || !(st === "en_curso" || st === "revision" || st === "bloqueada" || late)) return "";
+    if (!["revision", "entrega"].includes(pxpClaseEtapa(e)) || st === "listo") return "";
     const act = ((PROJECTS[k] || {}).bloqueos || []).find(b => !b.fin && b.etapa === (e.nombre || ""));
-    if (act) return `<span class="et-bq on" data-tip="Bloqueador activo desde ${fmtD(act.inicio)}">${IC.bloqueada}Bloqueando lo que sigue</span>`;
-    return enProyecto(k) || can() ? `<button type="button" class="et-bq" onclick="pxpEt('bloquear',${i})" data-tip="El feedback puede detener las etapas siguientes. Repórtalo como bloqueador para medir los días perdidos.">${IC.bloqueada}¿Bloquea lo que sigue?</button>` : "";
+    const pu = enProyecto(k) || can();
+    if (act) return pu ? `<button type="button" class="et-bq on" onclick="pxpEt('desbloquear',${i})" data-tip="Bloqueador activo desde ${fmtD(act.inicio)} · toca para desbloquear">${IC.bloqueada}Bloqueando lo que sigue</button>` : `<span class="et-bq on" data-tip="Bloqueador activo desde ${fmtD(act.inicio)}">${IC.bloqueada}Bloqueando lo que sigue</span>`;
+    return pu ? `<button type="button" class="et-bq" onclick="pxpEt('bloquear',${i})" data-tip="El feedback puede detener las etapas siguientes. Repórtalo como bloqueador para medir los días perdidos.">${IC.bloqueada}¿Bloquea lo que sigue?</button>` : "";
   }
   function rowHtml(k, x, i, n, t, ed, meN) {
     const e = x.e, st = e.estado || "pendiente", late = x.fin && x.fin < t && st !== "listo";
@@ -14528,6 +14531,9 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
         if (!ultimaSug || ultimaSug.k !== k) return; const n0 = E.length;
         ultimaSug.ids.forEach(o => { const j = E.indexOf(o); if (j >= 0) E.splice(j, 1); });
         log(`Se deshicieron ${n0 - E.length} etapas sugeridas`); ultimaSug = null; struct = true; break; }
+      case "desbloquear": {   // v171 · se desbloquea con un toque: el bloqueador queda resuelto hoy
+        const e = E[i]; if (!e) return; const b = (p.bloqueos || []).find(b => !b.fin && b.etapa === (e.nombre || "")); if (!b) return;
+        b.fin = today(); log(`Bloqueador resuelto en "${nm(i)}"`); if (window.pxpToast) pxpToast("Desbloqueado. El bloqueador queda como resuelto."); struct = true; break; }
       case "bloquear": {   // v155 · la revisión (feedback) detiene lo que sigue: se reporta como bloqueador
         const e = E[i]; if (!e) return; p.bloqueos = p.bloqueos || [];
         if (p.bloqueos.some(b => !b.fin && b.etapa === (e.nombre || ""))) return;
@@ -17774,7 +17780,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     "Generar reporte": "Generate report", "Reporte del cliente": "Client report", "Todos los clientes": "All clients", "Vista previa": "Preview", "Descargar PDF": "Download PDF",
   };
   // v170 · Textos de las versiones 163–169
-  Object.assign(DICT, {
+  Object.assign(DICT, { "Todavía no hay rodajes pasados.": "No past shoots yet.", "No hay rodajes en curso ni próximos. Agrégalos con “+ agregar rodaje esta semana”.": "No current or upcoming shoots. Add them with “+ add shoot this week”.", "Bloqueando lo que sigue": "Blocking what follows", "¿Bloquea lo que sigue?": "Blocks what follows?", "Desbloqueado. El bloqueador queda como resuelto.": "Unblocked. The blocker is marked as resolved.",
     "Más gráficas": "More charts", "Mostrar": "Show", "Ocultar": "Hide", "Sin entregas próximas": "No upcoming deliveries", "Todavía no tienes proyectos activos asignados.": "You don't have active projects assigned yet.",
     "Hoy van": "So far today", "Horas estimadas": "Estimated hours", "Cargas del equipo": "Team load", "Proyectos de peso": "Heavy projects", "Duración del proyecto": "Project duration", "Equipo de Post": "Post team", "Proyectos con estado": "Projects with status",
     "Disponible": "Available", "Proyectos": "Projects", "Horas": "Hours", "Vencidas": "Overdue", "Ausencia": "Absence", "Sí": "Yes", "Parcial": "Partial", "No": "No", "Ocupado": "Busy", "Libre": "Free", "Sobrecarga": "Overload",
@@ -17793,6 +17799,9 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   const PAT = [
     [/^Abrir la ficha de (.+)$/, (m, a) => `Open ${DICT[a] || a}'s card`], [/^Abrir el perfil de (.+)$/, (m, a) => `Open ${a}'s profile`], [/^Ver los proyectos de (.+)$/, (m, a) => `See ${DICT[a] || a}'s projects`], [/^Abrir (.+)$/, (m, a) => `Open ${a}`],
     [/^(\d+) proyectos?$/, (m, n) => pl(n, "project", "projects")], [/^(\d+) personas?$/, (m, n) => pl(n, "person", "people")], [/^(\d+) días?$/, (m, n) => pl(n, "day", "days")], [/^(\d+) semanas?$/, (m, n) => pl(n, "week", "weeks")],
+    [/^(\d+) de (\d+) proyectos\. Toca el título de una columna para ordenar; toca un cliente para esconder o mostrar sus proyectos\.$/, (m, a, b) => `${a} of ${b} projects. Tap a column title to sort; tap a client to hide or show its projects.`],
+    [/^(\d+) de (\d+) proyectos · se arma automático con lo que agregas en Traffic y en las fichas de cada proyecto\.$/, (m, a, b) => `${a} of ${b} projects · built automatically from what you add in Traffic and in each project's card.`],
+    [/^(.+) ← HOY$/, (m, a) => `${a} ← TODAY`],
     [/^(\d+) proyectos? ↗$/, (m, n) => pl(n, "project", "projects") + " ↗"], [/^(\d+) en curso$/, (m, n) => `${n} in progress`], [/^(\d+) esta semana$/, (m, n) => `${n} this week`], [/^(\d+)h registradas$/, (m, n) => `${n}h logged`],
     [/^Editar el grupo (.+)$/, (m, a) => `Edit the ${DICT[a] || a} group`], [/^Ver (\d+) más$/, (m, n) => `Show ${n} more`], [/^(\d+) h esta semana$/, (m, n) => `${n} h this week`], [/^(\d+) \/ semana$/, (m, n) => `${n} / week`], [/^de (\d+) h$/, (m, n) => `of ${n} h`],
     [/^(\d+) h · sin estimar$/, (m, n) => `${n} h · not estimated`], [/^(\d+) h en cola(.*)$/, (m, n, r) => `${n} h queued` + r.replace(/ sin cupo/g, " no room").replace(/ al límite/g, " at capacity")], [/^(\d+) horas en cola frente a dos semanas de jornada$/, (m, n) => `${n} queued hours vs two weeks of work`],
@@ -20060,7 +20069,9 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       let a = ext && ext.a && ext.a < t ? ext.a : null, b = ext && ext.b && ext.b > t ? ext.b : null;
       if (!a) { a = t; let n = 5; while (n > 0) { a = addD(a, -1); if (habil(a)) n--; } }
       if (!b) { b = t; let n = 5; while (n > 0) { b = addD(b, 1); if (habil(b)) n--; } }
-      for (let d = a; d <= b; d = addD(d, 1)) if (habil(d)) dias.push(d);
+      // v171 · Dos días hábiles de aire a la derecha: la línea de entrega no queda pegada al borde
+      let bv = b; for (let n = 2; n > 0;) { bv = addD(bv, 1); if (habil(bv)) n--; }
+      for (let d = a; d <= bv; d = addD(d, 1)) if (habil(d)) dias.push(d);
       const N = dias.length, y = (z) => +z.slice(0, 4) !== D(t).getFullYear() ? " " + z.slice(0, 4) : "";
       return { dias, pw: true, a, b, esc: N <= 10 ? "d" : N <= 70 ? "w" : "m", label: `${fD(a)}${y(a)} → ${fD(b)}${y(b)}` };
     }

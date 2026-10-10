@@ -8,9 +8,12 @@ const MAX_PARTE = 5 * 1024 * 1024;   // cada envío
 const json = (obj, status = 200) => new Response(JSON.stringify(obj), { status, headers: { "content-type": "application/json", "cache-control": "no-store" } });
 const okId = (s) => /^[A-Za-z0-9-]{8,64}$/.test(s || "");
 
+// v171 · Solo se aceptan cambios desde el propio tablero (otro sitio no puede escribir ni borrar)
+const ajeno = (req, url) => { if (req.method === "GET") return false; const o = req.headers.get("origin"); if (o) { try { return new URL(o).host !== url.host; } catch { return true; } } return req.headers.get("sec-fetch-site") === "cross-site"; };
 export default async (req) => {
   const store = getStore({ name: "trafico-archivos", consistency: "strong" });
   const url = new URL(req.url);
+  if (ajeno(req, url)) return new Response("Origen no permitido", { status: 403 });
   const parts = url.pathname.split("/").filter(Boolean);
   const id = parts[0] === "api" && parts[1] === "files" ? parts[2] : null;
 

@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v170** · 10 oct 2026 · Responsable: Bastián Torres
+Versión: **v171** · 10 oct 2026 · Responsable: Bastián Torres
 
 ## Cómo está armado ahora
 - **Una sola fuente:** `src/app.html`, con todo el CSS y las capas JS.
@@ -176,6 +176,8 @@ Versión: **v170** · 10 oct 2026 · Responsable: Bastián Torres
   - Logros en la tarjeta de perfil del Home: tarjeta corta (nombre, nivel y progreso); la completa queda en la pestaña Logros.
 
 - **v170:** traducciones al inglés de los textos nuevos (v163–v169) en el diccionario de la capa 31. Pendiente: notas explicativas largas y el catálogo de logros (nombres y descripciones) en inglés.
+
+- **v171:** bloqueadores de revisiones y entregas se bloquean y desbloquean con un toque (pxpEt 'desbloquear' los marca resueltos). En "Todo" el cronograma deja 2 días hábiles de aire tras la entrega. Servidor: state y files rechazan escrituras desde otro origen (403). Más textos en inglés.
 
 ## No cambiar sin consultar
 - El ZIP de Netlify va sin datos, y no se guarda nada antes de cargar los datos del servidor.
