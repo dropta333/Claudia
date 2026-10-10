@@ -1,0 +1,10 @@
+{
+  "name": "trafico-post-publicis-production",
+  "private": true,
+  "type": "module",
+  "description": "Tablero de tráfico de postproducción — Publicis Production",
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  }
+}
+

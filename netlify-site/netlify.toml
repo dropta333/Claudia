@@ -1,0 +1,15 @@
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+# El HTML siempre fresco para que todos vean la última versión del tablero
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "no-cache"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "same-origin"
+
