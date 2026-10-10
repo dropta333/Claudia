@@ -91,6 +91,19 @@ await page.locator("#et-gantt").screenshot({ path: shots + "/t-todo.png" });
 await page.evaluate(k => pxpProjSet("inicio", "2026-09-14"), K); await page.waitForTimeout(500);
 check("inicio guardado", await page.evaluate(k => PROJECTS[k].fechaInicio === "2026-09-14", K));
 check("KPI de inicio primero", await page.$eval("#pxp-proj .pj-kpis > :first-child", d => d.classList.contains("pj-ini")));
+// v159 · agregar etapa eligiendo la fase, botones del cronograma a la derecha y sin scroll horizontal
+const nAntes = await page.evaluate(k => PROJECTS[k].etapas.length, K);
+await page.click(".et-addb"); await page.waitForTimeout(250);
+await page.click(".pk-add .pk-op.fs-rodaje"); await page.waitForTimeout(400);
+const nueva = await page.evaluate(([k, n]) => { const E = PROJECTS[k].etapas; return E.length === n + 1 ? E.find(e => !e.nombre && e.fase === "rodaje") : null; }, [K, nAntes]);
+check("agregar etapa en Rodaje", !!nueva);
+await page.click('.et-grp[data-f="pre"] .et-gadd'); await page.waitForTimeout(400);
+check("agregar desde el grupo Preproducción", await page.evaluate(k => PROJECTS[k].etapas.filter(e => !e.nombre && e.fase === "pre").length === 1, K));
+for (const m of ["Todo", "Mes"]) {
+  await page.click(`#et-gantt .cr-seg button:has-text("${m}")`); await page.waitForTimeout(300);
+  const r = await page.$eval("#et-gantt .cr", c => { const s = c.querySelector(".cr-seg").getBoundingClientRect(), t = c.querySelector(".cr-top").getBoundingClientRect(), b = c.querySelector(".cr-body"); return { der: t.right - s.right, sx: b.scrollWidth - b.clientWidth, ox: getComputedStyle(b).overflowX }; });
+  check(`${m}: vistas a la derecha`, r.der < 30); check(`${m}: sin scroll horizontal`, r.ox === "hidden" || r.sx <= 1);
+}
 // 5 · desplegables
 const rl = await page.$eval(".rl-sec", s => [s.classList.contains("pj-fold"), s.classList.contains("open"), s.querySelector(".fd-sum").textContent]);
 check("enlaces plegable y cerrado", rl[0] && !rl[1]);

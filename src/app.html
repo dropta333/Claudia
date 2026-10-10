@@ -5782,6 +5782,15 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;tr
 .lc-lnote{margin:2px 2px 0;font:500 12.5px/1.4 var(--sans);color:var(--muted)}
 .lc-gr{display:block;margin-top:3px;font:600 12.5px/1.3 var(--sans);color:#F0476B}
 @media (min-width:1181px){.lc-lanes[style*="--n:5"]{grid-template-columns:repeat(5,minmax(0,1fr))}}
+/* v159 · Cronograma: Todo / Día / Semana / Mes / Año siempre a la derecha · sin scroll horizontal */
+.cr-top .cr-rg{flex:1;min-width:0}
+.cr-top .cr-nav{margin-left:0}
+.cr-body,.cr.many .cr-body{overflow-x:hidden!important}
+/* v159 · Agregar etapa por fase */
+.et-gadd{all:unset;box-sizing:border-box;cursor:pointer;display:block;width:calc(100% - 20px);margin:0 10px 10px;padding:8px 12px;border-radius:10px;border:1px dashed var(--border2);font:600 13.5px/1 var(--sans);color:var(--muted);text-align:center;transition:color .15s,border-color .15s,background-color .15s}
+.et-gadd:hover,.et-gadd:focus-visible{color:var(--text);border-color:var(--brand);background:color-mix(in srgb,var(--brand) 8%,transparent)}
+.et-grp:not(.open) > .et-gadd{display:none}
+.pk-op.fs-pre > .i:first-child{color:#1FB58F!important}.pk-op.fs-rodaje > .i:first-child{color:#FB8847!important}.pk-op.fs-post > .i:first-child{color:var(--blue)!important}
 </style>
 </head>
 <body>
@@ -11791,6 +11800,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const panelPz = `<div class="pz2"><div class="stp"><span class="stp-l">${PI(PL.pzI)}Total</span><button type="button" onclick="pxpPz('piezas',-1)" aria-label="Una pieza menos" ${lock}>−</button><input type="number" min="0" id="pj-piezas" value="${tot}" onchange="pxpProjSet('piezas',this.value)" aria-label="Total de piezas" ${lock}><button type="button" onclick="pxpPz('piezas',1)" aria-label="Una pieza más" ${lock}>+</button></div>
       <div class="stp ok"><span class="stp-l">${PI("<path d='m5 12.5 4.5 4.5L19 7.5'/>")}Entregadas</span><button type="button" onclick="pxpPz('piezasOk',-1)" aria-label="Una entregada menos">−</button><input type="number" min="0" id="pj-piezas-ok" value="${ok}" onchange="pxpProjSet('piezasOk',this.value)" aria-label="Piezas entregadas"><button type="button" onclick="pxpPz('piezasOk',1)" aria-label="Una entregada más">+</button></div></div>${det.length ? `<small class="note">El total se calcula con las piezas por tipo.</small>` : ""}`;
     const left = edP ? `<div class="cfg-col">
+      ${(() => { const fi = p.fechaInicio || "";
+        return `<div class="cfg-f cfg-ini"><button type="button" class="cfg-b ent-btn" onclick="pxpInicioPick(this,'${ea(k)}')" aria-haspopup="dialog"><span class="cfg-l">${PI("<path d='M5 21V4'/><path d='M5 4h9l-1.5 3.5L14 11H5'/><circle cx='18' cy='17' r='3'/>", "pl")}Inicio del proyecto</span><span class="cfg-v">${fi ? fmtD(fi) + (p.inicioEst ? ` <em class="cfg-tag">estimado</em>` : "") : `<span class="cfg-nil">Sin definir</span>`}</span>${PI("<rect x='4' y='5' width='16' height='15' rx='2'/><path d='M4 10h16M9 3v4M15 3v4'/>", "cfg-cal")}</button></div>`; })()}
       ${field("est", "Estado", PL.estado, `<i class="cfg-dot" style="--sc:${E[2]}"></i>${E[1]}${PXP_EST_MANUAL.has(est) ? "" : p.estadoFijo ? `<em class="cfg-tag fijo">a mano</em>` : `<em class="cfg-tag">auto</em>`}`, `${(() => {
         const c = pxpEstadoCalc(PROJECTS[k] || p), L = (v) => (EST.find(z => z[0] === v) || [, v])[1];
         if (PXP_EST_MANUAL.has(est)) return c && est !== "aprobado" && c.v !== est ? `<div class="est-sug"><span>Las etapas indican <b>${L(c.v)}</b> (${esc(c.por)}).</span><button type="button" class="btn-ghost sm" onclick="pxpCfgSel('estado','${c.v}')">Pasar a ${L(c.v)}</button></div>` : `<p class="est-note">${est === "aprobado" ? "Aprobado es siempre a mano: mueve el proyecto al Repositorio." : "Este estado es siempre a mano; las etapas no lo cambian."}</p>`;
@@ -11801,8 +11812,6 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       ${field("ag", "Agencia creativa", PL.ag, agenciaV ? esc(agenciaV) : `<span class="cfg-nil">Sin agencia</span>`, panelAg)}
       ${window.pxpPDHtml ? field("pd", "Piezas · Hero y derivadas", PI("<rect x='3.5' y='4' width='17' height='5' rx='1.5'/><rect x='3.5' y='11' width='17' height='5' rx='1.5'/><path d='M7 20h10'/>", "pl"), (() => { const R = window.pxpPiezasResumen ? pxpPiezasResumen(p) : null; return !det.length ? `<span class="cfg-nil">Sin definir</span>` : R && R.hero ? `Hero${R.hero.dur ? " " + esc(R.hero.dur) : ""}${R.nD ? ` + ${R.nD} derivada${R.nD !== 1 ? "s" : ""}` : ""}` : `${nDet} pieza${nDet !== 1 ? "s" : ""} · <span class="cfg-req">sin Hero</span>`; })(), `<div class="pd">${pxpPDHtml(k)}</div>`) : ""}
       ${window.pxpADHtml ? field("ad", "Adaptaciones por país", PI("<circle cx='12' cy='12' r='8.5'/><path d='M3.5 12h17M12 3.5c2.5 2.6 2.5 14.4 0 17M12 3.5c-2.5 2.6-2.5 14.4 0 17'/>", "pl"), ad.length ? `${ad.length} país${ad.length !== 1 ? "es" : ""} · ${vers} versión${vers !== 1 ? "es" : ""}` : `<span class="cfg-nil">Ninguna</span>`, `<div class="pd">${pxpADHtml(k)}</div>`) : ""}
-      ${(() => { const fi = p.fechaInicio || "";
-        return `<div class="cfg-f cfg-ini"><button type="button" class="cfg-b ent-btn" onclick="pxpInicioPick(this,'${ea(k)}')" aria-haspopup="dialog"><span class="cfg-l">${PI("<path d='M5 21V4'/><path d='M5 4h9l-1.5 3.5L14 11H5'/><circle cx='18' cy='17' r='3'/>", "pl")}Inicio del proyecto</span><span class="cfg-v">${fi ? fmtD(fi) + (p.inicioEst ? ` <em class="cfg-tag">estimado</em>` : "") : `<span class="cfg-nil">Sin definir</span>`}</span>${PI("<rect x='4' y='5' width='16' height='15' rx='2'/><path d='M4 10h16M9 3v4M15 3v4'/>", "cfg-cal")}</button></div>`; })()}
       ${(() => { const ef = p.entregaFinal || "";
         return `<div class="cfg-f"><button type="button" class="cfg-b ent-btn" onclick="pxpEntregaPick(this,'${ea(k)}')" aria-haspopup="dialog"><span class="cfg-l">${PI("<path d='M6 21V4'/><path d='M6 4.5h11l-2 4 2 4H6'/>", "pl")}Entrega final</span><span class="cfg-v">${ef ? fmtD(ef) + (p.entregaEst ? ` <em class="cfg-tag">estimada</em>` : "") : `<span class="cfg-nil cfg-req">Falta · define la salud</span>`}</span>${PI("<rect x='4' y='5' width='16' height='15' rx='2'/><path d='M4 10h16M9 3v4M15 3v4'/>", "cfg-cal")}</button></div>`; })()}
       <div class="cfg-f cfg-st"><span class="cfg-l">${PL.cpx}Complejidad</span><div class="seg pj-cpx" role="group" aria-label="Complejidad">${CPX.map(([v, l], n) => `<button type="button" class="${cpx === v ? "on" : ""}" style="--sc:${["var(--green)", "var(--yellow)", "var(--red)"][n]}" onclick="pxpProjSet('cpx','${v}')" aria-pressed="${cpx === v}"><span class="ic">${PI(CPX_IC(n + 1), "bars")}</span><span class="tx">${l}</span></button>`).join("")}</div></div>
@@ -13749,6 +13758,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
           <span class="et-gp" aria-label="${pct}% listo"><i style="width:${pct}%"></i></span>
         </button>
         <ol class="et-list" id="et-g-${f}">${L.map(x => rowHtml(k, x, x.i, P.length, t, ed, meN)).join("")}</ol>
+        ${ed ? `<button type="button" class="et-gadd" onclick="pxpEt('add',0,'${f}')">+ Agregar etapa a ${l}</button>` : ""}
       </section>`;
     }).join("");
     const H = P.reduce((s, x) => s + (x.horas || 0), 0);
@@ -13759,7 +13769,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
         <span class="et-leg" aria-label="Tipos de etapa">${Object.entries(PXP_CLASES).map(([c, [l]]) => `<span class="cl-${c}">${CLI[c]}${l}</span>`).join("")}</span></div>` : ""}
       ${P.length ? `<div class="et-grps">${grupos}</div>` : `<div class="empty-cta"><b>Sin etapas todavía</b>Agrega las etapas o tareas en el orden en que se hacen, o pide una sugerencia por fase según el equipo del proyecto.</div>`}
       ${!ed && enProyecto(k) ? `<div class="et-actions"><button type="button" class="btn-ghost sm" onclick="pxpEt('proponer')">+ Agregar mi etapa</button>${P.some(x => !x.e.resp && x.e.estado !== "listo") ? `<span class="note">o toma una etapa sin responsable con <b>Tomar</b></span>` : ""}</div>` : ""}
-      ${ed ? `<div class="et-actions"><button type="button" class="btn-ghost sm" onclick="pxpEt('add')">+ Agregar etapa</button>${sugBar}</div>` : (P.some(x => pxpEsResp(x.e, meN)) ? `<p class="note et-own-note">Puedes cambiar el estado de las etapas marcadas como <b>Tuya</b>. El resto lo ajusta Administración.</p>` : "")}
+      ${ed ? `<div class="et-actions"><button type="button" class="btn-ghost sm et-addb" onclick="pxpEtAdd(this)" aria-haspopup="menu">+ Agregar etapa</button>${sugBar}</div>` : (P.some(x => pxpEsResp(x.e, meN)) ? `<p class="note et-own-note">Puedes cambiar el estado de las etapas marcadas como <b>Tuya</b>. El resto lo ajusta Administración.</p>` : "")}
       ${P.length ? `<p class="note">Van en orden y por horas (jornada de 8:30 a 17:30, almuerzo de 12:30 a 13:30): cada etapa empieza donde termina la anterior, salvo que elijas Mañana, Tarde u Hora exacta, o le fijes una fecha. Revisiones y entregas se ven más compactas y vienen con menos horas y exigencia liviana; puedes cambiarlas.</p>` : ""}
     </div><div id="et-gantt">${ganttHtml(k)}</div>${P.length && ed && window.pxpRepOpen ? `<div class="tt-act"><button type="button" class="linkbtn tt-btn" onclick="pxpRepOpen('tt','${ea(k)}')"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4M8 14h3M13 14h3M8 17h3"/></svg>Time table en PDF</button></div>` : ""}`;
   }
@@ -13916,7 +13926,12 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       case "down": if (i < E.length - 1) { [E[i + 1], E[i]] = [E[i], E[i + 1]]; struct = true; } break;
       case "move": if (v !== i && v >= 0 && v < E.length) { const [m] = E.splice(i, 1); E.splice(v, 0, m); struct = true; } break;
       case "del": if (confirmDel !== i) { confirmDel = i; refresh(k); return; } confirmDel = null; log(`Etapa "${nm(i)}" eliminada`); E.splice(i, 1); struct = true; break;
-      case "add": E.push({ nombre: "", estado: "pendiente", hp: 8, dias: 1, resp: "", nota: "" }); struct = true; focusId = "et-name-" + (E.length - 1); break;
+      case "add": {   // v159 · se agrega al final de la fase elegida (Preproducción · Rodaje · Postproducción)
+        const f = PXP_FASES.some(z => z[0] === v) ? v : "post", rk = (x) => PXP_FASES.findIndex(z => z[0] === x);
+        let at = E.findIndex(e => rk(pxpFaseEtapa(e)) > rk(f)); if (at < 0) at = E.length;
+        E.splice(at, 0, { nombre: "", estado: "pendiente", hp: 8, dias: 1, resp: "", nota: "", fase: f });
+        { const G = grpGet(); G[k + "|" + f] = 1; setPref(grpKey, JSON.stringify(G)); }
+        closeMenu(); struct = true; focusId = "et-name-" + at; break; }
     }
     applyPlan(p);
     if (window.pxpEstadoAuto && pxpEstadoAuto(k)) struct = true;   // v157 · el estado del proyecto sigue a sus etapas
@@ -13999,6 +14014,13 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const f0 = menu.querySelector(".on"); if (f0) setTimeout(() => f0.focus(), 0);
   };
   const colocar = () => { if (!menu || !menu._a) return; const btn = document.querySelector(`.et-row[data-i="${menu.dataset.i}"] .${menu._a.classList.contains("pz") ? "pz" : "et-pick:not(.pz)"}`) || menu._a, r = btn.getBoundingClientRect(), H = menu.offsetHeight, W = menu.offsetWidth; menu.style.left = Math.max(8, Math.min(r.left, innerWidth - W - 8)) + "px"; menu.style.top = (r.bottom + 6 + H > innerHeight ? Math.max(8, r.top - 6 - H) : r.bottom + 6) + "px"; };
+  // v159 · "+ Agregar etapa": primero se elige la fase
+  window.pxpEtAdd = function (btn) {
+    if (menu && menu.classList.contains("pk-add")) { closeMenu(); return; }
+    const FI = { pre: "<rect x='5' y='4' width='14' height='17' rx='2'/><path d='M9 4V3h6v1M9 10h6M9 14h6M9 18h3'/>", rodaje: "<path d='M3.5 10h17v9.5a1.5 1.5 0 0 1-1.5 1.5H5a1.5 1.5 0 0 1-1.5-1.5z'/><path d='m3.3 10-.6-3.3 15.8-3 .6 3.3z'/>", post: "<rect x='3.5' y='4.5' width='17' height='15' rx='2'/><path d='M8 4.5v15M16 4.5v15'/>" };
+    const SUB = { pre: "Brief, guion, pruebas, PPM", rodaje: "Set, DIT, dailies", post: "Edición, color, audio, entregas" };
+    abrir(btn, -1, "pk-add", `<div class="pk-h"><b>¿En qué fase va la etapa?</b></div><div class="pk-ops">${PXP_FASES.map(([f, l]) => `<button type="button" role="menuitem" class="pk-op fs-${f}" onclick="pxpEt('add',0,'${f}')">${SVG(FI[f])}<span><b>${l}</b><small>${SUB[f]}</small></span></button>`).join("")}</div>`);
+  };
   window.pxpEtPick = function (kind, i, btn) {
     if (menu && menu.dataset.i === String(i) && menu.classList.contains("pk-" + kind)) { closeMenu(); return; }
     if (!can()) return; const w = $("et-wrap"); if (!w) return;
@@ -14012,7 +14034,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     if (!keep) { closeMenu(); return; }
     setTimeout(() => { if (menu && menu.classList.contains("pk-fr")) { menu.innerHTML = frHtml(i); colocar(); } }, 30);
   };
-  document.addEventListener("pointerdown", (e) => { if (menu && !menu.contains(e.target) && !(e.target.closest && e.target.closest(".et-cls,.et-pick"))) closeMenu(); }, true);
+  document.addEventListener("pointerdown", (e) => { if (menu && !menu.contains(e.target) && !(e.target.closest && e.target.closest(".et-cls,.et-pick,.et-addb"))) closeMenu(); }, true);
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && menu) { e.stopImmediatePropagation(); closeMenu(); } }, true);
   document.addEventListener("scroll", (e) => { if (menu && !menu.contains(e.target) && Date.now() - (menu._t || 0) > 350) closeMenu(); }, true);
   document.addEventListener("pointerdown", (e) => { if (pop && !pop.contains(e.target) && !(e.target.closest && e.target.closest(".et-who"))) closePop(); }, true);
@@ -19247,7 +19269,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     let cols = "", ticks = "", ult = -99;
     // Las fechas de la escala no se esconden detrás de las etiquetas de Hoy, Inicio y Entrega
     const marcas = [nowIn ? x(nowV) : null, opts.inicio ? x(abs(opts.inicio, 0)) : null, opts.fin ? x(abs(opts.fin, H)) : null].filter(v => v != null && v >= 0 && v <= 100);
-    const tk = (pos, html, cls) => { if ((R.pw && pos - ult < 5.5) || marcas.some(m => Math.abs(m - pos) < 4.5)) return; ult = pos; ticks += `<span class="cr-tk ${cls}" style="left:${pos}%">${html}</span>`; };
+    const tk = (pos, html, cls) => { if ((R.pw && pos - ult < 5.5) || marcas.some(m => Math.abs(m - pos) < (m > 96 || m < 4 ? 9 : 4.5))) return; ult = pos; ticks += `<span class="cr-tk ${cls}" style="left:${pos}%">${html}</span>`; };
     if (E === "m") {   // meses: un bloque por mes
       const mesHoy = hoy().slice(0, 7); let i0 = 0, k = 0;
       while (i0 < R.dias.length) {
@@ -19277,7 +19299,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
         return `<div class="cr-row"><div class="cr-l">${r.av || ""}<span><b>${esc(r.l)}</b>${r.sub ? `<small>${esc(r.sub)}</small>` : ""}</span></div><div class="cr-t"><span class="cr-out ${antes ? "l" : "r"} ${b0.st || "pendiente"}" style="--c:${b0.c || r.c || "var(--brand)"}" data-tip="${b0.tip || ""}">${antes ? "‹ " + esc(fueraTxt({ d: b0.dFin })) : esc(fueraTxt({ d: b0.dIni })) + " ›"}</span></div></div>`;
       }
       const bars = dentro.map(b => {
-        const l = Math.max(0, x(b.a)), w = Math.max(.8, Math.min(100, x(b.b)) - l), live = nowIn && nowV > b.a && nowV < b.b && b.st !== "listo", late = b.b <= nowV && b.st !== "listo";
+        const w = Math.max(.8, Math.min(100, x(b.b)) - Math.max(0, x(b.a))), l = Math.min(Math.max(0, x(b.a)), 100 - w), live = nowIn && nowV > b.a && nowV < b.b && b.st !== "listo", late = b.b <= nowV && b.st !== "listo";
         const tx = w > (E === "w" ? 6 : E === "m" ? 4 : 10) ? `<em>${esc(b.txt || "")}</em>` : "";
         return `<span class="cr-bar ${b.st || "pendiente"}${late ? " late" : ""}${live ? " live" : ""}${b.cls ? " " + b.cls : ""}${b.fr ? " " + b.fr : ""}" style="left:${l}%;width:${w}%;--c:${b.c || r.c || "var(--brand)"}" data-a="${b.a}" data-b="${b.b}" data-tip="${b.tip || ""}"${b.k ? ` role="button" tabindex="0" onclick="pxpOpenProject('${ea(b.k)}')"` : ""}>${tx}</span>`;
       }).join("");

@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v158** · 10 oct 2026 · Responsable: Bastián Torres
+Versión: **v159** · 10 oct 2026 · Responsable: Bastián Torres
 
 ## Cómo está armado ahora
 - **Una sola fuente:** `src/app.html`, con todo el CSS y las capas JS.
@@ -92,6 +92,11 @@ Versión: **v158** · 10 oct 2026 · Responsable: Bastián Torres
   - Salen de Activas a los 3 días (agotadas) y al día siguiente del vencimiento (vencidas). No se borran: quedan en Historial y en Todas.
   - Tablero de capacidad: columna **Agotadas / Vencidas** con las que aún no salen y cuántos días les quedan. "Por recargar" pasa a 1–24 %.
   - Pruebas: `node tools/test-licencias.mjs [carpeta-capturas]`.
+
+- **v159:** ajustes de la ventana de proyecto.
+  - "Inicio del proyecto" es el primer desplegable de las características.
+  - "+ Agregar etapa" pregunta la fase (`pxpEtAdd`); cada grupo abierto tiene "+ Agregar etapa a …". La etapa se inserta al final de su fase.
+  - Cronograma: Todo / Día / Semana / Mes / Año siempre a la derecha; las barras nunca pasan del borde y el cuerpo no se desplaza a lo ancho.
 
 ## No cambiar sin consultar
 - El ZIP de Netlify va sin datos, y no se guarda nada antes de cargar los datos del servidor.
