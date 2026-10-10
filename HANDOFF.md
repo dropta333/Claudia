@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v162** · 10 oct 2026 · Responsable: Bastián Torres
+Versión: **v163** · 10 oct 2026 · Responsable: Bastián Torres
 
 ## Cómo está armado ahora
 - **Una sola fuente:** `src/app.html`, con todo el CSS y las capas JS.
@@ -118,6 +118,15 @@ Versión: **v162** · 10 oct 2026 · Responsable: Bastián Torres
   - La casilla es para registrar lo trabajado: − N h + y "Registrar" (hoy, a nombre de quien inició sesión; `pxpHrQ`, `pxpHrQGo`). Responsables de la etapa y Administración. Debajo, la barra de reales contra estimadas, quién registró y el estimado. El detalle (otro día, nota, otra persona) sigue en el formulario de horas.
   - Estimado automático (`pxpEstAuto`): revisión 4 h, entrega 1 h y proceso según el nombre (offline 24, 3D 24, compo/IA/motion 16, color/online/audio/render/master 8, ingesta 4, kickoff/plan 2…). `e.hpAuto` = sigue en automático (se recalcula al cambiar nombre o tipo). Al cambiarlo a mano queda fijo; "Volver a automático". Las etapas que ya existían conservan sus horas.
   - Pruebas: `node tools/test-horas.mjs [carpeta-capturas]`.
+
+- **v163:** la ficha completa vive en la ventana del proyecto.
+  - Se quitó "Editar ficha completa". Lápiz junto al título (Administración): nombre, cliente y marca en la cabecera con Guardar/Cancelar (`pxpCabEditar`, `pxpCabGuardar`; reusa `pxpNuevoCab(k,p,tipo,editar)`). Renombrar mueve la clave y actualiza el tráfico semanal y las licencias; avisa si el nombre ya existe.
+  - Color del proyecto: se toca la franja de color de la cabecera (`pxpColorProy`) → paleta, color libre o "Volver al automático". Escribe solo `colorHex`; el color del cliente no se toca desde aquí.
+  - Eliminar proyecto en el pie (Administración), con doble toque de confirmación (`pxpProyEliminar`); borra también sus marcas del tráfico semanal.
+  - Corrección: `p.color` es el colorista; versiones anteriores podían guardar ahí el color del cliente. El mantenimiento (capa 47) lo mueve a `colorHex`.
+  - Al pasar a Entregado sin fecha de cierre, se pone hoy.
+  - El editor viejo (`saveFicha`) queda en el código sin acceso, para limpieza futura.
+  - Pruebas: `node tools/test-cabecera.mjs [carpeta-capturas]`.
 
 ## No cambiar sin consultar
 - El ZIP de Netlify va sin datos, y no se guarda nada antes de cargar los datos del servidor.

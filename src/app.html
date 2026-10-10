@@ -5909,6 +5909,28 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;tr
 .et-cell.c-dur{gap:7px!important}
 .et-line .c-dur{gap:8px;flex-wrap:wrap}
 @media (max-width:720px){.et-cell.c-peso{grid-column:1/-1}}
+/* ═════ v163 · Cabecera editable, color del proyecto y eliminar ═════ */
+.pj-sw-b{border:0;cursor:pointer;padding:0;transition:transform .15s,box-shadow .15s}
+.pj-sw-b:hover{transform:scaleX(1.25);box-shadow:0 0 0 3px color-mix(in srgb,var(--text) 12%,transparent)}
+.pj-sw-b:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+.pj-edit{border:0;background:transparent;color:var(--muted);cursor:pointer;width:34px;height:34px;border-radius:10px;display:inline-grid;place-items:center;vertical-align:middle;margin-left:6px;opacity:.7;transition:opacity .15s,background-color .15s}
+.pj-edit .i{width:18px;height:18px}
+.pj-head:hover .pj-edit,.pj-edit:focus-visible{opacity:1}
+.pj-edit:hover{background:var(--surface2);color:var(--text)}
+.pj-id h2#pj-title{display:inline-block;vertical-align:middle}
+.pj-new-act{display:inline-flex;gap:8px;align-items:center;margin-left:auto}
+.pj-new.edit .pj-new-k{color:var(--brand-text,var(--text))}
+.pj-cpop{width:260px!important}
+.cp-g{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:4px 0 8px}
+.cp-c{position:relative;aspect-ratio:1;border-radius:50%;border:0;background:var(--c);cursor:pointer;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12);transition:transform .15s}
+.cp-c:hover{transform:scale(1.12)}
+.cp-c.on{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--text)}
+.cp-x{display:grid;place-items:center;background:conic-gradient(#F63DA9,#FFC800,#64FF61,#61B3FF,#624AFF,#F63DA9)}
+.cp-x span{font:700 16px/1 var(--sans);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+.cp-x input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.pm-foot .pj-del{margin-right:auto;color:var(--muted)}
+.pm-foot .pj-del .i{width:16px;height:16px}
+.pm-foot .pj-del:hover,.pm-foot .pj-del.armed{color:#F0476B;border-color:#F0476B}
 </style>
 </head>
 <body>
@@ -7327,6 +7349,7 @@ function quitarProyectoDeTrafico(key) {
 function aplicarEstadoGeneral(key, value, before) {
   const proj = PROJECTS[key];
   proj.estadoGeneral = value;
+  if (value === "entregado" && before !== "entregado" && !proj.fechaFin) proj.fechaFin = new Date().toISOString().slice(0, 10);   // v163 · fecha de cierre automática
   if (value === "aprobado" && before !== "aprobado") {
     quitarProyectoDeTrafico(key);
     proj.archivadoEn = new Date().toISOString();
@@ -12001,8 +12024,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     pmBox.style.setProperty("--pc", col);
     pmBox.innerHTML = `
       <header class="pj-head">
-        <span class="pj-sw" style="background:${col}"></span>
-        ${p._borrador && window.pxpNuevoCab ? pxpNuevoCab(k, p, tipo) : `<div class="pj-id"><h2 id="pj-title">${esc(p.nombre || k)}</h2>
+        ${edP && !p._borrador ? `<button type="button" class="pj-sw pj-sw-b" style="background:${col}" onclick="pxpColorProy(this)" aria-label="Color del proyecto" data-tip="Color del proyecto"></button>` : `<span class="pj-sw" style="background:${col}"></span>`}
+        ${(p._borrador || window.__pxpCabEdit === k) && window.pxpNuevoCab ? pxpNuevoCab(k, p, tipo, !p._borrador) : `<div class="pj-id"><h2 id="pj-title">${esc(p.nombre || k)}</h2>${edP ? `<button type="button" class="pj-edit" onclick="pxpCabEditar('${ea(k)}')" aria-label="Editar nombre, cliente y marca" data-tip="Editar nombre, cliente y marca"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></svg></button>` : ""}
           <div class="pj-sub">${cli ? `<button class="pj-cli" data-cname="${esc(cli)}" title="Abrir la ficha del cliente">${av("client", cli, 24)}<span>${esc(cli)}</span></button>` : `<span class="muted">Sin cliente</span>`}${p.marca ? `<span class="pj-marca">${esc(p.marca)}</span>` : ""}<span class="tp-chip" style="--tc:${(window.pxpTipoColor || {})[tipo]}" title="Tipo de proyecto">${tipo}</span>${agenciaV ? `<span class="pj-ag-chip" title="Agencia creativa"><em>Agencia</em> ${esc(agenciaV)}</span>` : ""}${p.piezas ? `<span class="pj-ag-chip" title="Piezas entregadas / total"><em>Piezas</em> ${p.piezasOk || 0}/${p.piezas}</span>` : ""}</div></div>`}
         ${window.pxpPlantaHtml && !p._borrador ? `<div class="pj-flor">${pxpPlantaHtml(k, 92, true)}</div>` : ""}
         <button class="ficha-close" onclick="pxpCloseProject()" aria-label="Cerrar">✕</button>
@@ -12023,7 +12046,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
         </section>
         <div class="pj-col">${window.pxpLinksHtml ? pxpLinksHtml(k) : ""}${window.pxpShareHtml ? pxpShareHtml(k) : ""}${window.pxpTaxoHtml ? pxpTaxoHtml(k) : ""}${window.pxpBloqHtml ? pxpBloqHtml(k) : ""}</div></div>`}
       </div>
-      ${p._borrador ? `<footer class="pm-foot pj-new-foot"><p class="nm-err" id="pj-new-err" role="alert" hidden></p><button class="btn-ghost" onclick="pxpNuevoCancelar()">Cancelar</button><button class="ficha-save" onclick="pxpNuevoCrear()">Crear proyecto</button></footer>` : `<footer class="pm-foot"><button class="btn-ghost" onclick="pxpEditProject()">${I.pen} Editar ficha completa</button><button class="ficha-save" onclick="pxpCloseProject()">Listo</button></footer>`}`;
+      ${p._borrador ? `<footer class="pm-foot pj-new-foot"><p class="nm-err" id="pj-new-err" role="alert" hidden></p><button class="btn-ghost" onclick="pxpNuevoCancelar()">Cancelar</button><button class="ficha-save" onclick="pxpNuevoCrear()">Crear proyecto</button></footer>` : `<footer class="pm-foot">${edP ? `<button class="btn-ghost pj-del${window.__pxpDelArm === k ? " armed" : ""}" onclick="pxpProyEliminar('${ea(k)}')">${I.trash} ${window.__pxpDelArm === k ? "¿Seguro? Toca otra vez para eliminar" : "Eliminar proyecto"}</button>` : ""}<button class="ficha-save" onclick="pxpCloseProject()">Listo</button></footer>`}`;
   }
   window.pxpRenderProj = () => renderProj();
   window.pxpOpenProject = function (key) {
@@ -19888,6 +19911,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   "use strict";
   function normalizar() {
     let n = 0;
+    // v163 · Versiones anteriores podían guardar el color del cliente en "color" (que es el colorista): se mueve a colorHex
+    Object.values(PROJECTS || {}).forEach(p => { if (p && typeof p.color === "string" && /^(#[0-9a-f]{3,8}|var\(|hsl|rgb)/i.test(p.color.trim())) { if (/^#[0-9a-f]{6}$/i.test(p.color) && !p.colorHex) p.colorHex = p.color; delete p.color; n++; } });
     Object.values(PROJECTS || {}).forEach(p => {
       if (!p || typeof p !== "object") return;
       (p.etapas || []).forEach(e => { if (e && e.tt === "global") { e.tt = "revision"; n++; } });
@@ -20114,16 +20139,79 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   const hoy = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
   const borr = () => { const d = Object.getOwnPropertyDescriptor(PROJECTS, TMP); return d ? d.value : null; };
   const toast = (m) => (window.pxpToast ? pxpToast(m) : null);
-  window.pxpNuevoCab = function (k, p, tipo) {
+  // Cabecera editable: proyecto nuevo, o "Editar" en uno existente (solo Administración; renombrar mueve la clave)
+  window.pxpNuevoCab = function (k, p, tipo, editar) {
     const cl = (typeof knownClientes === "function" ? knownClientes() : []), mk = (window.pxpMarcas ? pxpMarcas() : []);
-    return `<div class="pj-id pj-new">
-      <span class="pj-new-k">Nuevo proyecto</span>
-      <input id="pj-new-name" class="pj-new-name" type="text" value="${esc(p.nombre || "")}" placeholder="Nombre del proyecto" autocomplete="off" aria-label="Nombre del proyecto (obligatorio)" oninput="pxpNuevoSet('nombre',this.value)" onkeydown="if(event.key==='Enter')pxpNuevoCrear()">
+    const set = editar ? "pxpCabSet" : "pxpNuevoSet", go = editar ? "pxpCabGuardar()" : "pxpNuevoCrear()";
+    return `<div class="pj-id pj-new${editar ? " edit" : ""}">
+      <span class="pj-new-k">${editar ? "Editar proyecto" : "Nuevo proyecto"}</span>
+      <input id="pj-new-name" class="pj-new-name" type="text" value="${esc(p.nombre || "")}" placeholder="Nombre del proyecto" autocomplete="off" aria-label="Nombre del proyecto (obligatorio)" oninput="${set}('nombre',this.value)" onkeydown="if(event.key==='Enter')${go};if(event.key==='Escape'&&${!!editar}){event.stopPropagation();pxpCabCancelar()}">
       <div class="pj-sub pj-new-sub">
-        <label class="pj-new-f"><span>Cliente *</span><input id="pj-new-cli" type="text" list="pj-new-cl" value="${esc(p.cliente || "")}" placeholder="Elige o escribe uno nuevo" autocomplete="off" onchange="pxpNuevoSet('cliente',this.value)"><datalist id="pj-new-cl">${cl.map(c => `<option value="${esc(c)}">`).join("")}</datalist></label>
-        <label class="pj-new-f"><span>Marca</span><input id="pj-new-marca" type="text" list="pj-new-mk" value="${esc(p.marca || "")}" placeholder="Ej: Oreo, Chiky…" autocomplete="off" onchange="pxpNuevoSet('marca',this.value)"><datalist id="pj-new-mk">${mk.map(c => `<option value="${esc(c)}">`).join("")}</datalist></label>
-        <span class="tp-chip" style="--tc:${(window.pxpTipoColor || {})[tipo]}" title="Tipo de proyecto (se ajusta con el nombre; puedes cambiarlo abajo)">${esc(tipo)}</span>
-      </div></div>`;
+        <label class="pj-new-f"><span>Cliente *</span><input id="pj-new-cli" type="text" list="pj-new-cl" value="${esc(p.cliente || "")}" placeholder="Elige o escribe uno nuevo" autocomplete="off" onchange="${set}('cliente',this.value)"><datalist id="pj-new-cl">${cl.map(c => `<option value="${esc(c)}">`).join("")}</datalist></label>
+        <label class="pj-new-f"><span>Marca</span><input id="pj-new-marca" type="text" list="pj-new-mk" value="${esc(p.marca || "")}" placeholder="Ej: Oreo, Chiky…" autocomplete="off" onchange="${set}('marca',this.value)"><datalist id="pj-new-mk">${mk.map(c => `<option value="${esc(c)}">`).join("")}</datalist></label>
+        ${editar ? `<span class="pj-new-act"><button type="button" class="btn-ghost sm" onclick="pxpCabCancelar()">Cancelar</button><button type="button" class="ficha-save sm" onclick="pxpCabGuardar()">Guardar</button></span>` : `<span class="tp-chip" style="--tc:${(window.pxpTipoColor || {})[tipo]}" title="Tipo de proyecto (se ajusta con el nombre; puedes cambiarlo abajo)">${esc(tipo)}</span>`}
+      </div>${editar ? `<p class="nm-err" id="pj-cab-err" role="alert" hidden></p>` : ""}</div>`;
+  };
+  // ── Editar nombre, cliente y marca (solo Administración) ──
+  const puede = () => !window.pxpPuedeEditar || pxpPuedeEditar();
+  const repintar = () => { try { const m = document.getElementById("pxp-proj"), y = m ? m.scrollTop : 0; if (window.pxpRenderProj) pxpRenderProj(); if (m) m.scrollTop = y; } catch (e) { console.error(e); } };
+  let tmp = null;
+  window.pxpCabEditar = function (k) { if (!puede()) return; const p = PROJECTS[k] || {}; tmp = { nombre: p.nombre || k, cliente: p.cliente || "", marca: p.marca || "" }; window.__pxpCabEdit = k; repintar(); setTimeout(() => { const n = $("pj-new-name"); if (n) { n.focus(); n.select(); } }, 40); };
+  window.pxpCabSet = function (f, v) { if (tmp) tmp[f] = String(v || "").trim(); };
+  window.pxpCabCancelar = function () { window.__pxpCabEdit = null; tmp = null; repintar(); };
+  const errCab = (m, extra) => { const e = $("pj-cab-err"); if (!e) return; e.hidden = !m; e.innerHTML = m ? esc(m) + (extra || "") : ""; };
+  window.pxpCabGuardar = async function () {
+    const k = window.__pxpCabEdit, p = k && PROJECTS[k]; if (!p || !puede()) return;
+    const nm = (($("pj-new-name") || {}).value || "").trim(), cli = (($("pj-new-cli") || {}).value || "").trim(), mar = (($("pj-new-marca") || {}).value || "").trim();
+    if (!nm) { errCab("El proyecto necesita un nombre."); return; }
+    if (!cli) { errCab("Elige o escribe el cliente."); return; }
+    const nk = projectKey(nm), log = [];
+    if (nk !== k) {
+      if (Object.prototype.propertyIsEnumerable.call(PROJECTS, nk) || getAllKnownProjectKeys().includes(nk)) { errCab(`Ya existe un proyecto llamado "${nk}".`); return; }
+      // Renombrar: mueve la clave y actualiza las referencias (tráfico semanal y proyectos de las licencias)
+      delete PROJECTS[k]; p.nombre = nk; PROJECTS[nk] = p;
+      [...TEAM, ...AUDIO].forEach(x => (x.weeks || []).forEach(w => { for (let i = 0; i < w.length; i++) if (projectKey(w[i]) === k) w[i] = nk; }));
+      try { (META.licencias || []).forEach(l => { if (Array.isArray(l.marcas)) l.marcas = l.marcas.map(m => normName(m) === normName(k) ? nk : m); }); } catch (e) { }
+      log.push(`Nombre del proyecto → ${nk}`);
+    } else if (nm.toUpperCase() !== p.nombre) { p.nombre = nm.toUpperCase(); }
+    if ((p.cliente || "") !== cli.toUpperCase()) { p.cliente = cli.toUpperCase(); log.push(`Cliente → ${p.cliente}`); }
+    if ((p.marca || "") !== mar) { if (mar) p.marca = mar; else delete p.marca; log.push(`Marca → ${mar || "sin marca"}`); }
+    if (log.length) (p.historial = p.historial || []).push({ ts: new Date().toISOString(), usuario: currentUser, texto: log.join(" · "), tipo: "cambio" });
+    window.__pxpCabEdit = null; tmp = null;
+    if (nk !== k) { window.__pxpDescartar = true; try { pxpCloseProject(); } finally { window.__pxpDescartar = false; } window.pxpOpenProject(nk); } else repintar();
+    try { render(currentWeek); switchView(currentView); } catch (e) { }
+    if (log.length) toast("Proyecto actualizado."); await saveState();
+  };
+  // ── Color del proyecto (desde la franja de la cabecera) ──
+  let cpop = null; const cerrarC = () => { if (cpop) { cpop.remove(); cpop = null; } };
+  window.pxpColorProy = function (btn) {
+    if (cpop) { cerrarC(); return; } if (!puede()) return;
+    const k = window.__pxpProjK, p = PROJECTS[k]; if (!p) return;
+    const pal = window.pxpPalette || [], cur = /^#[0-9a-f]{6}$/i.test(p.colorHex || "") ? p.colorHex.toUpperCase() : "";
+    cpop = document.createElement("div"); cpop.className = "et-pop et-menu pk-menu pj-cpop"; cpop.setAttribute("role", "dialog"); cpop.setAttribute("aria-label", "Color del proyecto");
+    cpop.innerHTML = `<div class="pk-h"><b>Color del proyecto</b></div><div class="cp-g">${pal.map(c => `<button type="button" class="cp-c${cur === c.toUpperCase() ? " on" : ""}" style="--c:${c}" onclick="pxpColorProySet('${c}')" aria-label="Color ${c}"></button>`).join("")}<label class="cp-c cp-x" aria-label="Otro color" data-tip="Otro color"><input type="color" value="${cur || "#624AFF"}" onchange="pxpColorProySet(this.value)"><span>+</span></label></div>
+      <button type="button" class="em-auto" onclick="pxpColorProySet('')">${cur ? "Volver al automático" : "Ahora es automático"}</button><p class="em-note">Se usa en el cronograma, las fichas y los reportes.</p>`;
+    const tp = $("pxp-tip"); if (tp) tp.classList.remove("on");   // que el tooltip no tape el título de la paleta
+    document.body.appendChild(cpop); const r = btn.getBoundingClientRect(); cpop.style.left = Math.max(8, Math.min(r.right + 8, innerWidth - cpop.offsetWidth - 8)) + "px"; cpop.style.top = Math.max(8, Math.min(r.top, innerHeight - cpop.offsetHeight - 8)) + "px";
+  };
+  window.pxpColorProySet = async function (c) {
+    const k = window.__pxpProjK, p = PROJECTS[k]; if (!p || !puede()) return;
+    if (/^#[0-9a-f]{6}$/i.test(c || "")) p.colorHex = c; else delete p.colorHex;
+    cerrarC(); repintar(); try { render(currentWeek); switchView(currentView); } catch (e) { } await saveState();
+  };
+  document.addEventListener("pointerdown", (e) => { if (cpop && !cpop.contains(e.target) && !(e.target.closest && e.target.closest(".pj-sw-b"))) cerrarC(); }, true);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && cpop) { e.stopImmediatePropagation(); cerrarC(); } }, true);
+  // ── Eliminar el proyecto (Administración, con confirmación) ──
+  let delT = null;
+  window.pxpProyEliminar = async function (k) {
+    if (!puede() || !PROJECTS[k]) return;
+    if (window.__pxpDelArm !== k) { window.__pxpDelArm = k; clearTimeout(delT); delT = setTimeout(() => { window.__pxpDelArm = null; repintar(); }, 4000); repintar(); return; }
+    window.__pxpDelArm = null; clearTimeout(delT);
+    delete PROJECTS[k];
+    [...TEAM, ...AUDIO].forEach(x => (x.weeks || []).forEach(w => { for (let i = w.length - 1; i >= 0; i--) if (projectKey(w[i]) === k) w.splice(i, 1); }));
+    window.__pxpDescartar = true; try { pxpCloseProject(); } finally { window.__pxpDescartar = false; }
+    try { render(currentWeek); switchView(currentView); } catch (e) { }
+    toast("Proyecto eliminado."); await saveState();
   };
   window.pxpNewProject = function (pre) {
     pre = (pre && typeof pre === "object" && !pre.target) ? pre : {};
@@ -20137,7 +20225,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   window.pxpNuevoSet = function (f, v) {
     const d = borr(); if (!d) return; v = String(v || "").trim();
     if (f === "nombre") { d.nombre = v.toUpperCase(); if (!d.tipo && window.pxpTipoAuto) { const t = pxpTipoAuto(v); const c = document.querySelector("#pxp-proj .pj-new .tp-chip"); if (c) c.textContent = t; } return; }
-    if (f === "cliente") { d.cliente = v.toUpperCase(); if (!d.color && window.pxpClientColor && d.cliente) d.color = pxpClientColor(d.cliente); }
+    if (f === "cliente") d.cliente = v.toUpperCase();
     if (f === "marca") { d.marca = v; if (!d.cliente && v) { const m = Object.values(PROJECTS).find(x => normName(x.marca || "") === normName(v) && (x.cliente || "").trim()); if (m) { d.cliente = m.cliente.trim().toUpperCase(); const c = $("pj-new-cli"); if (c) c.value = d.cliente; } } }
   };
   const err = (m, extra) => { const e = $("pj-new-err"); if (!e) return; e.hidden = !m; e.innerHTML = m ? esc(m) + (extra || "") : ""; };
@@ -20151,7 +20239,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     if (!key || key === TMP) { err("Ese nombre no es válido. Prueba con otro."); return; }
     if (Object.prototype.propertyIsEnumerable.call(PROJECTS, key) || getAllKnownProjectKeys().includes(key)) { err(`Ya existe un proyecto llamado "${key}".`, ` <button class="linkbtn" onclick="pxpNuevoAbrir('${ea(key)}')">Abrirlo</button>`); return; }
     if (d.fechaInicio && d.entregaFinal && d.entregaFinal < d.fechaInicio) { err("La entrega final no puede ser antes del inicio."); return; }
-    d.nombre = key; d.cliente = cli.toUpperCase(); if (!d.color && window.pxpClientColor) d.color = pxpClientColor(d.cliente);
+    d.nombre = key; d.cliente = cli.toUpperCase();
+    if (!d.colorHex && window.pxpClientColor) { const c = pxpClientColor(d.cliente); if (/^#[0-9a-f]{6}$/i.test(c)) d.colorHex = c; }   // toma el color de su cliente (se cambia en la cabecera)
     if (!d.tipo && window.pxpTipoAuto) { const t = pxpTipoAuto(nm); if (t) d.tipo = t; }
     delete d._borrador;
     d.historial = [{ ts: new Date().toISOString(), usuario: currentUser, texto: "Proyecto creado", tipo: "cambio" }].concat(d.historial || []);
