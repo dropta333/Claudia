@@ -839,6 +839,11 @@ svg.pxp-chart g.cbar{cursor:pointer}
 svg.pxp-chart g.cbar rect[data-tip]{transition:opacity .15s,filter .15s}
 svg.pxp-chart g.cbar:hover rect[data-tip]{filter:brightness(1.15)}
 .wk-sel{margin:0 4px;padding:6px 10px;font-size:14.5px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-s);color:var(--text)}
+/* v176 · desplegable de semana con diseño: píldora, calendario y flecha */
+.wk-sel{appearance:none;-webkit-appearance:none;cursor:pointer;padding:8px 36px 8px 38px!important;border-radius:99px!important;font:600 14px/1.1 var(--sans)!important;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238A8A96' stroke-width='2' stroke-linecap='round'%3E%3Crect x='4' y='5' width='16' height='15' rx='2'/%3E%3Cpath d='M4 10h16M9 3v4M15 3v4'/%3E%3C/svg%3E") no-repeat 13px 50%/16px,url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238A8A96' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center/14px,var(--surface2)!important;border:1px solid var(--border)!important;transition:border-color .15s}
+.wk-sel:hover{border-color:var(--border2)!important}
+.wk-sel:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.wk-sel option{background:var(--surface);color:var(--text)}
 .trf-sort{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 14px;border:1px solid var(--border);border-radius:var(--r-m);background:var(--surface);position:sticky;top:62px;z-index:20;box-shadow:0 10px 24px -18px rgba(0,0,0,.6)}
 .trf-sort .trf-q{flex:0 1 240px;margin-left:auto}
 .seg.wrapseg{flex-wrap:wrap}
@@ -957,6 +962,8 @@ b.cn-link:hover{text-decoration:underline;text-underline-offset:3px}
 input[type=email],input[type=tel],input[type=url],input[type=search]{background:var(--bg);border:1px solid var(--border);border-radius:var(--r-s);color:var(--text)}
 .strip{display:none}
 #home-teambox .hp-title{margin-bottom:12px}
+.tb-c.ausente .tb-n{color:#F0476B}
+.tb-c.freelance .tb-n{color:#61B3FF}
 .tb-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--r-s);overflow:hidden}
 .tb-c{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:4px;padding:16px 18px;background:var(--bg);transition:background .15s}
 .tb-c:hover{background:var(--surface2)}
@@ -4938,11 +4945,50 @@ body.trf-tabla #main-grid > .section-label{display:none!important}
 
 /* ═════ v110 · Etapas: fin editable, duración rápida y estado "En ajustes" ═════ */
 .et-end.et-date input{width:122px}
-.cl-merge{margin-top:14px;padding:12px 14px;border:1px dashed var(--border2);border-radius:12px;display:flex;flex-direction:column;gap:4px}
-.cl-merge small{color:var(--muted)}
-.cl-merge>div{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
-.cl-merge select{min-width:180px}
-.cl-merge .cl-del{color:#F0476B;border-color:#F0476B}
+.cl-save .cl-merge{margin-right:auto;display:inline-flex;align-items:center;gap:6px;padding:4px 4px 4px 12px;border:1px solid var(--border);border-radius:99px;background:var(--surface2)}
+.cl-save .cl-merge~.fb-msg{margin:0}
+.clm-l{display:inline-flex;align-items:center;gap:6px;font:700 11.5px/1 var(--display);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.clm-l .i{width:15px;height:15px}
+.clm-sel{position:relative;display:inline-flex}
+.clm-sel select{appearance:none;-webkit-appearance:none;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:99px;padding:7px 30px 7px 12px;font:600 13px/1.1 var(--sans);max-width:190px;cursor:pointer}
+.clm-sel::after{content:"";position:absolute;right:12px;top:50%;width:6px;height:6px;border-right:1.6px solid var(--muted);border-bottom:1.6px solid var(--muted);transform:translateY(-70%) rotate(45deg);pointer-events:none}
+.clm-sel select:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
+.clm-go,.clm-del{all:unset;cursor:pointer;padding:7px 12px;border-radius:99px;font:700 12.5px/1 var(--sans)}
+.clm-go{background:var(--text);color:var(--bg)}
+.clm-go:hover{opacity:.85}
+.clm-del{color:#F0476B}
+.clm-del:hover{background:color-mix(in srgb,#F0476B 12%,transparent)}
+/* v176 · Ventana de nuevo cliente con el look de nuevo proyecto */
+#pxp-newcli .pm-box{padding:0;overflow:hidden}
+.ncx-hd{position:relative;display:flex;gap:18px;align-items:center;padding:22px 56px 20px 26px;background:linear-gradient(120deg,color-mix(in srgb,var(--c) 16%,var(--surface)),color-mix(in srgb,var(--c) 5%,var(--surface)));border-bottom:1px solid var(--border)}
+.ncx-bar{position:absolute;left:0;top:18px;bottom:18px;width:6px;border-radius:0 4px 4px 0;background:var(--c)}
+.ncx-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.ncx-k{font:700 11.5px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.ncx-name{all:unset;box-sizing:border-box;width:100%;font:800 34px/1.05 var(--display);text-transform:uppercase;letter-spacing:.01em;color:var(--text);border-bottom:2px solid color-mix(in srgb,var(--text) 55%,transparent);padding:2px 0 6px}
+.ncx-name::placeholder{color:color-mix(in srgb,var(--text) 32%,transparent)}
+.ncx-name:focus{border-bottom-color:var(--c)}
+.ncx-tx small{color:var(--muted);font-size:12.5px}
+.ncx-av{display:flex;flex-direction:column;align-items:center;gap:8px}
+.ncx-img{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:99px;border:1px solid var(--border);background:var(--surface);font:600 12px/1 var(--sans);color:var(--text)}
+.ncx-img .i{width:14px;height:14px}
+.ncx-x{all:unset;cursor:pointer;position:absolute;top:14px;right:16px;width:30px;height:30px;display:grid;place-items:center;border-radius:50%;color:var(--muted)}
+.ncx-x:hover{background:var(--surface2);color:var(--text)}
+.ncx-body{display:flex;flex-direction:column;gap:8px;padding:18px 26px 6px}
+.ncx-row{display:flex;align-items:center;gap:14px;padding:9px 14px;border:1px solid var(--border);border-radius:12px;background:var(--surface2);min-height:44px}
+.ncx-row.tall{align-items:flex-start}
+.ncx-l{flex:none;width:170px;display:inline-flex;align-items:center;gap:9px;font:700 11.5px/1 var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ncx-row.tall .ncx-l{padding-top:6px}
+.ncx-l .i{width:16px;height:16px}
+.ncx-row input,.ncx-row textarea{all:unset;box-sizing:border-box;flex:1;min-width:0;font:500 14.5px/1.35 var(--sans);color:var(--text);text-align:right}
+.ncx-row textarea{text-align:left;min-height:62px;resize:vertical}
+.ncx-row input::placeholder,.ncx-row textarea::placeholder{color:color-mix(in srgb,var(--text) 35%,transparent)}
+.ncx-row .cswatches{flex:1;justify-content:flex-end}
+.ncx-row:focus-within{border-color:var(--c,var(--brand))}
+#pxp-newcli .ncx-hd input.ncx-name{background:transparent!important;border:0!important;border-bottom:2px solid color-mix(in srgb,var(--text) 55%,transparent)!important;border-radius:0!important;box-shadow:none!important;padding:2px 0 6px!important;font:800 34px/1.05 var(--display)!important;height:auto!important;outline:none!important}
+#pxp-newcli .ncx-hd input.ncx-name:focus{border-bottom-color:var(--c)!important}
+#pxp-newcli .ncx-row input,#pxp-newcli .ncx-row textarea{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;height:auto!important;outline:none!important;font:500 14.5px/1.35 var(--sans)!important}
+#pxp-newcli .ncx-row textarea{min-height:62px!important}
+@media (max-width:640px){.ncx-hd{flex-direction:column;align-items:flex-start;padding:20px 18px}.ncx-name{font-size:26px}.ncx-l{width:auto}.ncx-row{flex-wrap:wrap}.ncx-row input{text-align:left}}
 .pj-dot.bloqueada{border-color:#F0476B;background:color-mix(in srgb,#F0476B 30%,var(--surface))}
 .pj-dot.revision,.pj-dot.ajustes{border-color:var(--sc,#FF9F43);background:color-mix(in srgb,#FF9F43 30%,var(--surface))}
 
@@ -12694,8 +12740,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
           <div class="ficha-row">${f("cl-mail", "Correo", info.correo, "email", "nombre@empresa.com")}${f("cl-phone", "Teléfono", info.telefono, "tel", "+57 …")}</div>
           <div class="ficha-row"><div class="ficha-field"><label for="cl-notes">Notas generales</label><textarea id="cl-notes" rows="3" placeholder="Acuerdos, formatos de entrega, preferencias del cliente…" oninput="pxpClDirty()">${esc(info.notas || "")}</textarea></div></div>
           <p class="note">Si cambias el nombre, se actualiza en todos sus proyectos.</p>
-          <div class="cl-save"><p id="cl-warn" class="fb-msg warn" hidden><i></i>Tienes cambios sin guardar <button class="linkbtn" onclick="pxpCloseClient(true)">Descartar y cerrar</button></p><button class="ficha-save" onclick="pxpClSave()">Guardar datos</button></div>${(window.pxpPuedeEditar ? pxpPuedeEditar() : true) ? (() => { const otros = [...new Set([...knownClientes(), ...((META && META.clientesExtra) || [])].map(x => String(x).trim()).filter(x => x && norm(x) !== ck))].sort((a, b) => a.localeCompare(b, "es")); const np = Object.values(PROJECTS).filter(p => norm(p.cliente) === ck).length;
-            return `<div class="cl-merge"><b>Cliente repetido o que ya no se usa</b><small>${np ? `Fusiónalo con otro: sus ${np} proyecto${np !== 1 ? "s" : ""} pasan a ese cliente y este desaparece.` : "No tiene proyectos: puedes eliminarlo o fusionarlo."}</small><div><select id="cl-merge-to" aria-label="Fusionar con"><option value="">Fusionar con…</option>${otros.map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join("")}</select><button type="button" class="btn-ghost sm" onclick="pxpClMerge()">Fusionar</button>${np ? "" : `<button type="button" class="btn-ghost sm cl-del" onclick="pxpClMerge(true,this)">Eliminar cliente</button>`}</div></div>`; })() : ""}</section>
+          <div class="cl-save">${(window.pxpPuedeEditar ? pxpPuedeEditar() : true) ? (() => { const otros = [...new Set([...knownClientes(), ...((META && META.clientesExtra) || [])].map(x => String(x).trim()).filter(x => x && norm(x) !== ck))].sort((a, b) => a.localeCompare(b, "es")); const np = Object.values(PROJECTS).filter(p => norm(p.cliente) === ck).length;
+            return `<div class="cl-merge" data-tip="${np ? `Fusiónalo con otro: sus ${np} proyecto${np !== 1 ? "s" : ""} pasan a ese cliente y este desaparece.` : "No tiene proyectos: puedes eliminarlo o fusionarlo."}"><span class="clm-l"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v6a4 4 0 0 0 4 4h8M14 10l4 4-4 4M6 20v-3"/></svg>¿Repetido?</span><span class="clm-sel"><select id="cl-merge-to" aria-label="Fusionar con"><option value="">Fusionar con…</option>${otros.map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join("")}</select></span><button type="button" class="clm-go" onclick="pxpClMerge()">Fusionar</button>${np ? "" : `<button type="button" class="clm-del" onclick="pxpClMerge(true,this)" aria-label="Eliminar cliente">Eliminar</button>`}</div>`; })() : ""}<p id="cl-warn" class="fb-msg warn" hidden><i></i>Tienes cambios sin guardar <button class="linkbtn" onclick="pxpCloseClient(true)">Descartar y cerrar</button></p><button class="ficha-save" onclick="pxpClSave()">Guardar datos</button></div></section>
         <section class="pm-sec"><h3>Proyectos en marcha <span class="cnt">${act.length}</span></h3>
           ${act.length ? act.sort(byState).map(prow).join("") : `<p class="note" style="margin:0">No tiene proyectos activos.</p>`}
           <div class="pm-add"><input type="text" id="cl-newp" placeholder="Nombre del nuevo proyecto para ${esc(cl)}" onkeydown="if(event.key==='Enter')pxpClNewProject()"><button class="btn-add" onclick="pxpClNewProject()">+ Nuevo proyecto</button></div>
@@ -12851,6 +12897,9 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   }
 
   // ═════════ 2 · Home: estado del equipo 2×2 y gráficos ═════════
+  // v176 · Dos categorías más en Estado del equipo: ausentes y freelance
+  window.pxpShowAusentes = () => openResumen("Ausentes esta semana", rosterThisWeek().filter(r => r.ausencia).map(r => ({ text: r.name, sub: `${r.role} · ${typeof r.ausencia === "string" ? r.ausencia : (r.ausencia.tipo || "Ausencia")}` })));
+  window.pxpShowFreelance = () => openResumen("Freelance", (typeof FREELANCE !== "undefined" && Array.isArray(FREELANCE) ? FREELANCE : []).map(f => ({ text: f.name || f.nombre || "—", sub: f.role || f.rol || "Freelance" })));
   function teamBoxHtml() {
     const v = (id) => { const e = $(id); return e ? e.textContent.trim() : "0"; };
     const cell = (cls, n, l, fn, sub) => `<button class="tb-c ${cls}" onclick="${fn}"><span class="tb-n">${n}</span><span class="tb-l">${l}</span><span class="tb-s">${sub}</span></button>`;
@@ -12859,6 +12908,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       ${cell("libre", v("s-libre"), "Disponibles", "showDisponibles()", "pueden tomar trabajo")}
       ${cell("cargado", v("s-cargado"), "Ocupados", "showCargados()", "con trabajo asignado")}
       ${cell("saturado", v("s-saturado"), "Sobrecarga", "showSaturados()", "necesitan apoyo")}
+      ${cell("ausente", rosterThisWeek().filter(r => r.ausencia).length, "Ausentes", "pxpShowAusentes()", "licencia o vacaciones")}
+      ${cell("freelance", (typeof FREELANCE !== "undefined" && Array.isArray(FREELANCE) ? FREELANCE : []).length, "Freelance", "pxpShowFreelance()", "apoyo externo")}
     </div>`;
   }
   const TIPO_C = window.pxpTipoColor;
@@ -13492,25 +13543,30 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const col = nc.color || "#624AFF";
     return nc.photo ? `<span class="av" style="--s:76px"><img src="${nc.photo}" alt=""></span>` : `<span class="av ini" style="--s:76px;--c:${col}">${esc(ini)}</span>`;
   }
+  // v176 · Nuevo cliente con el mismo look de "Nuevo proyecto": cabecera teñida con el color, nombre grande y filas con icono
+  const NCI = (d) => `<svg class='i' viewBox='0 0 24 24' aria-hidden='true'>${d}</svg>`;
+  const NC_IC = { contact: NCI("<circle cx='12' cy='8' r='3.5'/><path d='M5 20c1.2-3.6 4-5 7-5s5.8 1.4 7 5'/>"), mail: NCI("<rect x='3.5' y='5.5' width='17' height='13' rx='2'/><path d='m4 7 8 6 8-6'/>"), phone: NCI("<path d='M6.5 3.5h3l1.5 4-2 1.3a11 11 0 0 0 6.2 6.2l1.3-2 4 1.5v3a2 2 0 0 1-2 2A16.5 16.5 0 0 1 4.5 5.5a2 2 0 0 1 2-2Z'/>"), color: NCI("<path d='M12 3.5a8.5 8.5 0 1 0 0 17c1.2 0 1.8-.9 1.4-2-.4-1 .3-2 1.4-2H17a3.5 3.5 0 0 0 3.5-3.5c0-5.2-3.8-9.5-8.5-9.5Z'/><circle cx='8' cy='11' r='1'/><circle cx='12' cy='8' r='1'/><circle cx='16' cy='11' r='1'/>"), notes: NCI("<path d='M6 3.5h9l3.5 3.5v13.5H6z'/><path d='M9 11h6M9 15h6'/>") };
   function renderNC() {
+    const col = nc.color || "#624AFF", row = (ic, l, ctl, cls) => `<label class="ncx-row${cls ? " " + cls : ""}"><span class="ncx-l">${NC_IC[ic]}${l}</span>${ctl}</label>`;
     mc.querySelector(".pm-box").innerHTML = `
-      ${head(I.building, "Nuevo cliente", "Registra al cliente y luego asígnale sus marcas y proyectos.")}
-      <div class="nm-body">
-        <div class="nm-idrow"><button type="button" class="pm-av" id="nc-av" onclick="pxpNCImg()" title="Subir imagen">${ncAvatar()}<span class="pm-cam">${I.cam}</span></button>
-          <div class="nm-idtxt">${fld("nc-name", "Nombre del cliente *", `<input type="text" id="nc-name" placeholder="Ej: Mondelez" autocomplete="off" oninput="pxpNCRefresh()" onkeydown="if(event.key==='Enter')pxpNCCreate()">`)}
-          <div class="pm-links"><button type="button" class="linkbtn" onclick="pxpNCImg()">Subir imagen</button><button type="button" class="linkbtn" id="nc-rm" onclick="pxpNCImg(true)" hidden>Quitar imagen</button></div></div></div>
-        <div class="nm-grid">
-          ${fld("nc-contact", "Contacto principal", `<input type="text" id="nc-contact" placeholder="Nombre y cargo">`)}
-          ${fld("nc-mail", "Correo", `<input type="email" id="nc-mail" placeholder="nombre@empresa.com">`)}
-          ${fld("nc-phone", "Teléfono", `<input type="tel" id="nc-phone" placeholder="+57 …">`)}
-          ${fld("nc-color", "Color del cliente", `<div class="cswatches">${PAL.map(h => `<button type="button" class="csw" style="--c:${h}" data-hex="${h}" title="${h}" onclick="pxpNCColor('${h}')"></button>`).join("")}<button type="button" class="linkbtn" onclick="pxpNCColor('')">Automático</button></div>`)}
-          ${fld("nc-notes", "Notas generales", `<textarea id="nc-notes" rows="3" placeholder="Acuerdos, formatos de entrega, preferencias…"></textarea>`, "nm-full")}
-        </div>
+      <div class="ncx-hd" id="ncx-hd" style="--c:${col}"><i class="ncx-bar" aria-hidden="true"></i>
+        <div class="ncx-tx"><span class="ncx-k">Nuevo cliente</span>
+          <input type="text" id="nc-name" class="ncx-name" placeholder="NOMBRE DEL CLIENTE" autocomplete="off" aria-label="Nombre del cliente" oninput="pxpNCRefresh()" onkeydown="if(event.key==='Enter')pxpNCCreate()">
+          <small>Regístralo y luego asígnale sus marcas y proyectos.</small></div>
+        <div class="ncx-av"><button type="button" class="pm-av" id="nc-av" onclick="pxpNCImg()" title="Subir imagen">${ncAvatar()}<span class="pm-cam">${I.cam}</span></button>
+          <button type="button" class="ncx-img" onclick="pxpNCImg()">${I.cam}Agregar imagen</button><button type="button" class="linkbtn" id="nc-rm" onclick="pxpNCImg(true)" hidden>Quitar</button></div>
+        <button type="button" class="ncx-x" onclick="pxpNewClose()" aria-label="Cerrar">✕</button></div>
+      <div class="ncx-body">
+        ${row("contact", "Contacto principal", `<input type="text" id="nc-contact" placeholder="Nombre y cargo">`)}
+        ${row("mail", "Correo", `<input type="email" id="nc-mail" placeholder="nombre@empresa.com">`)}
+        ${row("phone", "Teléfono", `<input type="tel" id="nc-phone" placeholder="+57 …">`)}
+        <div class="ncx-row"><span class="ncx-l">${NC_IC.color}Color del cliente</span><div class="cswatches">${PAL.map(h => `<button type="button" class="csw${nc.color === h ? " on" : ""}" style="--c:${h}" data-hex="${h}" title="${h}" onclick="pxpNCColor('${h}')"></button>`).join("")}</div></div>
+        ${row("notes", "Notas generales", `<textarea id="nc-notes" rows="3" placeholder="Acuerdos, formatos de entrega, preferencias…"></textarea>`, "tall")}
         <p class="nm-err" id="nm-err" role="alert" hidden></p>
       </div>
       ${foot("Crear cliente", "pxpNCCreate()")}`;
   }
-  window.pxpNCRefresh = function () { const a = $("nc-av"); if (a) { a.innerHTML = ncAvatar() + `<span class="pm-cam">${I.cam}</span>`; } const r = $("nc-rm"); if (r) r.hidden = !nc.photo; };
+  window.pxpNCRefresh = function () { const hd = $("ncx-hd"); if (hd) hd.style.setProperty("--c", nc.color || "#624AFF"); const a = $("nc-av"); if (a) { a.innerHTML = ncAvatar() + `<span class="pm-cam">${I.cam}</span>`; } const r = $("nc-rm"); if (r) r.hidden = !nc.photo; };
   window.pxpNCColor = function (hex) { nc.color = hex; mc.querySelectorAll(".csw").forEach(b => b.classList.toggle("on", b.dataset.hex === hex)); pxpNCRefresh(); };
   window.pxpNCImg = function (remove) { if (remove) { nc.photo = ""; pxpNCRefresh(); return; } if (window.pxpPickImage) window.pxpPickImage((url) => { nc.photo = url; pxpNCRefresh(); }); };
   window.pxpNewClient = function () {
@@ -17259,11 +17315,13 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   Object.assign(C.RT.es, { stages: "Detalle de etapas", cStage: "Etapa", cResp: "Responsable", cSt: "Estado", cFrom: "Inicio", cTo: "Fin", cD: "Días", cH: "Horas", moreSt: "+ {n} etapas más", st_pendiente: "Pendiente", st_en_curso: "En curso", st_bloqueada: "Bloqueada", st_ajustes: "En ajustes", st_revision: "En revisión", st_listo: "Listo", avgProg: "Avance promedio", avgProgS: "proyectos en curso", soon: "Entregas próximas", soonS: "en los próximos 14 días", overdue: "Con retraso", overdueS: "proyectos pasados de su meta", hrsT: "Horas registradas", hrsS: "en los proyectos del reporte", stagesC: "Estado de las etapas", nextD: "Próximas entregas", inD: "en {n} d", todayD: "hoy", lateD: "{n} d de atraso", cProg: "Avance", cHrs: "Horas", noSoon: "Sin entregas con fecha meta", stOf: "etapas de proyectos en curso", nextStage: "Próxima etapa", overdueSt: "Etapas con retraso", overdueStS: "pasadas de su fecha de fin", blkAdj: "Bloqueo · ajustes" });
   Object.assign(C.RT.en, { stages: "Stage details", cStage: "Stage", cResp: "Owner", cSt: "Status", cFrom: "Start", cTo: "End", cD: "Days", cH: "Hours", moreSt: "+ {n} more stages", st_pendiente: "Pending", st_en_curso: "In progress", st_bloqueada: "Blocked", st_ajustes: "Adjustments", st_revision: "In review", st_listo: "Done", avgProg: "Average progress", avgProgS: "projects in progress", soon: "Upcoming deliveries", soonS: "in the next 14 days", overdue: "Overdue", overdueS: "projects past their goal", hrsT: "Logged hours", hrsS: "across the report's projects", stagesC: "Stage status", nextD: "Upcoming deliveries", inD: "in {n} d", todayD: "today", lateD: "{n} d late", cProg: "Progress", cHrs: "Hours", noSoon: "No deliveries with a goal date", stOf: "stages of projects in progress", nextStage: "Next stage", overdueSt: "Overdue stages", overdueStS: "past their end date", blkAdj: "Blocked · adjustments" });
   function title(rec, s, x, y, w) { rec.text({ s, x, y, font: "serif", size: 12.5, color: INK }); rec.line({ x1: x, y1: y + 5, x2: x + w, y2: y + 5, stroke: INK, lw: .5 }); }
-  function card(rec, x, y, w, h) { rec.rect({ x, y, w, h, r: 7, fill: CARD, stroke: LINE, lw: .6 }); }
+  let CARD_MIN = 0;   // v175 · altura mínima para estirar una tarjeta y que no queden huecos en la página
+  function card(rec, x, y, w, h) { h = Math.max(h, CARD_MIN); CARD_MIN = 0; rec.rect({ x, y, w, h, r: 7, fill: CARD, stroke: LINE, lw: .6 }); }
   function kpi(rec, x, y, w, h, label, value, sub, color) {
     card(rec, x, y, w, h);
     rec.text({ s: String(label).toUpperCase(), x: x + 11, y: y + 16, font: "reg", size: 6.8, color: MUTED, cs: .7 });
-    rec.text({ s: clip(value, "cond", 21, w - 22), x: x + 11, y: y + 40, font: "cond", size: 21, color: color || INK });
+    let vs = 21; while (vs > 13 && tw(String(value), "cond", vs) > w - 22) vs -= .5;   // v175 · el valor se achica para caber entero
+    rec.text({ s: clip(value, "cond", vs, w - 22), x: x + 11, y: y + 40, font: "cond", size: vs, color: color || INK });
     if (sub) rec.text({ s: clip(sub, "light", 7.6, w - 22), x: x + 11, y: y + h - 9, font: "light", size: 7.6, color: MUTED });
   }
   function bandHeader(rec, o) {
@@ -17370,6 +17428,32 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       if (more > 0) rec.text({ s: tr(lang, "moreSt", { n: more }), x: x + 12, y: y + 54 + rows.length * 15 + 2, font: "light", size: 7.4, color: MUTED });
     } };
   }
+  // v176 · Estadísticas nuevas del reporte de proyecto
+  const LgS = (lang, es, en) => lang === "en" ? en : es;
+  function secEstados(p, lang) {
+    const E = p.etapas || []; if (!E.length) return null; const cnt = {}; E.forEach(e => { const q = e.estado || "pendiente"; cnt[q] = (cnt[q] || 0) + 1; });
+    const it = ETS_ORD.filter(q => cnt[q]).map(q => ({ q, v: cnt[q], c: ST_COLOR[q] || MUTED })), h = Math.max(136, 56 + it.length * 15);
+    return { h, draw(rec, x, y, w) { card(rec, x, y, w, h); title(rec, LgS(lang, "Etapas por estado", "Stages by status"), x + 12, y + 20, w - 24);
+      donut(rec, x + 58, y + 36 + (h - 36) / 2, 36, 23, it.map(o => ({ v: o.v, c: o.c })));
+      it.forEach((o, i) => { const ly = y + 48 + i * 15; rec.rect({ x: x + 112, y: ly - 7, w: 8, h: 8, r: 2, fill: o.c }); rec.text({ s: tr(lang, "st_" + o.q), x: x + 125, y: ly, font: "reg", size: 8, color: INK }); rec.text({ s: String(o.v), x: x + w - 12, y: ly, font: "cond", size: 10, color: INK, align: "r" }); });
+    } };
+  }
+  function secFases(p, lang) {
+    const P = (window.pxpPlanEtapas ? pxpPlanEtapas(p) : []).filter(x => x.ini && x.fin); if (!P.length) return null; const d = { pre: 0, rodaje: 0, post: 0 };
+    P.forEach(x => { const f = window.pxpFaseEtapa ? pxpFaseEtapa(x.e) : "post"; d[f in d ? f : "post"] += Math.max(1, dd(x.ini, x.fin) + 1); });
+    const it = [["pre", LgS(lang, "Preproducción", "Pre-production"), "#1FB58F"], ["rodaje", LgS(lang, "Rodaje", "Shoot"), "#FB8847"], ["post", LgS(lang, "Postproducción", "Post-production"), VIOLET]].filter(f => d[f[0]]).map(f => ({ l: f[1], v: d[f[0]], c: f[2] }));
+    const h = 64 + it.length * 19;
+    return { h, draw(rec, x, y, w) { card(rec, x, y, w, h); title(rec, LgS(lang, "Días de trabajo por fase", "Work days by phase"), x + 12, y + 20, w - 24); barsH(rec, x + 12, y + 50, w - 24, it, { lw: 92, rh: 19 }); } };
+  }
+  function secTiempo(p, lang) {
+    const E = p.etapas || [], a = inicio(p), z = planFin(p) || cierre(p); if (!a || !z || !E.length) return null;
+    const t = Math.max(0, Math.min(1, (dd(a, hoy()) + 1) / Math.max(1, dd(a, z) + 1))), v = E.filter(e => e.estado === "listo").length / E.length, gap = Math.round((t - v) * 100), h = 136;
+    return { h, draw(rec, x, y, w) { card(rec, x, y, w, h); title(rec, LgS(lang, "Tiempo frente a avance", "Time vs progress"), x + 12, y + 20, w - 24);
+      const bar = (yy, l, f, c) => { rec.text({ s: l, x: x + 12, y: yy, font: "reg", size: 8, color: INK }); rec.text({ s: Math.round(f * 100) + "%", x: x + w - 12, y: yy, font: "cond", size: 11, color: c, align: "r" }); rec.rect({ x: x + 12, y: yy + 5, w: w - 24, h: 7, r: 3.5, fill: "#E3E3EA" }); rec.rect({ x: x + 12, y: yy + 5, w: Math.max(3, (w - 24) * f), h: 7, r: 3.5, fill: c }); };
+      bar(y + 48, LgS(lang, "Tiempo transcurrido del plazo", "Time elapsed"), t, "#1E88E5"); bar(y + 80, LgS(lang, "Etapas terminadas", "Stages done"), v, VIOLET);
+      const ok = gap <= 10; rec.text({ s: ok ? LgS(lang, "El avance va al ritmo del calendario.", "Progress is keeping pace with the calendar.") : LgS(lang, `El avance va ${gap} puntos detrás del calendario.`, `Progress is ${gap} points behind the calendar.`), x: x + 12, y: y + h - 14, font: "semi", size: 8, color: ok ? GREEN : RED });
+    } };
+  }
   function secEquipo(p, lang) {
     const eq = equipoDe(p); if (!eq.length) return null; const cols = 3, rows = Math.ceil(eq.length / cols), h = 36 + rows * 31 + 4;
     return { h, draw(rec, x, y, w) {
@@ -17414,11 +17498,11 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const sub = [cli, (p.marca || "").trim(), (p.agencia || "").trim()].filter(Boolean).join("   ·   "); if (sub) rec.text({ s: clip(sub, "light", 9, CW - 130), x: W - MX, y: cy, font: "light", size: 9, color: "#FFFFFF", align: "r", a: .85 });
     // KPIs
     let y = bandH + 18; const kw = (CW - 30) / 4, ini = inicio(p), fin = cierre(p), pl = plazo(p), pi = piezasInfo(p), dur = ini && fin ? Math.max(1, dd(ini, fin) + 1) : null, goal = planFin(p);
-    kpi(rec, MX, y, kw, 62, tr(lang, "estado"), tr(lang, est), fin ? `${tr(lang, "closed")}: ${fdate(fin, lang)}` : "", EST_COLOR[est]);
-    const fEnt = goal || fin;   // v174 · inicio y entrega a la vista en el resumen
-    kpi(rec, MX + (kw + 10), y, kw, 62, lang === "en" ? "Start → delivery" : "Inicio → entrega", ini || fEnt ? `${ini ? fshort(ini, lang) : "—"} → ${fEnt ? fshort(fEnt, lang) : "—"}` : "—", dur ? `${dur} ${tr(lang, dur === 1 ? "day" : "days")}${!p.entregaFinal && fEnt ? (lang === "en" ? " · est." : " · est.") : ""}` : "");
-    kpi(rec, MX + 2 * (kw + 10), y, kw, 62, tr(lang, "deadline"), pl == null ? "—" : pl <= 0 && pl > -1 ? tr(lang, "ontime") : pl <= 0 ? tr(lang, "early", { n: -pl }) : tr(lang, "late", { n: pl }), goal ? `${lang === "en" ? "Goal" : "Meta"}: ${fdate(goal, lang)}` : "", pl == null ? INK : pl <= 0 ? GREEN : RED);
-    kpi(rec, MX + 3 * (kw + 10), y, kw, 62, tr(lang, "pieces"), pi.tot ? `${pi.ok}/${pi.tot}` : "—", pi.tot ? tr(lang, "delivered") : "");
+    const fEnt = goal || fin, Lg = (es, en) => lang === "en" ? en : es, INI_C = "#1E88E5", ENT_C = "#7B61FF";   // v176 · inicio primero y entrega al final, cada uno con su color
+    kpi(rec, MX, y, kw, 62, Lg("Inicio", "Start"), ini ? fshort(ini, lang) : "—", ini ? fdate(ini, lang) : "", INI_C);
+    kpi(rec, MX + (kw + 10), y, kw, 62, tr(lang, "estado"), tr(lang, est), dur ? `${dur} ${tr(lang, dur === 1 ? "day" : "days")}` : "", EST_COLOR[est]);
+    kpi(rec, MX + 2 * (kw + 10), y, kw, 62, tr(lang, "deadline"), pl == null ? "—" : pl <= 0 && pl > -1 ? tr(lang, "ontime") : pl <= 0 ? tr(lang, "early", { n: -pl }) : tr(lang, "late", { n: pl }), pl == null ? "" : "", pl == null ? INK : pl > 0 ? RED : GREEN);
+    kpi(rec, MX + 3 * (kw + 10), y, kw, 62, Lg("Entrega final", "Final delivery"), fEnt ? fshort(fEnt, lang) : "—", fEnt ? fdate(fEnt, lang) + (!p.entregaFinal ? Lg(" · estimada", " · estimated") : "") : "", ENT_C);
     y += 62 + 12;
     if (opt.cifras !== false && (p.etapas || []).length) {
       const E = p.etapas, P = window.pxpPlanEtapas ? pxpPlanEtapas(p) : [], t0 = hoy(), ls = E.filter(e => e.estado === "listo").length, pg = Math.round(ls / E.length * 100);
@@ -17427,16 +17511,28 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       kpi(rec, MX, y, kw, 62, tr(lang, "avgProg").replace(/ promedio| average/i, ""), pg + "%", `${ls}/${E.length} ${tr(lang, "st_listo").toLowerCase()}`, VIOLET);
       kpi(rec, MX + (kw + 10), y, kw, 62, tr(lang, "nextStage"), nx ? fshort(nx.fin, lang) : "—", nx ? clip(nx.e.nombre || "—", "light", 7.6, kw - 22) : "");
       kpi(rec, MX + 2 * (kw + 10), y, kw, 62, tr(lang, "overdueSt"), String(late), tr(lang, "overdueStS"), late ? RED : GREEN);
-      kpi(rec, MX + 3 * (kw + 10), y, kw, 62, tr(lang, "blkAdj"), `${bl} · ${aj}`, `${tr(lang, "st_bloqueada")} · ${tr(lang, "st_ajustes")}`, bl ? "#D43F5E" : INK);
+      kpi(rec, MX + 3 * (kw + 10), y, kw, 62, tr(lang, "pieces"), pi.tot ? `${pi.ok}/${pi.tot}` : "—", pi.tot ? tr(lang, "delivered") : `${bl} ${tr(lang, "st_bloqueada").toLowerCase()} · ${aj} ${tr(lang, "st_ajustes").toLowerCase()}`);
       y += 62 + 12;
+    }
+    const fin2 = goal || fin;
+    if (opt.ficha !== false) {   // v176 · ficha del proyecto debajo del resumen
+        const F = [[Lg("Cliente", "Client"), cli], [Lg("Marca", "Brand"), (p.marca || "").trim()], [Lg("Agencia", "Agency"), (p.agencia || "").trim()], [Lg("Tipo", "Type"), tr(lang, tipo)],
+          [tr(lang, "duration"), dur ? `${dur} ${tr(lang, dur === 1 ? "day" : "days")}` : ""],
+          [tr(lang, "pieces"), pi.tot ? `${pi.ok}/${pi.tot} ${tr(lang, "delivered")}` : ""], [Lg("Etapas", "Stages"), (p.etapas || []).length ? `${(p.etapas || []).filter(e => e.estado === "listo").length}/${p.etapas.length} ${Lg("listas", "done")}` : ""],
+          [Lg("Horas plan", "Planned hours"), (() => { const h = horasPorEtapa(p).reduce((a, x) => a + x.h, 0); return h ? `${Math.round(h * 10) / 10} h` : ""; })()], [Lg("Productor(a)", "Producer"), (equipoDe(p)[0] || { n: [""] }).n.join(", ")], [Lg("Equipo", "Team"), (() => { const n = equipoDe(p).reduce((a2, e) => a2 + e.n.length, 0); return n ? `${n} ${Lg(n === 1 ? "persona" : "personas", n === 1 ? "person" : "people")}` : ""; })()]].filter(f => f[1]);
+        const fc = 4, fr = Math.ceil(F.length / fc), fh = 36 + fr * 30 + 4, fcw = (CW - 24) / fc;
+        card(rec, MX, y, CW, fh); title(rec, Lg("Ficha del proyecto", "Project card"), MX + 12, y + 20, CW - 24);
+        F.forEach(([l, v], i) => { const fx = MX + 12 + (i % fc) * fcw, fy = y + 42 + Math.floor(i / fc) * 30; rec.text({ s: l.toUpperCase(), x: fx, y: fy, font: "reg", size: 6.4, color: MUTED, cs: .6 }); rec.text({ s: clip(String(v), "semi", 9.5, fcw - 10), x: fx, y: fy + 13, font: "semi", size: 9.5, color: INK }); });
+        y += fh + 12;
     }
     const avail = H - 42 - y;
     const arrange = (cap, drop) => {
-      const S = { pz: secPiezas(p, lang, cap), cr: secCrono(p, lang, cap), ad: secAdapt(p, lang, cap), rv: secRevis(p, lang), eq: opt.equipo ? secEquipo(p, lang) : null, hr: opt.horas ? secHoras(p, lang, cap) : null, et: opt.etapas ? secEtapas(p, lang, cap) : null, bl: opt.bloqueos ? secBloq(p, lang, cap) : null };
+      const S = { pz: secPiezas(p, lang, cap), cr: opt.ficha !== false ? null : secCrono(p, lang, cap), st: opt.ficha !== false ? secEstados(p, lang) : null, fa: opt.ficha !== false ? secFases(p, lang) : null, tp: opt.ficha !== false ? secTiempo(p, lang) : null, ad: secAdapt(p, lang, cap), rv: secRevis(p, lang), eq: opt.equipo ? secEquipo(p, lang) : null, hr: opt.horas ? secHoras(p, lang, cap) : null, et: opt.etapas && opt.ficha === false ? secEtapas(p, lang, cap) : null, bl: opt.bloqueos ? secBloq(p, lang, cap) : null };
       drop.forEach(d => { S[d] = null; });
-      const cw2 = (CW - 12) / 2, col = [[], []], hs = [0, 0];
-      [S.pz, S.cr, S.ad, S.rv].filter(Boolean).forEach(s => { const i = hs[0] <= hs[1] ? 0 : 1; col[i].push(s); hs[i] += s.h + 10; });
-      const full = [S.et, S.eq, S.hr, S.bl].filter(Boolean), fh = full.reduce((s, c) => s + c.h + 10, 0), total = Math.max(hs[0], hs[1]) + fh;
+      const cw2 = (CW - 12) / 2, col = [[], []], hs = [0, 0], full0 = [];
+      [S.tp, S.st, S.fa, S.pz, S.cr, S.ad, S.rv].filter(Boolean).forEach(s => { const i = hs[0] <= hs[1] ? 0 : 1; col[i].push(s); hs[i] += s.h + 10; });
+      if (!col[0].length || !col[1].length) { const solo = col[0].concat(col[1]); col[0] = []; col[1] = []; hs[0] = hs[1] = 0; full0.push(...solo); }   // v175 · una sola tarjeta no deja media página vacía
+      const full = full0.concat([S.et, S.eq, S.hr, S.bl].filter(Boolean)), fh = full.reduce((s, c) => s + c.h + 10, 0), total = Math.max(hs[0], hs[1]) + fh;
       return { col, full, cw2, total, hs };
     };
     const modes = [{ pz: 6, ad: 7, cr: 8, hr: 7, bl: 5, et: 10 }, { pz: 4, ad: 5, cr: 6, hr: 5, bl: 3, et: 7 }, { pz: 3, ad: 3, cr: 5, hr: 4, bl: 2, et: 5 }];
@@ -17445,8 +17541,35 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     let lay = null, dropped = [];
     outer: for (const d of dropOrder) for (const m of modes) { const t = arrange(m, d); if (t.total <= avail + 10) { lay = t; dropped = d.filter(x => ({ bl: opt.bloqueos, hr: opt.horas, eq: opt.equipo, et: opt.etapas, rv: true, ad: true }[x])); break outer; } }
     if (!lay) { lay = arrange(modes[2], dropOrder[6]); dropped = dropOrder[6]; }
-    lay.col.forEach((list, i) => { let yy = y; list.forEach(s => { s.draw(rec, MX + i * (lay.cw2 + 12), yy, lay.cw2); yy += s.h + 10; }); });
-    let yy = y + Math.max(lay.hs[0], lay.hs[1]); lay.full.forEach(s => { s.draw(rec, MX, yy, CW); yy += s.h + 10; });
+    // v175 · Equipo en red de nodos (se usa en la página 1 si sobra espacio, o en la 2)
+    // v176 · Equipo como en la ventana del proyecto: fondo negro, la forma y el color de cada grupo, nombre y cargo
+    const EQ0 = equipoDe(p), secRed = (hR0) => {
+      const nodos = []; EQ0.forEach(e => e.n.forEach(nm => { const per = (typeof TEAM !== "undefined" ? TEAM : []).find(t => t.name === nm), g = per && window.pxpGrupo ? pxpGrupo(per) : "";
+        nodos.push({ nm, r: e.r, c: g && window.pxpCargoColor ? pxpCargoColor(g) : VIOLET, f: g && window.pxpGrupoForma ? pxpGrupoForma(g) : "circle" }); }));
+      const NN = nodos.slice(0, 12);
+      const forma = (rec, f, x0, y0, r, o) => { const pg = (n, rot) => rec.poly(Object.assign({ pts: Array.from({ length: n }, (_, i) => { const t = rot + i * 2 * Math.PI / n; return [x0 + r * Math.cos(t), y0 + r * Math.sin(t)]; }) }, o));
+        if (f === "square") rec.rect(Object.assign({ x: x0 - r * .85, y: y0 - r * .85, w: r * 1.7, h: r * 1.7, r: 3 }, o)); else if (f === "hex" || f === "hexh") pg(6, f === "hex" ? 0 : Math.PI / 6); else if (f === "diamond") pg(4, -Math.PI / 2);
+        else if (f === "tri") pg(3, -Math.PI / 2); else if (f === "trid") pg(3, Math.PI / 2); else if (f === "penta" || f === "shield") pg(5, -Math.PI / 2); else if (f === "octa") pg(8, Math.PI / 8);
+        else if (f === "star") rec.poly(Object.assign({ pts: Array.from({ length: 10 }, (_, i) => { const t = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * .5 : r * 1.1; return [x0 + rr * Math.cos(t), y0 + rr * Math.sin(t)]; }) }, o)); else rec.circle(Object.assign({ x: x0, y: y0, r }, o)); };
+      return { h: hR0, fill: true, draw(rec, x, y, w) { const hR = this.h;
+        rec.rect({ x, y, w, h: hR, r: 7, fill: BAND });
+        rec.text({ s: tr(lang, "team"), x: x + 14, y: y + 22, font: "serif", size: 12.5, color: "#FFFFFF" }); rec.text({ s: `${nodos.length} ${LgS(lang, nodos.length === 1 ? "persona" : "personas", nodos.length === 1 ? "person" : "people")}`, x: x + w - 14, y: y + 22, font: "semi", size: 7.4, color: LIME, align: "r", cs: .6 });
+        const cx = x + w / 2, cy = y + 34 + (hR - 34) / 2, rx = w / 2 - 90, ry = Math.max(0, (hR - 34) / 2 - 34);
+        const pts = NN.map((_, i) => { const t = (NN.length <= 3 ? Math.PI : -Math.PI / 2) + i * 2 * Math.PI / NN.length; return [cx + rx * Math.cos(t), cy + ry * Math.sin(t)]; });
+        pts.forEach(([px, py], i) => rec.line({ x1: cx, y1: cy, x2: px, y2: py, stroke: NN[i].c, lw: .7, a: .55 }));
+        rec.circle({ x: cx, y: cy, r: 20, fill: "#FFFFFF" }); rec.text({ s: clip((p.nombre || k).toUpperCase(), "cond", 6.6, 34).slice(0, 3), x: cx, y: cy + 3, font: "cond", size: 9, color: BAND, align: "c" });
+        NN.forEach((o, i) => { const [px, py] = pts[i], up = py < cy - 4, ini2 = o.nm.split(/\s+/).map(z => z[0] || "").slice(0, 2).join("").toUpperCase();
+          forma(rec, o.f, px, py, 13, { fill: o.c }); rec.text({ s: ini2, x: px, y: py + 3, font: "semi", size: 8, color: "#FFFFFF", align: "c" });
+          const ty = up ? py - 25 : py + 25; rec.text({ s: clip(o.nm, "semi", 8, 120), x: px, y: ty, font: "semi", size: 8, color: "#FFFFFF", align: "c" }); rec.text({ s: clip(o.r.toUpperCase(), "reg", 6, 120), x: px, y: ty + 9, font: "reg", size: 6, color: "#A9A9B6", align: "c", cs: .4 }); });
+      } }; };
+    // v175 · Sin huecos: las dos columnas terminan a la misma altura y lo que sobra abajo lo toma la última tarjeta
+    let extra = Math.max(0, avail - lay.total - 4), redP1 = null;
+    if (opt.ficha === false && EQ0.length && extra >= (EQ0.reduce((a, e) => a + e.n.length, 0) > 3 ? 175 : 100)) {   // v176 · con la página 2, el equipo va allá
+      redP1 = secRed(extra - 10); extra = 0; }
+    const colH = Math.max(lay.hs[0], lay.hs[1]) + (lay.full.length ? 0 : extra);
+    lay.col.forEach((list, i) => { let yy = y; list.forEach((s, j) => { if (j === list.length - 1) CARD_MIN = s.h + colH - lay.hs[i]; s.draw(rec, MX + i * (lay.cw2 + 12), yy, lay.cw2); yy += s.h + 10; }); });
+    let yy = y + colH; lay.full.forEach((s, j) => { if (j === lay.full.length - 1) CARD_MIN = s.h + extra; s.draw(rec, MX, yy, CW); yy += s.h + 10; });
+    if (redP1) redP1.draw(rec, MX, yy, CW);
     // v173 · Página 2: ficha del proyecto, cronograma Gantt y equipo, como en la ventana del proyecto.
     // Lo que no cupo en la primera página pasa aquí en vez de quedar fuera.
     let nP = 1;
@@ -17456,40 +17579,21 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       rec.text({ s: clip((p.nombre || k).toUpperCase(), "cond", 13, CW - 150), x: MX, y: 22, font: "cond", size: 13, color: "#FFFFFF" });
       rec.text({ s: Lg("FICHA Y CRONOGRAMA", "CARD AND TIMELINE"), x: W - MX, y: 21, font: "semi", size: 7, color: LIME, align: "r", cs: 1.2 });
       let y2 = 52;
-      // Ficha
-      const fin2 = goal || fin, ef = !p.entregaFinal && fin2;
-      const F = [[Lg("Cliente", "Client"), cli], [Lg("Marca", "Brand"), (p.marca || "").trim()], [Lg("Agencia", "Agency"), (p.agencia || "").trim()], [Lg("Tipo", "Type"), tr(lang, tipo)],
-        [Lg("Estado", "Status"), tr(lang, est)], [Lg("Inicio", "Start"), ini ? fdate(ini, lang) : ""], [Lg("Entrega final", "Final delivery"), fin2 ? fdate(fin2, lang) + (ef ? Lg(" · est.", " · est.") : "") : ""], [tr(lang, "duration"), dur ? `${dur} ${tr(lang, dur === 1 ? "day" : "days")}` : ""],
-        [tr(lang, "pieces"), pi.tot ? `${pi.ok}/${pi.tot} ${tr(lang, "delivered")}` : ""], [Lg("Etapas", "Stages"), (p.etapas || []).length ? `${(p.etapas || []).filter(e => e.estado === "listo").length}/${p.etapas.length} ${Lg("listas", "done")}` : ""],
-        [Lg("Horas plan", "Planned hours"), (() => { const h = horasPorEtapa(p).reduce((a, x) => a + x.h, 0); return h ? `${Math.round(h * 10) / 10} h` : ""; })()], [tr(lang, "deadline"), pl == null ? "" : pl <= 0 && pl > -1 ? tr(lang, "ontime") : pl <= 0 ? tr(lang, "early", { n: -pl }) : tr(lang, "late", { n: pl })]].filter(f => f[1]);
-      const fc = 4, fr = Math.ceil(F.length / fc), fh = 36 + fr * 30 + 4, fcw = (CW - 24) / fc;
-      card(rec, MX, y2, CW, fh); title(rec, Lg("Ficha del proyecto", "Project card"), MX + 12, y2 + 20, CW - 24);
-      F.forEach(([l, v], i) => { const fx = MX + 12 + (i % fc) * fcw, fy = y2 + 42 + Math.floor(i / fc) * 30; rec.text({ s: l.toUpperCase(), x: fx, y: fy, font: "reg", size: 6.4, color: MUTED, cs: .6 }); rec.text({ s: clip(String(v), "semi", 9.5, fcw - 10), x: fx, y: fy + 13, font: "semi", size: 9.5, color: INK }); });
-      y2 += fh + 12;
+      const fin2 = goal || fin;
       // Lo que va después del cronograma: equipo (si no salió en la primera) y las secciones que no cupieron
       const C0 = modes[0], MK = { et: () => secEtapas(p, lang, C0), bl: () => secBloq(p, lang, C0), hr: () => secHoras(p, lang, C0), eq: () => secEquipo(p, lang), rv: () => secRevis(p, lang), ad: () => secAdapt(p, lang, C0) };
       const quiere = { bl: opt.bloqueos, hr: opt.horas, eq: opt.equipo, et: opt.etapas, rv: true, ad: true };
-      const resto = [], EQ = equipoDe(p);
-      if (EQ.length) { const nodos = []; EQ.forEach(e => e.n.forEach(nm => nodos.push({ nm, r: e.r }))); const NN = nodos.slice(0, 12), hR = 196;
-        resto.push({ h: hR, fill: true, draw(rec, x, y, w) { const hR = this.h;   // v174 · equipo como red de nodos (como en la ventana del proyecto)
-          card(rec, x, y, w, hR); title(rec, tr(lang, "team"), x + 12, y + 20, w - 24);
-          const cx = x + w / 2, cy = y + 30 + (hR - 30) / 2, rx = w / 2 - 92, ry = (hR - 30) / 2 - 30;
-          const pts = NN.map((_, i) => { const t = (NN.length <= 3 ? Math.PI : -Math.PI / 2) + i * 2 * Math.PI / NN.length; return [cx + rx * Math.cos(t), cy + ry * Math.sin(t)]; });
-          pts.forEach(([px, py]) => rec.line({ x1: cx, y1: cy, x2: px, y2: py, stroke: "#C9C2FF", lw: .8 }));
-          rec.circle({ x: cx, y: cy, r: 24, fill: VIOLET }); rec.text({ s: clip((p.nombre || k).toUpperCase(), "cond", 7.5, 120), x: cx, y: cy + 38, font: "cond", size: 7.5, color: INK, align: "c" });
-          rec.text({ s: String(NN.length), x: cx, y: cy + 4.5, font: "cond", size: 13, color: "#FFFFFF", align: "c" });
-          NN.forEach((o, i) => { const [px, py] = pts[i], ini2 = o.nm.split(/\s+/).map(z => z[0] || "").slice(0, 2).join("").toUpperCase(), up = py < cy - 4;
-            rec.circle({ x: px, y: py, r: 14, fill: "#FFFFFF", stroke: VIOLET, lw: 1.2 }); rec.text({ s: ini2, x: px, y: py + 3.5, font: "semi", size: 9, color: VIOLET, align: "c" });
-            const ty = up ? py - 26 : py + 25; rec.text({ s: clip(o.nm, "semi", 7.6, 110), x: px, y: ty, font: "semi", size: 7.6, color: INK, align: "c" }); rec.text({ s: clip(o.r.toUpperCase(), "reg", 5.8, 110), x: px, y: ty + 8.5, font: "reg", size: 5.8, color: MUTED, align: "c", cs: .4 }); });
-        } }); }
+      const resto = [];
+      if (EQ0.length && !redP1) resto.push(secRed(196));
+      if (opt.etapas !== false) { const se = secEtapas(p, lang, { et: 40 }); if (se) resto.push(se); }   // v176 · el detalle de etapas va con el cronograma
       dropped.filter(d => d !== "eq" && quiere[d]).forEach(d => { const sc = MK[d](); if (sc) resto.push(Object.assign(sc, { k: d })); });
       // Cronograma
       const P = (window.pxpPlanEtapas ? pxpPlanEtapas(p) : []).filter(x => x.ini && x.fin).sort((a, b) => a.ini.localeCompare(b.ini) || 0);
       const restoH = resto.reduce((a, c) => a + c.h + 10, 0), libre = H - 44 - y2;
       if (P.length) {
         let a = P[0].ini, z = P.reduce((m, x) => x.fin > m ? x.fin : m, P[0].fin); if (ini && ini < a) a = ini; if (fin2 && fin2 > z) z = fin2;
-        const n = Math.max(1, dd(a, z) + 1), gh0 = Math.max(160, libre - restoH - 2), rh = Math.max(10.5, Math.min(34, (gh0 - 78) / P.length));
-        const cap = Math.max(1, Math.floor((gh0 - 78) / rh)), rows = P.slice(0, cap), gh = 78 + rows.length * rh + (P.length > cap ? 10 : 0);
+        const n = Math.max(1, dd(a, z) + 1), gh0 = Math.max(160, libre - restoH - 2), rh = Math.max(10.5, Math.min(28, (gh0 - 78) / P.length));
+        const cap = Math.max(1, Math.floor((gh0 - 78) / rh)), rows = P.slice(0, cap), gh = 78 + rows.length * rh + (P.length > cap ? 10 : 0);   // sin nada debajo, el cronograma llega al pie
         card(rec, MX, y2, CW, gh); title(rec, Lg("Cronograma", "Timeline"), MX + 12, y2 + 20, CW - 24);
         const LW = 128, gx = MX + 12 + LW, gw = CW - 24 - LW, dw = gw / n, top = y2 + 44, bot = top + rows.length * rh;
         const pos = (d) => gx + Math.max(0, Math.min(n, dd(a, d))) * dw;
@@ -17501,7 +17605,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
           if (i % 2 === 0) rec.rect({ x: MX + 8, y: ry - 1, w: CW - 16, h: rh, fill: "#FFFFFF", a: .55 });
           rec.circle({ x: MX + 15, y: ry + rh / 2 - 1, r: 2.2, fill: col });
           rec.text({ s: clip(e.nombre || "—", st === "listo" ? "light" : "reg", 8, LW - 18), x: MX + 21, y: ry + rh / 2 + 1.8, font: st === "listo" ? "light" : "reg", size: 8, color: st === "listo" ? MUTED : INK });
-          const bx = pos(x.ini), bw = Math.max(2.5, pos(x.fin) + dw - bx), bh = Math.min(rh - 5, 16), by = ry + (rh - bh) / 2 - 1;
+          const bx = pos(x.ini), bw = Math.max(2.5, pos(x.fin) + dw - bx), bh = Math.min(rh - 5, rh > 40 ? 20 : 16), by = ry + (rh - bh) / 2 - 1;
           if (cl !== "proceso" && dd(x.ini, x.fin) <= 1) { const cx = bx + Math.min(bw, dw) / 2, cy = by + bh / 2, r = Math.min(4.2, bh / 2 + .6); rec.poly({ pts: [[cx, cy - r], [cx + r, cy], [cx, cy + r], [cx - r, cy]], fill: MC[cl] || INK, a: st === "listo" ? 1 : .85 }); }
           else rec.rect({ x: bx, y: by, w: bw, h: bh, r: Math.min(2.5, bh / 2), fill: col, a: st === "listo" ? 1 : st === "pendiente" ? .32 : .7 });
         });
@@ -17513,8 +17617,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
           rec.text({ s: l, x: lx + 12, y: ly, font: "light", size: 6.8, color: MUTED }); lx += 16 + tw(l, "light", 6.8) + 10; });
         y2 += gh + 12;
       }
-      { const f = resto.find(r => r.fill); if (f) f.h = Math.max(f.h, H - 44 - y2 - resto.filter(r => r !== f).reduce((a, c) => a + c.h + 10, 0)); }   // el equipo ocupa lo que sobra: la página queda llena
-      resto.forEach(sc => { if (y2 + sc.h > H - 40) { if (sc.k) omitted.push(NAME[sc.k]); return; } sc.draw(rec, MX, y2, CW); y2 += sc.h + 10; });
+      const sobra = Math.max(0, H - 44 - y2 - resto.reduce((a, c) => a + c.h + 10, 0) + 10), fR = resto.find(r => r.fill) || resto[resto.length - 1]; if (fR && fR.fill) fR.h += sobra;   // el equipo ocupa lo que sobra: la página queda llena
+      resto.forEach(sc => { if (y2 + sc.h > H - 40) { if (sc.k) omitted.push(NAME[sc.k]); return; } if (sc === fR && !sc.fill) CARD_MIN = sc.h + sobra; sc.draw(rec, MX, y2, CW); y2 += sc.h + 10; });
     } else dropped.forEach(d => omitted.push(NAME[d]));
     rec.pages.forEach((_, i) => { rec.p = rec.pages[i]; footer(rec, lang, i + 1, nP); });
     return { rec, omitted, name: p.nombre || k };
@@ -17599,9 +17703,10 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const cols = opt.detalle !== false ? [["cProject", 118, "l"], ["cType", 54, "l"], ["cStatus", 56, "l"], ["cStart", 40, "l"], ["cClose", 40, "l"], ["cPieces", 32, "r"], ["cProg", 40, "r"], ["cHrs", 34, "r"], ["cPlazo", 47, "r"]] : [["cProject", 150, "l"], ["cType", 62, "l"], ["cStatus", 60, "l"], ["cStart", 46, "l"], ["cClose", 46, "l"], ["cPieces", 36, "r"], ["cPlazo", 51, "r"]];
     const rowsAll = []; if (d.listos.length) { rowsAll.push({ g: tr(lang, "deliveredT") + " (" + d.listos.length + ")" }); d.listos.forEach(k => rowsAll.push({ k })); }
     if (d.curso.length) { rowsAll.push({ g: tr(lang, "inProgress") + " (" + d.curso.length + ")" }); d.curso.forEach(k => rowsAll.push({ k })); }
-    const RH = 18.5, top1 = y + 34, cap1 = Math.max(0, Math.floor((H - 40 - top1) / RH)), top2 = 112, cap2 = Math.floor((H - 40 - top2) / RH);
+    const RH = 18.5, top1 = y + 34, cap1 = 0,   // v176 · los proyectos del periodo empiezan siempre en la página 2
+      top2 = 112, cap2 = Math.floor((H - 40 - top2) / RH);
     let list = rowsAll, lost = 0;
-    const room = cap1 + cap2 - 0; if (list.length > room && room > 2) { const keep = list.slice(0, room - 1); const dropped = list.length - keep.length; lost = list.slice(room - 1).filter(r => r.k).length; list = keep.concat([{ more: lost || dropped }]); omitted.push(String(lost)); }
+    const room = cap2 * 6; if (list.length > room && room > 2) { const keep = list.slice(0, room - 1); const dropped = list.length - keep.length; lost = list.slice(room - 1).filter(r => r.k).length; list = keep.concat([{ more: lost || dropped }]); omitted.push(String(lost)); }
     const drawHead = (yy) => { title(rec, tr(lang, "table"), MX, yy, CW); let x = MX; cols.forEach(([k, w, a]) => { rec.text({ s: tr(lang, k).toUpperCase(), x: a === "r" ? x + w : x, y: yy + 22, font: "reg", size: 6.6, color: MUTED, cs: .6, align: a === "r" ? "r" : "l" }); x += w; }); rec.line({ x1: MX, y1: yy + 27, x2: W - MX, y2: yy + 27, stroke: LINE, lw: .6 }); };
     const drawRow = (r, yy) => {
       if (r.g) { rec.text({ s: r.g.toUpperCase(), x: MX, y: yy + 12, font: "semi", size: 7.6, color: VIOLET, cs: .8 }); return; }
@@ -17622,13 +17727,13 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       rec.line({ x1: MX, y1: yy + RH - 1.5, x2: W - MX, y2: yy + RH - 1.5, stroke: "#EFEFF3", lw: .5 });
     };
     if (list.length) {
-      drawHead(y); let i = 0, yy = top1;
+      if (cap1) drawHead(y); let i = 0, yy = top1;
       for (; i < list.length && i < cap1; i++) { drawRow(list[i], yy); yy += RH; }
       let pages = 1;
-      if (i < list.length) {
-        rec.add(); pages = 2; rec.rect({ x: 0, y: 0, w: W, h: 56, fill: BAND }); rec.rect({ x: 0, y: 56, w: W, h: 2, fill: VIOLET });
+      while (i < list.length) {
+        rec.add(); pages++; const fin = Math.min(list.length, i + cap2); rec.rect({ x: 0, y: 0, w: W, h: 56, fill: BAND }); rec.rect({ x: 0, y: 56, w: W, h: 2, fill: VIOLET });
         rec.text({ s: String(cli).toUpperCase(), x: MX, y: 36, font: "cond", size: 22, color: "#FFFFFF" }); rec.text({ s: perLabel(per, lang), x: W - MX, y: 36, font: "serif", size: 13, color: LIME, align: "r" });
-        drawHead(top2 - 34); yy = top2; for (; i < list.length; i++) { drawRow(list[i], yy); yy += RH; }
+        drawHead(top2 - 34); yy = top2; for (; i < fin; i++) { drawRow(list[i], yy); yy += RH; }
       }
       const n = rec.pages.length; rec.pages.forEach((_, pi2) => { rec.p = rec.pages[pi2]; footer(rec, lang, pi2 + 1, n); });
     } else { rec.text({ s: tr(lang, "noData"), x: MX, y: y + 20, font: "light", size: 10, color: MUTED }); footer(rec, lang, 1, 1); }
