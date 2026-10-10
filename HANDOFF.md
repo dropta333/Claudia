@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v178** · 10 oct 2026 · Responsable: Bastián Torres
+Versión: **v179** · 10 oct 2026 · Responsable: Bastián Torres
 
 ## Cómo está armado ahora
 - **Una sola fuente:** `src/app.html`, con todo el CSS y las capas JS.
@@ -190,6 +190,8 @@ Versión: **v178** · 10 oct 2026 · Responsable: Bastián Torres
 - **v177:** reporte de proyecto: el equipo vuelve a tarjeta blanca y pasa a la página 1 a una columna (secRed se adapta a media columna); Etapas por estado más compacta; página 2 con dos gráficas de barras, días por etapa y etapas por persona (secBarrasP2).
 
 - **v178:** reporte de proyecto: "Actividad del proyecto" (secActividad, gráfica de puntos de notas, cambios, revisiones y bloqueos en el tiempo) reemplaza al detalle de etapas en la página 2 (el detalle queda solo si no hay historial); la ficha lista a todos los que participaron (equipo y responsables de etapas).
+
+- **v179:** título de la página "Publicis Production · Traffic Platform", favicon SVG en línea (P lima con punto violeta sobre negro) y theme-color.
 
 ## No cambiar sin consultar
 - El ZIP de Netlify va sin datos, y no se guarda nada antes de cargar los datos del servidor.
