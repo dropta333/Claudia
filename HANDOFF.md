@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v166** · 10 oct 2026 · Responsable: Bastián Torres
+Versión: **v167** · 10 oct 2026 · Responsable: Bastián Torres
 
 ## Cómo está armado ahora
 - **Una sola fuente:** `src/app.html`, con todo el CSS y las capas JS.
@@ -153,6 +153,14 @@ Versión: **v166** · 10 oct 2026 · Responsable: Bastián Torres
   - Fuentes del PDF: se sumó `black` (Barlow Black, subconjunto latino, licencia OFL) en `src/vendor-fonts.js`.
   - "Equipo en la cabecera" (`s.roles`, `pxpTTRol`): desplegable con casillas, se elige rol por rol quién sale (por defecto productor(a) ejecutivo(a), director de post y PM); la ficha pasa a 3 columnas si hay más de 4. Los sábados y domingos tienen siempre el mismo gris; solo los días hábiles cambian de tono por mes. Festivos y domingos llevan rayas marcadas (`FEST_C`); los domingos sin la palabra. Un borde sutil (`MES_LN`) sigue el contorno de cada mes. En el calendario cada etapa lleva solo su nombre (9,5 pt); cada día se parte en mañana (arriba) y tarde (abajo) en mitades iguales y las etapas de cada mitad se reparten su espacio; la de todo el día ocupa la celda; en el Gantt, el nombre (9,5 pt) y la hora de los hitos.
   - Pruebas: `node tools/test-tt.mjs`.
+
+- **v167:** Home, Dashboard, Tráfico y logros.
+  - Home (solo Global, capa del mosaico): fijas Estado del equipo, Estado de los proyectos y Tipos de proyecto; el resto en el bloque plegable "Más gráficas" (`pxpHmMore`, se recuerda por persona en `pxp_hm_more_<usuario>`). La vista Personal no cambia.
+  - Dashboard: sin la vista Fichas (siempre paneles); "Nuevo proyecto" va en la fila de "Disponibilidad del equipo".
+  - Tráfico: fichas a 3 columnas (2 en pantallas medianas, 1 en móvil) con el lenguaje de las fichas del Dashboard.
+  - Logros: tarjeta flotante al pasar el mouse (o tocar en celular) en la pestaña Logros, el Home y el perfil: qué mide, nivel actual con progreso, los 4 niveles con lo que falta y "Cómo lograrlo" (`COMO`).
+  - Logros nuevos (capa 37): 6 generales (Viernes 5:29 pm, Fin de semana heroico, Madrugador, Cuatro manos, Emoji master, Desatascador oficial) y 3 por cargo (`c` = grupo; solo los ve y gana ese grupo). Métricas nuevas en `extras()`.
+  - Pruebas: `node tools/test-v167.mjs`.
 
 ## No cambiar sin consultar
 - El ZIP de Netlify va sin datos, y no se guarda nada antes de cargar los datos del servidor.

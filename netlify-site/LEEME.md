@@ -1,9 +1,11 @@
-# Tráfico Post · v166 — cómo publicar
+# Tráfico Post · v167 — cómo publicar
 
 1. En el tablero actual toca **Descargar copia** (pie de página) para tener un respaldo de hoy.
 2. En Netlify, abre tu sitio → **Deploys** y arrastra este ZIP (o la carpeta descomprimida) a la zona de despliegue.
 3. Los datos del equipo **no se tocan**: viven en Netlify Blobs y el tablero los carga al abrir.
 4. Entra primero como Administración y espera el aviso **"Tablero optimizado"** (mueve las imágenes viejas a archivos).
+
+Novedades v167 (solo el tablero): Home con "Más gráficas" plegable, Dashboard sin fichas, Tráfico a 3 columnas, tarjeta de logros al pasar el mouse y logros nuevos por cargo.
 
 Novedades v166 (tablero y pdf.js): time table en PDF nuevo con vistas Calendario y Gantt, cabecera de marca, tonos por mes, idioma y logo; la vista previa de reportes suma 100 % y arrastrar. Sube el ZIP completo: pdf.js trae una fuente nueva.
 
