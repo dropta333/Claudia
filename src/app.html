@@ -5791,6 +5791,19 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;tr
 .et-gadd:hover,.et-gadd:focus-visible{color:var(--text);border-color:var(--brand);background:color-mix(in srgb,var(--brand) 8%,transparent)}
 .et-grp:not(.open) > .et-gadd{display:none}
 .pk-op.fs-pre > .i:first-child{color:#1FB58F!important}.pk-op.fs-rodaje > .i:first-child{color:#FB8847!important}.pk-op.fs-post > .i:first-child{color:var(--blue)!important}
+/* v159 · Ficha de resumen: datos en dos columnas y ocupa todo el alto, sin zonas vacías */
+#pxp-proj .cfg{align-items:stretch}
+#pxp-proj .cfg-sum{justify-content:space-between;gap:16px}
+#pxp-proj .cs-grid{gap:0 20px;align-content:stretch;grid-auto-rows:1fr;flex:1;padding-top:0}
+#pxp-proj .cs-grid > div{min-width:0;display:flex;flex-direction:column;justify-content:center;gap:6px;padding:12px 0;border-bottom:1px solid color-mix(in srgb,var(--border) 70%,transparent)}
+#pxp-proj .cs-grid > div:nth-last-child(-n+2){border-bottom:0}
+#pxp-proj .cs-grid .cs-v{font-size:19px}
+#pxp-proj .cs-grid .cs-v{overflow-wrap:anywhere}
+.cs-u{font:500 13px var(--sans);color:var(--muted);margin-left:2px}
+@media (min-width:901px){
+  #pxp-proj .cfg.ro .cfg-sum:not(:has(.cs-pd,.cs-adb)){grid-template-columns:minmax(0,1fr) minmax(0,2fr);grid-template-areas:"a g" "p g"}
+  #pxp-proj .cfg.ro .cfg-sum:not(:has(.cs-pd,.cs-adb)) .cs-grid{grid-template-columns:1fr 1fr!important;padding-left:24px!important;border-left:1px solid var(--border)!important}
+}
 </style>
 </head>
 <body>
@@ -11821,9 +11834,10 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const right = `<aside class="cfg-sum" style="--sc:${E[2]};--tc:${TC[tipo] || "var(--muted)"};--cc:${cCol}">
       <div class="cs-a"><span class="cs-k">Estado</span><div class="cs-est"><span class="ic">${PI(ST_IC[est])}</span><b>${E[1]}</b></div></div>
       <div class="cs-grid"><div><span class="cs-k">Tipo</span><b class="cs-v cs-tp">${PI(TIPO_IC[tipo] || TAG_IC)}${esc(tipo)}</b></div><div><span class="cs-k">Complejidad</span><b class="cs-v cs-cx">${PI(CPX_IC(ci + 1), "bars")}${CPX[ci][1]}</b></div>
-        <div class="cs-wide"><span class="cs-k">Inicio del proyecto</span><b class="cs-v">${p.fechaInicio ? fmtD(p.fechaInicio) + (p.inicioEst ? ` <em class="cfg-tag">estimado</em>` : "") : `<span class="cfg-nil">Sin definir</span>`}</b></div>
-        <div class="cs-wide"><span class="cs-k">Entrega final</span><b class="cs-v">${p.entregaFinal ? fmtD(p.entregaFinal) + (p.estadoGeneral === "entregado" ? "" : (() => { const l = diasLabel(diffDays(p.entregaFinal)); return ` <span class="due-pill ${l.cls}">${esc(l.txt)}</span>`; })()) : `<span class="cfg-nil cfg-req">Sin definir</span>`}</b></div>
-        <div class="cs-wide"><span class="cs-k">Agencia creativa</span><b class="cs-v">${agenciaV ? esc(agenciaV) : `<span class="cfg-nil">Sin agencia</span>`}</b></div></div>
+        <div><span class="cs-k">Inicio</span><b class="cs-v">${p.fechaInicio ? fmtD(p.fechaInicio) + (p.inicioEst ? ` <em class="cfg-tag">estimado</em>` : "") : `<span class="cfg-nil">Sin definir</span>`}</b></div>
+        <div><span class="cs-k">Entrega final</span><b class="cs-v">${p.entregaFinal ? fmtD(p.entregaFinal) + (p.estadoGeneral === "entregado" ? "" : (() => { const l = diasLabel(diffDays(p.entregaFinal)); return ` <span class="due-pill ${l.cls}">${esc(l.txt)}</span>`; })()) : `<span class="cfg-nil cfg-req">Sin definir</span>`}</b></div>
+        <div><span class="cs-k">Duración</span><b class="cs-v">${(() => { const a = p.fechaInicio, b = p.entregaFinal; if (!a || !b || b < a) return `<span class="cfg-nil">${a || b ? "Falta una fecha" : "Sin fechas"}</span>`; let n = 0; for (let d = new Date(a + "T00:00:00"); d <= new Date(b + "T00:00:00"); d.setDate(d.getDate() + 1)) { const z = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); if (window.pxpEsHabil ? pxpEsHabil(z) : (d.getDay() % 6)) n++; } return `${n} <small class="cs-u">días hábiles</small>`; })()}</b></div>
+        <div><span class="cs-k">Agencia creativa</span><b class="cs-v">${agenciaV ? esc(agenciaV) : `<span class="cfg-nil">Sin agencia</span>`}</b></div></div>
       <div class="cs-pz"><span class="cs-k">Piezas</span>${tot ? `<div class="cs-big"><b>${ok}</b><span>/ ${tot} entregadas</span><em>${pct}%</em></div><span class="cs-bar"><i style="width:${pct}%"></i></span>` : `<span class="cfg-nil">Sin definir</span>`}</div>
       ${det.length ? `<div class="cs-blk cs-pd"><span class="cs-k">Piezas</span><ul class="cs-ul">${det.slice().sort((a, b) => (b.hero ? 1 : 0) - (a.hero ? 1 : 0)).map(x => `<li class="${x.hero ? "hero" : x.deriv ? "der" : ""}"><b>${x.hero ? "★" : +x.cant || 1}</b><span>${x.hero ? "Hero · " : ""}${esc(x.tipo || "Pieza")}</span>${x.dur || x.formato ? `<em>${esc([x.dur, x.formato].filter(Boolean).join(" · "))}</em>` : ""}</li>`).join("")}</ul></div>` : ""}
       ${ad.length ? `<div class="cs-blk cs-adb"><span class="cs-k">Adaptaciones por país</span><div class="cs-ad">${ad.map(a => `<span>${esc(a.pais)}<b>×${a.versiones}</b></span>`).join("")}</div></div>` : ""}

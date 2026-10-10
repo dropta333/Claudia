@@ -5,7 +5,7 @@
 3. Los datos del equipo **no se tocan**: viven en Netlify Blobs y el tablero los carga al abrir.
 4. Entra primero como Administración y espera el aviso **"Tablero optimizado"** (mueve las imágenes viejas a archivos).
 
-Novedades v159 (solo el tablero): Inicio del proyecto de primero en las características; agregar etapas eligiendo la fase (Preproducción, Rodaje o Postproducción); vistas del cronograma siempre a la derecha y sin scroll horizontal.
+Novedades v159 (solo el tablero): Inicio del proyecto de primero en las características; ficha de resumen mejor distribuida, con la duración en días hábiles; agregar etapas eligiendo la fase (Preproducción, Rodaje o Postproducción); vistas del cronograma siempre a la derecha y sin scroll horizontal.
 
 Novedades v158 (solo el tablero): licencias agotadas salen de la lista a los 3 días y vencidas al día siguiente (quedan en Historial); nueva columna "Agotadas / Vencidas" en el Tablero de capacidad.
 

@@ -96,6 +96,7 @@ Versión: **v159** · 10 oct 2026 · Responsable: Bastián Torres
 - **v159:** ajustes de la ventana de proyecto.
   - "Inicio del proyecto" es el primer desplegable de las características.
   - "+ Agregar etapa" pregunta la fase (`pxpEtAdd`); cada grupo abierto tiene "+ Agregar etapa a …". La etapa se inserta al final de su fase.
+  - Ficha de resumen: Tipo, Complejidad, Inicio, Entrega final, Duración (días hábiles) y Agencia en dos columnas que ocupan todo el alto; en modo consulta, los datos usan el espacio libre en dos columnas.
   - Cronograma: Todo / Día / Semana / Mes / Año siempre a la derecha; las barras nunca pasan del borde y el cuerpo no se desplaza a lo ancho.
 
 ## No cambiar sin consultar
