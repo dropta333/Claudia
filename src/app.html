@@ -17428,8 +17428,63 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     if (!lay) { lay = arrange(modes[2], dropOrder[6]); dropped = dropOrder[6]; }
     lay.col.forEach((list, i) => { let yy = y; list.forEach(s => { s.draw(rec, MX + i * (lay.cw2 + 12), yy, lay.cw2); yy += s.h + 10; }); });
     let yy = y + Math.max(lay.hs[0], lay.hs[1]); lay.full.forEach(s => { s.draw(rec, MX, yy, CW); yy += s.h + 10; });
-    dropped.forEach(d => omitted.push(NAME[d]));
-    footer(rec, lang, 1, 1);
+    // v173 · Página 2: ficha del proyecto, cronograma Gantt y equipo, como en la ventana del proyecto.
+    // Lo que no cupo en la primera página pasa aquí en vez de quedar fuera.
+    let nP = 1;
+    if (opt.ficha !== false) {
+      nP = 2; rec.add(); const Lg = (es, en) => lang === "en" ? en : es;
+      rec.rect({ x: 0, y: 0, w: W, h: 34, fill: BAND });
+      rec.text({ s: clip((p.nombre || k).toUpperCase(), "cond", 13, CW - 150), x: MX, y: 22, font: "cond", size: 13, color: "#FFFFFF" });
+      rec.text({ s: Lg("FICHA Y CRONOGRAMA", "CARD AND TIMELINE"), x: W - MX, y: 21, font: "semi", size: 7, color: LIME, align: "r", cs: 1.2 });
+      let y2 = 52;
+      // Ficha
+      const fin2 = goal || fin, ef = !p.entregaFinal && fin2;
+      const F = [[Lg("Cliente", "Client"), cli], [Lg("Marca", "Brand"), (p.marca || "").trim()], [Lg("Agencia", "Agency"), (p.agencia || "").trim()], [Lg("Tipo", "Type"), tr(lang, tipo)],
+        [Lg("Estado", "Status"), tr(lang, est)], [Lg("Inicio", "Start"), ini ? fdate(ini, lang) : ""], [Lg("Entrega final", "Final delivery"), fin2 ? fdate(fin2, lang) + (ef ? Lg(" · est.", " · est.") : "") : ""], [tr(lang, "duration"), dur ? `${dur} ${tr(lang, dur === 1 ? "day" : "days")}` : ""],
+        [tr(lang, "pieces"), pi.tot ? `${pi.ok}/${pi.tot} ${tr(lang, "delivered")}` : ""], [Lg("Etapas", "Stages"), (p.etapas || []).length ? `${(p.etapas || []).filter(e => e.estado === "listo").length}/${p.etapas.length} ${Lg("listas", "done")}` : ""],
+        [Lg("Horas plan", "Planned hours"), (() => { const h = horasPorEtapa(p).reduce((a, x) => a + x.h, 0); return h ? `${Math.round(h * 10) / 10} h` : ""; })()], [tr(lang, "deadline"), pl == null ? "" : pl <= 0 && pl > -1 ? tr(lang, "ontime") : pl <= 0 ? tr(lang, "early", { n: -pl }) : tr(lang, "late", { n: pl })]].filter(f => f[1]);
+      const fc = 4, fr = Math.ceil(F.length / fc), fh = 36 + fr * 30 + 4, fcw = (CW - 24) / fc;
+      card(rec, MX, y2, CW, fh); title(rec, Lg("Ficha del proyecto", "Project card"), MX + 12, y2 + 20, CW - 24);
+      F.forEach(([l, v], i) => { const fx = MX + 12 + (i % fc) * fcw, fy = y2 + 42 + Math.floor(i / fc) * 30; rec.text({ s: l.toUpperCase(), x: fx, y: fy, font: "reg", size: 6.4, color: MUTED, cs: .6 }); rec.text({ s: clip(String(v), "semi", 9.5, fcw - 10), x: fx, y: fy + 13, font: "semi", size: 9.5, color: INK }); });
+      y2 += fh + 12;
+      // Lo que va después del cronograma: equipo (si no salió en la primera) y las secciones que no cupieron
+      const C0 = modes[0], MK = { et: () => secEtapas(p, lang, C0), bl: () => secBloq(p, lang, C0), hr: () => secHoras(p, lang, C0), eq: () => secEquipo(p, lang), rv: () => secRevis(p, lang), ad: () => secAdapt(p, lang, C0) };
+      const quiere = { bl: opt.bloqueos, hr: opt.horas, eq: opt.equipo, et: opt.etapas, rv: true, ad: true };
+      const resto = []; if (!opt.equipo || dropped.includes("eq")) { const e2 = secEquipo(p, lang); if (e2) resto.push(e2); }
+      dropped.filter(d => d !== "eq" && quiere[d]).forEach(d => { const sc = MK[d](); if (sc) resto.push(Object.assign(sc, { k: d })); });
+      // Cronograma
+      const P = (window.pxpPlanEtapas ? pxpPlanEtapas(p) : []).filter(x => x.ini && x.fin).sort((a, b) => a.ini.localeCompare(b.ini) || 0);
+      const restoH = resto.reduce((a, c) => a + c.h + 10, 0), libre = H - 44 - y2;
+      if (P.length) {
+        let a = P[0].ini, z = P.reduce((m, x) => x.fin > m ? x.fin : m, P[0].fin); if (ini && ini < a) a = ini; if (fin2 && fin2 > z) z = fin2;
+        const n = Math.max(1, dd(a, z) + 1), want = 78 + P.length * 20, gh0 = Math.max(160, Math.min(want, libre - restoH)), rh = Math.max(10.5, Math.min(20, (gh0 - 78) / P.length));
+        const cap = Math.max(1, Math.floor((gh0 - 78) / rh)), rows = P.slice(0, cap), gh = 78 + rows.length * rh + (P.length > cap ? 10 : 0);
+        card(rec, MX, y2, CW, gh); title(rec, Lg("Cronograma", "Timeline"), MX + 12, y2 + 20, CW - 24);
+        const LW = 128, gx = MX + 12 + LW, gw = CW - 24 - LW, dw = gw / n, top = y2 + 44, bot = top + rows.length * rh;
+        const pos = (d) => gx + Math.max(0, Math.min(n, dd(a, d))) * dw;
+        let m0 = a, mi = 0; while (m0 <= z) { const ym = m0.slice(0, 7); let m1 = m0, c = 0; while (m1 <= z && m1.slice(0, 7) === ym) { c++; const d1 = D(m1); d1.setDate(d1.getDate() + 1); m1 = d1.getFullYear() + "-" + String(d1.getMonth() + 1).padStart(2, "0") + "-" + String(d1.getDate()).padStart(2, "0"); }
+          const mx = pos(m0), mw = c * dw; if (mi % 2) rec.rect({ x: mx, y: top - 6, w: mw, h: bot - top + 8, fill: "#ECECF1" });
+          if (mw > 18) rec.text({ s: tr(lang, "mshort")[+ym.slice(5, 7) - 1].toUpperCase(), x: mx + 3, y: top - 9, font: "semi", size: 6.4, color: MUTED, cs: .6 }); m0 = m1; mi++; }
+        const GC2 = { pre: "#1FB58F", rodaje: "#FB8847", post: VIOLET }, MC = { revision: "#1E88E5", entrega: "#E0A100" };
+        rows.forEach((x, i) => { const ry = top + i * rh, e = x.e, st = e.estado || "pendiente", fa = window.pxpFaseEtapa ? pxpFaseEtapa(e) : "post", cl = pxpClaseEtapa(e), col = GC2[fa] || VIOLET;
+          if (i % 2 === 0) rec.rect({ x: MX + 8, y: ry - 1, w: CW - 16, h: rh, fill: "#FFFFFF", a: .55 });
+          rec.circle({ x: MX + 15, y: ry + rh / 2 - 1, r: 2.2, fill: col });
+          rec.text({ s: clip(e.nombre || "—", st === "listo" ? "light" : "reg", 8, LW - 18), x: MX + 21, y: ry + rh / 2 + 1.8, font: st === "listo" ? "light" : "reg", size: 8, color: st === "listo" ? MUTED : INK });
+          const bx = pos(x.ini), bw = Math.max(2.5, pos(x.fin) + dw - bx), by = ry + 2, bh = rh - 5;
+          if (cl !== "proceso" && dd(x.ini, x.fin) <= 1) { const cx = bx + Math.min(bw, dw) / 2, cy = by + bh / 2, r = Math.min(4.2, bh / 2 + .6); rec.poly({ pts: [[cx, cy - r], [cx + r, cy], [cx, cy + r], [cx - r, cy]], fill: MC[cl] || INK, a: st === "listo" ? 1 : .85 }); }
+          else rec.rect({ x: bx, y: by, w: bw, h: bh, r: Math.min(2.5, bh / 2), fill: col, a: st === "listo" ? 1 : st === "pendiente" ? .32 : .7 });
+        });
+        if (P.length > cap) rec.text({ s: `+${P.length - cap} ${tr(lang, "more")}`, x: MX + 21, y: bot + 10, font: "light", size: 7, color: MUTED });
+        const mark = (d, c, l, lw) => { if (!d || d < a || d > z) return; const lx = d === fin2 ? pos(d) + dw : pos(d); rec.line({ x1: lx, y1: top - 6, x2: lx, y2: bot + 2, stroke: c, lw: lw || 1 }); rec.text({ s: l, x: lx, y: bot + 10, font: "semi", size: 6.6, color: c, align: "c" }); };
+        mark(ini, "#1E88E5", Lg("Inicio", "Start")); mark(hoy(), INK, Lg("Hoy", "Today"), .8); mark(fin2, "#7B61FF", Lg("Entrega", "Delivery"), 1.4);
+        let lx = MX + 12; [[GC2.pre, Lg("Preproducción", "Pre-production")], [GC2.rodaje, Lg("Rodaje", "Shoot")], [GC2.post, Lg("Postproducción", "Post-production")], [MC.revision, Lg("Revisión", "Review"), 1], [MC.entrega, Lg("Entrega", "Delivery"), 1]].forEach(([c, l, dm]) => {
+          const ly = y2 + gh - 9; if (dm) rec.poly({ pts: [[lx + 3.5, ly - 6.5], [lx + 7, ly - 3], [lx + 3.5, ly + .5], [lx, ly - 3]], fill: c }); else rec.rect({ x: lx, y: ly - 6, w: 9, h: 6, r: 2, fill: c });
+          rec.text({ s: l, x: lx + 12, y: ly, font: "light", size: 6.8, color: MUTED }); lx += 16 + tw(l, "light", 6.8) + 10; });
+        y2 += gh + 12;
+      }
+      resto.forEach(sc => { if (y2 + sc.h > H - 40) { if (sc.k) omitted.push(NAME[sc.k]); return; } sc.draw(rec, MX, y2, CW); y2 += sc.h + 10; });
+    } else dropped.forEach(d => omitted.push(NAME[d]));
+    rec.pages.forEach((_, i) => { rec.p = rec.pages[i]; footer(rec, lang, i + 1, nP); });
     return { rec, omitted, name: p.nombre || k };
   }
 
@@ -17641,7 +17696,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     if (!can()) { toast(L("Solo Administración genera reportes.", "Only Administration can generate reports.")); return; }
     const pl = periodos(), now = hoy().slice(0, 7);
     const X = B.custom && B.custom[kind];
-    S = { kind, key, lang: platLang(), ...(X && X.init ? X.init(key) : {}), equipo: false, horas: false, bloqueos: false, etapas: true, cifras: true, proximas: true, detalle: true, curso: true, per: { tipo: "mes", v: pl.months.includes(now) ? now : pl.months[0] }, rec: null, busy: true, warn: "" };
+    S = { kind, key, lang: platLang(), ...(X && X.init ? X.init(key) : {}), equipo: false, horas: false, bloqueos: false, etapas: true, cifras: true, ficha: true, proximas: true, detalle: true, curso: true, per: { tipo: "mes", v: pl.months.includes(now) ? now : pl.months[0] }, rec: null, busy: true, warn: "" };
     md.classList.add("open"); paintShell(); regen(0);
   };
   const seg = (name, cur, opts) => `<div class="seg" role="group">${opts.map(([v, l]) => `<button type="button" class="${cur === v ? "on" : ""}" aria-pressed="${cur === v}" onclick="${name}('${v}')">${l}</button>`).join("")}</div>`;
@@ -17677,7 +17732,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
         <select class="rp-sel" onchange="pxpRepPerV(this.value)" aria-label="${L("Período", "Period")}">${opts.map(([v, l]) => `<option value="${v}" ${v === s.per.v ? "selected" : ""}>${esc(l)}</option>`).join("")}</select></div>`;
     }
     return `<div class="rp-og"><h4>${L("Idioma del reporte", "Report language")}</h4>${seg("pxpRepLang", s.lang, [["es", "Español"], ["en", "English"]])}</div>${per}
-      <div class="rp-og"><h4>${L("Incluir", "Include")}</h4>${isP ? tog("equipo", s.equipo, L("Equipo", "Team"), L("Nombres y roles del proyecto", "Names and roles")) + tog("horas", s.horas, L("Horas registradas", "Logged hours"), L("Por etapa", "By stage")) + tog("bloqueos", s.bloqueos, L("Bloqueos", "Blockers"), L("Tipo, fechas y días perdidos", "Type, dates and days lost")) + tog("cifras", s.cifras, L("Más cifras", "More figures"), L("Avance, próxima etapa, atrasos y bloqueos", "Progress, next stage, delays and blockers")) + tog("etapas", s.etapas, L("Detalle de etapas", "Stage details"), L("Responsable, estado, fechas, días y horas", "Owner, status, dates, days and hours")) : tog("curso", s.curso, L("Proyectos en curso", "Projects in progress"), L("Además de los entregados en el período", "In addition to those delivered in the period")) + tog("cifras", s.cifras, L("Más cifras", "More figures"), L("Avance promedio, entregas próximas y retrasos", "Average progress, upcoming and overdue")) + tog("etapas", s.etapas, L("Estado de las etapas", "Stage status"), L("Etapas de los proyectos en curso", "Stages of projects in progress")) + tog("proximas", s.proximas, L("Próximas entregas", "Upcoming deliveries"), L("Las 5 más cercanas por fecha meta", "The 5 nearest by goal date")) + tog("detalle", s.detalle, L("Avance y horas en la tabla", "Progress and hours in the table"), L("Dos columnas más por proyecto", "Two extra columns per project")) + tog("horas", s.horas, L("Horas registradas", "Logged hours"), L("Total en las cifras y por proyecto", "Total in the figures and per project"))}
+      <div class="rp-og"><h4>${L("Incluir", "Include")}</h4>${isP ? tog("equipo", s.equipo, L("Equipo", "Team"), L("Nombres y roles del proyecto", "Names and roles")) + tog("horas", s.horas, L("Horas registradas", "Logged hours"), L("Por etapa", "By stage")) + tog("bloqueos", s.bloqueos, L("Bloqueos", "Blockers"), L("Tipo, fechas y días perdidos", "Type, dates and days lost")) + tog("ficha", s.ficha, L("Ficha y cronograma", "Card and timeline"), L("Página 2: datos del proyecto, Gantt de etapas y equipo", "Page 2: project data, stage Gantt and team")) + tog("cifras", s.cifras, L("Más cifras", "More figures"), L("Avance, próxima etapa, atrasos y bloqueos", "Progress, next stage, delays and blockers")) + tog("etapas", s.etapas, L("Detalle de etapas", "Stage details"), L("Responsable, estado, fechas, días y horas", "Owner, status, dates, days and hours")) : tog("curso", s.curso, L("Proyectos en curso", "Projects in progress"), L("Además de los entregados en el período", "In addition to those delivered in the period")) + tog("cifras", s.cifras, L("Más cifras", "More figures"), L("Avance promedio, entregas próximas y retrasos", "Average progress, upcoming and overdue")) + tog("etapas", s.etapas, L("Estado de las etapas", "Stage status"), L("Etapas de los proyectos en curso", "Stages of projects in progress")) + tog("proximas", s.proximas, L("Próximas entregas", "Upcoming deliveries"), L("Las 5 más cercanas por fecha meta", "The 5 nearest by goal date")) + tog("detalle", s.detalle, L("Avance y horas en la tabla", "Progress and hours in the table"), L("Dos columnas más por proyecto", "Two extra columns per project")) + tog("horas", s.horas, L("Horas registradas", "Logged hours"), L("Total en las cifras y por proyecto", "Total in the figures and per project"))}
         <p class="rp-note">${L("Nunca se incluyen la salud del proyecto ni la carga del equipo: son información interna.", "Project health and team load are never included: they are internal information.")}</p></div>`;
   }
   function paintShell() {
@@ -17704,7 +17759,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       try {
         if (!window.jspdf || !window.PXP_FONTS) throw new Error("PDF");
         const X = B.custom && B.custom[s.kind];
-        const res = X ? await X.build(s) : s.kind === "project" ? await B.project(s.key, { lang: s.lang, equipo: s.equipo, horas: s.horas, bloqueos: s.bloqueos, etapas: s.etapas, cifras: s.cifras }) : await B.client(s.key, s.per, { lang: s.lang, curso: s.curso, cifras: s.cifras, etapas: s.etapas, proximas: s.proximas, detalle: s.detalle, horas: s.horas });
+        const res = X ? await X.build(s) : s.kind === "project" ? await B.project(s.key, { lang: s.lang, equipo: s.equipo, horas: s.horas, bloqueos: s.bloqueos, etapas: s.etapas, cifras: s.cifras, ficha: s.ficha }) : await B.client(s.key, s.per, { lang: s.lang, curso: s.curso, cifras: s.cifras, etapas: s.etapas, proximas: s.proximas, detalle: s.detalle, horas: s.horas });
         if (my !== seq || S !== s) return; s.rec = res.rec; s.res = res;
         const pv = $("rp-prev"); if (!pv) return; const n = res.rec.pages.length;
         pv.innerHTML = (res.omitted && res.omitted.length && s.kind === "project" ? `<div class="rp-warn">${esc(tr(s.lang, "omitted", { x: res.omitted.join(", ") }))}</div>` : "") + (s.kind === "client" && res.omitted && res.omitted.length ? `<div class="rp-warn">${esc(L(`Para mantener 2 páginas, ${res.omitted[0]} proyectos se resumen en una línea.`, `To keep it to 2 pages, ${res.omitted[0]} projects are summarized in one line.`))}</div>` : "")
