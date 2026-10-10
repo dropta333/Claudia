@@ -48,7 +48,7 @@ await page.click('.et-row[data-i="0"] .et-pick.pz'); await page.waitForTimeout(2
 await page.click('.pk-pz .pk-op.pz-pesada'); await page.waitForTimeout(300);
 check("exigencia pesada", await page.evaluate(k => PROJECTS[k].etapas[0].peso === "pesada", K));
 // tipo revisión: fila compacta, liviana y 4 h si tenía la duración sugerida
-const idxR = await page.evaluate(k => { const E = PROJECTS[k].etapas; E.push({ nombre: "Etapa de prueba", estado: "pendiente", hp: 8, dias: 1, resp: "" }); pxpRenderProj(); return E.length - 1; }, K); await page.waitForTimeout(400);
+const idxR = await page.evaluate(k => { const E = PROJECTS[k].etapas; E.push({ nombre: "Etapa de prueba", estado: "pendiente", hp: 8, dias: 1, hpAuto: true, resp: "" }); pxpRenderProj(); return E.length - 1; }, K); await page.waitForTimeout(400);
 await page.click(`.et-row[data-i="${idxR}"] .et-cls`); await page.waitForTimeout(250);
 await page.click('.et-menu .em-c.cl-revision'); await page.waitForTimeout(400);
 const eR = await page.evaluate(([k, i]) => ({ e: PROJECTS[k].etapas[i], t: pxpTipoEtapa(PROJECTS[k].etapas[i]) }), [K, idxR]);

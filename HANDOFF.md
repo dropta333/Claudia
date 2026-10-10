@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v161** · 10 oct 2026 · Responsable: Bastián Torres
+Versión: **v162** · 10 oct 2026 · Responsable: Bastián Torres
 
 ## Cómo está armado ahora
 - **Una sola fuente:** `src/app.html`, con todo el CSS y las capas JS.
@@ -113,6 +113,11 @@ Versión: **v161** · 10 oct 2026 · Responsable: Bastián Torres
   - Etapas: nombre a 22 px (18 px en revisión y entrega); Duración y Horas en una sola casilla (`pxpEtHorasReg`: barra de registradas frente a planeadas, en rojo si se pasa; toca para registrar).
   - Fases: fondo en escala de grises (Preproducción el más claro, Postproducción el más profundo) con línea y marca del color de su estado.
   - Pruebas: `node tools/test-nuevo.mjs [carpeta-capturas]`.
+
+- **v162:** horas reales en la etapa.
+  - La casilla es para registrar lo trabajado: − N h + y "Registrar" (hoy, a nombre de quien inició sesión; `pxpHrQ`, `pxpHrQGo`). Responsables de la etapa y Administración. Debajo, la barra de reales contra estimadas, quién registró y el estimado. El detalle (otro día, nota, otra persona) sigue en el formulario de horas.
+  - Estimado automático (`pxpEstAuto`): revisión 4 h, entrega 1 h y proceso según el nombre (offline 24, 3D 24, compo/IA/motion 16, color/online/audio/render/master 8, ingesta 4, kickoff/plan 2…). `e.hpAuto` = sigue en automático (se recalcula al cambiar nombre o tipo). Al cambiarlo a mano queda fijo; "Volver a automático". Las etapas que ya existían conservan sus horas.
+  - Pruebas: `node tools/test-horas.mjs [carpeta-capturas]`.
 
 ## No cambiar sin consultar
 - El ZIP de Netlify va sin datos, y no se guarda nada antes de cargar los datos del servidor.
