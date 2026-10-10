@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v160** · 10 oct 2026 · Responsable: Bastián Torres
+Versión: **v161** · 10 oct 2026 · Responsable: Bastián Torres
 
 ## Cómo está armado ahora
 - **Una sola fuente:** `src/app.html`, con todo el CSS y las capas JS.
@@ -105,6 +105,14 @@ Versión: **v160** · 10 oct 2026 · Responsable: Bastián Torres
   - Selector flotante en forma de píldora (flechas y Esc); al pasar el mouse por una reacción (o mantener presionado en el celular) se ve quién reaccionó y cuándo.
   - Notificaciones: quien escribió la nota recibe las reacciones de los demás (últimos 30 días).
   - Pruebas: `node tools/test-reacciones.mjs [carpeta-capturas]`.
+
+- **v161:** nuevo proyecto y etapas más legibles.
+  - **Nuevo proyecto** (capa 50) abre la misma ventana del proyecto en modo creación: nombre, cliente y marca en la cabecera; características, equipo (mapa vacío con la lista para arrastrar o sumar) y etapas; Cancelar / Crear proyecto. Estado inicial Cotizado; obligatorios nombre y cliente.
+  - El borrador vive en `PROJECTS["· NUEVO PROYECTO ·"]` como propiedad **no enumerable**: la ventana lo encuentra, pero listas, conteos, guardados (Netlify, vista previa, borrador local) y copias no lo ven. Al crear pasa a su clave real; al cancelar se borra (pregunta si ya tenía datos; tocar el fondo no lo cierra).
+  - Se quitó el formulario viejo de nuevo proyecto (capas 9, 21, 34c y 34e). Quedan selectores CSS `#pxp-newproj` sin uso para una limpieza futura de CSS.
+  - Etapas: nombre a 22 px (18 px en revisión y entrega); Duración y Horas en una sola casilla (`pxpEtHorasReg`: barra de registradas frente a planeadas, en rojo si se pasa; toca para registrar).
+  - Fases: fondo en escala de grises (Preproducción el más claro, Postproducción el más profundo) con línea y marca del color de su estado.
+  - Pruebas: `node tools/test-nuevo.mjs [carpeta-capturas]`.
 
 ## No cambiar sin consultar
 - El ZIP de Netlify va sin datos, y no se guarda nada antes de cargar los datos del servidor.
