@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v157** · 10 oct 2026 · Responsable: Bastián Torres
+Versión: **v158** · 10 oct 2026 · Responsable: Bastián Torres
 
 ## Cómo está armado ahora
 - **Una sola fuente:** `src/app.html`, con todo el CSS y las capas JS.
@@ -86,6 +86,12 @@ Versión: **v157** · 10 oct 2026 · Responsable: Bastián Torres
   - Se recalcula en cada cambio de etapa y al abrir el proyecto (quien puede editar; en Netlify se guarda al momento, en la vista previa con el siguiente guardado).
   - Cronograma **Todo**: borde izquierdo = inicio del proyecto, derecho = entrega final (con su marca, "est." si es estimada), hoy al centro; cada mitad tiene su propia escala. Columna de etapas de 280 px y textos más grandes.
   - Pruebas: `node tools/test-estado.mjs [carpeta-capturas]`.
+
+- **v158:** licencias agotadas y vencidas.
+  - Agotada = usa créditos y está en 0 %. Se guarda `agotadaEn` al marcar 0 % (y se borra al recargar); para datos viejos se usa `creditosFecha`.
+  - Salen de Activas a los 3 días (agotadas) y al día siguiente del vencimiento (vencidas). No se borran: quedan en Historial y en Todas.
+  - Tablero de capacidad: columna **Agotadas / Vencidas** con las que aún no salen y cuántos días les quedan. "Por recargar" pasa a 1–24 %.
+  - Pruebas: `node tools/test-licencias.mjs [carpeta-capturas]`.
 
 ## No cambiar sin consultar
 - El ZIP de Netlify va sin datos, y no se guarda nada antes de cargar los datos del servidor.

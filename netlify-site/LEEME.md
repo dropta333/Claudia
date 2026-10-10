@@ -1,9 +1,11 @@
-# Tráfico Post · v157 — cómo publicar
+# Tráfico Post · v158 — cómo publicar
 
 1. En el tablero actual toca **Descargar copia** (pie de página) para tener un respaldo de hoy.
 2. En Netlify, abre tu sitio → **Deploys** y arrastra este ZIP (o la carpeta descomprimida) a la zona de despliegue.
 3. Los datos del equipo **no se tocan**: viven en Netlify Blobs y el tablero los carga al abrir.
 4. Entra primero como Administración y espera el aviso **"Tablero optimizado"** (mueve las imágenes viejas a archivos).
+
+Novedades v158 (solo el tablero): licencias agotadas salen de la lista a los 3 días y vencidas al día siguiente (quedan en Historial); nueva columna "Agotadas / Vencidas" en el Tablero de capacidad.
 
 Novedades v157 (solo el tablero): estado del proyecto automático según sus etapas (con nuevo estado "En preproducción"; Entregado se marca solo cuando la entrega final queda lista; Cotizado, Standby y Aprobado siguen a mano y, al quedar Entregado, aparece un aviso para confirmar Aprobado); cronograma "Todo" de inicio a entrega final con hoy al centro; columna de etapas más ancha y textos más grandes.
 

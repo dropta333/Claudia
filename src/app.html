@@ -5774,6 +5774,14 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;tr
 .ent-conf p{flex:1;min-width:220px;margin:0;font:500 14.5px/1.4 var(--sans)}
 .ent-conf-ic{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:#7B61FF;color:#fff;flex:none}
 .ent-conf-ic .i{width:18px;height:18px}
+/* v158 · Licencias: columna Agotadas / Vencidas y aviso antes de salir de la lista */
+.lc-lane.out{--lc:#F0476B;background:color-mix(in srgb,#F0476B 4%,var(--bg))}
+.lc-lane.out .lc-bc{opacity:.92}
+.lc-out{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 9px;border-radius:8px;background:color-mix(in srgb,#F0476B 10%,transparent);font:500 13px/1.3 var(--sans);color:var(--muted)}
+.lc-out b{font:700 12px/1 var(--display);letter-spacing:.08em;text-transform:uppercase;color:#F0476B}
+.lc-lnote{margin:2px 2px 0;font:500 12.5px/1.4 var(--sans);color:var(--muted)}
+.lc-gr{display:block;margin-top:3px;font:600 12.5px/1.3 var(--sans);color:#F0476B}
+@media (min-width:1181px){.lc-lanes[style*="--n:5"]{grid-template-columns:repeat(5,minmax(0,1fr))}}
 </style>
 </head>
 <body>
@@ -17761,7 +17769,17 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   const visibles = () => LIC().filter(l => vista() || esMia(l));
   const esLic = (l) => (l.estado || "activa") === "activa";
   const status = (l) => { const v = D(l.fechaVence); if (!v) return { key: "ok", days: null }; const days = Math.round((v - D(hoy())) / 864e5); return { key: days < 0 ? "bad" : days <= WARN ? "warn" : "ok", days }; };
-  const vivas = () => visibles().filter(l => esLic(l) && status(l).key !== "bad");
+  // v158 · Agotadas y vencidas: se ven un tiempo y luego salen de la lista (quedan en Historial, nunca se borran).
+  //   Agotada (créditos en 0 %): 3 días desde que se marcó. Vencida: hasta el día siguiente al vencimiento.
+  const ARCH_AG = 3, ARCH_VE = 2;
+  const agotada = (l) => usaCred(l) && l.creditosPct === 0;
+  const diasDesde = (d) => d ? Math.round((D(hoy()) - D(d)) / 864e5) : 0;
+  const agotadaDesde = (l) => String(l.agotadaEn || l.creditosFecha || l.actualizado || "").slice(0, 10);
+  const restan = (l) => { const s0 = status(l), a = agotada(l) ? ARCH_AG - diasDesde(agotadaDesde(l)) : 99, v = s0.key === "bad" ? ARCH_VE + s0.days : 99; return Math.min(a, v); };
+  const archivada = (l) => esLic(l) && (agotada(l) || status(l).key === "bad") && restan(l) <= 0;
+  const enGracia = (l) => esLic(l) && (agotada(l) || status(l).key === "bad") && restan(l) > 0;
+  const graciaTxt = (l) => { const n = restan(l); return n === 1 ? L("sale mañana de la lista", "leaves the list tomorrow") : L(`sale de la lista en ${n} días`, `leaves the list in ${n} days`); };
+  const vivas = () => visibles().filter(l => esLic(l) && status(l).key !== "bad" && !archivada(l));
   const leftText = (s) => s.days == null ? "" : s.days < 0 ? L(`Venció hace ${-s.days} ${-s.days === 1 ? "día" : "días"}`, `Expired ${-s.days} day${-s.days === 1 ? "" : "s"} ago`) : s.days === 0 ? L("Vence hoy", "Expires today") : s.days === 1 ? L("Vence mañana", "Expires tomorrow") : L(`Quedan ${s.days} días`, `${s.days} days left`);
   const life = (l) => { const a = D(l.fechaCompra), b = D(l.fechaVence); if (!a || !b || b <= a) return 100; return Math.max(0, Math.min(100, (D(hoy()) - a) / (b - a) * 100)); };
   const tono = (p) => `hsl(${Math.round(Math.max(0, Math.min(100, p)) * 1.2)} 95% 55%)`;
@@ -17789,7 +17807,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   function lista() {
     const q = normName(F.q); let a = visibles();
     if (F.est === "solicitudes") a = a.filter(l => l.estado === "pendiente" || l.estado === "rechazada" || l.solicitante);
-    else { a = a.filter(esLic); if (F.est === "activas") a = a.filter(l => status(l).key !== "bad"); else if (F.est === "porvencer") a = a.filter(l => status(l).key === "warn"); else if (F.est === "historial") a = a.filter(l => status(l).key === "bad" || (usaCred(l) && l.creditosPct === 0)); }
+    else { a = a.filter(esLic); if (F.est === "activas") a = a.filter(l => status(l).key !== "bad" && !archivada(l)); else if (F.est === "porvencer") a = a.filter(l => status(l).key === "warn"); else if (F.est === "historial") a = a.filter(l => status(l).key === "bad" || (usaCred(l) && l.creditosPct === 0)); }
     a = a.filter(l => (!F.plat || l.plataforma === F.plat) && (!F.art || l.operador === F.art) && (!F.prod || l.productora === F.prod) && (!F.dir || l.director === F.dir) && (!q || normName([l.operador, l.productora, l.director, l.correo, l.tipo, l.plataforma, (l.marcas || []).join(" ")].join(" ")).includes(q)));
     const cmp = { recent: (x, y) => (y.fechaCompra || "").localeCompare(x.fechaCompra || ""), vence: (x, y) => (x.fechaVence || "9").localeCompare(y.fechaVence || "9"), art: (x, y) => String(x.operador || "~").localeCompare(String(y.operador || "~"), "es"), prod: (x, y) => String(x.productora || "~").localeCompare(String(y.productora || "~"), "es"), cred: (x, y) => (x.creditosPct == null ? 999 : x.creditosPct) - (y.creditosPct == null ? 999 : y.creditosPct) }[F.sort];
     return a.sort(cmp);
@@ -17837,7 +17855,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       <div class="lc-pr" data-l="${L("Proyectos", "Projects")}">${(l.marcas || []).length ? (l.marcas || []).map(tag).join("") : `<span class="lc-none">${L("Sin proyectos", "No projects")}</span>`}</div>
       <div class="lc-pl" data-l="${L("Plan", "Plan")}"><div><b>${esc(l.tipo || l.plataforma || "—")}</b><span>${esc(l.plataforma || "")} · ${l.ciclo === "anual" ? L("Anual", "Yearly") : l.ciclo === "mensual" ? L("Mensual", "Monthly") : L("Otro ciclo", "Other cycle")}</span>${uc && l.creditos ? `<span>${Number(l.creditos).toLocaleString("es-CO")} ${L("créditos", "credits")}</span>` : ""}${(ver || dueno) && l.valor ? `<em>${money(l.valor)}</em>` : ""}</div></div>
       <div class="lc-cr">${cred}</div>
-      <div class="lc-vg" data-l="${L("Vigencia", "Validity")}" style="--vc:${tono(s.key === "bad" ? 0 : 100 - pct)}"><div class="lc-vd"><span>${fmt(l.fechaCompra)}</span><span>${fmt(l.fechaVence)}</span></div><div class="lc-vb"><i style="width:${pct}%"></i></div><b class="lc-vt">${leftText(s)}</b></div>
+      <div class="lc-vg" data-l="${L("Vigencia", "Validity")}" style="--vc:${tono(s.key === "bad" ? 0 : 100 - pct)}"><div class="lc-vd"><span>${fmt(l.fechaCompra)}</span><span>${fmt(l.fechaVence)}</span></div><div class="lc-vb"><i style="width:${pct}%"></i></div><b class="lc-vt">${leftText(s)}</b>${enGracia(l) ? `<small class="lc-gr">${agotada(l) ? L("Agotada", "Depleted") + " · " : ""}${graciaTxt(l)}</small>` : ""}</div>
       <div class="lc-ac4">${fpop}${npop}${ed}</div></article>`;
   }
   const ESTL = { pendiente: ["Pendiente", "Pending", "#FFC800"], activa: ["Aprobada", "Approved", "#64FF61"], rechazada: ["Rechazada", "Declined", "#FF644A"] };
@@ -17857,14 +17875,16 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const vence = act.filter(l => status(l).key === "warn").length, conCred = act.filter(l => usaCred(l) && l.creditosPct != null), prom = conCred.length ? Math.round(conCred.reduce((s, l) => s + l.creditosPct, 0) / conCred.length) : null;
     const gastoMes = all.filter(l => (l.fechaCompra || "").startsWith(mes)).reduce((s, l) => s + (+l.valor || 0), 0);
     const kp = [[L("Licencias activas", "Active licenses"), act.length, "#8AFF6B"], [L("Por vencer", "Expiring soon"), vence, vence ? "#FFC800" : ""], [L("Créditos disponibles", "Credits available"), prom == null ? "—" : prom + "%", ""], [L("Inversión del mes", "This month's spend"), money(gastoMes), "#61B3FF"]];
-    const conC = act.filter(usaCred), laneOf = (l) => l.creditosPct == null ? "na" : l.creditosPct >= 60 ? "hi" : l.creditosPct >= 25 ? "mid" : "lo";
-    const lanes = [["hi", L("Disponibles", "Available"), "60–100 %"], ["mid", L("En uso", "In use"), "25–59 %"], ["lo", L("Por recargar", "Needs top-up"), "0–24 %"]]; if (conC.some(l => l.creditosPct == null)) lanes.push(["na", L("Sin medir", "Not measured"), ""]);
+    const conC = act.filter(l => usaCred(l) && !agotada(l)), fuera = visibles().filter(enGracia).sort((a, b) => restan(a) - restan(b)), laneOf = (l) => enGracia(l) ? "out" : l.creditosPct == null ? "na" : l.creditosPct >= 60 ? "hi" : l.creditosPct >= 25 ? "mid" : "lo";
+    const lanes = [["hi", L("Disponibles", "Available"), "60–100 %"], ["mid", L("En uso", "In use"), "25–59 %"], ["lo", L("Por recargar", "Needs top-up"), "1–24 %"]]; if (conC.some(l => l.creditosPct == null)) lanes.push(["na", L("Sin medir", "Not measured"), ""]);
     const cardB = (l) => { const st = status(l), p = l.creditosPct, m = l.marcas || [], ed = puedeEd(l);
-      return `<div class="lc-bc ${laneOf(l)}" style="--pc:${platC(l.plataforma)}"><div class="lc-bct">${l.operador && window.pxpAvatar ? pxpAvatar("person", l.operador, 30) : ""}<b>${esc(tit(l.operador || L("Sin AI artist", "No AI artist")))}</b><span>${p == null ? "—" : p + "%"}</span>${ed ? `<button type="button" class="lc-bce" onclick="pxpLicForm('${ea(l.id)}')" aria-label="${L("Editar", "Edit")}">${svg(IC.edit)}</button>` : ""}</div>
+      return `<div class="lc-bc ${laneOf(l)}" style="--pc:${platC(l.plataforma)}"><div class="lc-bct">${l.operador && window.pxpAvatar ? pxpAvatar("person", l.operador, 30) : ""}<b>${esc(tit(l.operador || L("Sin AI artist", "No AI artist")))}</b><span>${enGracia(l) ? (agotada(l) ? "0%" : "—") : p == null ? "—" : p + "%"}</span>${ed ? `<button type="button" class="lc-bce" onclick="pxpLicForm('${ea(l.id)}')" aria-label="${L("Editar", "Edit")}">${svg(IC.edit)}</button>` : ""}</div>
         <div class="lc-bcb"><i style="width:${p || 0}%"></i></div><div class="lc-bcm">${mono(l.plataforma, 20)}<span>${esc(l.tipo || l.plataforma || "")} · ${esc(tit((l.productora || "").split("/")[0].trim()))} · ${m.length} ${m.length === 1 ? L("proyecto", "project") : L("proyectos", "projects")}${st.days == null ? "" : " · " + (st.days === 0 ? L("vence hoy", "expires today") : st.days < 0 ? L("vencida", "expired") : L("vence en ", "expires in ") + st.days + " d")}</span></div>
+        ${enGracia(l) ? `<div class="lc-out"><b>${agotada(l) ? L("Agotada", "Depleted") : L("Vencida", "Expired")}</b><span>${graciaTxt(l)}</span></div>` : ""}
         ${m.length ? `<div class="lc-bctags">${m.slice(0, 3).map(tag).join("")}${m.length > 3 ? `<span class="lc-tag">+${m.length - 3}</span>` : ""}</div>` : ""}</div>`; };
-    const board = `<div class="lc-lanes" style="--n:${lanes.length}">${lanes.map(([k, t, r]) => { const it = conC.filter(l => laneOf(l) === k).sort((a, b) => (b.creditosPct == null ? -1 : b.creditosPct) - (a.creditosPct == null ? -1 : a.creditosPct)); const np = Math.max(1, Math.ceil(it.length / LANE)), pg = Math.min(LP[k] || 0, np - 1), vis = it.slice(pg * LANE, pg * LANE + LANE);
-      return `<div class="lc-lane ${k}"><div class="lc-lh"><span><i></i>${t} <small>${r}</small></span>${np > 1 ? `<span class="lc-lp"><button type="button" onclick="pxpLicLane('${k}',-1)" ${pg ? "" : "disabled"} aria-label="${L("Anteriores", "Previous")}">‹</button><small>${pg + 1}/${np}</small><button type="button" onclick="pxpLicLane('${k}',1)" ${pg < np - 1 ? "" : "disabled"} aria-label="${L("Siguientes", "Next")}">›</button></span>` : ""}<em>${it.length}</em></div><div class="lc-lc">${vis.length ? vis.map(cardB).join("") : `<div class="lc-ln">${L("Ninguna", "None")}</div>`}</div>${np > 1 ? `<div class="lc-dots">${Array.from({ length: np }, (_, i) => `<i class="${i === pg ? "on" : ""}"></i>`).join("")}</div>` : ""}</div>`; }).join("")}</div>`;
+    lanes.push(["out", L("Agotadas / Vencidas", "Depleted / Expired"), ""]);
+    const board = `<div class="lc-lanes" style="--n:${lanes.length}">${lanes.map(([k, t, r]) => { const it = k === "out" ? fuera : conC.filter(l => laneOf(l) === k).sort((a, b) => (b.creditosPct == null ? -1 : b.creditosPct) - (a.creditosPct == null ? -1 : a.creditosPct)); const np = Math.max(1, Math.ceil(it.length / LANE)), pg = Math.min(LP[k] || 0, np - 1), vis = it.slice(pg * LANE, pg * LANE + LANE);
+      return `<div class="lc-lane ${k}"><div class="lc-lh"><span><i></i>${t} <small>${r}</small></span>${np > 1 ? `<span class="lc-lp"><button type="button" onclick="pxpLicLane('${k}',-1)" ${pg ? "" : "disabled"} aria-label="${L("Anteriores", "Previous")}">‹</button><small>${pg + 1}/${np}</small><button type="button" onclick="pxpLicLane('${k}',1)" ${pg < np - 1 ? "" : "disabled"} aria-label="${L("Siguientes", "Next")}">›</button></span>` : ""}<em>${it.length}</em></div><div class="lc-lc">${vis.length ? vis.map(cardB).join("") : `<div class="lc-ln">${k === "out" ? L("Nada agotado ni vencido.", "Nothing depleted or expired.") : L("Ninguna", "None")}</div>`}</div>${k === "out" ? `<p class="lc-lnote">${L("Las agotadas salen de la lista a los 3 días y las vencidas al día siguiente. Quedan en Historial.", "Depleted ones leave the list after 3 days and expired ones the next day. They stay in History.")}</p>` : ""}${np > 1 ? `<div class="lc-dots">${Array.from({ length: np }, (_, i) => `<i class="${i === pg ? "on" : ""}"></i>`).join("")}</div>` : ""}</div>`; }).join("")}</div>`;
     const total = all.reduce((s, l) => s + (+l.valor || 0), 0), bc = new Map(); all.forEach(l => (l.marcas || []).forEach(m => { const k = normName(m), e = bc.get(k) || { n: m, c: 0 }; e.c++; bc.set(k, e); }));
     const topB = [...bc.values()].sort((a, b) => b.c - a.c)[0], soon = all.filter(l => { const x = status(l); return x.days != null && x.days >= 0 && x.days <= 30; }), soonSum = soon.reduce((s, l) => s + (+l.valor || 0), 0);
     const first = all.map(l => l.fechaCompra).filter(Boolean).sort()[0]; let span = 6; if (first) { const fd = D(first), nd = new Date(); span = Math.max(6, Math.min(12, (nd.getFullYear() - fd.getFullYear()) * 12 + nd.getMonth() - fd.getMonth() + 1)); }
@@ -17897,7 +17917,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     ensure(); const w = $("lic-wrap"); if (!w) return;
     const adm = admin(), ver = vista(), vs = visibles(), todas = lista(), pend = LIC().filter(l => l.estado === "pendiente"), mias = vs.filter(l => l.estado === "pendiente" || l.estado === "rechazada");
     const opts = (k, arr, all) => `<select onchange="pxpLicF('${k}',this.value)" aria-label="${all}"><option value="">${all}</option>${arr.map(v => `<option value="${esc(v)}" ${F[k] === v ? "selected" : ""}>${esc(tit(v))}</option>`).join("")}</select>`;
-    const conteo = { activas: vs.filter(l => esLic(l) && status(l).key !== "bad").length, porvencer: vs.filter(l => esLic(l) && status(l).key === "warn").length, historial: vs.filter(l => esLic(l) && (status(l).key === "bad" || (usaCred(l) && l.creditosPct === 0))).length, solicitudes: vs.filter(l => l.estado === "pendiente" || l.estado === "rechazada" || l.solicitante).length, todas: vs.filter(esLic).length };
+    const conteo = { activas: vs.filter(l => esLic(l) && status(l).key !== "bad" && !archivada(l)).length, porvencer: vs.filter(l => esLic(l) && status(l).key === "warn").length, historial: vs.filter(l => esLic(l) && (status(l).key === "bad" || (usaCred(l) && l.creditosPct === 0))).length, solicitudes: vs.filter(l => l.estado === "pendiente" || l.estado === "rechazada" || l.solicitante).length, todas: vs.filter(esLic).length };
     const chips = [["activas", L("Activas", "Active")], ["porvencer", L("Por vencer", "Expiring")], ["historial", L("Historial", "History")], ["solicitudes", L("Solicitudes", "Requests")], ["todas", L("Todas", "All")]];
     const G = grupos(todas), PAGE = 6, pages = Math.max(1, Math.ceil(G.length / PAGE)); if (F.page > pages) F.page = pages; const shown = G.slice((F.page - 1) * PAGE, F.page * PAGE);
     const res = ver && F.est !== "solicitudes" ? resumen().split("<!--SUM-->") : ["", ""];
@@ -17919,7 +17939,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   // ═════════ Acciones ═════════
   // Se redibuja al instante (con lo que ya cambió en pantalla) y el guardado sigue en segundo plano
   const guardar = async (msg) => { if (msg) toast(msg); renderLic(); try { await saveState(); } catch (e) { } };
-  window.pxpLicPct = async (id, v) => { const l = LIC().find(x => x.id === id); if (!l) return; window.__pxpLastMsg = L(`Créditos actualizados: ${v}%`, `Credits updated: ${v}%`); toast(window.__pxpLastMsg); l.creditosPct = +v; l.creditosFecha = new Date().toISOString(); l.actualizado = l.creditosFecha; await guardar(); };
+  window.pxpLicPct = async (id, v) => { const l = LIC().find(x => x.id === id); if (!l) return; window.__pxpLastMsg = L(`Créditos actualizados: ${v}%`, `Credits updated: ${v}%`); toast(window.__pxpLastMsg); if (+v === 0 && l.creditosPct !== 0) l.agotadaEn = new Date().toISOString(); else if (+v !== 0) delete l.agotadaEn; l.creditosPct = +v; l.creditosFecha = new Date().toISOString(); l.actualizado = l.creditosFecha; await guardar(); };
   window.pxpLicNota = async (id) => { const l = LIC().find(x => x.id === id), i = $("ln-" + id), t = (i && i.value || "").trim(); if (!l || !t) return; (l.notasList = l.notasList || []).push({ autor: currentUser, fecha: new Date().toISOString(), texto: t }); await guardar(L("Nota agregada.", "Note added.")); };
   window.pxpLicDel = async (id) => { if (!admin()) return; if (armed !== id) { armed = id; clearTimeout(armT); armT = setTimeout(() => { armed = null; renderLic(); }, 3500); renderLic(); return; } armed = null; META.licencias = LIC().filter(x => x.id !== id); await guardar(L("Licencia eliminada.", "License deleted.")); };
   window.pxpLicRej = (id) => { const l = LIC().find(x => x.id === id); if (l) { l.rechazando = !l.rechazando; renderLic(); setTimeout(() => { const i = $("rj-" + id); if (i) i.focus(); }, 40); } };
@@ -18004,7 +18024,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       const files = $("lf-file").files; let nuevas = []; if (files && files.length && window.pxpAdjSubir) { const sub = await pxpAdjSubir(Array.from(files)); nuevas = sub.map(a => ({ fid: uid(), name: a.nombre, type: a.tipo, size: a.tam, fecha: new Date().toISOString(), url: a.url, id: a.id, partes: a.partes })); }
       const nota = v("lf-nota"), now = new Date().toISOString(), uc = $("lf-uc").checked;
       const rec = Object.assign({}, l, { plataforma: pl, productora: v("lf-prod"), operador: v("lf-oper"), director: v("lf-dir"), correo: v("lf-correo"), marcas: LF.marcas.slice(), tipo: v("lf-tipo"), ciclo: v("lf-ciclo"), fechaCompra: v("lf-compra"), fechaVence: v("lf-vence"), valor: +v("lf-valor") || 0, usaCreditos: uc, creditos: uc ? (+v("lf-cred") || 0) : 0, creditosPct: uc ? +v("lf-pct") : null, facturas: (l.facturas || []).concat(nuevas), actualizado: now });
-      if (uc && rec.creditosPct !== l.creditosPct) rec.creditosFecha = now; delete rec._nueva; rec.id = l.id && !l._nueva ? l.id : uid(); if (!rec.creado) rec.creado = now; rec.notasList = (l.notasList || []).slice(); if (nota) rec.notasList.push({ autor: currentUser, fecha: now, texto: nota });
+      if (uc && rec.creditosPct !== l.creditosPct) rec.creditosFecha = now;
+      if (uc && rec.creditosPct === 0 && l.creditosPct !== 0) rec.agotadaEn = now; else if (rec.creditosPct !== 0) delete rec.agotadaEn; delete rec._nueva; rec.id = l.id && !l._nueva ? l.id : uid(); if (!rec.creado) rec.creado = now; rec.notasList = (l.notasList || []).slice(); if (nota) rec.notasList.push({ autor: currentUser, fecha: now, texto: nota });
       if (LF.aprobando || (l.estado === "pendiente")) { rec.estado = "activa"; rec.respondidoPor = currentUser; rec.respondidoEn = now; } else rec.estado = l.estado || "activa";
       const arr = LIC().slice(), i = arr.findIndex(x => x.id === rec.id); if (i >= 0) arr[i] = rec; else arr.push(rec); META.licencias = arr;
       window.pxpLicClose(); await guardar(L("Licencia guardada.", "License saved."));
