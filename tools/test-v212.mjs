@@ -26,6 +26,8 @@ check("Sala: 10 puestos alrededor de la mesa", await page.evaluate(() => PXP_SAL
 await page.waitForTimeout(8000);
 const demo = await page.evaluate(() => PXP_SALA.state().people.filter(p => p.demo));
 check(`Sala: compañeros de demostración entran y se sientan (${demo.length})`, demo.length >= 3 && demo.some(p => p.seat >= 0));
+await page.click("#sl-demo"); await page.waitForTimeout(300);
+check("Sala: apagar la demostración saca a los simulados", await page.evaluate(() => !PXP_SALA.state().people.some(p => p.demo)));
 await page.evaluate(() => document.getElementById("sl-stage").scrollIntoView({ block: "center" })); await page.waitForTimeout(200);
 const r = await page.evaluate(() => document.getElementById("sl-stage").getBoundingClientRect().toJSON());
 const libre = await page.evaluate(() => { const used = new Set(PXP_SALA.state().people.map(p => p.seat)); return [0, 1, 2, 3].find(i => !used.has(i)); });
@@ -60,8 +62,6 @@ check("Sala: apagar cámara y micrófono libera los dispositivos", await page.ev
 // proveedor: los mensajes salen por el adaptador cuando exista
 const prov = await page.evaluate(async () => { const out = []; await PXP_SALA.setProvider({ connect: async () => true, send: m => out.push(m.t) }); PXP_SALA.say("hola proveedor"); return out; });
 check("Sala: con proveedor conectado, el chat viaja por el adaptador", prov.includes("say"));
-await page.click("#sl-demo"); await page.waitForTimeout(300);
-check("Sala: apagar la demostración saca a los simulados", await page.evaluate(() => !PXP_SALA.state().people.some(p => p.demo)));
 // asistente → sala
 check("Asistente: «ve a la sala» navega", await page.evaluate(() => { switchView("home"); const r = PXA_AGENT.ask("ve a la sala"); return /Sala/.test(r.text) && document.getElementById("view-sala").classList.contains("active"); }));
 check("Asistente: catálogo de 12 herramientas listo para la IA", await page.evaluate(() => PXA_AGENT.tools().length === 12 && PXA_AGENT.tools().every(t => t.type === "function" && t.function.parameters)));
