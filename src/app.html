@@ -6818,6 +6818,11 @@ body[data-view="dashboard"] .legend-d,body[data-view="dashboard"] .legend-row{di
 #view-team .team-section.tm-closed{padding-bottom:4px!important}
 #view-team .team-section.tm-closed .team-section-title{border-bottom:0;margin-bottom:0}
 #view-team .tm-fold{margin-left:10px}
+.grp-bar{flex-wrap:wrap}
+/* v205 · de derecha a izquierda: Nuevo miembro · Nuevo grupo · Cerrar/Abrir todos */
+#view-team .vh > .tm-fold{order:1}
+#view-team .vh > .tm-bar{order:2}
+#view-team .vh > .btn-new.mem{order:3}
 
 /* ═════ v204 · Disponibilidad: hasta 4 filas por columna ═════ */
 #dash-wrap .lb-panel .lb-chip.lb-x{display:none!important}
@@ -9127,7 +9132,6 @@ function teamRowHtml(name, role, status, weekCount) {
       <span class="dot ${status}"></span>
       <span class="team-name">${name}</span>
       <span class="team-role">${role||""}${(() => { const f = window.pxpFindPerson && pxpFindPerson(name), t = f && f.p && f.p.tipoMiembro; return t === "externo" ? ' <em class="tm-b ext">Externo</em>' : t === "freelance" ? ' <em class="tm-b fl">Freelance</em>' : ""; })()}</span>
-      <span class="team-count">${weekCount} esta semana</span>
       <span class="team-total" onclick="filterProjectsByPerson('${name.replace(/'/g,"\\'")}')" title="Ver sus proyectos en Projects">${total} proyecto${total === 1 ? "" : "s"} ↗</span>
     </div>
   `;
@@ -12385,7 +12389,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
 
   const CARGO_ORDER = ["Dirección de Post", "Producción", "Editores", "Coloristas", "Compositing / Motion", "3D / CGI", "IA / Automatización", "Mastering / Data", "Audio", "Producción Ejecutiva", "Project Manager", "Otros"];
   const ord = (l) => { const i = CARGO_ORDER.indexOf(l); return i < 0 ? 50 : i; };
-  const nameOf = (tr) => { const b = tr.querySelector(".pn-name"); return b ? b.textContent.trim() : ""; };
+  // v205 · el nombre sin la foto que se le agrega después (si no, "ABAndrés Briñez" no se reconoce y la foto sale redonda)
+  const nameOf = (tr) => { const b = tr.querySelector(".pn-name"); if (!b) return ""; if (!b.dataset.n) b.dataset.n = Array.from(b.childNodes).filter(n => n.nodeType === 3).map(n => n.textContent).join("").trim() || b.textContent.trim(); return b.dataset.n; };
   const cargoOf = (tr) => {
     const f = findPerson(nameOf(tr)); if (f) return pxpGrupo(f.p);
     const r = tr.querySelector(".htd-rol"); return categorizeRole(r ? r.textContent : "");

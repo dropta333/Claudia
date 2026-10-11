@@ -2,6 +2,8 @@
 
 Versión: **v189** · 10 oct 2026 · Responsable: Bastián Torres
 
+## v205 · Team sin "esta semana" en las fichas y botones Nuevo miembro · Nuevo grupo · Cerrar/Abrir todos (de derecha a izquierda); Capacidad y Horas: las fotos conservan la forma del grupo al esconder/mostrar (nameOf sin las iniciales del avatar); grp-bar con wrap
+
 ## v204 · Team: grupos plegables con flecha + Abrir/Cerrar todos (pxp_team_cerr), sin horas registradas en las fichas; Capacidad: encabezados de grupo en barra (avatares, personas, horas en cola, sin cupo/al límite); Disponibilidad: máximo 4 filas por columna con "Ver N más"
 
 ## v203 · Tráfico: se elimina "Carga por rol" (diseño antiguo) de raíz: renderRoleSummary y roleSummary borrados; el plegable queda como "Rodajes" y se limpia cualquier tarjeta vieja que se cuele

@@ -17,7 +17,8 @@ await page.reload(); await page.waitForTimeout(700); await page.evaluate(() => {
 await page.evaluate(() => { for (let i = 0; i < 6; i++) try { pxpLogroCerrar(); } catch (e) { } switchView("team"); }); await page.waitForTimeout(1000);
 t = await tm(); check("Team: se recuerda lo plegado", t.c === t.n);
 await page.click("#view-team [data-tm=open]"); await page.waitForTimeout(500); t = await tm(); check("Team: Abrir todos", t.c === 0);
-check("Team: sin horas registradas en las fichas", await page.evaluate(() => !/\d+h registradas/.test(document.getElementById("view-team").textContent)));
+check("Team: de derecha a izquierda Nuevo miembro, Nuevo grupo, Cerrar/Abrir todos", await page.evaluate(() => { const x = (q) => document.querySelector("#view-team .vh > " + q).getBoundingClientRect().left; return x(".btn-new.mem") > x(".tm-bar") && x(".tm-bar") > x(".tm-fold"); }));
+check("Team: sin horas registradas en las fichas", await page.evaluate(() => !/\d+h registradas|esta semana/.test(document.getElementById("view-team").textContent)));
 await page.evaluate(() => switchView("capacidad")); await page.waitForTimeout(900);
 const cap = await page.evaluate(() => { const h = document.querySelector("#cap-wrap .pfc-gh.gh2"); return h ? { av: h.querySelectorAll(".gh-av > *").length, txt: h.querySelector(".gh-m").textContent, alto: Math.round(h.getBoundingClientRect().height) } : null; });
 check(`Capacidad: encabezado en barra con avatares y resumen (${JSON.stringify(cap)})`, cap && cap.av > 0 && /personas? · \d+ h en cola/.test(cap.txt) && cap.alto >= 44);
