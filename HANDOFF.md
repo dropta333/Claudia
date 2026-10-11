@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v184** · 10 oct 2026 · Responsable: Bastián Torres
+Versión: **v185** · 10 oct 2026 · Responsable: Bastián Torres
 
 ## Cómo está armado ahora
 - **Una sola fuente:** `src/app.html`, con todo el CSS y las capas JS.
@@ -202,6 +202,8 @@ Versión: **v184** · 10 oct 2026 · Responsable: Bastián Torres
 - **v183:** perfil de persona: balancearPerfil arma arriba Sus proyectos (izq.) y Etapas (der.), debajo el resto en dos columnas parejas (.pp-b) y el cronograma a todo el ancho (.pp-full). Notas del proyecto: se ven 2 y el resto en "Ver N notas más" (recuerda si estaba abierto por proyecto). Grupos: 5 formas nuevas (hepta, kite, para, burst, arch: CSS --sh, pxpShapeSvg, PDF) y 3 colores (#E11D48, #9CA33A, #B07A4A) en las tres paletas de grupo. Home personal: tarjeta "Mi carga · próximas semanas" (horas de mis etapas pendientes por semana, 6 semanas, línea de 40 h).
 
 - **v184:** copias completas y migración. Antes "Descargar copia" solo guardaba algunas claves de META (se perdían licencias, logros, temas…); ahora guarda todo. "Restaurar copia" combina con lo actual (pxpCombinarEstado: lo actual manda, se agregan proyectos, personas, listas con id e historiales que falten, y claves de META vacías) y acepta también los datos crudos de /api/state. Nueva función netlify/functions/migrate.mjs (POST /api/migrate {from} lee el tablero antiguo; {from, file} copia un adjunto, por partes si pesa más de 4,5 MB; solo https://*.netlify.app y solo desde el propio tablero). En la barra inferior (solo Netlify y Administración): "Traer datos de otro servidor". Pruebas: tools/nf-server.mjs (servidor local), tools/migrate-e2e.mjs (dos servidores: antiguo y nuevo).
+
+- **v185:** extractor de datos (tools/extractor/extractor.html, va en el ZIP como public/extractor.html): un botón de favoritos que, abierto en cualquier sitio del tablero, descarga restauracion-completa-….json con el estado completo y los adjuntos dentro (base64). "Restaurar copia" sube esos adjuntos al sitio nuevo, cambia los ids y combina. No requiere tocar el sitio antiguo. Prueba: tools/extractor-e2e.mjs.
 
 ## No cambiar sin consultar
 - El ZIP de Netlify va sin datos, y no se guarda nada antes de cargar los datos del servidor.

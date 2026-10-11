@@ -18025,7 +18025,9 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const reader = new FileReader();
     reader.onload = async (e) => {
       try {
-        const r = window.pxpCombinarEstado(JSON.parse(e.target.result));
+        let j = JSON.parse(e.target.result);
+        if (j && j.archivos && typeof j.archivos === "object") j = await subirIncrustados(j);   // v185 · archivo del extractor: trae los adjuntos dentro
+        const r = window.pxpCombinarEstado(j);
         await saveState(); repintar(); estado("Copia combinada con lo actual · " + resumen(r));
         if (window.pxpToast) pxpToast("Copia restaurada y combinada con lo actual.");
       } catch (err) { console.error(err); estado("Ese archivo no parece una copia del tablero (ni datos de /api/state)."); }
@@ -18033,6 +18035,30 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     };
     reader.readAsText(file);
   };
+  // v185 · Sube los adjuntos que vienen dentro del archivo del extractor y cambia sus ids por los nuevos
+  async function subirIncrustados(j) {
+    const ids = Object.keys(j.archivos || {}), st = j.state || j;
+    if (window.PXP_BACKEND !== "netlify" || !ids.length) return st;
+    const PARTE = 4.5 * 1024 * 1024; let txt = JSON.stringify(st), ok = 0, mal = 0;
+    for (let i = 0; i < ids.length; i++) {
+      const old = ids[i], f = j.archivos[old]; estado(`Subiendo archivos ${i + 1} de ${ids.length}…`);
+      try {
+        const body = await (await fetch(f.data)).blob(), tipo = f.type || body.type || "application/octet-stream", nombre = f.name || "archivo";
+        const n = Math.max(1, Math.ceil(body.size / PARTE)), upId = n > 1 ? (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2)) : "";
+        let res = null;
+        for (let k = 0; k < n; k++) {
+          const h = { "content-type": tipo, "x-file-name": encodeURIComponent(nombre) };
+          if (n > 1) Object.assign(h, { "x-upload-id": upId, "x-part": String(k), "x-parts": String(n), "x-total-size": String(body.size) });
+          const r = await fetch("/api/files", { method: "POST", headers: h, body: n > 1 ? body.slice(k * PARTE, (k + 1) * PARTE) : body });
+          if (!r.ok) throw new Error("subida"); res = await r.json();
+        }
+        if (res && res.id && res.id !== old) txt = txt.split(old).join(res.id);
+        ok++;
+      } catch (e) { mal++; }
+    }
+    estado(`Archivos: ${ok} subidos${mal ? `, ${mal} con error` : ""}. Combinando datos…`);
+    return JSON.parse(txt);
+  }
   // Traer datos de otro servidor (solo en Netlify)
   window.pxpMigrar = async function (from, onLog) {
     const log = (t) => { if (onLog) onLog(t); };

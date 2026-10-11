@@ -37,6 +37,8 @@ D = R / "dist"; D.mkdir(exist_ok=True)
 def zipit(path, full):
     with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
         z.writestr("public/index.html", net); z.writestr("public/pdf.js", pdfjs)
+        ext = R / "tools/extractor/extractor.html"
+        if ext.exists(): z.write(ext, "public/extractor.html")   # v185 · extractor de datos (botón de favoritos)
         if full:
             for f in sorted((R / "netlify-site").rglob("*")):
                 if f.is_file(): z.write(f, f.relative_to(R / "netlify-site").as_posix())
