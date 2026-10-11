@@ -24160,7 +24160,7 @@ button.pm-pxa{cursor:pointer}
 .sl-mn{all:unset;position:absolute;width:calc(var(--u)*14);height:calc(var(--u)*11);translate:-50% -50%;cursor:pointer;border-radius:calc(var(--u)*1.5)}
 .sl-mn.hub{width:calc(var(--u)*8);height:calc(var(--u)*8);border-radius:50%}
 .sl-mn:hover,.sl-mn:focus-visible{box-shadow:0 0 0 2px #F3FF57,0 0 12px rgba(243,255,87,.6)}
-.sl-mn::after{content:attr(data-tip);position:absolute;right:0;top:calc(100% + 6px);white-space:nowrap;padding:5px 9px;border-radius:7px;background:rgba(20,18,32,.92);color:#fff;font:600 12px/1.1 var(--sans);opacity:0;pointer-events:none;transition:opacity .12s;z-index:4}
+.sl-mn::after{content:attr(data-sl-tip);position:absolute;right:0;top:calc(100% + 6px);white-space:nowrap;padding:5px 9px;border-radius:7px;background:rgba(20,18,32,.92);color:#fff;font:600 12px/1.1 var(--sans);opacity:0;pointer-events:none;transition:opacity .12s;z-index:4}
 .sl-mn:hover::after,.sl-mn:focus-visible::after{opacity:1}
 .sl-mp{position:fixed;inset:0;z-index:1400;background:rgba(10,8,18,.6);display:grid;place-items:center;padding:20px}
 .sl-mp-b{width:min(1040px,100%);max-height:86vh;overflow:auto;background:var(--surface);border:1px solid var(--border2);border-radius:16px;box-shadow:0 30px 80px rgba(0,0,0,.45)}
@@ -24612,8 +24612,8 @@ button.pm-pxa{cursor:pointer}
   function mapaHot() {
     const box = $("sl-map"); if (!box || !S.mapa) return; const k = S.mapa.map(m => m.cliente + m.proyectos.length).join("|"); if (k === mapK) return; mapK = k;
     const pct = (v, o, l) => ((v - o) / l * 100) + "%";
-    box.innerHTML = S.mapa.map((m, i) => `<button type="button" class="sl-mn" data-i="${i}" style="left:${pct(m.slot[0], BOARD.x, BOARD.w)};top:${pct(m.slot[1], BOARD.y, BOARD.h)}" data-tip="${esc(m.cliente)} · ${m.proyectos.length} ${m.proyectos.length === 1 ? L("proyecto", "project") : L("proyectos", "projects")} · ${m.team.length} ${m.team.length === 1 ? L("persona", "person") : L("personas", "people")}" aria-label="${esc(m.cliente)}"></button>`).join("")
-      + `<button type="button" class="sl-mn hub" style="left:50%;top:${pct(BOARD.y + 20, BOARD.y, BOARD.h)}" data-tip="${L("Mapa de proyectos", "Project map")}" aria-label="${L("Abrir el mapa de proyectos", "Open project map")}"></button>`;
+    box.innerHTML = S.mapa.map((m, i) => `<button type="button" class="sl-mn" data-i="${i}" style="left:${pct(m.slot[0], BOARD.x, BOARD.w)};top:${pct(m.slot[1], BOARD.y, BOARD.h)}" data-sl-tip="${esc(m.cliente)} · ${m.proyectos.length} ${m.proyectos.length === 1 ? L("proyecto", "project") : L("proyectos", "projects")} · ${m.team.length} ${m.team.length === 1 ? L("persona", "person") : L("personas", "people")}" aria-label="${esc(m.cliente)}"></button>`).join("")
+      + `<button type="button" class="sl-mn hub" style="left:50%;top:${pct(BOARD.y + 20, BOARD.y, BOARD.h)}" data-sl-tip="${L("Mapa de proyectos", "Project map")}" aria-label="${L("Abrir el mapa de proyectos", "Open project map")}"></button>`;
     box.onclick = ev => { const b = ev.target.closest(".sl-mn"); if (!b) return; ev.stopPropagation(); mapaBig(b.dataset.i != null ? +b.dataset.i : -1); };
   }
   function mapaBig(focus) {

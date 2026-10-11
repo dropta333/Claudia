@@ -47,7 +47,7 @@ check("Sala: clic en el TV lo abre en grande", await page.evaluate(() => !!docum
 await page.keyboard.press("Escape"); await page.waitForTimeout(200);
 check("Sala: TV en formato 16:9", await page.evaluate(() => { const r = document.getElementById("sl-tv").getBoundingClientRect(); return Math.abs(r.width / r.height - 16 / 9) < .03; }));
 await page.hover(".sl-mn[data-i='0']"); await page.waitForTimeout(250);
-check("Sala: las notas del mapa muestran cliente, proyectos y equipo al pasar", await page.evaluate(() => { const b = document.querySelector(".sl-mn[data-i='0']"); return !!b && /proyecto/.test(b.dataset.tip) && getComputedStyle(b, "::after").opacity === "1"; }));
+check("Sala: las notas del mapa muestran cliente, proyectos y equipo al pasar", await page.evaluate(() => { const b = document.querySelector(".sl-mn[data-i='0']"); return !!b && /proyecto/.test(b.dataset.slTip) && getComputedStyle(b, "::after").opacity === "1"; }));
 await page.click(".sl-mn[data-i='0']"); await page.waitForTimeout(300);
 check("Sala: clic en el mapa abre clientes con sus proyectos y su equipo", await page.evaluate(() => document.querySelectorAll(".sl-mp .sl-mp-c").length > 2 && !!document.querySelector(".sl-mp .sl-mp-c.on [data-k]") && !!document.querySelector(".sl-mp .sl-mp-p")));
 await page.keyboard.press("Escape"); await page.waitForTimeout(200);
