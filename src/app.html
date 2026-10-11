@@ -6858,7 +6858,21 @@ body[data-view="dashboard"] .legend-d,body[data-view="dashboard"] .legend-row{di
 .mm-legend.nx-leg .nx-q{margin-left:auto}
 .nx-info{all:unset;cursor:help;display:grid;place-items:center;width:20px;height:20px;border-radius:50%;border:1px solid var(--border2);font:700 11px/1 var(--sans);color:var(--muted)}
 .nx-info:hover{color:var(--text)}
-@media (max-width:600px){#pxp-person .pm-head.ph2{flex-wrap:wrap;padding-right:52px}#pxp-person .ph-role{flex-wrap:wrap;row-gap:6px}#pxp-person .ph-role-t{font-size:15px}#pxp-person .ph-grp,#pxp-person .ph-state{white-space:nowrap}}
+@media (max-width:600px){
+  #pxp-person .pm-head.ph2{position:relative;flex-direction:column;align-items:center;text-align:center;gap:14px;padding:26px 16px 20px}
+  #pxp-person .pm-head.ph2 .ficha-close{position:absolute;top:12px;right:12px}
+  #pxp-person .ph-avw .av{--s:108px!important}
+  #pxp-person .ph-acts{right:-10px;bottom:-4px}
+  #pxp-person .pm-head.ph2 .pm-id{width:100%;display:flex;flex-direction:column;align-items:center}
+  #pxp-person .pm-head.ph2 .pm-id h2{font-size:28px;line-height:1.02}
+  #pxp-person .pm-head.ph2 .pm-id > p{justify-content:center;gap:6px}
+  #pxp-person .ph-role{flex:0 1 auto;width:fit-content;flex-direction:column;justify-content:center;max-width:calc(100% - 44px);padding:7px 14px;gap:5px}
+  #pxp-person .ph-role-t{font-size:15px}
+  #pxp-person .ph-grp,#pxp-person .ph-state{white-space:nowrap}
+  #pxp-person .ph-pen{width:30px;height:30px}
+  #pxp-person .pm-head.ph2 .pm-links{justify-content:center}
+  #pxp-person .pm-role-ed{justify-content:center}
+}
 </style>
 </head>
 <body>
