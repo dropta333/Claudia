@@ -2,6 +2,8 @@
 
 Versión: **v189** · 10 oct 2026 · Responsable: Bastián Torres
 
+## v195 · Control de plegar/desplegar unificado (.fold con íconos) en Proyectos, Horas, Capacidad, Repositorio, Reportes y Clientes; Capacidad en fichas: grupos plegables (pxp_cap_cerr) y Esconder/Mostrar todos funcionan; filtros de Proyectos dentro de la barra
+
 ## v194 · Red de proyectos del cliente vuelve a todo el ancho (choque de clase .rc → .rcx); Proyectos sin agrupar por defecto (clave pxp_pv_v4) y Agrupar/Filtrar/Ordenar con desplegables diseñados (optgroup, buscador); logros de grupo y equipo en una fila
 
 ## v193 · Licencias: barra integrada (buscar + acciones / estados + filtros + ordenar) con desplegables diseñados (data-dd, hoja en celular); Clientes: botones Abrir/Cerrar todos y Ver todos
