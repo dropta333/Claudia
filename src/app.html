@@ -4962,6 +4962,20 @@ body.trf-tabla #main-grid > .section-label{display:none!important}
 #pxp-newcli .ncx-row input,#pxp-newcli .ncx-row textarea{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;height:auto!important;outline:none!important;font:500 14.5px/1.35 var(--sans)!important}
 #pxp-newcli .ncx-row textarea{min-height:62px!important}
 @media (max-width:640px){.ncx-hd{flex-direction:column;align-items:flex-start;padding:20px 18px}.ncx-name{font-size:26px}.ncx-l{width:auto}.ncx-row{flex-wrap:wrap}.ncx-row input{text-align:left}}
+/* v184 · Ventana de migración */
+.mig-ov{position:fixed;inset:0;z-index:9000;display:grid;place-items:center;padding:16px;background:color-mix(in srgb,#000 45%,transparent);backdrop-filter:blur(6px)}
+.mig-box{position:relative;width:min(560px,100%);background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:18px;padding:24px 24px 20px;box-shadow:0 24px 60px rgba(0,0,0,.25)}
+.mig-k{font:700 11.5px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.mig-box h3{margin:6px 0 8px;font:800 26px/1.05 var(--display);text-transform:uppercase}
+.mig-box p{margin:0 0 14px;color:var(--muted);font-size:14px;line-height:1.45}
+.mig-f{display:flex;flex-direction:column;gap:6px;font:700 11.5px/1 var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.mig-f input{font:500 15px/1.3 var(--sans);text-transform:none;letter-spacing:0;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);color:var(--text)}
+.mig-log{margin:14px 0 0;padding:0 0 0 18px;font-size:13.5px;color:var(--text);display:flex;flex-direction:column;gap:4px;max-height:180px;overflow:auto}
+.mig-log:empty{display:none}
+.mig-log .err{color:#F0476B}.mig-log .ok{color:var(--green);font-weight:600}
+.mig-a{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:18px}
+.mig-x{all:unset;cursor:pointer;position:absolute;top:14px;right:16px;width:30px;height:30px;display:grid;place-items:center;border-radius:50%;color:var(--muted)}
+.mig-x:hover{background:var(--surface2);color:var(--text)}
 .pj-dot.bloqueada{border-color:#F0476B;background:color-mix(in srgb,#F0476B 30%,var(--surface))}
 .pj-dot.revision,.pj-dot.ajustes{border-color:var(--sc,#FF9F43);background:color-mix(in srgb,#FF9F43 30%,var(--surface))}
 
@@ -17917,6 +17931,156 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
 </script>
 <script>
 // ════════════════════════════════════════════════════════════════
+// v184 · Copias completas y migración entre servidores
+//   · "Descargar copia" guarda TODO (antes faltaban licencias, logros, temas y otras claves de META).
+//   · "Restaurar copia" combina con lo actual: no borra nada de lo nuevo y agrega lo que falte.
+//     Acepta la copia del tablero y también los datos crudos de /api/state.
+//   · "Traer datos de otro servidor": lee el tablero antiguo por /api/migrate, lo combina y copia los adjuntos.
+// ════════════════════════════════════════════════════════════════
+(function () {
+  "use strict";
+  const isObj = (v) => !!v && typeof v === "object" && !Array.isArray(v);
+  const vacio = (v) => v == null || v === "" || (Array.isArray(v) && !v.length) || (isObj(v) && !Object.keys(v).length);
+  const nn = (s) => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toUpperCase();
+  const idDe = (x) => isObj(x) ? (x.id != null ? "id:" + x.id : x.ts ? "ts:" + x.ts + "|" + (x.usuario || "") + "|" + String(x.texto || "").slice(0, 80) : JSON.stringify(x)) : JSON.stringify(x);
+  // Une listas: deja todo lo actual y agrega lo que solo estaba en la antigua
+  const unir = (a, b) => { const out = (a || []).slice(), ids = new Set(out.map(idDe)); let n = 0; (b || []).forEach((x) => { const k = idDe(x); if (!ids.has(k)) { ids.add(k); out.push(x); n++; } }); return [out, n]; };
+  const LISTAS_UNIBLES = ["historial", "bloqueos", "adjuntos", "links", "notasRev", "revisiones"];
+  // Completa un objeto actual con lo antiguo: lo actual manda; se llenan los campos vacíos y se suman historiales y listas con id
+  function rellenar(cur, old) {
+    if (!isObj(cur)) return vacio(cur) ? old : cur;
+    if (!isObj(old)) return cur;
+    const o = Object.assign({}, cur);
+    Object.keys(old).forEach((k) => {
+      const a = o[k], b = old[k];
+      if (vacio(a)) { if (!vacio(b)) o[k] = b; return; }
+      if (Array.isArray(a) && Array.isArray(b) && (LISTAS_UNIBLES.includes(k) || (a.concat(b).every((x) => isObj(x) && x.id != null)))) {
+        o[k] = unir(a, b)[0]; if (k === "historial") o[k].sort((x, y) => String(x.ts || "").localeCompare(String(y.ts || "")));
+      }
+    });
+    return o;
+  }
+  // Lleva cualquier formato (copia del tablero, respuesta de /api/state o estado directo) a la forma del servidor
+  function normalizar(j) {
+    if (!isObj(j)) return null;
+    if (isObj(j.state)) j = j.state;
+    if (Array.isArray(j.TEAM)) return j;
+    if (Array.isArray(j.team)) return { TEAM: j.team, RODAJES: j.rodajes, FREELANCE: j.freelance, PENDIENTES: j.pendientes, CAPACIDAD_HISTORICO: j.capacidadHistorico, AUDIO: j.audio, PROJECTS: j.projects, META: j.meta };
+    return null;
+  }
+  const personas = (cur, old) => {
+    const out = (cur || []).slice(), idx = new Map(out.map((p, i) => [nn(p && p.name), i])); let nuevas = 0;
+    (old || []).forEach((p) => { if (!p || !p.name) return; const i = idx.get(nn(p.name));
+      if (i == null) { out.push(p); idx.set(nn(p.name), out.length - 1); nuevas++; return; }
+      const c = out[i], m = rellenar(c, p);
+      if (Array.isArray(c.weeks) && Array.isArray(p.weeks)) m.weeks = c.weeks.map((w, k) => (vacio(w) && !vacio(p.weeks[k]) ? p.weeks[k] : w)).concat(p.weeks.slice(c.weeks.length));
+      out[i] = m; });
+    return [out, nuevas];
+  };
+  const semanas = (cur, old) => { const a = Array.isArray(cur) ? cur.slice() : [], b = Array.isArray(old) ? old : []; for (let i = 0; i < b.length; i++) a[i] = unir(a[i] || [], b[i] || [])[0]; return a; };
+  // Combina el estado antiguo dentro del actual. Devuelve el resumen de lo que se agregó.
+  window.pxpCombinarEstado = function (oldRaw) {
+    const old = normalizar(oldRaw); if (!old) throw new Error("formato");
+    const r = { proyectosNuevos: 0, proyectosCompletados: 0, personasNuevas: 0, metaClaves: [], licencias: 0 };
+    const P = Object.assign({}, PROJECTS);
+    Object.keys(old.PROJECTS || {}).forEach((k) => { const o = old.PROJECTS[k]; if (!o) return;
+      if (!P[k]) { P[k] = o; r.proyectosNuevos++; } else { const m = rellenar(P[k], o); if (JSON.stringify(m) !== JSON.stringify(P[k])) r.proyectosCompletados++; P[k] = m; } });
+    PROJECTS = P;
+    let t = personas(TEAM, old.TEAM); TEAM = t[0]; r.personasNuevas += t[1];
+    if (Array.isArray(old.AUDIO)) { t = personas(AUDIO, old.AUDIO); AUDIO = t[0]; r.personasNuevas += t[1]; }
+    RODAJES = semanas(RODAJES, old.RODAJES); FREELANCE = semanas(FREELANCE, old.FREELANCE); PENDIENTES = semanas(PENDIENTES, old.PENDIENTES);
+    if (isObj(old.CAPACIDAD_HISTORICO)) CAPACIDAD_HISTORICO = Object.assign({}, old.CAPACIDAD_HISTORICO, CAPACIDAD_HISTORICO || {});
+    const M = Object.assign({}, META || {}), OM = old.META || {};
+    Object.keys(OM).forEach((k) => {
+      if (["updatedAt", "updatedBy", "exportadoPor", "exportadoEl"].includes(k)) return;
+      const a = M[k], b = OM[k]; if (vacio(b)) return;
+      const antes = JSON.stringify(a);
+      if (vacio(a)) M[k] = b;
+      else if (Array.isArray(a) && Array.isArray(b)) { const u = unir(a, b); M[k] = u[0]; if (k === "licencias") r.licencias += u[1]; }
+      else if (isObj(a) && isObj(b)) { const o = Object.assign({}, a); Object.keys(b).forEach((s2) => { o[s2] = vacio(o[s2]) ? b[s2] : (isObj(o[s2]) && isObj(b[s2]) ? rellenar(o[s2], b[s2]) : o[s2]); }); M[k] = o; }
+      if (k === "licencias" && vacio(a) && Array.isArray(b)) r.licencias += b.length;
+      if (JSON.stringify(M[k]) !== antes) r.metaClaves.push(k);
+    });
+    META = M;
+    return r;
+  };
+  // Todos los adjuntos que el estado menciona (notas, banners, fotos, licencias…)
+  window.pxpAdjuntosDe = function (st) { const ids = new Set(); const txt = JSON.stringify(st || {}); const re = /\/api\/files\/([A-Za-z0-9-]{8,64})/g; let m; while ((m = re.exec(txt))) ids.add(m[1]); return [...ids]; };
+  const puede = () => (window.pxpPuedeEditar ? pxpPuedeEditar() : true);
+  const estado = (t) => { const el = document.getElementById("sync-status"); if (el) el.textContent = t; };
+  const resumen = (r) => [r.proyectosNuevos ? `${r.proyectosNuevos} proyectos recuperados` : "", r.proyectosCompletados ? `${r.proyectosCompletados} proyectos completados` : "", r.personasNuevas ? `${r.personasNuevas} personas` : "", r.licencias ? `${r.licencias} licencias` : "", r.metaClaves.length ? `${r.metaClaves.length} ajustes (${r.metaClaves.slice(0, 6).join(", ")}${r.metaClaves.length > 6 ? "…" : ""})` : ""].filter(Boolean).join(" · ") || "No había nada nuevo que agregar";
+  const repintar = () => { try { render(currentWeek); } catch (e) { } try { if (window.renderHome && currentView === "home") renderHome(); } catch (e) { } };
+  // Copia completa: todo el estado, con todas las claves de META
+  window.downloadBackup = async function () {
+    const state = { team: TEAM, rodajes: RODAJES, freelance: FREELANCE, pendientes: PENDIENTES, audio: AUDIO, projects: PROJECTS, capacidadHistorico: CAPACIDAD_HISTORICO, meta: Object.assign({}, META || {}, { exportadoPor: currentUser, exportadoEl: new Date().toISOString() }), completa: true, adjuntos: window.pxpAdjuntosDe(PROJECTS).length };
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `tablero_trafico_pxp_backup_${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    estado("Copia completa descargada (incluye licencias, logros y todos los ajustes).");
+  };
+  // Restaurar: combina con lo actual (nunca borra lo nuevo)
+  window.importBackup = function (event) {
+    const input = event && event.target, file = input && input.files && input.files[0]; if (!file) return;
+    if (!puede()) { estado("Solo Administración puede restaurar copias."); input.value = ""; return; }
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const r = window.pxpCombinarEstado(JSON.parse(e.target.result));
+        await saveState(); repintar(); estado("Copia combinada con lo actual · " + resumen(r));
+        if (window.pxpToast) pxpToast("Copia restaurada y combinada con lo actual.");
+      } catch (err) { console.error(err); estado("Ese archivo no parece una copia del tablero (ni datos de /api/state)."); }
+      input.value = "";
+    };
+    reader.readAsText(file);
+  };
+  // Traer datos de otro servidor (solo en Netlify)
+  window.pxpMigrar = async function (from, onLog) {
+    const log = (t) => { if (onLog) onLog(t); };
+    const post = (body) => fetch("/api/migrate", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(Object.assign({ from }, body)) });
+    log("Leyendo el tablero antiguo…");
+    const r = await post({}); if (!r.ok) { let m = ""; try { m = (await r.json()).error; } catch (e) { } throw new Error(m || "No se pudo leer el tablero antiguo (" + r.status + ")."); }
+    const old = await r.json(), st = normalizar(old); if (!st) throw new Error("El tablero antiguo no devolvió datos válidos.");
+    const res = window.pxpCombinarEstado(st); log("Datos combinados · " + resumen(res));
+    const ids = window.pxpAdjuntosDe(st); let ok = 0, ya = 0, mal = 0;
+    for (let i = 0; i < ids.length; i++) {
+      log(`Copiando archivos ${i + 1} de ${ids.length}…`);
+      try { const q = await post({ file: ids[i] }); const j = await q.json().catch(() => ({})); if (q.ok) { if (j.ya) ya++; else ok++; } else mal++; } catch (e) { mal++; }
+    }
+    log("Guardando…"); await saveState(); repintar();
+    const fin = `Listo · ${resumen(res)} · archivos: ${ok} copiados${ya ? `, ${ya} ya estaban` : ""}${mal ? `, ${mal} no se pudieron copiar` : ""}.`;
+    log(fin); estado(fin); return { res, ok, ya, mal, total: ids.length };
+  };
+  window.pxpMigrarAbrir = function () {
+    if (!puede()) { estado("Solo Administración puede traer datos de otro servidor."); return; }
+    let d = document.getElementById("pxp-mig"); if (d) d.remove();
+    d = document.createElement("div"); d.id = "pxp-mig"; d.className = "mig-ov";
+    const ult = (() => { try { return localStorage.getItem("pxp_mig_from") || ""; } catch (e) { return ""; } })();
+    d.innerHTML = `<div class="mig-box" role="dialog" aria-modal="true" aria-labelledby="mig-t"><button type="button" class="mig-x" onclick="document.getElementById('pxp-mig').remove()" aria-label="Cerrar">✕</button>
+      <span class="mig-k">Migración</span><h3 id="mig-t">Traer datos de otro servidor</h3>
+      <p>Lee todo el tablero antiguo (proyectos, equipo, licencias, logros, ajustes y archivos adjuntos) y lo <b>combina</b> con lo que hay aquí: no se borra nada de lo actual; solo se agrega lo que falta.</p>
+      <label class="mig-f"><span>Dirección del tablero antiguo</span><input id="mig-url" type="url" placeholder="https://…netlify.app" value="${String(ult).replace(/"/g, "&quot;")}" autocomplete="off"></label>
+      <ol class="mig-log" id="mig-log" aria-live="polite"></ol>
+      <div class="mig-a"><button type="button" class="btn-ghost" onclick="pxpDescargarCopiaAntes()">Descargar copia de lo actual primero</button><button type="button" class="ficha-save" id="mig-go" onclick="pxpMigrarIr()">Traer y combinar</button></div></div>`;
+    document.body.appendChild(d); setTimeout(() => { const i = document.getElementById("mig-url"); if (i) i.focus(); }, 30);
+  };
+  window.pxpDescargarCopiaAntes = () => window.downloadBackup();
+  window.pxpMigrarIr = async function () {
+    const i = document.getElementById("mig-url"), b = document.getElementById("mig-go"), L = document.getElementById("mig-log");
+    const from = (i.value || "").trim().replace(/\/+$/, ""); if (!/^https:\/\/[^/]+\.netlify\.app$/i.test(from)) { i.focus(); L.innerHTML = `<li class="err">Escribe la dirección completa, por ejemplo https://mi-tablero-antiguo.netlify.app</li>`; return; }
+    try { localStorage.setItem("pxp_mig_from", from); } catch (e) { }
+    b.disabled = true; i.disabled = true; L.innerHTML = "";
+    const add = (t) => { const li = document.createElement("li"); li.textContent = t; if (/^Copiando archivos/.test(t) && L.lastChild && /^Copiando archivos/.test(L.lastChild.textContent)) L.lastChild.textContent = t; else L.appendChild(li); };
+    try { await window.pxpMigrar(from, add); b.textContent = "Hecho"; L.lastChild && L.lastChild.classList.add("ok"); }
+    catch (e) { const li = document.createElement("li"); li.className = "err"; li.textContent = e.message || "No se pudo completar."; L.appendChild(li); b.disabled = false; i.disabled = false; }
+  };
+  // Botón en la barra inferior (solo con el servidor de Netlify)
+  if (window.PXP_BACKEND === "netlify") {
+    const bar = document.querySelector(".sync-bar input#restore-file-input");
+    if (bar) bar.insertAdjacentHTML("afterend", `<button class="sync-refresh mig-btn" onclick="pxpMigrarAbrir()"><svg class='i' viewBox='0 0 24 24' aria-hidden='true'><path d='M4 7h12'/><path d='m13 4 3 3-3 3'/><path d='M20 17H8'/><path d='m11 14-3 3 3 3'/></svg>Traer datos de otro servidor</button>`);
+  }
+})();
+
+// ════════════════════════════════════════════════════════════════
 // v180 · Nombres de etapas en inglés para el time table y los reportes en inglés
 //   Solo se traduce lo que sale en el PDF: el proyecto guardado no cambia.
 //   La copia conserva el tipo, la fase y el plan del original (no cambian fechas ni horas).
@@ -18053,6 +18217,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     "Calendario del proyecto a partir de su cronograma, en el formato de Publicis Production.": "Project calendar from its timeline, in the Publicis Production format.",
     "Se ganan solos con tu trabajo en el tablero: etapas cerradas, horas registradas, notas y proyectos entregados. Hay logros individuales, de tu grupo y de todo el equipo, en cuatro niveles.": "You earn them with your work on the board: closed stages, logged hours, notes and delivered projects. There are individual, group and whole-team achievements, in four levels.",
     "Mi carga": "My load", "próximas semanas": "upcoming weeks", "Cuando tengas etapas asignadas verás aquí cuántas horas te esperan cada semana.": "When you have stages assigned, you'll see here how many hours await you each week.", "Ver menos": "Show less",
+    "Traer datos de otro servidor": "Import from another server", "Migración": "Migration", "Dirección del tablero antiguo": "Old board address", "Descargar copia de lo actual primero": "Download a backup of the current data first", "Traer y combinar": "Import and merge", "Hecho": "Done",
+    "Leyendo el tablero antiguo…": "Reading the old board…", "Guardando…": "Saving…", "Copia completa descargada (incluye licencias, logros y todos los ajustes).": "Full backup downloaded (includes licenses, achievements and all settings).",
     "Otorgar logro": "Give achievement", "Míos": "Mine", "Mi grupo": "My group", "Especial": "Special", "Personal": "Personal", "Quitar": "Remove",
     ": quedan guardados aquí (no se borran) pero ya no aparecen en Traffic ni suman en los totales de \"proyectos\" del tablero.": ": they're kept here (not deleted) but no longer appear in Traffic or count in the board's \"projects\" totals.",
     "En el repositorio": "In the repository", "Línea de tiempo": "Timeline", "cuándo se trabajó cada proyecto y con quién": "when each project was worked on and with whom", "Por fecha": "By date",

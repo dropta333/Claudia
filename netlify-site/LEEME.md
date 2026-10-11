@@ -1,9 +1,17 @@
-# Tráfico Post · v183 — cómo publicar
+# Tráfico Post · v184 — cómo publicar
 
 1. En el tablero actual toca **Descargar copia** (pie de página) para tener un respaldo de hoy.
 2. En Netlify, abre tu sitio → **Deploys** y arrastra este ZIP (o la carpeta descomprimida) a la zona de despliegue.
 3. Los datos del equipo **no se tocan**: viven en Netlify Blobs y el tablero los carga al abrir.
 4. Entra primero como Administración y espera el aviso **"Tablero optimizado"** (mueve las imágenes viejas a archivos).
+
+Novedades v184: "Descargar copia" ahora guarda todo (antes faltaban licencias, logros y otros ajustes). "Restaurar copia" combina con lo actual sin borrar nada. Nuevo botón "Traer datos de otro servidor" para pasar todo desde un sitio antiguo, archivos adjuntos incluidos.
+
+Cómo traer los datos del sitio antiguo:
+1. Sube este ZIP completo al sitio nuevo (incluye la función nueva netlify/functions/migrate.mjs).
+2. Entra al sitio nuevo con un usuario de Administración.
+3. En la barra de abajo toca "Traer datos de otro servidor" (recomendado: primero "Descargar copia de lo actual").
+4. Escribe la dirección del sitio antiguo (https://….netlify.app) y toca "Traer y combinar". No se borra nada de lo actual; se agrega lo que falte y se copian los archivos.
 
 Novedades v183: perfil de persona reordenado, notas con "Ver más", 5 formas y 3 colores nuevos para grupos, y "Mi carga" en el Home personal.
 
