@@ -2,6 +2,8 @@
 
 Versión: **v189** · 10 oct 2026 · Responsable: Bastián Torres
 
+## v201–v202 · Ficha del proyecto sin Inicio/Entrega repetidos; ventana de Rodajes con estilo naranja por semana (pxpRodajesVentana); nombres con mayúscula inicial (pxpNombreBonito) y foto centrada con nombre y cargo en las fichas de persona
+
 ## v200 · Clientes: "Proyectos activos / Todo el año" y Semana en una barra encima de las gráficas (.cli-gbar); "Nuevo cliente" dentro de la caja de clientes y sin la fila superior; sin el texto explicativo del árbol
 
 ## v199 · Clientes: "Trabajo por cliente" y "Tipo de proyecto" lado a lado; selector Semanas/Meses/Año compartido (window.__cliPer) en las dos gráficas y en "Ver tablas de datos" (pxpCliGrupos, pxpCliTablasPer, periodoCli)

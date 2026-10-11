@@ -6763,6 +6763,33 @@ body[data-view="dashboard"] .legend-d,body[data-view="dashboard"] .legend-row{di
 #view-clientes > .vh.vh-off{display:none!important}
 #cli-wrap .ct-bar0 .ct-new{margin-left:10px}
 #cli-wrap .ct-bar0 .ct-acc{margin-left:auto}
+
+/* ═════ v202 · Fichas de persona: foto centrada con nombre y cargo · ventana de rodajes ═════ */
+.psc{display:grid!important;grid-template-columns:auto minmax(0,1fr);grid-template-areas:"av t" "m m";column-gap:14px;row-gap:10px;align-items:center}
+.psc > .psc-av{grid-area:av;align-self:center}
+.psc > .psc-t{grid-area:t;align-self:center}
+.psc > .psc-m{grid-area:m;margin:0}
+#resumen-overlay.rj-ov{--rj:#FB8847}
+.rj-head{background:linear-gradient(120deg,color-mix(in srgb,var(--rj) 22%,transparent),transparent 70%);border-bottom:1px solid color-mix(in srgb,var(--rj) 35%,var(--border))}
+.rj-hi{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:color-mix(in srgb,var(--rj) 22%,transparent);color:var(--rj);margin-right:12px;flex:none}
+.rj-hi .i{width:20px;height:20px}
+.rj-body{padding:14px 18px 18px!important;display:flex;flex-direction:column;gap:16px}
+.rj-sem h4{display:flex;align-items:center;gap:10px;margin:0 0 8px;font:600 12.5px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--rj)}
+.rj-sem h4 em{font-style:normal;padding:3px 8px;border-radius:99px;background:color-mix(in srgb,var(--rj) 20%,transparent);color:var(--rj);letter-spacing:.08em}
+.rj-sem h4 em.ok{background:color-mix(in srgb,var(--text) 8%,transparent);color:var(--muted)}
+.rj-sem h4 b{margin-left:auto;color:var(--muted);font-weight:600}
+.rj-list{display:flex;flex-direction:column;gap:8px}
+.rj-c{display:grid;grid-template-columns:58px minmax(0,1fr) auto;align-items:center;gap:14px;padding:10px 14px 10px 10px;border-radius:14px;border:1px solid color-mix(in srgb,var(--rj) 30%,var(--border));border-left:4px solid var(--rj);background:linear-gradient(110deg,color-mix(in srgb,var(--rj) 12%,var(--surface)),var(--surface) 65%);transition:transform .15s,border-color .15s}
+.rj-c:hover{transform:translateX(2px);border-color:color-mix(in srgb,var(--rj) 60%,var(--border))}
+.rj-d{display:flex;flex-direction:column;align-items:center;justify-content:center;width:58px;height:58px;border-radius:12px;background:linear-gradient(160deg,var(--rj),color-mix(in srgb,var(--rj) 60%,#7a2d00));color:#1a0a00;box-shadow:0 6px 18px color-mix(in srgb,var(--rj) 35%,transparent)}
+.rj-d b{font:700 24px/1 var(--display)}
+.rj-d b sup{font-size:12px;margin-left:1px}
+.rj-d span{font:700 11px/1.2 var(--display);letter-spacing:.12em;text-transform:uppercase}
+.rj-t h5{margin:0;font:700 15px/1.2 var(--display);letter-spacing:.03em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rj-t p{margin:3px 0 0;font-size:13.5px;color:var(--muted)}
+.rj-ic{color:color-mix(in srgb,var(--rj) 70%,var(--muted))}
+.rj-ic .i{width:20px;height:20px}
+.rj-sem.pasado .rj-c{opacity:.8}
 </style>
 </head>
 <body>
@@ -10203,6 +10230,14 @@ async function addHoras() {
 }
 
 // ── RESUMEN (drill-down desde strip y Home) ──────────────────
+// v202 · Nombre con mayúscula inicial ("OSCAR BARRERA" → "Oscar Barrera"); si ya trae minúsculas se respeta
+function pxpNombreBonito(n) {
+  n = String(n || "").trim(); if (!n || /\p{Ll}/u.test(n)) return n;
+  const peq = new Set(["de", "del", "la", "las", "los", "y", "da", "van", "von"]);
+  return n.toLowerCase().split(/(\s+)/).map((w, i) => /^\s+$/.test(w) || (i > 0 && peq.has(w)) ? w : w.replace(/(^|[-'’])(\p{L})/gu, (m, a, b) => a + b.toUpperCase())).join("");
+}
+window.pxpNombreBonito = pxpNombreBonito;
+
 function openResumen(title, items) {
   const box = document.getElementById("resumen-box");
   const body = items.length === 0
@@ -10319,6 +10354,7 @@ function showEntregasSemana() {
 }
 
 function showRodajesResumen() {
+  if (window.pxpRodajesVentana) return window.pxpRodajesVentana();
   const items = [];
   WEEKS.forEach((wk, i) => {
     getRodajesSemana(i).forEach(desc => items.push({ text: desc, sub: `Semana ${wk.label}` }));
@@ -18680,6 +18716,48 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
 })();
 
 // ════════════════════════════════════════════════════════════════
+// v202 · Ventana de rodajes con su estilo (naranja de Rodaje): por semana, con fecha, título y detalle
+// ════════════════════════════════════════════════════════════════
+(function () {
+  "use strict";
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const MES = { ene: 0, enero: 0, feb: 1, febrero: 1, mar: 2, marzo: 2, abr: 3, abril: 3, may: 4, mayo: 4, jun: 5, junio: 5, jul: 6, julio: 6, ago: 7, agosto: 7, sep: 8, sept: 8, septiembre: 8, set: 8, oct: 9, octubre: 9, nov: 10, noviembre: 10, dic: 11, diciembre: 11 };
+  const MC = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+  const CAM = "<svg class='i' viewBox='0 0 24 24' aria-hidden='true'><path d='M3.5 10h17v9.5a1.5 1.5 0 0 1-1.5 1.5H5a1.5 1.5 0 0 1-1.5-1.5z'/><path d='m3.3 10-.6-3.3 15.8-3 .6 3.3z'/><path d='m8 6.7 2 3.2M13 5.7l2 3.2'/></svg>";
+  function leer(desc, w) {
+    const t = String(desc || "").replace(/\s+/g, " ").trim();
+    const m = /(\d{1,2})(?:\s*(?:,|y|al|-|–)\s*\d{1,2})*\s*(?:de\s+)?(ene(?:ro)?|feb(?:rero)?|mar(?:zo)?|abr(?:il)?|may(?:o)?|jun(?:io)?|jul(?:io)?|ago(?:sto)?|sept?(?:iembre)?|set|oct(?:ubre)?|nov(?:iembre)?|dic(?:iembre)?)\b/i.exec(t);
+    const d0 = new Date(weekDates(w)[0] + "T00:00:00");
+    const dia = m ? +m[1] : d0.getDate(), mes = m ? MES[m[2].toLowerCase()] : d0.getMonth();
+    let [tit, det] = t.split(/\s+[—–-]\s+/);
+    tit = (tit || t).replace(/^rodaje\s+/i, "");
+    if (!det && m) { det = t.slice(m.index).trim(); tit = t.slice(0, m.index).replace(/^rodaje\s+/i, "").trim() || tit; }
+    const dsem = /\s+(lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bado|domingo)$/i.exec(tit);
+    if (dsem) { tit = tit.slice(0, dsem.index); det = dsem[1] + " " + (det || ""); }
+    det = (det || "").trim(); if (det && !/\p{Ll}/u.test(det)) det = det.toLowerCase();
+    det = det.charAt(0).toUpperCase() + det.slice(1);
+    return { tit: tit.trim(), det, dia, mes, rango: /\d{1,2}\s*(?:,|y|al|-|–)\s*\d{1,2}/.test(t) };
+  }
+  window.pxpRodajesVentana = function () {
+    const ov = document.getElementById("resumen-overlay"), box = document.getElementById("resumen-box"); if (!ov || !box) return;
+    const sem = []; let total = 0;
+    WEEKS.forEach((wk, i) => { const l = getRodajesSemana(i).map(d => leer(d, i)); if (l.length) { sem.push({ i, wk, l }); total += l.length; } });
+    const cw = typeof currentWeek !== "undefined" ? currentWeek : 0;
+    const prox = sem.find(x => x.i >= cw);
+    const body = !total ? `<div class="resumen-empty">No hay rodajes programados.</div>` : sem.map(x => {
+      const est = x.i < cw ? "pasado" : x.i === cw ? "esta" : "";
+      return `<section class="rj-sem ${est}"><h4><span>${esc("Semana " + x.wk.label)}</span>${x.i === cw ? `<em>Esta semana</em>` : x === prox && x.i > cw ? `<em>Próximo</em>` : x.i < cw ? `<em class="ok">Realizado</em>` : ""}<b>${x.l.length}</b></h4>
+        <div class="rj-list">${x.l.map(r => `<article class="rj-c"><div class="rj-d"><b>${r.dia}${r.rango ? "<sup>+</sup>" : ""}</b><span>${MC[r.mes]}</span></div><div class="rj-t"><h5>${esc(r.tit)}</h5>${r.det ? `<p>${esc(r.det)}</p>` : ""}</div><span class="rj-ic">${CAM}</span></article>`).join("")}</div></section>`;
+    }).join("");
+    box.innerHTML = `<div class="resumen-head rj-head"><span class="rj-hi">${CAM}</span><span class="rtitle">Rodajes programados · ${total}</span><button class="ficha-close" onclick="closeResumen()" aria-label="Cerrar">✕</button></div><div class="resumen-body rj-body">${body}</div>`;
+    box.style.maxWidth = "620px"; ov.classList.remove("rs-cards"); ov.classList.add("open", "rj-ov");
+    const cur = box.querySelector(".rj-sem.esta") || box.querySelector(".rj-sem:not(.pasado)"); if (cur) setTimeout(() => cur.scrollIntoView({ block: "nearest" }), 30);
+  };
+  const oClose = window.closeResumen;
+  if (typeof oClose === "function") window.closeResumen = function () { const ov = document.getElementById("resumen-overlay"); if (ov) ov.classList.remove("rj-ov"); return oClose.apply(this, arguments); };
+})();
+
+// ════════════════════════════════════════════════════════════════
 // v184 · Copias completas y migración entre servidores
 //   · "Descargar copia" guarda TODO (antes faltaban licencias, logros, temas y otras claves de META).
 //   · "Restaurar copia" combina con lo actual: no borra nada de lo nuevo y agrega lo que falte.
@@ -18934,7 +19012,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     "Agregar imagen del proyecto": "Add project image", "Cambiar imagen": "Change image", "Sugerencias": "Suggestions", "Avance por etapas": "Progress by stage", "Notas": "Notes", "Adjuntar": "Attach", "Bloqueadores": "Blockers", "+ Reportar bloqueador": "+ Report blocker", "Revisiones y enlaces": "Reviews and links", "+ Agregar enlace": "+ Add link", "Ruta en el share": "Share path", "+ Agregar ruta": "+ Add path", "Copiar ruta": "Copy path", "Editar ficha completa": "Edit full card", "Revisar": "Review", "Descargar": "Download", "Cronograma": "Schedule", "Piezas por tipo": "Pieces by type", "Adaptaciones por país": "Adaptations by country", "Agregar etapa": "Add stage", "+ Agregar etapa": "+ Add stage", "Usar etapas típicas": "Use typical stages",
     "Pendiente": "Pending", "Con cambios": "Changes requested", "En curso": "In progress", "Revisión": "Review", "Datos del proyecto": "Project details", "Color": "Color", "Nota": "Note", "Historial": "History", "Horas trabajadas en el proyecto": "Hours worked on the project",
 
-    "Por tipo": "By type", "proyectos": "projects", "proyecto": "project", "% de asignaciones en Tráfico": "% of assignments in Traffic", "Ordenar por": "Sort by", "trabajó de más": "worked overtime", "horas estimadas": "estimated hours", "Semanas de cola": "Queue weeks", "Color por cargo": "Color by role", "tipo de proyecto": "project type", "Todo el año 2026": "Whole year 2026", "Filtrar por tipo": "Filter by type", "Vista de la lista": "List view", "Ordenar por estado": "Sort by status", "Filtrar por estado": "Filter by status", "Ordenar por tiempo": "Sort by time", "Ordenar por inicio": "Sort by start", "Ordenar por cliente": "Sort by client", "Ver tablas de datos": "View data tables", "Filtrar por agencia": "Filter by agency", "Le caben por semana": "Fits per week", "Filtrar por cliente": "Filter by client", "clientes": "clients", "Limpiar": "Clear", "Gráficas": "Charts", "Semanas": "Weeks", "Meses": "Months", "Año": "Year", "por mes": "by month", "por año": "by year", "por semana": "by week", "Últimos": "Latest", "Agrupar": "Group", "Filtrar por": "Filter by", "Ordenar": "Sort", "Buscar…": "Search…", "Sin resultados": "No results", "Abrir o cerrar todos": "Open or close all", "Quitar": "Remove", "Abrir todos": "Open all", "Ver menos": "See less", "Cerrar todos": "Close all", "Ver todos": "See all", "Qué proyectos ver": "Which projects to show", "Toca un cliente para desplegar sus proyectos, agrupados por marca. Toca su nombre para abrir su ficha.": "Tap a client to expand its projects, grouped by brand. Tap its name to open its card.", "El tipo sale de la ficha de cada proyecto; si no tiene, se deduce del nombre (\"Caso…\" → Casos, \"Licitación…\" → Licitaciones, el resto → Comercial).": "The type comes from each project card; if it has none, it is inferred from the name (\"Caso…\" → Case studies, \"Licitación…\" → Tenders, the rest → Commercial).", "Toca su nombre para abrir su ficha y crearle uno.": "Tap its name to open its card and create one.", "Reparto por cliente": "Split by client", "Ordenar por proyecto": "Sort by project", "Jornada de referencia": "Reference workday", "Qué proyectos mostrar": "Which projects to show", "Filtrar por complejidad": "Filter by complexity", "Ordenar por complejidad": "Sort by complexity", "Trabajaron fin de semana": "Worked on weekends", "Sin cliente identificado": "No client identified", "Ordenar por entrega final": "Sort by final delivery", "Ordenar por próximo avance": "Sort by next milestone", "cliente → marca → proyecto": "client → brand → project", "Sin cupo (cola > 2 semanas)": "No room (queue > 2 weeks)", "Guardar horas de esta semana": "Save this week's hours", "Los cambios se guardan solos": "Changes save automatically", "8 h al día · 40 h por semana": "8 h a day · 40 h a week", "Clientes, marcas y proyectos": "Clients, brands and projects", "usan default por complejidad": "use the complexity default", "ocupados con 1 o 2 proyectos": "busy with 1 or 2 projects", "Proyectos sin horas estimadas": "Projects without estimated hours", "Volver a las horas automáticas": "Back to automatic hours", "L–V 8:30–5:30 · 1 h de almuerzo": "Mon–Fri 8:30–5:30 · 1 h lunch", "Personas con exceso esta semana": "People over hours this week", "Compensatorio sugerido (equipo)": "Suggested comp time (team)", "Fin de semana · el reloj no corre": "Weekend · the clock stops", "Horas estimadas cargada en la ficha": "Estimated hours set in the card", "Proyectos activos (horas estimadas)": "Active projects (estimated hours)", "Guardar esta semana en el histórico": "Save this week to history", "Buscar por proyecto, cliente o marca": "Search by project, client or brand", "toca una barra para ver sus proyectos": "tap a bar to see its projects", "Las horas corren solas, como un reloj.": "Hours run on their own, like a clock.", "Sin horas estimadas — usando default de medio": "No estimated hours — using the medium default", "Sin horas estimadas — usando default de complejo": "No estimated hours — using the complex default", "Horas sumadas a mano por encima de lo automático": "Hours added by hand on top of the automatic ones", "sin estimar": "not estimated", "El": "The", "Mis datos": "My details", "Sobre mí": "About me", "Correo": "Email", "Teléfono": "Phone", "Notas": "Notes",
+    "Por tipo": "By type", "proyectos": "projects", "proyecto": "project", "% de asignaciones en Tráfico": "% of assignments in Traffic", "Ordenar por": "Sort by", "trabajó de más": "worked overtime", "horas estimadas": "estimated hours", "Semanas de cola": "Queue weeks", "Color por cargo": "Color by role", "tipo de proyecto": "project type", "Todo el año 2026": "Whole year 2026", "Filtrar por tipo": "Filter by type", "Vista de la lista": "List view", "Ordenar por estado": "Sort by status", "Filtrar por estado": "Filter by status", "Ordenar por tiempo": "Sort by time", "Ordenar por inicio": "Sort by start", "Ordenar por cliente": "Sort by client", "Ver tablas de datos": "View data tables", "Filtrar por agencia": "Filter by agency", "Le caben por semana": "Fits per week", "Filtrar por cliente": "Filter by client", "clientes": "clients", "Limpiar": "Clear", "Esta semana": "This week", "Próximo": "Next", "Realizado": "Done", "No hay rodajes programados.": "No shoots scheduled.", "Gráficas": "Charts", "Semanas": "Weeks", "Meses": "Months", "Año": "Year", "por mes": "by month", "por año": "by year", "por semana": "by week", "Últimos": "Latest", "Agrupar": "Group", "Filtrar por": "Filter by", "Ordenar": "Sort", "Buscar…": "Search…", "Sin resultados": "No results", "Abrir o cerrar todos": "Open or close all", "Quitar": "Remove", "Abrir todos": "Open all", "Ver menos": "See less", "Cerrar todos": "Close all", "Ver todos": "See all", "Qué proyectos ver": "Which projects to show", "Toca un cliente para desplegar sus proyectos, agrupados por marca. Toca su nombre para abrir su ficha.": "Tap a client to expand its projects, grouped by brand. Tap its name to open its card.", "El tipo sale de la ficha de cada proyecto; si no tiene, se deduce del nombre (\"Caso…\" → Casos, \"Licitación…\" → Licitaciones, el resto → Comercial).": "The type comes from each project card; if it has none, it is inferred from the name (\"Caso…\" → Case studies, \"Licitación…\" → Tenders, the rest → Commercial).", "Toca su nombre para abrir su ficha y crearle uno.": "Tap its name to open its card and create one.", "Reparto por cliente": "Split by client", "Ordenar por proyecto": "Sort by project", "Jornada de referencia": "Reference workday", "Qué proyectos mostrar": "Which projects to show", "Filtrar por complejidad": "Filter by complexity", "Ordenar por complejidad": "Sort by complexity", "Trabajaron fin de semana": "Worked on weekends", "Sin cliente identificado": "No client identified", "Ordenar por entrega final": "Sort by final delivery", "Ordenar por próximo avance": "Sort by next milestone", "cliente → marca → proyecto": "client → brand → project", "Sin cupo (cola > 2 semanas)": "No room (queue > 2 weeks)", "Guardar horas de esta semana": "Save this week's hours", "Los cambios se guardan solos": "Changes save automatically", "8 h al día · 40 h por semana": "8 h a day · 40 h a week", "Clientes, marcas y proyectos": "Clients, brands and projects", "usan default por complejidad": "use the complexity default", "ocupados con 1 o 2 proyectos": "busy with 1 or 2 projects", "Proyectos sin horas estimadas": "Projects without estimated hours", "Volver a las horas automáticas": "Back to automatic hours", "L–V 8:30–5:30 · 1 h de almuerzo": "Mon–Fri 8:30–5:30 · 1 h lunch", "Personas con exceso esta semana": "People over hours this week", "Compensatorio sugerido (equipo)": "Suggested comp time (team)", "Fin de semana · el reloj no corre": "Weekend · the clock stops", "Horas estimadas cargada en la ficha": "Estimated hours set in the card", "Proyectos activos (horas estimadas)": "Active projects (estimated hours)", "Guardar esta semana en el histórico": "Save this week to history", "Buscar por proyecto, cliente o marca": "Search by project, client or brand", "toca una barra para ver sus proyectos": "tap a bar to see its projects", "Las horas corren solas, como un reloj.": "Hours run on their own, like a clock.", "Sin horas estimadas — usando default de medio": "No estimated hours — using the medium default", "Sin horas estimadas — usando default de complejo": "No estimated hours — using the complex default", "Horas sumadas a mano por encima de lo automático": "Hours added by hand on top of the automatic ones", "sin estimar": "not estimated", "El": "The", "Mis datos": "My details", "Sobre mí": "About me", "Correo": "Email", "Teléfono": "Phone", "Notas": "Notes",
     "Proyecto modificado": "Project modified", "Los cambios se guardan al cerrar la ventana o con el botón.": "Changes are saved when you close the window or with the button.", "Recetas": "Recipes", "Nuevo grupo": "New group", "Skills y software": "Skills and software", "Taxonomía sugerida": "Suggested naming", "Editar": "Edit",
     // reportes
     "Generar reporte": "Generate report", "Reporte del cliente": "Client report", "Todos los clientes": "All clients", "Vista previa": "Preview", "Descargar PDF": "Download PDF",
@@ -20595,8 +20673,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       const r = ros[normName(p.name)] || {}, st = SC[r.status] || [((window.AUSENCIA_LABELS || {})[r.status]) || "—", "var(--muted)"], g = grupoReal(p), c = window.pxpCargoColor ? pxpCargoColor(g) : "var(--brand)";
       return `<article class="psc" style="--gc:${c};--sc:${st[1]}" tabindex="0" onclick="closeResumen();pxpOpenPerson('${esc(p.name.replace(/'/g, "\\'"))}')" onkeydown="if(event.key==='Enter')this.click()">
         <div class="psc-av">${window.pxpAvatar ? pxpAvatar("person", p.name, 58) : ""}</div>
-        <div class="psc-t"><h4>${esc(p.alias || p.name)}</h4><span>${esc(p.role || "")}</span>
-          <div class="psc-m"><em class="psc-s"><i></i>${esc(st[0])}</em>${r.count != null ? `<em>${r.count} ${r.count === 1 ? "proyecto" : "proyectos"}</em>` : ""}${window.pxpGrupoBadge ? `<em class="psc-g">${pxpGrupoBadge(g, 14)}${esc(window.pxpGL ? pxpGL(g) : g)}</em>` : ""}</div></div></article>`;
+        <div class="psc-t"><h4>${esc(p.alias || pxpNombreBonito(p.name))}</h4><span>${esc(p.role || "")}</span></div>
+          <div class="psc-m"><em class="psc-s"><i></i>${esc(st[0])}</em>${r.count != null ? `<em>${r.count} ${r.count === 1 ? "proyecto" : "proyectos"}</em>` : ""}${window.pxpGrupoBadge ? `<em class="psc-g">${pxpGrupoBadge(g, 14)}${esc(window.pxpGL ? pxpGL(g) : g)}</em>` : ""}</div></article>`;
     };
     box.innerHTML = `<div class="resumen-head"><span class="rtitle">${esc(title)} · ${items.length}</span><button class="ficha-close" onclick="closeResumen()" aria-label="Cerrar">✕</button></div>
       <div class="rsm-grid psc-grid">${items.map((it, i) => card(per[i], it)).join("")}</div>`;
