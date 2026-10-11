@@ -6790,6 +6790,40 @@ body[data-view="dashboard"] .legend-d,body[data-view="dashboard"] .legend-row{di
 .rj-ic{color:color-mix(in srgb,var(--rj) 70%,var(--muted))}
 .rj-ic .i{width:20px;height:20px}
 .rj-sem.pasado .rj-c{opacity:.8}
+
+/* ═════ v204 · Capacidad: encabezados de grupo como barra · Team: grupos plegables ═════ */
+#cap-wrap .pfc-gh.gh2{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:9px 14px 9px 10px;margin:0 0 12px;border:1px solid var(--border);border-left:4px solid var(--gc);border-radius:14px;background:linear-gradient(100deg,color-mix(in srgb,var(--gc) 14%,var(--surface)),var(--surface) 70%);transition:border-color .15s,background .15s}
+#cap-wrap .pfc-gh.gh2:hover{border-color:color-mix(in srgb,var(--gc) 55%,var(--border))}
+#cap-wrap .pfc-gh.gh2:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+#cap-wrap .pfc-gh.gh2::after{content:none!important}
+#cap-wrap .pfc-gh.gh2 > span{padding:0;background:none;border-radius:0;font-weight:inherit}
+#cap-wrap .gh-av{display:flex;flex:none}
+#cap-wrap .gh-av > *{margin-left:-7px;box-shadow:0 0 0 2px var(--surface)}
+#cap-wrap .gh-av > *:first-child{margin-left:0}
+#cap-wrap .gh-n{font:600 15px/1.1 var(--display);letter-spacing:.06em;text-transform:uppercase;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto;min-width:0}
+#cap-wrap .gh-m{font:400 13px/1.3 var(--sans);letter-spacing:0;text-transform:none;color:var(--muted);flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#cap-wrap .gh-m em{font-style:normal;font-weight:600}
+#cap-wrap .gh-m em.sc{color:var(--red)}
+#cap-wrap .gh-m em.al{color:var(--yellow)}
+#cap-wrap .gh-ch{flex:none;width:9px;height:9px;margin:0 4px 0 auto;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(225deg) translate(-2px,-2px);transition:transform .2s}
+#cap-wrap .pfc-sec.closed .gh-ch{transform:rotate(45deg) translate(-2px,-2px)}
+#cap-wrap .pfc-sec.closed .pfc-gh.gh2{margin:0}
+#cap-wrap .cap-mos.on > .pfc-sec.closed .gh-m{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+#view-team .team-section-title .tm-ch{all:unset;cursor:pointer;margin-left:auto;display:grid;place-items:center;width:32px;height:32px;border-radius:10px;flex:none;transition:background .15s}
+#view-team .team-section-title .tm-ch:hover{background:var(--surface2)}
+#view-team .team-section-title .tm-ch:focus-visible{outline:2px solid var(--brand)}
+#view-team .team-section-title .tm-ch::before{content:"";width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(225deg) translate(-2px,-2px);transition:transform .2s}
+#view-team .team-section.tm-closed .tm-ch::before{transform:rotate(45deg) translate(-2px,-2px)}
+#view-team .team-section.tm-closed > :not(.team-section-title){display:none!important}
+#view-team .team-section.tm-closed{padding-bottom:4px!important}
+#view-team .team-section.tm-closed .team-section-title{border-bottom:0;margin-bottom:0}
+#view-team .tm-fold{margin-left:10px}
+
+/* ═════ v204 · Disponibilidad: hasta 4 filas por columna ═════ */
+#dash-wrap .lb-panel .lb-chip.lb-x{display:none!important}
+#dash-wrap .lb-more{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:6px 14px;border-radius:99px;border:1px solid var(--border);background:var(--surface);font:600 12px/1 var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);transition:color .15s,border-color .15s}
+#dash-wrap .lb-more:hover{color:var(--text);border-color:var(--border2)}
+#dash-wrap .lb-more .i{width:14px;height:14px}
 </style>
 </head>
 <body>
@@ -9094,7 +9128,6 @@ function teamRowHtml(name, role, status, weekCount) {
       <span class="team-name">${name}</span>
       <span class="team-role">${role||""}${(() => { const f = window.pxpFindPerson && pxpFindPerson(name), t = f && f.p && f.p.tipoMiembro; return t === "externo" ? ' <em class="tm-b ext">Externo</em>' : t === "freelance" ? ' <em class="tm-b fl">Freelance</em>' : ""; })()}</span>
       <span class="team-count">${weekCount} esta semana</span>
-      <span class="team-count" style="color:var(--purple)">${horas}h registradas</span>
       <span class="team-total" onclick="filterProjectsByPerson('${name.replace(/'/g,"\\'")}')" title="Ver sus proyectos en Projects">${total} proyecto${total === 1 ? "" : "s"} ↗</span>
     </div>
   `;
@@ -17465,7 +17498,10 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       const sinAgr = !!(window.pxpGrpSt && window.pxpGrpSt("capacidad").mode === "none");
       filas.forEach(f => { const pp = window.pxpFindPerson(f.name); if (!pp) return; const g = sinAgr ? "__todos" : grupoDe(pp.p); (byG[g] = byG[g] || []).push({ f, p: pp.p }); });
       if (sinAgr && byG.__todos) byG.__todos.sort((a, b) => (b.f.semanas || 0) - (a.f.semanas || 0) || a.p.name.localeCompare(b.p.name));
-      const html = ordenGrupos(Object.keys(byG)).map(g => `<section class="pfc-sec${g === "__todos" ? " todos" : ""}" data-g="${esc(g)}">${g === "__todos" ? "" : `<h3 class="pfc-gh" role="button" tabindex="0" aria-expanded="true" style="--gc:${window.pxpCargoColor(g)}"><i></i>${esc(GL(g))}<span>${byG[g].length}</span></h3>`}<div class="pfc-grid">${byG[g].map(({ f, p }) => {
+      const html = ordenGrupos(Object.keys(byG)).map(g => `<section class="pfc-sec${g === "__todos" ? " todos" : ""}" data-g="${esc(g)}">${g === "__todos" ? "" : `<h3 class="pfc-gh gh2" role="button" tabindex="0" aria-expanded="true" style="--gc:${window.pxpCargoColor(g)}">${(() => {
+        const L = byG[g], hrs = L.reduce((a, x) => a + (+x.f.totalHoras || 0), 0), sc = L.filter(x => x.f.proyectos.length && nivel(x.f.semanas) === "critico").length, al = L.filter(x => x.f.proyectos.length && nivel(x.f.semanas) === "alerta").length;
+        return `<span class="gh-av">${L.slice(0, 4).map(x => av(x.p.name, 26)).join("")}</span><b class="gh-n">${esc(GL(g))}</b><span class="gh-m">${L.length} persona${L.length !== 1 ? "s" : ""} · ${Math.round(hrs)} h en cola${sc ? ` · <em class="sc">${sc} sin cupo</em>` : ""}${al ? ` · <em class="al">${al} al límite</em>` : ""}</span><span class="gh-ch" aria-hidden="true"></span>`;
+      })()}</h3>`}<div class="pfc-grid">${byG[g].map(({ f, p }) => {
         const lv = f.proyectos.length ? nivel(f.semanas) : "ok", lim = (typeof LIMITE_SEMANAL_HORAS !== "undefined" ? LIMITE_SEMANAL_HORAS : 42);
         return fichaPersona({ p, color: NV[lv][1], badge: `<span class="pfc-badge" style="--c:${NV[lv][1]}">${NV[lv][0]}</span>`,
           stats: [["Horas en cola", `${f.totalHoras}<small> h</small>`, "", I.clock], ["Semanas", n1(f.semanas), lv === "critico" ? "late" : lv === "alerta" ? "soon" : "", I.gauge], ["Le caben", f.cabenPorSemana ? `${f.cabenPorSemana}<small>/sem</small>` : "—", "", I.plus]],
@@ -18575,10 +18611,10 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const g = document.querySelector("#cap-wrap .cap-mos"); if (!g || !g.offsetParent) return;
     const secs = Array.from(g.querySelectorAll(":scope > .pfc-sec")).filter(x => !x.hidden);
     g.classList.remove("on"); g.style.removeProperty("grid-template-columns"); secs.forEach(s => { s.style.gridColumn = ""; s.style.gridRow = ""; s.style.removeProperty("--c"); });
-    const W = g.clientWidth, gap = 16, n = W >= 1500 ? 5 : W >= 1150 ? 4 : W >= 820 ? 3 : W >= 560 ? 2 : 1;
+    const W = g.clientWidth, gap = 16, todosCerr = secs.length && secs.every(x => x.classList.contains("closed")), n0 = W >= 1500 ? 5 : W >= 1150 ? 4 : W >= 820 ? 3 : W >= 560 ? 2 : 1, n = todosCerr && n0 === 5 ? 4 : n0;
     if (n < 2) return;
     g.classList.add("on"); g.style.setProperty("--n", n);
-    secs.forEach(s => { const c = s.classList.contains("todos") ? n : s.classList.contains("closed") ? 1 : Math.max(1, Math.min(n, s.querySelectorAll(".pfc-grid > .pfc:not([hidden])").length || 1)); s.style.setProperty("--c", c); s.__c = c; s.style.gridColumn = `span ${c}`; });
+    secs.forEach(s => { const c = s.classList.contains("todos") ? n : s.classList.contains("closed") ? (n >= 4 ? 2 : 1) : Math.max(1, Math.min(n, s.querySelectorAll(".pfc-grid > .pfc:not([hidden])").length || 1)); s.style.setProperty("--c", c); s.__c = c; s.style.gridColumn = `span ${c}`; });
     const alt = secs.map(s => s.getBoundingClientRect().height);
     const col = new Array(n).fill(1);
     // va primero el grupo que quede más arriba (a igual altura, el orden normal): los pequeños llenan los huecos
@@ -18709,6 +18745,72 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   };
   const oClose = window.closeResumen;
   if (typeof oClose === "function") window.closeResumen = function () { const ov = document.getElementById("resumen-overlay"); if (ov) ov.classList.remove("rj-ov"); return oClose.apply(this, arguments); };
+})();
+
+// ════════════════════════════════════════════════════════════════
+// v204 · Team: cada grupo se pliega con una flecha a la derecha del título (se recuerda); Abrir/Cerrar todos
+// ════════════════════════════════════════════════════════════════
+(function () {
+  "use strict";
+  const K = "pxp_team_cerr";
+  const cerr = () => { try { return new Set(JSON.parse(localStorage.getItem(K) || "[]")); } catch (e) { return new Set(); } };
+  const guardar = (st) => { try { localStorage.setItem(K, JSON.stringify([...st])); } catch (e) { } };
+  const keyOf = (sec) => ((sec.querySelector(".team-section-title") || {}).dataset || {}).g || ((sec.querySelector(".team-section-title .tst") || sec.querySelector(".team-section-title") || {}).textContent || "").trim();
+  const FOLD = "<svg class='i' viewBox='0 0 24 24' aria-hidden='true'><path d='m7 10 5-5 5 5M7 19l5-5 5 5'/></svg>", UNFOLD = "<svg class='i' viewBox='0 0 24 24' aria-hidden='true'><path d='m7 5 5 5 5-5M7 14l5 5 5-5'/></svg>";
+  function decorar() {
+    const v = document.getElementById("view-team"); if (!v) return false;
+    const st = cerr(); let cambio = false;
+    v.querySelectorAll(".team-section").forEach(sec => {
+      const t = sec.querySelector(".team-section-title"); if (!t) return;
+      if (!t.querySelector(".tm-ch")) { t.insertAdjacentHTML("beforeend", `<button type="button" class="tm-ch" aria-label="Plegar o desplegar el grupo"></button>`); }
+      const c = st.has(keyOf(sec)); if (sec.classList.contains("tm-closed") !== c) { sec.classList.toggle("tm-closed", c); cambio = true; }
+      t.querySelector(".tm-ch").setAttribute("aria-expanded", String(!c));
+    });
+    const vh = v.querySelector(".vh"); if (vh && !vh.querySelector(".tm-fold")) vh.insertAdjacentHTML("beforeend", `<span class="fold tm-fold" role="group" aria-label="Grupos"><button type="button" data-tm="close">${FOLD}Cerrar todos</button><button type="button" data-tm="open">${UNFOLD}Abrir todos</button></span>`);
+    return cambio;
+  }
+  const repack = () => { try { window.pxpTeamPack && window.pxpTeamPack(true); } catch (e) { } };
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest && e.target.closest("#view-team .tm-ch, #view-team [data-tm]"); if (!b) return;
+    e.preventDefault(); e.stopPropagation();
+    const st = cerr();
+    if (b.dataset.tm) { if (b.dataset.tm === "close") document.querySelectorAll("#view-team .team-section").forEach(s => st.add(keyOf(s))); else st.clear(); }
+    else { const k = keyOf(b.closest(".team-section")); if (st.has(k)) st.delete(k); else st.add(k); }
+    guardar(st); decorar(); repack();
+  }, true);
+  if (window.pxpOnDom) pxpOnDom(() => { try { if (decorar()) repack(); } catch (e) { console.error(e); } }, { childList: true, subtree: true });
+  window.pxpTeamFold = decorar;
+})();
+
+// ════════════════════════════════════════════════════════════════
+// v204 · Dashboard · Disponibilidad: cada columna muestra hasta 4 filas; el resto con "Ver N más"
+// ════════════════════════════════════════════════════════════════
+(function () {
+  "use strict";
+  const FILAS = 4, abiertas = new Set(); let raf = 0;
+  function recortar() {
+    raf = 0;
+    document.querySelectorAll("#dash-wrap .lb-panel .lb-col").forEach(col => {
+      const list = col.querySelector(".lb-list"); if (!list || !list.offsetParent) return;
+      const key = ((col.querySelector(".lb-h") || {}).textContent || "").replace(/\d+/g, "").trim().slice(0, 20);
+      const chips = Array.from(list.children).filter(x => x.classList.contains("lb-chip"));
+      chips.forEach(c => c.classList.remove("lb-x"));
+      const ncol = Math.max(1, getComputedStyle(list).gridTemplateColumns.split(" ").filter(Boolean).length);
+      const max = ncol * FILAS, extra = chips.length - max;
+      let btn = col.querySelector(":scope > .lb-more");
+      if (extra <= 0) { if (btn) btn.remove(); return; }
+      const abierta = abiertas.has(key);
+      if (!abierta) chips.slice(max).forEach(c => c.classList.add("lb-x"));
+      if (!btn) { btn = document.createElement("button"); btn.type = "button"; btn.className = "lb-more"; col.appendChild(btn); }
+      btn.dataset.k = key; btn.setAttribute("aria-expanded", String(abierta));
+      btn.innerHTML = abierta ? `Ver menos<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 15 5-5 5 5"/></svg>` : `Ver ${extra} más<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>`;
+    });
+  }
+  const pedir = () => { if (!raf) raf = requestAnimationFrame(recortar); };
+  document.addEventListener("click", (e) => { const b = e.target.closest && e.target.closest("#dash-wrap .lb-more"); if (!b) return; const k = b.dataset.k; if (abiertas.has(k)) abiertas.delete(k); else abiertas.add(k); recortar(); });
+  if (window.pxpOnDom) pxpOnDom(() => { const p = document.querySelector("#dash-wrap .lb-panel"); if (p && p.querySelector(".lb-chip:not(.lb-x)") && [...p.querySelectorAll(".lb-col")].some(c => !c.querySelector(".lb-more") && c.querySelectorAll(".lb-chip").length > 4)) pedir(); }, { childList: true, subtree: true });
+  window.addEventListener("resize", pedir);
+  window.pxpLbRecortar = recortar;
 })();
 
 // ════════════════════════════════════════════════════════════════
@@ -18966,7 +19068,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     "Agregar imagen del proyecto": "Add project image", "Cambiar imagen": "Change image", "Sugerencias": "Suggestions", "Avance por etapas": "Progress by stage", "Notas": "Notes", "Adjuntar": "Attach", "Bloqueadores": "Blockers", "+ Reportar bloqueador": "+ Report blocker", "Revisiones y enlaces": "Reviews and links", "+ Agregar enlace": "+ Add link", "Ruta en el share": "Share path", "+ Agregar ruta": "+ Add path", "Copiar ruta": "Copy path", "Editar ficha completa": "Edit full card", "Revisar": "Review", "Descargar": "Download", "Cronograma": "Schedule", "Piezas por tipo": "Pieces by type", "Adaptaciones por país": "Adaptations by country", "Agregar etapa": "Add stage", "+ Agregar etapa": "+ Add stage", "Usar etapas típicas": "Use typical stages",
     "Pendiente": "Pending", "Con cambios": "Changes requested", "En curso": "In progress", "Revisión": "Review", "Datos del proyecto": "Project details", "Color": "Color", "Nota": "Note", "Historial": "History", "Horas trabajadas en el proyecto": "Hours worked on the project",
 
-    "Por tipo": "By type", "proyectos": "projects", "proyecto": "project", "% de asignaciones en Tráfico": "% of assignments in Traffic", "Ordenar por": "Sort by", "trabajó de más": "worked overtime", "horas estimadas": "estimated hours", "Semanas de cola": "Queue weeks", "Color por cargo": "Color by role", "tipo de proyecto": "project type", "Todo el año 2026": "Whole year 2026", "Filtrar por tipo": "Filter by type", "Vista de la lista": "List view", "Ordenar por estado": "Sort by status", "Filtrar por estado": "Filter by status", "Ordenar por tiempo": "Sort by time", "Ordenar por inicio": "Sort by start", "Ordenar por cliente": "Sort by client", "Ver tablas de datos": "View data tables", "Filtrar por agencia": "Filter by agency", "Le caben por semana": "Fits per week", "Filtrar por cliente": "Filter by client", "clientes": "clients", "Limpiar": "Clear", "Esta semana": "This week", "Próximo": "Next", "Realizado": "Done", "No hay rodajes programados.": "No shoots scheduled.", "Gráficas": "Charts", "Semanas": "Weeks", "Meses": "Months", "Año": "Year", "por mes": "by month", "por año": "by year", "por semana": "by week", "Últimos": "Latest", "Agrupar": "Group", "Filtrar por": "Filter by", "Ordenar": "Sort", "Buscar…": "Search…", "Sin resultados": "No results", "Abrir o cerrar todos": "Open or close all", "Quitar": "Remove", "Abrir todos": "Open all", "Ver menos": "See less", "Cerrar todos": "Close all", "Ver todos": "See all", "Qué proyectos ver": "Which projects to show", "Toca un cliente para desplegar sus proyectos, agrupados por marca. Toca su nombre para abrir su ficha.": "Tap a client to expand its projects, grouped by brand. Tap its name to open its card.", "El tipo sale de la ficha de cada proyecto; si no tiene, se deduce del nombre (\"Caso…\" → Casos, \"Licitación…\" → Licitaciones, el resto → Comercial).": "The type comes from each project card; if it has none, it is inferred from the name (\"Caso…\" → Case studies, \"Licitación…\" → Tenders, the rest → Commercial).", "Toca su nombre para abrir su ficha y crearle uno.": "Tap its name to open its card and create one.", "Reparto por cliente": "Split by client", "Ordenar por proyecto": "Sort by project", "Jornada de referencia": "Reference workday", "Qué proyectos mostrar": "Which projects to show", "Filtrar por complejidad": "Filter by complexity", "Ordenar por complejidad": "Sort by complexity", "Trabajaron fin de semana": "Worked on weekends", "Sin cliente identificado": "No client identified", "Ordenar por entrega final": "Sort by final delivery", "Ordenar por próximo avance": "Sort by next milestone", "cliente → marca → proyecto": "client → brand → project", "Sin cupo (cola > 2 semanas)": "No room (queue > 2 weeks)", "Guardar horas de esta semana": "Save this week's hours", "Los cambios se guardan solos": "Changes save automatically", "8 h al día · 40 h por semana": "8 h a day · 40 h a week", "Clientes, marcas y proyectos": "Clients, brands and projects", "usan default por complejidad": "use the complexity default", "ocupados con 1 o 2 proyectos": "busy with 1 or 2 projects", "Proyectos sin horas estimadas": "Projects without estimated hours", "Volver a las horas automáticas": "Back to automatic hours", "L–V 8:30–5:30 · 1 h de almuerzo": "Mon–Fri 8:30–5:30 · 1 h lunch", "Personas con exceso esta semana": "People over hours this week", "Compensatorio sugerido (equipo)": "Suggested comp time (team)", "Fin de semana · el reloj no corre": "Weekend · the clock stops", "Horas estimadas cargada en la ficha": "Estimated hours set in the card", "Proyectos activos (horas estimadas)": "Active projects (estimated hours)", "Guardar esta semana en el histórico": "Save this week to history", "Buscar por proyecto, cliente o marca": "Search by project, client or brand", "toca una barra para ver sus proyectos": "tap a bar to see its projects", "Las horas corren solas, como un reloj.": "Hours run on their own, like a clock.", "Sin horas estimadas — usando default de medio": "No estimated hours — using the medium default", "Sin horas estimadas — usando default de complejo": "No estimated hours — using the complex default", "Horas sumadas a mano por encima de lo automático": "Hours added by hand on top of the automatic ones", "sin estimar": "not estimated", "El": "The", "Mis datos": "My details", "Sobre mí": "About me", "Correo": "Email", "Teléfono": "Phone", "Notas": "Notes",
+    "Por tipo": "By type", "proyectos": "projects", "proyecto": "project", "% de asignaciones en Tráfico": "% of assignments in Traffic", "Ordenar por": "Sort by", "trabajó de más": "worked overtime", "horas estimadas": "estimated hours", "Semanas de cola": "Queue weeks", "Color por cargo": "Color by role", "tipo de proyecto": "project type", "Todo el año 2026": "Whole year 2026", "Filtrar por tipo": "Filter by type", "Vista de la lista": "List view", "Ordenar por estado": "Sort by status", "Filtrar por estado": "Filter by status", "Ordenar por tiempo": "Sort by time", "Ordenar por inicio": "Sort by start", "Ordenar por cliente": "Sort by client", "Ver tablas de datos": "View data tables", "Filtrar por agencia": "Filter by agency", "Le caben por semana": "Fits per week", "Filtrar por cliente": "Filter by client", "clientes": "clients", "Limpiar": "Clear", "Plegar o desplegar el grupo": "Collapse or expand the group", "Esta semana": "This week", "Próximo": "Next", "Realizado": "Done", "No hay rodajes programados.": "No shoots scheduled.", "Gráficas": "Charts", "Semanas": "Weeks", "Meses": "Months", "Año": "Year", "por mes": "by month", "por año": "by year", "por semana": "by week", "Últimos": "Latest", "Agrupar": "Group", "Filtrar por": "Filter by", "Ordenar": "Sort", "Buscar…": "Search…", "Sin resultados": "No results", "Abrir o cerrar todos": "Open or close all", "Quitar": "Remove", "Abrir todos": "Open all", "Ver menos": "See less", "Cerrar todos": "Close all", "Ver todos": "See all", "Qué proyectos ver": "Which projects to show", "Toca un cliente para desplegar sus proyectos, agrupados por marca. Toca su nombre para abrir su ficha.": "Tap a client to expand its projects, grouped by brand. Tap its name to open its card.", "El tipo sale de la ficha de cada proyecto; si no tiene, se deduce del nombre (\"Caso…\" → Casos, \"Licitación…\" → Licitaciones, el resto → Comercial).": "The type comes from each project card; if it has none, it is inferred from the name (\"Caso…\" → Case studies, \"Licitación…\" → Tenders, the rest → Commercial).", "Toca su nombre para abrir su ficha y crearle uno.": "Tap its name to open its card and create one.", "Reparto por cliente": "Split by client", "Ordenar por proyecto": "Sort by project", "Jornada de referencia": "Reference workday", "Qué proyectos mostrar": "Which projects to show", "Filtrar por complejidad": "Filter by complexity", "Ordenar por complejidad": "Sort by complexity", "Trabajaron fin de semana": "Worked on weekends", "Sin cliente identificado": "No client identified", "Ordenar por entrega final": "Sort by final delivery", "Ordenar por próximo avance": "Sort by next milestone", "cliente → marca → proyecto": "client → brand → project", "Sin cupo (cola > 2 semanas)": "No room (queue > 2 weeks)", "Guardar horas de esta semana": "Save this week's hours", "Los cambios se guardan solos": "Changes save automatically", "8 h al día · 40 h por semana": "8 h a day · 40 h a week", "Clientes, marcas y proyectos": "Clients, brands and projects", "usan default por complejidad": "use the complexity default", "ocupados con 1 o 2 proyectos": "busy with 1 or 2 projects", "Proyectos sin horas estimadas": "Projects without estimated hours", "Volver a las horas automáticas": "Back to automatic hours", "L–V 8:30–5:30 · 1 h de almuerzo": "Mon–Fri 8:30–5:30 · 1 h lunch", "Personas con exceso esta semana": "People over hours this week", "Compensatorio sugerido (equipo)": "Suggested comp time (team)", "Fin de semana · el reloj no corre": "Weekend · the clock stops", "Horas estimadas cargada en la ficha": "Estimated hours set in the card", "Proyectos activos (horas estimadas)": "Active projects (estimated hours)", "Guardar esta semana en el histórico": "Save this week to history", "Buscar por proyecto, cliente o marca": "Search by project, client or brand", "toca una barra para ver sus proyectos": "tap a bar to see its projects", "Las horas corren solas, como un reloj.": "Hours run on their own, like a clock.", "Sin horas estimadas — usando default de medio": "No estimated hours — using the medium default", "Sin horas estimadas — usando default de complejo": "No estimated hours — using the complex default", "Horas sumadas a mano por encima de lo automático": "Hours added by hand on top of the automatic ones", "sin estimar": "not estimated", "El": "The", "Mis datos": "My details", "Sobre mí": "About me", "Correo": "Email", "Teléfono": "Phone", "Notas": "Notes",
     "Proyecto modificado": "Project modified", "Los cambios se guardan al cerrar la ventana o con el botón.": "Changes are saved when you close the window or with the button.", "Recetas": "Recipes", "Nuevo grupo": "New group", "Skills y software": "Skills and software", "Taxonomía sugerida": "Suggested naming", "Editar": "Edit",
     // reportes
     "Generar reporte": "Generate report", "Reporte del cliente": "Client report", "Todos los clientes": "All clients", "Vista previa": "Preview", "Descargar PDF": "Download PDF",
