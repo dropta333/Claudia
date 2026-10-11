@@ -1919,6 +1919,15 @@ table.pv-table .status-pill{max-width:150px}
 .pvc-g .chev{width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform .2s;margin-right:4px}
 .pvc-g.closed .chev{transform:rotate(-45deg)}
 .pvc-g b{font:600 15px/1 var(--display);letter-spacing:.06em;text-transform:uppercase}
+/* v187 · Proyectos en fichas agrupadas: bloques lado a lado sin huecos */
+.pvc-grid.pvc-blocks{grid-auto-flow:row dense;align-items:start}
+.pvc-blk{display:flex;flex-direction:column;gap:12px;min-width:0}
+.pvc-blk > .pvc-g{margin-top:0;flex-wrap:nowrap;min-width:0;min-height:56px}
+.pvc-blk > .pvc-g > *{flex:none}
+.pvc-blk > .pvc-g > .cnt{flex:none;white-space:nowrap}
+.pvc-blk > .pvc-g > .mini{flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pvc-blk[data-n="1"] > .pvc-g > .mini,.pvc-blk[data-n="0"] > .pvc-g > .mini{display:none}
+.pvc-in{display:grid;grid-template-columns:repeat(var(--c,1),minmax(0,1fr));gap:14px}
 .pvc-g .cnt,.pvc-g .mini{font-size:13.5px;color:var(--muted)}
 .pvc{position:relative;display:flex;flex-direction:column;gap:12px;padding:16px 16px 14px;border:1px solid var(--border);border-radius:var(--r-m);background:var(--surface);cursor:pointer;overflow:hidden;transition:transform .18s,box-shadow .18s,border-color .18s}
 .pvc::before{content:"";position:absolute;inset:0 0 auto;height:4px;background:var(--pc)}
@@ -15120,19 +15129,31 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     if (!useCards()) return;
     const table = wrap.querySelector("table.pv-table"); if (!table) return;
     let html = "", n = 0;
+    // v187 · Con grupos, cada grupo va en su bloque (encabezado + sus fichas) para acomodarlos lado a lado sin huecos
+    const blq = []; let cur = null;
     table.querySelectorAll("tbody > tr").forEach(tr => {
-      if (tr.classList.contains("pv-g")) { html += `<div class="pvc-g${tr.classList.contains("closed") ? " closed" : ""}" onclick="${esc(tr.getAttribute("onclick") || "")}">${tr.firstElementChild.innerHTML}</div>`; return; }
+      if (tr.classList.contains("pv-g")) { cur = { head: `<div class="pvc-g${tr.classList.contains("closed") ? " closed" : ""}" onclick="${esc(tr.getAttribute("onclick") || "")}">${tr.firstElementChild.innerHTML}</div>`, cards: "", n: 0, closed: tr.classList.contains("closed") }; blq.push(cur); return; }
       const nameTd = tr.querySelector("td.pt-name"); if (!nameTd) return;
       const m = /openProjectFicha\('((?:\\.|[^'])*)'\)/.exec(nameTd.getAttribute("onclick") || ""); if (!m) return;
       const k = m[1].replace(/\\(.)/g, "$1"); const del = tr.querySelector(".pt-del"); n++;
-      html += cardHtml(k, del ? del.innerHTML : "");
+      const c = cardHtml(k, del ? del.innerHTML : ""); if (cur) { cur.cards += c; cur.n++; } else html += c;
     });
+    if (blq.length) html += blq.map(b => `<section class="pvc-blk${b.closed ? " closed" : ""}" data-n="${b.closed ? 0 : b.n}">${b.head}${b.n && !b.closed ? `<div class="pvc-in">${b.cards}</div>` : ""}</section>`).join("");
     const sorts = Array.from(table.querySelectorAll("thead .sortbtn")).map((b, i) => ({ i, l: b.textContent.replace(/[▲▼↕]/g, "").trim(), on: b.classList.contains("on") })).filter(x => x.l);
     const sortSel = sorts.length ? `<label class="pvc-sort">Ordenar por <select onchange="document.querySelectorAll('#proj-wrap thead .sortbtn')[this.value].click()">${sorts.map(x => `<option value="${x.i}" ${x.on ? "selected" : ""}>${esc(x.l.charAt(0) + x.l.slice(1).toLowerCase())}</option>`).join("")}</select></label>` : "";
     const zone = document.createElement("div"); zone.className = "pvc-zone";
-    zone.innerHTML = `${sortSel}<div class="pvc-grid">${html || `<p class="note">No hay proyectos con estos filtros.</p>`}</div>`;
+    zone.innerHTML = `${sortSel}<div class="pvc-grid${blq.length ? " pvc-blocks" : ""}">${html || `<p class="note">No hay proyectos con estos filtros.</p>`}</div>`;
     const tw = table.closest(".proj-table-wrap"); (tw || table).insertAdjacentElement("afterend", zone);
+    acomodarBloques();
   }
+  // Cada bloque ocupa las columnas que necesita (hasta las que caben); los pequeños se acomodan en los huecos
+  function acomodarBloques() {
+    const g = document.querySelector("#proj-wrap .pvc-grid.pvc-blocks"); if (!g) return;
+    const cols = Math.max(1, getComputedStyle(g).gridTemplateColumns.split(" ").filter(Boolean).length);
+    g.querySelectorAll(":scope > .pvc-blk").forEach(b => { const c = Math.max(1, Math.min(cols, +b.dataset.n || 1)); b.style.gridColumn = `span ${c}`; b.style.setProperty("--c", c); });
+  }
+  window.pxpProyBloques = acomodarBloques;
+  addEventListener("resize", () => requestAnimationFrame(acomodarBloques));
   wrapFn("renderProjects", buildCards);
   wrapFn("pxpPaint", (el) => { if (el && el.id === "pv-list") buildCards(); });   // filtros, búsqueda y plegar grupos repintan solo la lista
   let rT = null, wasCards = null;
@@ -19435,7 +19456,21 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   const ADMIN = ["Dirección de Post", "Producción Ejecutiva", "Project Manager"];
   const SIGLA = { "Dirección de Post": "dps", "Producción Ejecutiva": "pe", "Project Manager": "pm", "Producción": "prd", "Editores": "edi", "Coloristas": "col", "Compositing / Motion": "cmp", "3D / CGI": "3d", "IA / Automatización": "ia", "Mastering / Data": "mst", "Freelance": "fl", "Audio": "aud" };
   const persona = (n) => [...TEAM, ...AUDIO].find((p) => normName(p.name) === normName(n));
-  const grupoDe = (n) => { const p = persona(n); return p ? (window.pxpGrupo ? pxpGrupo(p) : categorizeRole(p.role)) : "Otros"; };
+  // v187 · En Netlify el equipo se carga al entrar: para que la pantalla de ingreso agrupe bien, se lee el servidor antes
+  //   y se calcula el grupo de cada persona (sin tocar los datos de la página).
+  let GMAP = null;
+  const grupoDe = (n) => { const p = persona(n); if (p) return window.pxpGrupo ? pxpGrupo(p) : categorizeRole(p.role); return (GMAP && GMAP[normName(n)]) || "Otros"; };
+  function precargarGrupos() {
+    if (GMAP || window.PXP_BACKEND !== "netlify" || !window.pxpEstadoServidor || (typeof TEAM !== "undefined" && TEAM.length)) return;
+    GMAP = {};
+    Promise.resolve(window.pxpEstadoServidor()).then((j) => {
+      const s = j && j.state; if (!s || !Array.isArray(s.TEAM)) return;
+      const T = TEAM, A = AUDIO, M = META;
+      try { TEAM = s.TEAM; AUDIO = s.AUDIO || []; META = s.META || M; [...TEAM, ...AUDIO].forEach((p) => { if (p && p.name) GMAP[normName(p.name)] = window.pxpGrupo ? pxpGrupo(p) : categorizeRole(p.role); }); }
+      finally { TEAM = T; AUDIO = A; META = M; }
+      const l = $("login-list"), q = $("login-q"); if (l && !l.hidden) pintarLista(q && !q.classList.contains("ok") ? q.value : "");
+    }).catch(() => { GMAP = null; });
+  }
   const esAdmin = (n) => normName(n) === "BASTIAN TORRES" || ADMIN.includes(grupoDe(n));
   const meta = () => (typeof META !== "undefined" && META) || {};
   const toast = (m) => (window.pxpToast ? window.pxpToast(m) : null);
@@ -19493,6 +19528,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   }
   function montarLogin() {
     const sel = $("login-user"); if (!sel || $("login-q")) return;
+    precargarGrupos();
     const f = sel.closest(".login-field"); sel.hidden = true;
     const lb = f.querySelector("label"); if (lb) { lb.textContent = "Nombre o @usuario"; lb.htmlFor = "login-q"; }
     f.insertAdjacentHTML("beforeend", `<div class="lg-pick"><input id="login-q" type="text" autocomplete="off" spellcheck="false" placeholder="Busca tu nombre o escribe tu @usuario" role="combobox" aria-controls="login-list" aria-expanded="false"><div class="lg-list" id="login-list" role="listbox" hidden></div></div>`);

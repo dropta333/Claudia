@@ -26,6 +26,10 @@ const put = await fetch(BASE + "/api/state", { method: "PUT", headers: { "conten
 check("siembra del servidor", put.ok);
 const ajeno = await fetch(BASE + "/api/state", { method: "PUT", headers: { "content-type": "application/json", origin: "https://otro-sitio.com" }, body: "{}" });
 check("rechaza cambios desde otro sitio (403)", ajeno.status === 403);
+// 1b · pantalla de ingreso: las personas salen en sus grupos aunque el equipo aún no se haya cargado
+{ const pl = await (await b.newContext()).newPage(); await pl.goto(BASE + "/"); await pl.waitForTimeout(1200); await pl.focus("#login-q").catch(() => {}); await pl.waitForTimeout(1500);
+  const gs = await pl.$$eval("#login-list .lg-gt", x => x.map(e => e.childNodes[0].textContent.trim()));
+  check(`ingreso agrupado por equipo (${gs.length} grupos)`, gs.length > 3 && !(gs.length === 1 && /Otros/.test(gs[0]))); await pl.close(); }
 // 2 · dos personas abren el tablero publicado
 const abrir = async (nombre) => { const p = await (await b.newContext({ viewport: { width: 1440, height: 1000 } })).newPage(); p.on("pageerror", e => errs.push(nombre + ": " + e.message));
   await p.goto(BASE + "/"); await p.waitForTimeout(800); await p.evaluate(n => { try { localStorage.setItem("pxp_lg_off", "1"); } catch (e) { } enterApp({ name: n }, "x"); }, nombre); await p.waitForTimeout(2500); return p; };
