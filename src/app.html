@@ -6564,6 +6564,16 @@ body:not(.trf-tabla) #main-grid > .card:not(.span-all){padding:16px 16px 14px!im
 .pchip.done{opacity:.6}
 .ct-foot{margin:4px 0 0}
 @media (max-width:760px){.ctree2{columns:1}.ct-bar{width:54px}#view-clientes .ctree2 .cn-h{column-gap:10px;padding:10px 12px!important}}
+
+/* ═════ v191 · Capacidad en mosaico · fichas con 3 proyectos ═════ */
+#cap-wrap .cap-mos.on{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));grid-auto-rows:4px;column-gap:16px;row-gap:0;align-items:start}
+#cap-wrap .cap-mos.on > .pfc-sec{margin:0;min-width:0}
+#cap-wrap .cap-mos.on .pfc-grid{grid-template-columns:repeat(var(--c,1),minmax(0,1fr))!important;gap:16px}
+#cap-wrap .cap-mos .pfc-gh{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#cap-wrap .pfc-proj .pfc-x{display:none}
+#cap-wrap .pfc-proj.all .pfc-x{display:inline-flex}
+.pfc-more{all:unset;cursor:pointer;align-self:flex-start;font-size:12.5px;font-weight:700;color:var(--muted);padding:3px 10px;border-radius:99px;border:1px dashed var(--border2)}
+.pfc-more:hover{color:var(--text);border-style:solid}
 </style>
 </head>
 <body>
@@ -10525,9 +10535,12 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       { t: "Próximas semanas", f: h => h.diff > 7, max: 5, sort: (a, b) => a.diff - b.diff },
       { t: "Vencidas", f: h => h.diff < 0, max: 3, sort: (a, b) => b.diff - a.diff, late: true },
     ];
+    // v191 · En la vista personal la caja es más corta: 5 próximas en total y 2 vencidas
+    let cupo = (window.pxpHomePersonal && pxpHomePersonal()) ? 5 : 99;
     const hitosHtml = grupos.map(g => {
       const arr = hitos.filter(g.f).sort(g.sort); if (!arr.length) return "";
-      const first = arr.slice(0, g.max), rest = arr.slice(g.max);
+      const mx = cupo === 99 ? g.max : g.late ? Math.min(g.max, 2) : Math.min(g.max, Math.max(1, cupo)); if (!g.late && cupo !== 99) cupo -= Math.min(arr.length, mx);
+      const first = arr.slice(0, mx), rest = arr.slice(mx);
       return `<div class="tl-g${g.late ? " late" : ""}"><div class="tl-h">${g.t}<span>${arr.length}</span></div>${first.map(hitoRow).join("")}
         ${rest.length ? `<details class="tl-more"><summary>Ver ${rest.length} más</summary>${rest.map(hitoRow).join("")}</details>` : ""}</div>`;
     }).join("");
@@ -17226,7 +17239,10 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
           bar: f.totalHoras / (lim * 2) * 100, barLbl: `${f.totalHoras} horas en cola frente a dos semanas de jornada`,
           proj: f.proyectos.map(pr => ({ k: projectKey(pr.nombre), n: pr.nombre, extra: (pr.horas != null ? pr.horas + " h" : "") + (pr.tieneEstimado ? "" : " · sin estimar"), plant: false })), empty: "Sin proyectos activos" });
       }).join("")}</div></section>`).join("");
-      tw.style.display = "none"; tw.insertAdjacentHTML("afterend", `<div class="pfc-wrap">${html}</div>`);
+      tw.style.display = "none"; tw.insertAdjacentHTML("afterend", `<div class="pfc-wrap cap-mos">${html}</div>`);
+      // v191 · fichas más bajas: se ven 3 proyectos y el resto con "+N más"
+      wrap.querySelectorAll(".cap-mos .pfc-proj").forEach(pj => { const ps = pj.querySelectorAll(":scope > .pfc-p"); if (ps.length <= 3) return; ps.forEach((x, i) => { if (i >= 3) x.classList.add("pfc-x"); }); pj.insertAdjacentHTML("beforeend", `<button type="button" class="pfc-more" onclick="event.stopPropagation();pxpCapMas(this)">+${ps.length - 3} más</button>`); });
+      if (window.pxpCapMosaico) requestAnimationFrame(window.pxpCapMosaico);
     } catch (e) { console.error(e); }
     return r;
   };
@@ -18227,6 +18243,45 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
 })();
 
 // ════════════════════════════════════════════════════════════════
+// v191 · Capacidad en mosaico: cada grupo ocupa las columnas que necesita y se acomoda
+//   donde quede más arriba (como Tráfico y Proyectos), sin huecos.
+// ════════════════════════════════════════════════════════════════
+(function () {
+  "use strict";
+  const U = 4; let raf = 0, ro = null;
+  window.pxpCapMas = function (b) {
+    const pj = b.closest(".pfc-proj"); if (!pj) return; const on = !pj.classList.contains("all"); pj.classList.toggle("all", on);
+    const n = pj.querySelectorAll(".pfc-x").length; b.textContent = on ? "Ver menos" : `+${n} más`;
+  };
+  function acomodar() {
+    raf = 0;
+    const g = document.querySelector("#cap-wrap .cap-mos"); if (!g || !g.offsetParent) return;
+    const secs = Array.from(g.querySelectorAll(":scope > .pfc-sec"));
+    g.classList.remove("on"); g.style.removeProperty("grid-template-columns"); secs.forEach(s => { s.style.gridColumn = ""; s.style.gridRow = ""; s.style.removeProperty("--c"); });
+    const W = g.clientWidth, gap = 16, n = W >= 1500 ? 5 : W >= 1150 ? 4 : W >= 820 ? 3 : W >= 560 ? 2 : 1;
+    if (n < 2) return;
+    g.classList.add("on"); g.style.setProperty("--n", n);
+    secs.forEach(s => { const c = Math.max(1, Math.min(n, s.querySelectorAll(".pfc-grid > .pfc").length || 1)); s.style.setProperty("--c", c); s.__c = c; s.style.gridColumn = `span ${c}`; });
+    const alt = secs.map(s => s.getBoundingClientRect().height);
+    const col = new Array(n).fill(1);
+    // va primero el grupo que quede más arriba (a igual altura, el orden normal): los pequeños llenan los huecos
+    const pos = (c) => { let best = 0, bv = Infinity; for (let x = 0; x + c <= n; x++) { const v = Math.max(...col.slice(x, x + c)); if (v < bv) { bv = v; best = x; } } return [best, bv]; };
+    const quedan = secs.map((s, i) => i);
+    while (quedan.length) {
+      let pick = 0, pp = pos(secs[quedan[0]].__c);
+      for (let j = 1; j < quedan.length; j++) { const q = pos(secs[quedan[j]].__c); if (q[1] < pp[1]) { pick = j; pp = q; } }
+      const i = quedan.splice(pick, 1)[0], s = secs[i], c = s.__c, span = Math.max(1, Math.ceil((alt[i] + gap) / U)), [best, bv] = pp;
+      s.style.gridColumn = `${best + 1} / span ${c}`; s.style.gridRow = `${bv} / span ${span}`;
+      for (let x = best; x < best + c; x++) col[x] = bv + span; s.__h = alt[i];
+    }
+    if (window.ResizeObserver) { if (!ro) ro = new ResizeObserver(es => { if (es.some(e => Math.abs((e.target.__h || 0) - e.target.getBoundingClientRect().height) > 1)) pedir(); }); ro.disconnect(); secs.forEach(s => ro.observe(s)); }
+  }
+  const pedir = () => { if (!raf) raf = requestAnimationFrame(acomodar); };
+  window.addEventListener("resize", pedir);
+  window.pxpCapMosaico = acomodar;
+})();
+
+// ════════════════════════════════════════════════════════════════
 // v184 · Copias completas y migración entre servidores
 //   · "Descargar copia" guarda TODO (antes faltaban licencias, logros, temas y otras claves de META).
 //   · "Restaurar copia" combina con lo actual: no borra nada de lo nuevo y agrega lo que falte.
@@ -18481,7 +18536,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     "Agregar imagen del proyecto": "Add project image", "Cambiar imagen": "Change image", "Sugerencias": "Suggestions", "Avance por etapas": "Progress by stage", "Notas": "Notes", "Adjuntar": "Attach", "Bloqueadores": "Blockers", "+ Reportar bloqueador": "+ Report blocker", "Revisiones y enlaces": "Reviews and links", "+ Agregar enlace": "+ Add link", "Ruta en el share": "Share path", "+ Agregar ruta": "+ Add path", "Copiar ruta": "Copy path", "Editar ficha completa": "Edit full card", "Revisar": "Review", "Descargar": "Download", "Cronograma": "Schedule", "Piezas por tipo": "Pieces by type", "Adaptaciones por país": "Adaptations by country", "Agregar etapa": "Add stage", "+ Agregar etapa": "+ Add stage", "Usar etapas típicas": "Use typical stages",
     "Pendiente": "Pending", "Con cambios": "Changes requested", "En curso": "In progress", "Revisión": "Review", "Datos del proyecto": "Project details", "Color": "Color", "Nota": "Note", "Historial": "History", "Horas trabajadas en el proyecto": "Hours worked on the project",
 
-    "Por tipo": "By type", "proyectos": "projects", "proyecto": "project", "% de asignaciones en Tráfico": "% of assignments in Traffic", "Ordenar por": "Sort by", "trabajó de más": "worked overtime", "horas estimadas": "estimated hours", "Semanas de cola": "Queue weeks", "Color por cargo": "Color by role", "tipo de proyecto": "project type", "Todo el año 2026": "Whole year 2026", "Filtrar por tipo": "Filter by type", "Vista de la lista": "List view", "Ordenar por estado": "Sort by status", "Filtrar por estado": "Filter by status", "Ordenar por tiempo": "Sort by time", "Ordenar por inicio": "Sort by start", "Ordenar por cliente": "Sort by client", "Ver tablas de datos": "View data tables", "Filtrar por agencia": "Filter by agency", "Le caben por semana": "Fits per week", "Filtrar por cliente": "Filter by client", "clientes": "clients", "Abrir todos": "Open all", "Cerrar todos": "Close all", "Ver todos": "See all", "Qué proyectos ver": "Which projects to show", "Toca un cliente para desplegar sus proyectos, agrupados por marca. Toca su nombre para abrir su ficha.": "Tap a client to expand its projects, grouped by brand. Tap its name to open its card.", "El tipo sale de la ficha de cada proyecto; si no tiene, se deduce del nombre (\"Caso…\" → Casos, \"Licitación…\" → Licitaciones, el resto → Comercial).": "The type comes from each project card; if it has none, it is inferred from the name (\"Caso…\" → Case studies, \"Licitación…\" → Tenders, the rest → Commercial).", "Toca su nombre para abrir su ficha y crearle uno.": "Tap its name to open its card and create one.", "Reparto por cliente": "Split by client", "Ordenar por proyecto": "Sort by project", "Jornada de referencia": "Reference workday", "Qué proyectos mostrar": "Which projects to show", "Filtrar por complejidad": "Filter by complexity", "Ordenar por complejidad": "Sort by complexity", "Trabajaron fin de semana": "Worked on weekends", "Sin cliente identificado": "No client identified", "Ordenar por entrega final": "Sort by final delivery", "Ordenar por próximo avance": "Sort by next milestone", "cliente → marca → proyecto": "client → brand → project", "Sin cupo (cola > 2 semanas)": "No room (queue > 2 weeks)", "Guardar horas de esta semana": "Save this week's hours", "Los cambios se guardan solos": "Changes save automatically", "8 h al día · 40 h por semana": "8 h a day · 40 h a week", "Clientes, marcas y proyectos": "Clients, brands and projects", "usan default por complejidad": "use the complexity default", "ocupados con 1 o 2 proyectos": "busy with 1 or 2 projects", "Proyectos sin horas estimadas": "Projects without estimated hours", "Volver a las horas automáticas": "Back to automatic hours", "L–V 8:30–5:30 · 1 h de almuerzo": "Mon–Fri 8:30–5:30 · 1 h lunch", "Personas con exceso esta semana": "People over hours this week", "Compensatorio sugerido (equipo)": "Suggested comp time (team)", "Fin de semana · el reloj no corre": "Weekend · the clock stops", "Horas estimadas cargada en la ficha": "Estimated hours set in the card", "Proyectos activos (horas estimadas)": "Active projects (estimated hours)", "Guardar esta semana en el histórico": "Save this week to history", "Buscar por proyecto, cliente o marca": "Search by project, client or brand", "toca una barra para ver sus proyectos": "tap a bar to see its projects", "Las horas corren solas, como un reloj.": "Hours run on their own, like a clock.", "Sin horas estimadas — usando default de medio": "No estimated hours — using the medium default", "Sin horas estimadas — usando default de complejo": "No estimated hours — using the complex default", "Horas sumadas a mano por encima de lo automático": "Hours added by hand on top of the automatic ones", "sin estimar": "not estimated", "El": "The", "Mis datos": "My details", "Sobre mí": "About me", "Correo": "Email", "Teléfono": "Phone", "Notas": "Notes",
+    "Por tipo": "By type", "proyectos": "projects", "proyecto": "project", "% de asignaciones en Tráfico": "% of assignments in Traffic", "Ordenar por": "Sort by", "trabajó de más": "worked overtime", "horas estimadas": "estimated hours", "Semanas de cola": "Queue weeks", "Color por cargo": "Color by role", "tipo de proyecto": "project type", "Todo el año 2026": "Whole year 2026", "Filtrar por tipo": "Filter by type", "Vista de la lista": "List view", "Ordenar por estado": "Sort by status", "Filtrar por estado": "Filter by status", "Ordenar por tiempo": "Sort by time", "Ordenar por inicio": "Sort by start", "Ordenar por cliente": "Sort by client", "Ver tablas de datos": "View data tables", "Filtrar por agencia": "Filter by agency", "Le caben por semana": "Fits per week", "Filtrar por cliente": "Filter by client", "clientes": "clients", "Abrir todos": "Open all", "Ver menos": "See less", "Cerrar todos": "Close all", "Ver todos": "See all", "Qué proyectos ver": "Which projects to show", "Toca un cliente para desplegar sus proyectos, agrupados por marca. Toca su nombre para abrir su ficha.": "Tap a client to expand its projects, grouped by brand. Tap its name to open its card.", "El tipo sale de la ficha de cada proyecto; si no tiene, se deduce del nombre (\"Caso…\" → Casos, \"Licitación…\" → Licitaciones, el resto → Comercial).": "The type comes from each project card; if it has none, it is inferred from the name (\"Caso…\" → Case studies, \"Licitación…\" → Tenders, the rest → Commercial).", "Toca su nombre para abrir su ficha y crearle uno.": "Tap its name to open its card and create one.", "Reparto por cliente": "Split by client", "Ordenar por proyecto": "Sort by project", "Jornada de referencia": "Reference workday", "Qué proyectos mostrar": "Which projects to show", "Filtrar por complejidad": "Filter by complexity", "Ordenar por complejidad": "Sort by complexity", "Trabajaron fin de semana": "Worked on weekends", "Sin cliente identificado": "No client identified", "Ordenar por entrega final": "Sort by final delivery", "Ordenar por próximo avance": "Sort by next milestone", "cliente → marca → proyecto": "client → brand → project", "Sin cupo (cola > 2 semanas)": "No room (queue > 2 weeks)", "Guardar horas de esta semana": "Save this week's hours", "Los cambios se guardan solos": "Changes save automatically", "8 h al día · 40 h por semana": "8 h a day · 40 h a week", "Clientes, marcas y proyectos": "Clients, brands and projects", "usan default por complejidad": "use the complexity default", "ocupados con 1 o 2 proyectos": "busy with 1 or 2 projects", "Proyectos sin horas estimadas": "Projects without estimated hours", "Volver a las horas automáticas": "Back to automatic hours", "L–V 8:30–5:30 · 1 h de almuerzo": "Mon–Fri 8:30–5:30 · 1 h lunch", "Personas con exceso esta semana": "People over hours this week", "Compensatorio sugerido (equipo)": "Suggested comp time (team)", "Fin de semana · el reloj no corre": "Weekend · the clock stops", "Horas estimadas cargada en la ficha": "Estimated hours set in the card", "Proyectos activos (horas estimadas)": "Active projects (estimated hours)", "Guardar esta semana en el histórico": "Save this week to history", "Buscar por proyecto, cliente o marca": "Search by project, client or brand", "toca una barra para ver sus proyectos": "tap a bar to see its projects", "Las horas corren solas, como un reloj.": "Hours run on their own, like a clock.", "Sin horas estimadas — usando default de medio": "No estimated hours — using the medium default", "Sin horas estimadas — usando default de complejo": "No estimated hours — using the complex default", "Horas sumadas a mano por encima de lo automático": "Hours added by hand on top of the automatic ones", "sin estimar": "not estimated", "El": "The", "Mis datos": "My details", "Sobre mí": "About me", "Correo": "Email", "Teléfono": "Phone", "Notas": "Notes",
     "Proyecto modificado": "Project modified", "Los cambios se guardan al cerrar la ventana o con el botón.": "Changes are saved when you close the window or with the button.", "Recetas": "Recipes", "Nuevo grupo": "New group", "Skills y software": "Skills and software", "Taxonomía sugerida": "Suggested naming", "Editar": "Edit",
     // reportes
     "Generar reporte": "Generate report", "Reporte del cliente": "Client report", "Todos los clientes": "All clients", "Vista previa": "Preview", "Descargar PDF": "Download PDF",
@@ -18556,7 +18611,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     [/^(\d+) personas de post$/, (m, n) => `${n} post people`], [/^Lograste (\d+) logros? nuevos?$/, (m, n) => `You earned ${n} new achievement${n === "1" ? "" : "s"}`], [/^Última actualización: (.+)$/, (m, a) => `Last update: ${a}`],
     [/^(.*)Todos los derechos reservados\.$/, (m, a) => `${a}All rights reserved.`], [/^(.+) \(cliente por confirmar\)$/, (m, a) => `${a} (client to be confirmed)`],
     [/^Ver (\d+) notas? más$/, (m, n) => `Show ${n} more note${n === "1" ? "" : "s"}`], [/^Ver menos$/, () => "Show less"],
-    [/^Ver (\d+) más · quedan (\d+)$/, (m, a, b) => `Show ${a} more · ${b} left`], [/^· quedan (\d+)$/, (m, b) => `· ${b} left`], [/^Ver (\d+) más$/, (m, a) => `Show ${a} more`],
+    [/^\+(\d+) más$/, (m, n) => `+${n} more`], [/^(\d+) proyectos? activos?$/, (m, n) => `${n} active project${n === "1" ? "" : "s"}`], [/^(\d+) clientes? sin proyectos activos · $/, (m, n) => `${n} client${n === "1" ? "" : "s"} with no active projects · `], [/^Otros (\d+)$/, (m, n) => `Others ${n}`], [/^Ver (\d+) más · quedan (\d+)$/, (m, a, b) => `Show ${a} more · ${b} left`], [/^· quedan (\d+)$/, (m, b) => `· ${b} left`], [/^Ver (\d+) más$/, (m, a) => `Show ${a} more`],
     [/^salió el (.+)$/, (m, d) => `left on ${trText(d) || d}`], [/^(.+?) Cuenta las asignaciones en Tráfico con el tipo elegido en cada proyecto; si no tiene, se deduce del nombre\.$/, (m, w) => `${/^Semana /.test(w) ? fecha(w.replace(/^Semana /, "Week ")) : w} Counts Traffic assignments with the type chosen in each project; if it has none, it's inferred from the name.`]
   );
   function trText(raw) {
