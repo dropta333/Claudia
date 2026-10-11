@@ -2,6 +2,8 @@
 
 Versión: **v189** · 10 oct 2026 · Responsable: Bastián Torres
 
+## v190 · Clientes: "Mars" y "MARS" se unen en las gráficas; Reparto por cliente con donut grande + ranking + "Otros"; Tipos de proyecto en lista con barras; desplegable por cliente (Activos por defecto)
+
 ## Cómo está armado ahora
 - **Una sola fuente:** `src/app.html`, con todo el CSS y las capas JS.
   - Marcadores: `/*@state*/` para los datos y `<!--@pdf-->` para jsPDF y las fuentes.
