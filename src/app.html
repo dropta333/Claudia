@@ -6874,6 +6874,22 @@ body[data-view="dashboard"] .legend-d,body[data-view="dashboard"] .legend-row{di
   #pxp-person .pm-role-ed{justify-content:center}
 }
 
+/* ═════ v209 · Team: foto alineada con nombre y cargo, nombre más grande, habilidades a todo el ancho ═════ */
+#view-team .team-row{--ph:58px;padding:14px 14px 14px calc(16px + var(--ph) + 14px)!important;min-height:0}
+#view-team .team-row .team-name .av{top:14px;transform:none}
+#view-team .team-row .team-name{font-size:23px!important;line-height:1.15;align-self:flex-start;white-space:normal!important;text-overflow:clip!important;overflow:visible!important}
+#view-team .team-row .team-role{font-size:14.5px;margin-top:-2px!important}
+#view-team .team-row > .sk-mini.tm{flex:1 1 100%;margin:8px 0 0 calc(-1 * (var(--ph) + 14px))!important}
+#view-team .team-row .team-total{align-self:center;order:1}
+#view-team .team-row > .team-role{order:2}
+#view-team .team-row > .sk-mini.tm{order:3}
+@media (max-width:720px){
+  #view-team .team-row{--ph:50px;padding:12px 12px 12px calc(12px + var(--ph) + 12px)!important}
+  #view-team .team-row .team-name .av{top:12px}
+  #view-team .team-row .team-name{font-size:19px!important;flex-basis:calc(100% - 128px)!important}
+  #view-team .team-row .team-total{padding:4px 8px;font-size:12px}
+  #view-team .team-row > .sk-mini.tm{margin-left:calc(-1 * (var(--ph) + 12px))!important}
+}
 /* ═════ v208 · Home personal: "Mis gráficas" plegable ═════ */
 #home-wrap .hm-more.hm-in{margin:0}
 #home-wrap .hm-more.hm-in .hm-more-t small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -16915,27 +16931,28 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       }
       return;
     }
-    // v208 · Vista personal: las gráficas ("Mis …") van en un bloque plegable, como "Más gráficas" en Global
+    // v209 · Vista personal: mosaico como antes (sin huecos); "Mis gráficas" es una barra compacta al pie de la columna más corta que muestra u oculta las gráficas
     const graf = panels.filter(p => p.classList.contains("ps-tile")), fijas = panels.filter(p => !graf.includes(p));
     if (graf.length && fijas.length) {
-      const t = document.createElement("div"); cols.replaceWith(t); repartir(t, fijas, Math.max(1, Math.min(n, fijas.length)));
       const kk = "pxp_hm_mis_" + normName((typeof currentUser !== "undefined" && currentUser) || "");
       const abierto = (() => { try { return localStorage.getItem(kk) !== "0"; } catch (e) { return true; } })();
+      const t = document.createElement("div"); cols.replaceWith(t);
+      const usar = abierto ? panels : fijas; repartir(t, usar, Math.max(1, Math.min(n, usar.length)));
       const nombres = graf.map(p => { const h = p.querySelector(".hp-title"); return h ? ((h.childNodes[0] || {}).textContent || "").trim() : ""; }).filter(Boolean);
-      const sec = document.createElement("section"); sec.className = "hm-more" + (abierto ? " open" : ""); sec.dataset.k = kk;
-      sec.innerHTML = `<button type="button" class="hm-more-b" aria-expanded="${abierto}" onclick="pxpHmMore(this)"><span class="hm-more-t"><b>Mis gráficas</b><small>${graf.length} · ${esc(nombres.slice(0, 5).join(" · "))}</small></span><span class="hm-more-a">${abierto ? "Ocultar" : "Mostrar"}<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg></span></button><div class="hm-more-c"></div>`;
-      t.after(sec); const c2 = sec.querySelector(".hm-more-c"); sec.classList.add("open"); repartir(c2, graf, n); if (!abierto) sec.classList.remove("open");
-      // cerrado: la barra va en la columna más corta (llena el hueco bajo la caja más baja)
-      if (!abierto) { const cs = Array.from(t.querySelectorAll(":scope > .ht-col")); if (cs.length > 1) { const c = cs.reduce((a, b) => (b.offsetHeight < a.offsetHeight ? b : a)); c.appendChild(sec); sec.classList.add("hm-in"); } }
+      const sec = document.createElement("section"); sec.className = "hm-more hm-in"; sec.dataset.k = kk; sec.dataset.on = abierto ? "1" : "0";
+      sec.innerHTML = `<button type="button" class="hm-more-b" aria-expanded="${abierto}" onclick="pxpHmMore(this)"><span class="hm-more-t"><b>Mis gráficas</b><small>${graf.length} · ${esc(nombres.slice(0, 5).join(" · "))}</small></span><span class="hm-more-a">${abierto ? "Ocultar" : "Mostrar"}<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="${abierto ? "m7 14 5-5 5 5" : "m7 10 5 5 5-5"}"/></svg></span></button>`;
+      const cs = Array.from(t.querySelectorAll(":scope > .ht-col"));
+      const c = cs.length ? cs.reduce((a, b) => (b.offsetHeight < a.offsetHeight ? b : a)) : t; c.appendChild(sec);
       return;
     }
     const t = document.createElement("div"); cols.replaceWith(t); repartir(t, panels, n);
   }
   window.pxpHmMore = function (btn) {
-    const sec = btn.closest(".hm-more"); if (!sec) return; const on = !sec.classList.contains("open");
+    const sec = btn.closest(".hm-more"); if (!sec) return;
+    if (sec.dataset.k) { try { localStorage.setItem(sec.dataset.k, sec.dataset.on === "1" ? "0" : "1"); } catch (e) { } try { renderHome(); } catch (e) { } return; }   // vista personal: se vuelve a armar el mosaico
+    const on = !sec.classList.contains("open");
     sec.classList.toggle("open", on); btn.setAttribute("aria-expanded", on); const a = btn.querySelector(".hm-more-a"); if (a) a.firstChild.textContent = on ? "Ocultar" : "Mostrar";
-    try { localStorage.setItem(sec.dataset.k || ("pxp_hm_more_" + normName((typeof currentUser !== "undefined" && currentUser) || "")), on ? "1" : "0"); } catch (e) { }
-    if (sec.dataset.k) { try { renderHome(); } catch (e) { } }   // vista personal: se reacomoda (abierto a todo el ancho, cerrado en el hueco)
+    try { localStorage.setItem("pxp_hm_more_" + normName((typeof currentUser !== "undefined" && currentUser) || ""), on ? "1" : "0"); } catch (e) { }
   };
   // Reparte cajas en n columnas parejas (fijas: una por columna, en orden)
   function repartir(t, panels, n, enOrden) {

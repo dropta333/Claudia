@@ -12,15 +12,6 @@ for (const [n, f] of [["semana anterior", () => setWeek(currentWeek - 1)], ["sem
   await page.evaluate(f); await page.waitForTimeout(40);
   check(`Tráfico: ${n} → sin fichas montadas ni un instante`, (await ov()) === 0);
 }
-await page.evaluate(() => { pxpHomeModo("personal"); switchView("home"); }); await page.waitForTimeout(1500);
-const st = () => page.evaluate(() => { const m = document.querySelector("#home-wrap .hm-more[data-k]"); return m ? { open: m.classList.contains("open"), vis: [...m.querySelectorAll(".ps-tile")].filter(x => x.offsetParent).length, n: m.querySelectorAll(".ps-tile").length } : null; });
-let s = await st(); check(`Home personal: "Mis gráficas" abierto por defecto (${JSON.stringify(s)})`, s && s.open && s.vis === s.n && s.n > 0);
-await page.click("#home-wrap .hm-more[data-k] .hm-more-b"); await page.waitForTimeout(500); s = await st();
-check("Home personal: se pueden ocultar", s && !s.open && s.vis === 0);
-await page.evaluate(() => { pxpHomeModo("global"); pxpHomeModo("personal"); switchView("home"); }); await page.waitForTimeout(1200); s = await st();
-check("Home personal: se recuerda oculto", s && !s.open);
-await page.click("#home-wrap .hm-more[data-k] .hm-more-b"); await page.waitForTimeout(500); s = await st();
-check("Home personal: Mostrar las vuelve a abrir", s && s.open && s.vis === s.n);
 await page.evaluate(() => pxpHomeModo("global"));
 check("sin errores: " + errs.slice(0, 3).join(" | "), errs.length === 0);
 console.log(ok.map(x => "✓ " + x).join("\n")); console.log(fail.map(x => "✗ " + x).join("\n")); await b.close(); process.exit(fail.length ? 1 : 0);

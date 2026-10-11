@@ -1,6 +1,10 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v189** · 10 oct 2026 · Responsable: Bastián Torres
+Versión: **v209** · 11 oct 2026 · Resumen general en `HANDOFF-COMPLETO.md` · Responsable: Bastián Torres
+
+## v209 · Home personal vuelve al mosaico sin huecos; "Mis gráficas" es una barra compacta al pie de la columna más corta (pxp_hm_mis_<usuario>, data-on); Team: foto alineada con nombre (23 px) y cargo, skills a todo el ancho; HANDOFF-COMPLETO.md
+
+## v208 · Tráfico: decorar + acomodar sincrónico al repintar, vigilante del #main-grid y limpieza del mosaico sin fichas
 
 ## v207 · Cabecera del perfil en celular: foto arriba, centrada y más grande (108 px); nombre, cargo (caja angosta con el lápiz al lado) y estado centrados
 
