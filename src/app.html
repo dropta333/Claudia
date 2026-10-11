@@ -8476,33 +8476,6 @@ function showPersonProjects(name) {
   openResumen(`${name} — Proyectos`, items);
 }
 
-function renderRoleSummary(container) {
-  // Por pedido de Juliana: la carga por rol solo muestra las áreas operativas de post
-  // (editores, motion/compo, IA, directores de post, 3D, color, master). Productoras
-  // Ejecutivas, PM, Project Manager, Casa de Audio y Otros no se muestran acá.
-  const columnOrder = ["Director de Post","Editor","Color","Compo / Motion","Mastering / Data","3D / CGI","IA / Automatización"];
-  const byColumn = {};
-  columnOrder.forEach(c => byColumn[c] = []);
-
-  TEAM.forEach(p => {
-    const col = summaryColumnFor(p.role);
-    if (!columnOrder.includes(col)) return;
-    (byColumn[col] || (byColumn[col] = [])).push({ name: p.name, count: totalProjectCount(p.name) });
-  });
-  const panel = document.createElement("div");
-  panel.className = "card";
-  const cols = columnOrder.map(col => {
-    const entries = (byColumn[col]||[]).slice().sort((a,b) => b.count - a.count || a.name.localeCompare(b.name));
-    if (entries.length === 0) return "";
-    const rows = entries.map(e => `<div style="display:flex;justify-content:space-between;gap:8px;padding:2px 0;cursor:pointer" onclick="showPersonProjects('${e.name.replace(/'/g,"\\'")}')" title="Ver sus proyectos"><span>${e.name}</span><span style="color:var(--muted)">${e.count} ↗</span></div>`).join("");
-    return `<div style="min-width:150px"><div style="font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">${col}</div>${rows}</div>`;
-  }).join("");
-  panel.innerHTML = `
-    <div class="card-header"><span class="person-name">Carga por rol — total de proyectos (todo el equipo)</span></div>
-    <div class="card-body" style="gap:24px;flex-wrap:wrap">${cols}</div>
-  `;
-  container.appendChild(panel);
-}
 
 function render(w) {
   const grid = document.getElementById("main-grid");
@@ -8552,8 +8525,7 @@ function render(w) {
   let libres = 0, cargados = 0, saturados = 0;
   const allProjects = new Set();
 
-  // Carga por rol
-  renderRoleSummary(grid);
+  // v203 · "Carga por rol" es del diseño antiguo: ya no se dibuja en Tráfico (la carga se ve en Dashboard y Capacidad)
 
   // Section label
   const lbl = document.createElement("div");
@@ -12712,29 +12684,10 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   window.pxpTrfSort = function (m) { ts.mode = m; try { localStorage.setItem(TS_KEY, JSON.stringify({ mode: m })); } catch (e) { } sortTraffic(); };
   window.pxpTrfQ = function (v) { ts.q = v; sortTraffic(); };
 
-  // ═════════ B · CARGA POR ROL: compacta ═════════
-  function roleSummary() {
-    const grid = $("main-grid"); if (!grid) return;
-    const card = Array.from(grid.children).find(c => c.classList.contains("card") && /Carga por rol/.test(c.textContent) && !c.querySelector(".ch-top"));
-    if (!card || card.dataset.rs) return;
-    card.dataset.rs = "1"; card.classList.add("rs-card");
-    const cols = ["Director de Post", "Editor", "Color", "Compo / Motion", "Mastering / Data", "3D / CGI", "IA / Automatización"];
-    const by = {}; cols.forEach(c => by[c] = []);
-    TEAM.forEach(p => { const col = summaryColumnFor(p.role); if (by[col]) by[col].push({ name: p.name, n: totalProjectCount(p.name), st: getStatus(p, currentWeek) }); });
-    const max = Math.max(1, ...Object.values(by).flat().map(e => e.n));
-    const total = Object.values(by).flat().length;
-    const groups = cols.filter(c => by[c].length).map(c => {
-      const list = by[c].sort((a, b) => b.n - a.n || a.name.localeCompare(b.name, "es"));
-      return `<div class="rs-g"><div class="rs-h">${esc(c)}<span>${list.length}</span></div>${list.map(e => `
-        <div class="rs-r"><button class="rs-n" data-pname="${esc(e.name)}" title="Abrir el perfil de ${esc(e.name)}">${av("person", e.name, 24)}<span>${esc(e.name)}</span></button>
-          <span class="rs-b"><i style="width:${Math.round(e.n / max * 100)}%;background:${STATUS_COLOR[e.st] || "var(--muted)"}"></i></span>
-          <button class="rs-c" onclick="showPersonProjects('${ea(e.name)}')" title="Ver sus proyectos">${e.n}</button></div>`).join("")}</div>`;
-    }).join("");
-    card.innerHTML = `<div class="rs-top"><div><div class="rs-t">Carga por rol</div><div class="rs-s">Proyectos en fichas por persona · ${total} personas de post · el color de la barra es su semáforo de esta semana</div></div></div><div class="rs-grid">${groups}</div>`;
-  }
+
 
   const origRender = window.render;
-  window.render = function () { const r = origRender.apply(this, arguments); try { roleSummary(); sortTraffic(); } catch (e) { console.error(e); } return r; };
+  window.render = function () { const r = origRender.apply(this, arguments); try { sortTraffic(); } catch (e) { console.error(e); } return r; };
 
   // ═════════ C · VENTANA DE PROYECTO ═════════
   const pm = makeModal("pxp-proj", 1080);
@@ -17598,10 +17551,11 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       const items = [add, ...forms, rod, carga].filter(Boolean); if (!items.length) return;
       const nr = rod ? ((rod.querySelector(".rod-h .seg button em") || {}).textContent || "0") : "0";
       const d = document.createElement("details"); d.className = "card span-all trf-extra"; if (pref("pxp_trf_extra", "0") === "1") d.open = true;
-      d.innerHTML = `<summary>${svg(I.cam)}<b>Rodajes y carga por rol</b><span class="trf-x-chips"><em>${nr} rodaje${nr === "1" ? "" : "s"} en curso o próximos</em></span><span class="trf-x-hint">${d.open ? "Ocultar" : "Ver"}</span></summary><div class="trf-x-b"></div>`;
+      d.innerHTML = `<summary>${svg(I.cam)}<b>Rodajes</b><span class="trf-x-chips"><em>${nr} rodaje${nr === "1" ? "" : "s"} en curso o próximos</em></span><span class="trf-x-hint">${d.open ? "Ocultar" : "Ver"}</span></summary><div class="trf-x-b"></div>`;
       d.addEventListener("toggle", () => { window.pxpTrfExtra(d.open); const h = d.querySelector(".trf-x-hint"); if (h) h.textContent = d.open ? "Ocultar" : "Ver"; });
       items[0].before(d); items.forEach(x => d.querySelector(".trf-x-b").appendChild(x));
     }
+    g.querySelectorAll(".card.span-all").forEach(c => { if (/^\s*Carga por rol/.test((c.textContent || "").slice(0, 60)) && !c.classList.contains("trf-extra")) c.remove(); });
     // fichas de personas: franja superior con el color de su carga
     g.querySelectorAll(":scope > .card:not(.span-all)").forEach(c => { if (c.dataset.sc) return; c.dataset.sc = "1"; const col = c.style.borderLeftColor; if (col) c.style.setProperty("--sc", col); c.classList.add("tcard"); });
   }

@@ -2,6 +2,8 @@
 
 Versión: **v189** · 10 oct 2026 · Responsable: Bastián Torres
 
+## v203 · Tráfico: se elimina "Carga por rol" (diseño antiguo) de raíz: renderRoleSummary y roleSummary borrados; el plegable queda como "Rodajes" y se limpia cualquier tarjeta vieja que se cuele
+
 ## v201–v202 · Ficha del proyecto sin Inicio/Entrega repetidos; ventana de Rodajes con estilo naranja por semana (pxpRodajesVentana); nombres con mayúscula inicial (pxpNombreBonito) y foto centrada con nombre y cargo en las fichas de persona
 
 ## v200 · Clientes: "Proyectos activos / Todo el año" y Semana en una barra encima de las gráficas (.cli-gbar); "Nuevo cliente" dentro de la caja de clientes y sin la fila superior; sin el texto explicativo del árbol
