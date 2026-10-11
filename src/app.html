@@ -23396,9 +23396,9 @@ button.pm-pxa{cursor:pointer}
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     b.innerHTML = `<div class="pxb-o"><div class="pxb-i"><button type="button" class="pxa-bx" aria-label="Cerrar">✕</button><p class="pxa-you" hidden></p><p class="pxa-bt" aria-live="polite"></p><div class="pxa-chips"></div><div class="pxa-card" hidden></div>
       <div class="pxa-ac" role="listbox" hidden></div>
-      <form class="pxa-bf"><input type="text" placeholder="Pídeme algo · @persona #proyecto" aria-label="Escríbele a tu avatar" autocomplete="off">
+      <div class="pxa-bf" role="group" aria-label="Pedido"><input type="text" enterkeyhint="send" placeholder="Pídeme algo · @persona #proyecto" aria-label="Escríbele a tu avatar" autocomplete="off">
       <button type="button" class="pxa-mic" aria-label="${SR ? "Dictar" : "Dictado no disponible en este navegador"}" title="${SR ? "Dictar (es)" : "Tu navegador no permite dictado"}"${SR ? "" : " disabled"}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
-      <button type="submit" class="pxa-send" aria-label="Enviar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6l-6 6"/></svg></button></form></div></div>${TAIL}`;
+      <button type="button" class="pxa-send" aria-label="Enviar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6l-6 6"/></svg></button></div></div></div>${TAIL}`;
     document.body.appendChild(b);
     const place = () => { if (!anchor.isConnected && opts.reanchor) { const a = opts.reanchor(); if (a) anchor = a; } if (innerWidth <= 760) { b.style.left = b.style.top = ""; return; }
       const r = anchor.getBoundingClientRect(), w = b.offsetWidth, h = b.offsetHeight, room = innerWidth - r.right;
@@ -23451,12 +23451,15 @@ button.pm-pxa{cursor:pointer}
       mic.classList.add("on"); mic.setAttribute("aria-pressed", "true"); say("Te escucho…");
       rec.onresult = ev => { let s = ""; for (const r of ev.results) s += r[0].transcript; inp.value = base + s; };
       rec.onerror = ev => { say(ev.error === "not-allowed" ? "Necesito permiso para usar el micrófono." : "No te escuché bien. ¿Lo intentamos otra vez?"); };
-      rec.onend = () => { mic.classList.remove("on"); mic.setAttribute("aria-pressed", "false"); rec = null; if (inp.value.trim()) b.querySelector(".pxa-bf").requestSubmit(); };
+      rec.onend = () => { mic.classList.remove("on"); mic.setAttribute("aria-pressed", "false"); rec = null; if (inp.value.trim()) send(); };
       try { rec.start(); } catch (e) { rec = null; mic.classList.remove("on"); }
     };
     const ask = async v => { you.hidden = false; you.textContent = v; setChips([]); setCard(null);
       let r; try { r = opts.onAsk ? await Promise.resolve(opts.onAsk(v)) : { text: REPLIES[Math.floor(Math.random() * REPLIES.length)] }; } catch (e) { r = { text: "Se me cayó el render. ¿Me lo repites?" }; } show(r); };
-    $(".pxa-bf").onsubmit = e => { e.preventDefault(); const v = inp.value.trim(); if (!v) { inp.focus(); return; } inp.value = ""; ac.hidden = true; ask(v); };
+    /* sin <form>: en vistas incrustadas (sandbox sin allow-forms) el envío de formularios está bloqueado */
+    function send() { const v = inp.value.trim(); if (!v) { inp.focus(); return; } inp.value = ""; ac.hidden = true; ask(v); }
+    $(".pxa-send").addEventListener("click", send);
+    inp.addEventListener("keydown", e => { if (e.key === "Enter" && !e.isComposing && !e.defaultPrevented && ac.hidden) { e.preventDefault(); send(); } });
     const close = () => { clearInterval(timer); if (rec) try { rec.abort(); } catch (e) { } b.remove(); document.removeEventListener("keydown", onKey); removeEventListener("resize", place); if (opts.onClose) opts.onClose(); };
     const onKey = e => { if (e.key === "Escape" && ac.hidden) close(); };
     document.addEventListener("keydown", onKey);
