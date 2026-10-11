@@ -2,6 +2,8 @@
 
 Versión: **v189** · 10 oct 2026 · Responsable: Bastián Torres
 
+## v200 · Clientes: "Proyectos activos / Todo el año" y Semana en una barra encima de las gráficas (.cli-gbar); "Nuevo cliente" dentro de la caja de clientes y sin la fila superior; sin el texto explicativo del árbol
+
 ## v199 · Clientes: "Trabajo por cliente" y "Tipo de proyecto" lado a lado; selector Semanas/Meses/Año compartido (window.__cliPer) en las dos gráficas y en "Ver tablas de datos" (pxpCliGrupos, pxpCliTablasPer, periodoCli)
 
 ## v197–v198 · Clientes: árbol primero, semana solo en Activos (desplegable), Reparto/Tipos en 2 columnas y más bajos; Logros: cabecera compacta, conteo por nivel grande, últimos al lado del progreso; Home personal: estado en 2 columnas; Dashboard: Disponibilidad muestra a todos los "cargado" (antes solo 1–2 proyectos) y sin leyenda
