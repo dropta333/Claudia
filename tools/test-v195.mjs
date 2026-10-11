@@ -7,8 +7,7 @@ await page.goto("file://" + path.resolve("dist/preview.html")); await page.waitF
 await page.evaluate(() => { window.pxpSaveBase = function () { }; try { localStorage.setItem("pxp_lg_off", "1"); localStorage.removeItem("pxp_cap_cerr"); } catch (e) { } enterApp({ name: "Bastián Torres" }, "preview"); });
 await page.waitForTimeout(1800); await page.evaluate(() => { for (let i = 0; i < 6; i++) try { pxpLogroCerrar(); } catch (e) { } pxpHomeModo("global"); switchView("projects"); pvAlcance("todos"); pvGroup("cliente"); }); await page.waitForTimeout(800);
 const ok = [], fail = []; const check = (n, c) => (c ? ok : fail).push(n);
-await page.evaluate(() => { if (!document.querySelector(".pvx-fbtn.on")) pvFiltros(); }); await page.waitForTimeout(200);
-check("los filtros quedan dentro de la barra", await page.evaluate(() => !!document.querySelector(".pvx-bar > #pvx-f")));
+check("Filtrar por dentro de la barra, sin fila aparte (v196)", await page.evaluate(() => !!document.querySelector(".pvx-bar .pvx-fdd") && !document.querySelector(".pvx-bar > .pvx-f")));
 check("Proyectos: control con íconos", await page.evaluate(() => document.querySelectorAll(".pvx-gl.fold > button .i").length >= 2));
 const rows = () => page.evaluate(() => [...document.querySelectorAll("#proj-wrap tbody tr:not(.pv-g)")].filter(r => r.offsetParent).length + document.querySelectorAll("#proj-wrap .pvc").length);
 for (const v of ["fichas", "filas"]) {

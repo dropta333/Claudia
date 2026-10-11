@@ -19,7 +19,7 @@ await page.click(".pvx-grp .dd-btn"); await page.waitForTimeout(250);
 check("Agrupar abre una lista con ✓ en la elegida", await page.evaluate(() => /Sin agrupar/.test(document.querySelector(".dd-pop .dd-o.sel").textContent)));
 await page.click(".dd-pop .dd-o >> nth=0"); await page.waitForTimeout(800);
 check("elegir Cliente agrupa", await page.evaluate(() => !!document.querySelector("#proj-wrap .pvc-blk")));
-await page.click(".pvx-fbtn"); await page.waitForTimeout(200); await page.click("#pvx-f .dd-btn"); await page.waitForTimeout(250);
+await page.click(".pvx-fdd .dd-btn"); await page.waitForTimeout(250);
 check("Filtrar por: lista con secciones y buscador", await page.evaluate(() => document.querySelectorAll(".dd-pop .dd-g").length >= 3 && !!document.querySelector(".dd-pop .dd-q")));
 await page.fill(".dd-pop .dd-q input", "revis"); await page.waitForTimeout(100);
 check("el buscador filtra y esconde secciones vacías", await page.evaluate(() => [...document.querySelectorAll(".dd-pop .dd-g")].filter(g => !g.hidden).length === 1));

@@ -10,17 +10,17 @@ const ok = [], fail = []; const check = (n, c) => (c ? ok : fail).push(n);
 await page.evaluate(() => { Object.keys(localStorage).filter(k => /pxp_pv_v[34]|pxp_vista_proy/.test(k)).forEach(k => localStorage.removeItem(k)); switchView("projects"); }); await page.waitForTimeout(1000);
 const st = () => page.evaluate(() => ({ fichas: document.querySelectorAll("#proj-wrap .pvc").length, bloques: document.querySelectorAll("#proj-wrap .pvc-blk").length, grupo: document.querySelector(".pvx-grp select").value,
   vista: (document.querySelector(".pvx-vista button.on") || {}).textContent, alcance: (document.querySelector(".pvx-scope button.on") || {}).textContent, entregados: [...document.querySelectorAll("#proj-wrap .pvc")].filter(c => c.classList.contains("entregado")).length,
-  filtrosVisibles: !document.querySelector("#pvx-f").hidden, n: (document.querySelector(".pvx-fbtn b") || {}).textContent || "" }));
+  filtrosVisibles: !!document.querySelector("#pvx-f:not([hidden])"), n: (document.querySelector(".pvx-n") || {}).textContent || "" }));
 let r = await st();
 check(`por defecto: fichas, activos y sin agrupar (v194) (${JSON.stringify(r)})`, /Fichas/.test(r.vista) && /Activos/.test(r.alcance) && r.grupo === "none");
 check("activos: sin entregados", r.entregados === 0);
-check("filtros escondidos al inicio", !r.filtrosVisibles);
+check("sin filtros no hay fila de etiquetas (v196)", !r.filtrosVisibles);
 const act = r.fichas;
 await page.click(".pvx-scope button:nth-child(2)"); await page.waitForTimeout(700); r = await st();
 check(`todos: incluye los entregados (${r.fichas} > ${act})`, r.fichas > act && r.entregados > 0);
-await page.click(".pvx-fbtn"); await page.waitForTimeout(300); r = await st(); check("el botón Filtros los muestra", r.filtrosVisibles);
+check("Filtrar por está en la barra principal (v196)", !!(await page.$(".pvx-bar .pvx-fdd .dd-btn")));
 const op = await page.$eval(".pvx-fsel", s => [...s.options].find(o => /^tipo\|/.test(o.value)).value); await page.selectOption(".pvx-fsel", op); await page.waitForTimeout(700); r = await st();
-check(`un solo selector de filtros; muestra cuántos hay (${r.n})`, r.n === "1" && (await page.$$("#pvx-f select")).length === 1);
+check(`un solo selector de filtros; muestra cuántos hay (${r.n})`, r.n === "1" && (await page.$$(".pvx-fdd select")).length === 1);
 check("el filtro aplicado queda como etiqueta", !!(await page.$(".pvx-tag")));
 await page.click(".pvx-tag"); await page.waitForTimeout(700); r = await st(); check("la etiqueta ✕ quita el filtro", r.n === "");
 await page.selectOption(".pvx-fsel", op); await page.waitForTimeout(700);

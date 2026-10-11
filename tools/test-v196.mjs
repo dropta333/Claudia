@@ -1,0 +1,52 @@
+// Prueba v196: Proyectos (plegar tras otras pestañas, barra en dos filas) · Reportes en mosaico · Capacidad en fichas respeta "Por cargo / Sin agrupar" y la búsqueda; los botones de la barra no se mueven
+import { createRequire } from "node:module"; import { execSync } from "node:child_process"; import path from "node:path";
+const req = createRequire(import.meta.url); let pw; try { pw = req("playwright"); } catch { pw = req(execSync("npm root -g").toString().trim() + "/playwright"); }
+const b = await pw.chromium.launch(); const page = await (await b.newContext({ viewport: { width: 1600, height: 900 } })).newPage();
+const errs = []; page.on("pageerror", e => errs.push(e.message)); page.on("console", m => { if (m.type() === "error") errs.push(m.text()); });
+await page.goto("file://" + path.resolve("dist/preview.html")); await page.waitForTimeout(700);
+await page.evaluate(() => { window.pxpSaveBase = function () { }; try { localStorage.setItem("pxp_lg_off", "1"); localStorage.removeItem("pxp_cap_cerr"); localStorage.removeItem("pxp_grp"); } catch (e) { } enterApp({ name: "Bastián Torres" }, "preview"); });
+await page.waitForTimeout(1800); await page.evaluate(() => { for (let i = 0; i < 6; i++) try { pxpLogroCerrar(); } catch (e) { } pxpHomeModo("global"); switchView("capacidad"); }); await page.waitForTimeout(900);
+const ok = [], fail = []; const check = (n, c) => (c ? ok : fail).push(n);
+const st = () => page.evaluate(() => ({ secs: [...document.querySelectorAll("#cap-wrap .cap-mos > .pfc-sec")].filter(s => !s.hidden).length, heads: document.querySelectorAll("#cap-wrap .pfc-gh").length, fichas: [...document.querySelectorAll("#cap-wrap .pfc")].filter(x => x.offsetParent).length, pos: [...document.querySelectorAll("#cap-wrap .grp-bar button")].map(x => Math.round(x.getBoundingClientRect().left)).join(","), on: (document.querySelector("#cap-wrap .grp-bar .seg button.on") || {}).textContent }));
+const a = await st();
+check(`por cargo: varios grupos (${JSON.stringify(a)})`, a.secs > 3 && a.heads === a.secs);
+await page.click("#cap-wrap .grp-bar .seg button[data-m='none']"); await page.waitForTimeout(700);
+const s2 = await st();
+check(`sin agrupar: una sola sección sin títulos y las mismas fichas (${JSON.stringify(s2)})`, s2.secs === 1 && s2.heads === 0 && s2.fichas === a.fichas && /Sin agrupar/i.test(s2.on));
+check("los botones no se mueven al cambiar", s2.pos === a.pos);
+const orden = await page.evaluate(() => [...document.querySelectorAll("#cap-wrap .pfc")].map(c => parseFloat((c.querySelectorAll(".pfc-stats b")[1] || {}).textContent.replace(",", ".")) || 0));
+check("sin agrupar: de la más cargada a la menos", orden.every((v, i) => !i || orden[i - 1] >= v));
+await page.fill("#cap-wrap .grp-bar input", "oscar"); await page.waitForTimeout(500);
+const s3 = await st(); check(`buscar filtra las fichas (${s3.fichas})`, s3.fichas >= 1 && s3.fichas < a.fichas);
+check("el cursor sigue en el buscador", await page.evaluate(() => document.activeElement && document.activeElement.closest("#cap-wrap .grp-bar") !== null));
+await page.click("#cap-wrap .grp-bar .seg button[data-m='grupo']"); await page.waitForTimeout(700);
+const s4 = await st(); check(`volver a por cargo, con la búsqueda aplicada (${JSON.stringify(s4)})`, s4.heads >= 1 && s4.fichas === s3.fichas && s4.pos === a.pos);
+await page.fill("#cap-wrap .grp-bar input", ""); await page.waitForTimeout(500);
+check("borrar la búsqueda devuelve todo", (await st()).fichas === a.fichas);
+await page.evaluate(() => { pxpCapVista("tabla"); }); await page.waitForTimeout(700);
+await page.click("#cap-wrap .grp-bar .seg button[data-m='none']"); await page.waitForTimeout(500);
+check("en tabla también funciona sin agrupar", await page.evaluate(() => document.querySelectorAll("#cap-wrap tr.pv-g").length === 0));
+await page.click("#cap-wrap .grp-bar .seg button[data-m='grupo']"); await page.waitForTimeout(500);
+check("en tabla, por cargo", await page.evaluate(() => document.querySelectorAll("#cap-wrap tr.pv-g").length > 3));
+await page.evaluate(() => { pxpCapVista("fichas"); }); await page.waitForTimeout(500);
+// Proyectos: plegar/desplegar después de visitar Capacidad (antes se rompía) y barra en dos filas
+await page.evaluate(() => { switchView("projects"); pvAlcance("todos"); pvGroup("cliente"); pxpVistaProy("fichas"); }); await page.waitForTimeout(900);
+const nP = () => page.$$eval("#proj-wrap .pvc", x => x.length); const p0 = await nP();
+await page.click(".pvx-gl button:has-text('Plegar')"); await page.waitForTimeout(500); const p1 = await nP();
+await page.click(".pvx-gl button:has-text('Desplegar')"); await page.waitForTimeout(500);
+check(`Proyectos: plegar tras visitar Capacidad (${p0}→${p1}→${await nP()})`, p0 > 0 && p1 === 0 && (await nP()) === p0);
+check("Proyectos: sin la fila suelta de 'Filtrar por'", await page.evaluate(() => !!document.querySelector(".pvx-bar .pvx-fdd") && !document.querySelector("#pvx-f:not([hidden]) .dd-btn")));
+check("Proyectos: Ordenar por en la fila de estados", await page.evaluate(() => !!document.querySelector("#proj-wrap .pvx-chips .pvc-sort")));
+await page.evaluate(() => { pvSet("tipo", "Comercial"); renderProjects(); }); await page.waitForTimeout(600);
+check("Proyectos: el filtro aplicado queda como etiqueta junto a los estados", await page.evaluate(() => !!document.querySelector(".pvx-chips .pvx-tags .pvx-tag") && document.querySelector(".pvx-n").textContent === "1"));
+await page.evaluate(() => { pvClear(); pvGroup("none"); }); await page.waitForTimeout(500);
+// Reportes en mosaico
+await page.evaluate(() => switchView("reportes")); await page.waitForTimeout(900);
+await page.click("#rp-wrap .rp-all button >> nth=1"); await page.waitForTimeout(600);
+const rp = await page.evaluate(() => { const S = [...document.querySelectorAll("#rp-wrap > .rp-cl")]; const r = S.map(x => x.getBoundingClientRect()); let o = 0; for (let i = 0; i < r.length; i++) for (let j = i + 1; j < r.length; j++) { const a = r[i], d = r[j]; if (a.left < d.right - 1 && d.left < a.right - 1 && a.top < d.bottom - 1 && d.top < a.bottom - 1) o++; } const uno = S.filter(x => x.querySelectorAll(":scope > .rp-grid > *").length === 1); const W = document.getElementById("rp-wrap").clientWidth; return { mos: document.getElementById("rp-wrap").classList.contains("rp-mos"), o, uno: uno.length, angostos: uno.filter(x => x.getBoundingClientRect().width < W / 2).length }; });
+check(`Reportes: mosaico sin montarse y clientes de un proyecto en una columna (${JSON.stringify(rp)})`, rp.mos && rp.o === 0 && rp.uno > 0 && rp.angostos === rp.uno);
+await page.click("#rp-wrap .rp-all button >> nth=0"); await page.waitForTimeout(600);
+const rc = await page.evaluate(() => { const S = [...document.querySelectorAll("#rp-wrap > .rp-cl")]; return new Set(S.map(x => Math.round(x.getBoundingClientRect().top))).size < S.length; });
+check("Reportes: cerrados quedan lado a lado", rc);
+check("sin errores: " + errs.slice(0, 3).join(" | "), errs.length === 0);
+console.log(ok.map(x => "✓ " + x).join("\n")); console.log(fail.map(x => "✗ " + x).join("\n")); await b.close(); process.exit(fail.length ? 1 : 0);
