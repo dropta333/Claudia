@@ -6498,7 +6498,7 @@ body:not(.trf-tabla) #main-grid > .card:not(.span-all){padding:16px 16px 14px!im
 
 /* ═════ v190 · Clientes: reparto, tipos y desplegables ═════ */
 #view-clientes .home-panel.c7,#view-clientes .home-panel.c5{display:flex;flex-direction:column}
-.rc{display:grid;grid-template-columns:minmax(200px,250px) minmax(0,1fr);gap:26px;align-items:center}
+.rcx{display:grid;grid-template-columns:minmax(200px,250px) minmax(0,1fr);gap:26px;align-items:center}
 .rc-d{position:relative;display:grid;place-items:center}
 .rc-d svg.pxp-donut{width:100%;max-width:250px;height:auto;aspect-ratio:1}
 .rc-k{display:flex;gap:6px;align-items:baseline;justify-content:center;margin-top:8px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
@@ -6521,7 +6521,7 @@ body:not(.trf-tabla) #main-grid > .card:not(.span-all){padding:16px 16px 14px!im
 .rc-oc button::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--c)}
 .rc-oc button small{color:var(--muted);font-weight:500}
 .rc-oc button:hover{background:color-mix(in srgb,var(--c) 20%,transparent)}
-.rc + .rc-o{margin-top:18px}
+.rcx + .rc-o{margin-top:18px}
 #view-clientes .home-panel.c5 .sbar{margin:2px 0 14px}
 .tp-l{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;flex:1;justify-content:space-between}
 .tp-l li{display:grid;grid-template-columns:62px minmax(0,1fr) auto;grid-template-areas:"p nm c" "p b b";column-gap:12px;row-gap:5px;align-items:center;padding:6px 2px}
@@ -6529,11 +6529,11 @@ body:not(.trf-tabla) #main-grid > .card:not(.span-all){padding:16px 16px 14px!im
 .tp-p{grid-area:p;font:600 26px/1 var(--display);color:var(--c);font-variant-numeric:tabular-nums}
 .tp-p small{font-size:13px;margin-left:1px}
 .tp-nm{grid-area:nm;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tp-c{grid-area:c;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.tp-cn{grid-area:c;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
 .tp-b{grid-area:b;height:5px;border-radius:99px;background:color-mix(in srgb,var(--text) 7%,transparent);overflow:hidden}
 .tp-b i{display:block;height:100%;width:var(--w);border-radius:inherit;background:var(--c)}
 #view-clientes .home-panel.c5 .note{margin:12px 0 0}
-@media (max-width:760px){.rc{grid-template-columns:1fr;gap:14px}.rc-d svg.pxp-donut{max-width:210px}}
+@media (max-width:760px){.rcx{grid-template-columns:1fr;gap:14px}.rc-d svg.pxp-donut{max-width:210px}}
 
 .ct-bar0{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 12px}
 .ct-seg button b{font-weight:600;opacity:.65;margin-left:4px}
@@ -6578,7 +6578,7 @@ body:not(.trf-tabla) #main-grid > .card:not(.span-all){padding:16px 16px 14px!im
 .lc-clr{all:unset;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--muted);padding:0 6px;text-decoration:underline;text-underline-offset:3px}
 .lc-clr:hover{color:var(--text)}
 select.dd-src{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important;margin:0!important;padding:0!important;border:0!important}
-.dd-btn{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 12px 0 14px;max-width:260px;border-radius:99px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13.5px;transition:border-color .15s,background .15s}
+.dd-btn{all:unset;box-sizing:border-box;cursor:pointer;font-family:var(--sans);font-weight:400;text-transform:none;letter-spacing:0;line-height:1.2;display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 12px 0 14px;max-width:260px;border-radius:99px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13.5px;transition:border-color .15s,background .15s}
 .dd-btn:hover{border-color:var(--border2);background:var(--surface2)}
 .dd-btn:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 .dd-btn[aria-expanded="true"]{border-color:var(--brand)}
@@ -6610,7 +6610,7 @@ select.dd-src{position:absolute!important;width:1px!important;height:1px!importa
 .dd-ck{display:grid;place-items:center;width:20px;height:20px;border-radius:50%;opacity:0}
 .dd-ck .i{width:14px;height:14px}
 .dd-o.sel .dd-ck{opacity:1;background:var(--brand);color:var(--on-brand,#111)}
-.dd-dot{width:9px;height:9px;border-radius:50%;background:var(--brand);flex:none;margin:0 4px}
+.dd-dot{width:9px;height:9px;border-radius:50%;background:var(--muted2);flex:none;margin:0 4px}
 .dd-dot.all{background:transparent;border:1.5px dashed var(--muted)}
 .dd-o .av{flex:none}
 .dd-none{margin:8px 10px;color:var(--muted);font-size:13px}
@@ -6621,6 +6621,15 @@ select.dd-src{position:absolute!important;width:1px!important;height:1px!importa
 @keyframes ddSheet{from{transform:translateY(100%)}to{transform:none}}
 #lic-wrap .lc-ch button{white-space:nowrap;flex:none}
 @media (max-width:760px){#lic-wrap .lc-r1 .lc-s{flex:1 1 100%}#lic-wrap .lc-fs{margin-left:0;width:100%}#lic-wrap .lc-r2 .lc-ch{width:100%;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}.lc-sep{display:none}.dd-btn{max-width:100%}}
+
+/* ═════ v194 · Logros en una fila · desplegables tipo valor/acción ═════ */
+.lg-psec .lg-pi.lg-x{display:none}
+.dd-btn.fijo .dd-l::after{content:":"}
+.dd-btn.accion{border-style:dashed}
+.dd-g{padding:10px 10px 4px;font:600 11px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.dd-g[hidden]{display:none}
+.dd-list .dd-g:first-child{padding-top:2px}
+.pvx-grp{display:inline-flex}
 </style>
 </head>
 <body>
@@ -10729,7 +10738,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const go = (l) => `pxpCliGo('${jsq(l)}')`;
     const donut = pc.total === 0
       ? `<div class="home-empty">Sin asignaciones de tráfico cargadas para ${esc(WEEKS[w].label)}.</div>`
-      : `<div class="rc">
+      : `<div class="rcx">
           <div class="rc-d">${donutSvg(top.map(e => ({ label: e.label, value: e.count, color: clientColor(e.label), unit: _u, onclick: go(e.label) })).concat(nResto ? [{ label: `Otros ${resto.length}`, value: nResto, color: "var(--muted2)", unit: _u }] : []), String(pc.total), _u)}
             <div class="rc-k"><b>${pc.entries.length}</b><span>clientes</span></div></div>
           <ol class="rc-l">${top.map((e, i) => `<li><button onclick="${go(e.label)}" style="--c:${clientColor(e.label)};--w:${(e.count / maxC * 100).toFixed(1)}%"><span class="rc-n">${i + 1}</span><span class="rc-nm">${esc(e.label)}</span><span class="rc-v"><b>${e.pct}%</b> · ${e.count}</span><span class="rc-b"><i></i></span></button></li>`).join("")}</ol>
@@ -10739,7 +10748,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const ptS = pt.entries.slice().sort((a, b) => b.count - a.count), maxT = Math.max(1, ...ptS.map(e => e.count));
     const tipo = pt.total === 0 ? `<div class="home-empty">Sin asignaciones para esta semana.</div>` : `
       ${stackBar(ptS.map(e => ({ label: e.label, value: e.count, color: TIPO_C[e.label], unit: _u })))}
-      <ul class="tp-l">${ptS.map(e => `<li class="${e.count ? "" : "z"}" style="--c:${TIPO_C[e.label]};--w:${(e.count / maxT * 100).toFixed(1)}%"><span class="tp-p">${Math.round(e.pct)}<small>%</small></span><span class="tp-nm">${esc(e.label)}</span><span class="tp-c">${e.count}</span><span class="tp-b"><i></i></span></li>`).join("")}</ul>
+      <ul class="tp-l">${ptS.map(e => `<li class="${e.count ? "" : "z"}" style="--c:${TIPO_C[e.label]};--w:${(e.count / maxT * 100).toFixed(1)}%"><span class="tp-p">${Math.round(e.pct)}<small>%</small></span><span class="tp-nm">${esc(e.label)}</span><span class="tp-cn">${e.count}</span><span class="tp-b"><i></i></span></li>`).join("")}</ul>
       <p class="note">El tipo sale de la ficha de cada proyecto; si no tiene, se deduce del nombre ("Caso…" → Casos, "Licitación…" → Licitaciones, el resto → Comercial).</p>`;
 
     // Columnas apiladas por semana (100%)
@@ -11951,9 +11960,9 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   });
 
   // ═════════ PROYECTOS: agrupados por cliente y ordenables ═════════
-  const PV_KEY = "pxp_pv_v3";   // v189 · nuevos valores por defecto: activos y agrupados por cliente
+  const PV_KEY = "pxp_pv_v4";   // v194 · por defecto: activos y sin agrupar (de la v3 se conserva todo menos el grupo)
 
-  let pv = Object.assign({ group: "cliente", alcance: "activos", fopen: false, sort: "nombre", dir: 1, gdir: 1, complejidad: "", tipo: "", agencia: "", collapsed: {} }, (() => { try { return JSON.parse(localStorage.getItem(PV_KEY) || "{}"); } catch (e) { return {}; } })());
+  let pv = Object.assign({ group: "none", alcance: "activos", fopen: false, sort: "nombre", dir: 1, gdir: 1, complejidad: "", tipo: "", agencia: "", collapsed: {} }, (() => { try { const v4 = localStorage.getItem(PV_KEY); if (v4) return JSON.parse(v4); const v3 = JSON.parse(localStorage.getItem("pxp_pv_v3") || "{}"); delete v3.group; return v3; } catch (e) { return {}; } })());
   if (pv.sort === "etapa") pv.sort = "avance";
   const pvSave = () => { try { localStorage.setItem(PV_KEY, JSON.stringify(pv)); } catch (e) { } };
   const ORD_EST = { cotizado: 0, preproduccion: 0.5, rodaje: 1, en_produccion: 2, revision: 3, standby: 4, entregado: 5, aprobado: 6 };
@@ -12116,7 +12125,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
           <button type="button" class="pvx-fbtn${pv.fopen ? " on" : ""}${nFil ? " has" : ""}" onclick="pvFiltros()" aria-expanded="${!!pv.fopen}" aria-controls="pvx-f">${IV.filtro}Filtros${nFil ? `<b>${nFil}</b>` : ""}</button>
           <div class="pvx-r">
             <div class="seg pvx-vista" role="group" aria-label="Vista"><button class="${vista !== "filas" ? "on" : ""}" onclick="pxpVistaProy('fichas')" aria-label="Fichas" data-tip="Fichas">${IV.fichas}<span>Fichas</span></button><button class="${vista === "filas" ? "on" : ""}" onclick="pxpVistaProy('filas')" aria-label="Filas" data-tip="Filas">${IV.filas}<span>Filas</span></button></div>
-            <label class="pvx-grp"><span>Agrupar</span><select onchange="pvGroup(this.value)" aria-label="Agrupar por">${GR.map(([v, l]) => `<option value="${v}" ${pv.group === v ? "selected" : ""}>${l}</option>`).join("")}</select></label>
+            <span class="pvx-grp"><select data-dd="Agrupar" data-dd-kind="valor" onchange="pvGroup(this.value)" aria-label="Agrupar por">${GR.map(([v, l]) => `<option value="${v}" ${pv.group === v ? "selected" : ""}>${l}</option>`).join("")}</select></span>
             ${typeof pxpPuedeEditar !== "function" || pxpPuedeEditar() ? `<button type="button" class="btn-new proj pvx-new" onclick="pxpNewProject()"><svg class='i' viewBox='0 0 24 24' aria-hidden='true'><path d='M12 5v14M5 12h14'/></svg><span>Nuevo proyecto</span></button>` : ""}
           </div>
         </div>
@@ -12125,7 +12134,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
             const F = [["estado", "Estado", ["cotizado", "preproduccion", "rodaje", "en_produccion", "revision", "standby", "entregado"].map(e => [e, EST_LBL[e]]), projectsFilter.estado],
               ["cliente", "Cliente", clientes.map(c => [c, c]), projectsFilter.cliente], ["agencia", "Agencia", window.pxpAgencias().map(a => [a, a]), pv.agencia],
               ["tipo", "Tipo", window.pxpTipos.map(t => [t, t]), pv.tipo], ["complejidad", "Complejidad", ["simple", "medio", "complejo"].map(c => [c, c[0].toUpperCase() + c.slice(1)]), pv.complejidad]];
-            const sel = `<select class="pvx-fsel" onchange="if(this.value){const i=this.value.indexOf('|');pvSet(this.value.slice(0,i),this.value.slice(i+1));renderProjects()}" aria-label="Agregar un filtro"><option value="">Filtrar por…</option>${F.map(([k, l, ops, cur]) => `<optgroup label="${l}">${ops.map(([v, t]) => `<option value="${k}|${esc(v)}" ${cur && norm(cur) === norm(v) ? "disabled" : ""}>${esc(t)}</option>`).join("")}</optgroup>`).join("")}</select>`;
+            const sel = `<select class="pvx-fsel" data-dd="Filtrar por" data-dd-kind="accion" onchange="if(this.value){const i=this.value.indexOf('|');pvSet(this.value.slice(0,i),this.value.slice(i+1));renderProjects()}" aria-label="Agregar un filtro"><option value="">Filtrar por…</option>${F.map(([k, l, ops, cur]) => `<optgroup label="${l}">${ops.map(([v, t]) => `<option value="${k}|${esc(v)}" ${cur && norm(cur) === norm(v) ? "disabled" : ""}>${esc(t)}</option>`).join("")}</optgroup>`).join("")}</select>`;
             const tags = F.filter(f => f[3]).map(([k, l, ops, cur]) => { const o = ops.find(x => norm(x[0]) === norm(cur)); return `<button type="button" class="pvx-tag" onclick="pvSet('${k}','');renderProjects()" aria-label="Quitar filtro ${l}"><span>${l}:</span> ${esc(o ? o[1] : cur)} <i aria-hidden="true">✕</i></button>`; }).join("");
             return sel + (tags ? `<div class="pvx-tags">${tags}</div>` : "");
           })()}
@@ -15428,7 +15437,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     });
     if (blq.length) html += blq.map(b => `<section class="pvc-blk${b.closed ? " closed" : ""}" data-n="${b.closed ? 0 : b.n}">${b.head}${b.n && !b.closed ? `<div class="pvc-in">${b.cards}</div>` : ""}</section>`).join("");
     const sorts = Array.from(table.querySelectorAll("thead .sortbtn")).map((b, i) => ({ i, l: b.textContent.replace(/[▲▼↕]/g, "").trim(), on: b.classList.contains("on") })).filter(x => x.l);
-    const sortSel = sorts.length ? `<label class="pvc-sort">Ordenar por <select onchange="document.querySelectorAll('#proj-wrap thead .sortbtn')[this.value].click()">${sorts.map(x => `<option value="${x.i}" ${x.on ? "selected" : ""}>${esc(x.l.charAt(0) + x.l.slice(1).toLowerCase())}</option>`).join("")}</select></label>` : "";
+    const sortSel = sorts.length ? `<span class="pvc-sort">Ordenar por <select data-dd="Ordenar por" data-dd-kind="sort" aria-label="Ordenar por" onchange="document.querySelectorAll('#proj-wrap thead .sortbtn')[this.value].click()">${sorts.map(x => `<option value="${x.i}" ${x.on ? "selected" : ""}>${esc(x.l.charAt(0) + x.l.slice(1).toLowerCase())}</option>`).join("")}</select></span>` : "";
     const zone = document.createElement("div"); zone.className = "pvc-zone";
     zone.innerHTML = `${sortSel}<div class="pvc-grid${blq.length ? " pvc-blocks" : ""}">${html || `<p class="note">No hay proyectos con estos filtros.</p>`}</div>`;
     const tw = table.closest(".proj-table-wrap"); (tw || table).insertAdjacentElement("afterend", zone);
@@ -18259,38 +18268,42 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     x: "<svg class='i' viewBox='0 0 24 24' aria-hidden='true'><path d='M7 7l10 10M17 7 7 17'/></svg>",
     ok: "<svg class='i' viewBox='0 0 24 24' aria-hidden='true'><path d='m5.5 12.5 4 4 9-9'/></svg>",
     sort: "<svg class='i' viewBox='0 0 24 24' aria-hidden='true'><path d='M7 4v16M3.5 16.5 7 20l3.5-3.5M17 20V4M13.5 7.5 17 4l3.5 3.5'/></svg>",
-    q: "<svg class='i' viewBox='0 0 24 24' aria-hidden='true'><circle cx='11' cy='11' r='6.5'/><path d='m20 20-4.2-4.2'/></svg>"
+    q: "<svg class='i' viewBox='0 0 24 24' aria-hidden='true'><circle cx='11' cy='11' r='6.5'/><path d='m20 20-4.2-4.2'/></svg>",
+    filt: "<svg class='i' viewBox='0 0 24 24' aria-hidden='true'><path d='M4 5h16l-6 7.5V19l-4 1.5v-8z'/></svg>"
   };
   let pop = null, cur = null;
   const txt = (sel) => { const o = sel.options[sel.selectedIndex]; return o ? o.textContent : ""; };
   function pill(sel) {
     const b = sel.__dd; if (!b) return;
-    const lab = sel.dataset.dd, v = sel.value, sort = sel.dataset.ddKind === "sort", on = !!v && !sort;
-    b.classList.toggle("on", on);
-    b.innerHTML = `${sort ? IC.sort : ""}<span class="dd-l">${esc(lab)}</span>${on || sort ? `<b class="dd-v">${esc(txt(sel))}</b>` : ""}${on ? `<span class="dd-x" role="button" tabindex="-1" aria-label="Quitar">${IC.x}</span>` : IC.chev}`;
+    const lab = sel.dataset.dd, v = sel.value, kind = sel.dataset.ddKind || "", sort = kind === "sort", fijo = sort || kind === "valor", accion = kind === "accion", on = !!v && !fijo && !accion;
+    b.classList.toggle("on", on); b.classList.toggle("fijo", kind === "valor"); b.classList.toggle("accion", accion);
+    b.innerHTML = `${sort ? IC.sort : accion ? IC.filt : ""}<span class="dd-l">${esc(lab)}</span>${on || fijo ? `<b class="dd-v">${esc(txt(sel))}</b>` : ""}${on ? `<span class="dd-x" role="button" tabindex="-1" aria-label="Quitar">${IC.x}</span>` : IC.chev}`;
   }
   function elegir(sel, v) { const y = scrollY; sel.value = v; cerrar(); sel.dispatchEvent(new Event("change", { bubbles: true })); pill(sel); if (Math.abs(scrollY - y) > 1) scrollTo(0, y); requestAnimationFrame(() => { if (Math.abs(scrollY - y) > 1) scrollTo(0, y); }); }
   function cerrar() { if (pop) { pop.remove(); pop = null; } if (cur && cur.__dd) cur.__dd.setAttribute("aria-expanded", "false"); cur = null; document.removeEventListener("pointerdown", fuera, true); }
   function fuera(e) { if (pop && !pop.contains(e.target) && !(cur && cur.__dd && cur.__dd.contains(e.target))) cerrar(); }
   function abrir(sel) {
     if (cur === sel) { cerrar(); return; } cerrar(); cur = sel;
-    const b = sel.__dd, kind = sel.dataset.ddKind || "", ops = Array.from(sel.options), muchas = ops.length > 8;
+    const b = sel.__dd, kind = sel.dataset.ddKind || "", ops = Array.from(sel.options), muchas = ops.length > 8, plano = kind === "sort" || kind === "valor";
     const av = (t) => kind === "persona" && window.pxpAvatar ? window.pxpAvatar("person", t, 26) : `<span class="dd-dot"></span>`;
     pop = document.createElement("div"); pop.__t = Date.now(); pop.className = "dd-pop" + (kind ? " k-" + kind : ""); pop.setAttribute("role", "listbox");
     pop.innerHTML = `<div class="dd-h">${esc(sel.dataset.dd)}</div>${muchas ? `<label class="dd-q">${IC.q}<input type="search" placeholder="Buscar…" aria-label="Buscar"></label>` : ""}
-      <div class="dd-list">${ops.map((o, i) => `<button type="button" role="option" class="dd-o${o.value === sel.value ? " sel" : ""}${!o.value && kind !== "sort" ? " all" : ""}" data-i="${i}" aria-selected="${o.value === sel.value}">${!o.value && kind !== "sort" ? `<span class="dd-dot all"></span>` : kind === "sort" ? "" : av(o.textContent)}<span class="dd-t">${esc(o.textContent)}</span><span class="dd-ck">${IC.ok}</span></button>`).join("")}<p class="dd-none" hidden>Sin resultados</p></div>`;
+      <div class="dd-list">${ops.map((o, i) => { if (kind === "accion" && !o.value) return ""; const g = o.parentElement && o.parentElement.tagName === "OPTGROUP" ? o.parentElement : null, gh = g && g.firstElementChild === o ? `<div class="dd-g">${esc(g.label)}</div>` : "";
+        return gh + `<button type="button" role="option" class="dd-o${o.value === sel.value && kind !== "accion" ? " sel" : ""}${!o.value && !plano ? " all" : ""}" data-i="${i}" aria-selected="${o.value === sel.value}">${!o.value && !plano ? `<span class="dd-dot all"></span>` : plano ? "" : av(o.textContent)}<span class="dd-t">${esc(o.textContent)}</span><span class="dd-ck">${IC.ok}</span></button>`; }).join("")}<p class="dd-none" hidden>Sin resultados</p></div>`;
     document.body.appendChild(pop);
     const r = b.getBoundingClientRect(), pw = Math.max(r.width, 240), vw = document.documentElement.clientWidth;
     if (vw < 560) { pop.classList.add("sheet"); b.setAttribute("aria-expanded", "true"); }   // en celular: hoja desde abajo
     else {
     pop.style.minWidth = pw + "px"; pop.style.left = Math.max(8, Math.min(r.left, vw - pop.offsetWidth - 8)) + "px";
     const abajo = innerHeight - r.bottom, alto = pop.offsetHeight;
-    if (abajo < alto + 12 && r.top > abajo) { pop.style.top = ""; pop.style.bottom = (innerHeight - r.top + 6) + "px"; pop.classList.add("up"); } else pop.style.top = (r.bottom + 6) + "px";
+    const arriba = abajo < alto + 12 && r.top > abajo + 120, lista = pop.querySelector(".dd-list"), extra = alto - lista.offsetHeight, cabe = (arriba ? r.top : abajo) - extra - 18;
+    if (lista.offsetHeight > cabe) lista.style.maxHeight = Math.max(160, cabe) + "px";
+    if (arriba) { pop.style.top = ""; pop.style.bottom = (innerHeight - r.top + 6) + "px"; pop.classList.add("up"); } else pop.style.top = (r.bottom + 6) + "px";
     b.setAttribute("aria-expanded", "true"); }
     const btns = Array.from(pop.querySelectorAll(".dd-o"));
     btns.forEach(x => x.addEventListener("click", () => elegir(sel, ops[+x.dataset.i].value)));
     const q = pop.querySelector(".dd-q input");
-    if (q) { q.addEventListener("input", () => { const t = q.value.trim().toLowerCase(); let n = 0; btns.forEach(x => { const ok = !t || x.textContent.toLowerCase().includes(t); x.hidden = !ok; if (ok) n++; }); pop.querySelector(".dd-none").hidden = n > 0; }); setTimeout(() => q.focus(), 10); }
+    if (q) { q.addEventListener("input", () => { const t = q.value.trim().toLowerCase(); let n = 0; btns.forEach(x => { const ok = !t || x.textContent.toLowerCase().includes(t); x.hidden = !ok; if (ok) n++; }); pop.querySelectorAll(".dd-g").forEach(h => { let e = h.nextElementSibling, v = false; while (e && !e.classList.contains("dd-g")) { if (e.classList.contains("dd-o") && !e.hidden) v = true; e = e.nextElementSibling; } h.hidden = !v; }); pop.querySelector(".dd-none").hidden = n > 0; }); setTimeout(() => q.focus(), 10); }
     else (pop.querySelector(".dd-o.sel") || btns[0] || {}).focus && (pop.querySelector(".dd-o.sel") || btns[0]).focus();
     pop.addEventListener("keydown", (e) => {
       const vis = btns.filter(x => !x.hidden), i = vis.indexOf(document.activeElement);
@@ -18655,7 +18668,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     "Agregar imagen del proyecto": "Add project image", "Cambiar imagen": "Change image", "Sugerencias": "Suggestions", "Avance por etapas": "Progress by stage", "Notas": "Notes", "Adjuntar": "Attach", "Bloqueadores": "Blockers", "+ Reportar bloqueador": "+ Report blocker", "Revisiones y enlaces": "Reviews and links", "+ Agregar enlace": "+ Add link", "Ruta en el share": "Share path", "+ Agregar ruta": "+ Add path", "Copiar ruta": "Copy path", "Editar ficha completa": "Edit full card", "Revisar": "Review", "Descargar": "Download", "Cronograma": "Schedule", "Piezas por tipo": "Pieces by type", "Adaptaciones por país": "Adaptations by country", "Agregar etapa": "Add stage", "+ Agregar etapa": "+ Add stage", "Usar etapas típicas": "Use typical stages",
     "Pendiente": "Pending", "Con cambios": "Changes requested", "En curso": "In progress", "Revisión": "Review", "Datos del proyecto": "Project details", "Color": "Color", "Nota": "Note", "Historial": "History", "Horas trabajadas en el proyecto": "Hours worked on the project",
 
-    "Por tipo": "By type", "proyectos": "projects", "proyecto": "project", "% de asignaciones en Tráfico": "% of assignments in Traffic", "Ordenar por": "Sort by", "trabajó de más": "worked overtime", "horas estimadas": "estimated hours", "Semanas de cola": "Queue weeks", "Color por cargo": "Color by role", "tipo de proyecto": "project type", "Todo el año 2026": "Whole year 2026", "Filtrar por tipo": "Filter by type", "Vista de la lista": "List view", "Ordenar por estado": "Sort by status", "Filtrar por estado": "Filter by status", "Ordenar por tiempo": "Sort by time", "Ordenar por inicio": "Sort by start", "Ordenar por cliente": "Sort by client", "Ver tablas de datos": "View data tables", "Filtrar por agencia": "Filter by agency", "Le caben por semana": "Fits per week", "Filtrar por cliente": "Filter by client", "clientes": "clients", "Limpiar": "Clear", "Ordenar": "Sort", "Buscar…": "Search…", "Sin resultados": "No results", "Abrir o cerrar todos": "Open or close all", "Quitar": "Remove", "Abrir todos": "Open all", "Ver menos": "See less", "Cerrar todos": "Close all", "Ver todos": "See all", "Qué proyectos ver": "Which projects to show", "Toca un cliente para desplegar sus proyectos, agrupados por marca. Toca su nombre para abrir su ficha.": "Tap a client to expand its projects, grouped by brand. Tap its name to open its card.", "El tipo sale de la ficha de cada proyecto; si no tiene, se deduce del nombre (\"Caso…\" → Casos, \"Licitación…\" → Licitaciones, el resto → Comercial).": "The type comes from each project card; if it has none, it is inferred from the name (\"Caso…\" → Case studies, \"Licitación…\" → Tenders, the rest → Commercial).", "Toca su nombre para abrir su ficha y crearle uno.": "Tap its name to open its card and create one.", "Reparto por cliente": "Split by client", "Ordenar por proyecto": "Sort by project", "Jornada de referencia": "Reference workday", "Qué proyectos mostrar": "Which projects to show", "Filtrar por complejidad": "Filter by complexity", "Ordenar por complejidad": "Sort by complexity", "Trabajaron fin de semana": "Worked on weekends", "Sin cliente identificado": "No client identified", "Ordenar por entrega final": "Sort by final delivery", "Ordenar por próximo avance": "Sort by next milestone", "cliente → marca → proyecto": "client → brand → project", "Sin cupo (cola > 2 semanas)": "No room (queue > 2 weeks)", "Guardar horas de esta semana": "Save this week's hours", "Los cambios se guardan solos": "Changes save automatically", "8 h al día · 40 h por semana": "8 h a day · 40 h a week", "Clientes, marcas y proyectos": "Clients, brands and projects", "usan default por complejidad": "use the complexity default", "ocupados con 1 o 2 proyectos": "busy with 1 or 2 projects", "Proyectos sin horas estimadas": "Projects without estimated hours", "Volver a las horas automáticas": "Back to automatic hours", "L–V 8:30–5:30 · 1 h de almuerzo": "Mon–Fri 8:30–5:30 · 1 h lunch", "Personas con exceso esta semana": "People over hours this week", "Compensatorio sugerido (equipo)": "Suggested comp time (team)", "Fin de semana · el reloj no corre": "Weekend · the clock stops", "Horas estimadas cargada en la ficha": "Estimated hours set in the card", "Proyectos activos (horas estimadas)": "Active projects (estimated hours)", "Guardar esta semana en el histórico": "Save this week to history", "Buscar por proyecto, cliente o marca": "Search by project, client or brand", "toca una barra para ver sus proyectos": "tap a bar to see its projects", "Las horas corren solas, como un reloj.": "Hours run on their own, like a clock.", "Sin horas estimadas — usando default de medio": "No estimated hours — using the medium default", "Sin horas estimadas — usando default de complejo": "No estimated hours — using the complex default", "Horas sumadas a mano por encima de lo automático": "Hours added by hand on top of the automatic ones", "sin estimar": "not estimated", "El": "The", "Mis datos": "My details", "Sobre mí": "About me", "Correo": "Email", "Teléfono": "Phone", "Notas": "Notes",
+    "Por tipo": "By type", "proyectos": "projects", "proyecto": "project", "% de asignaciones en Tráfico": "% of assignments in Traffic", "Ordenar por": "Sort by", "trabajó de más": "worked overtime", "horas estimadas": "estimated hours", "Semanas de cola": "Queue weeks", "Color por cargo": "Color by role", "tipo de proyecto": "project type", "Todo el año 2026": "Whole year 2026", "Filtrar por tipo": "Filter by type", "Vista de la lista": "List view", "Ordenar por estado": "Sort by status", "Filtrar por estado": "Filter by status", "Ordenar por tiempo": "Sort by time", "Ordenar por inicio": "Sort by start", "Ordenar por cliente": "Sort by client", "Ver tablas de datos": "View data tables", "Filtrar por agencia": "Filter by agency", "Le caben por semana": "Fits per week", "Filtrar por cliente": "Filter by client", "clientes": "clients", "Limpiar": "Clear", "Agrupar": "Group", "Filtrar por": "Filter by", "Ordenar": "Sort", "Buscar…": "Search…", "Sin resultados": "No results", "Abrir o cerrar todos": "Open or close all", "Quitar": "Remove", "Abrir todos": "Open all", "Ver menos": "See less", "Cerrar todos": "Close all", "Ver todos": "See all", "Qué proyectos ver": "Which projects to show", "Toca un cliente para desplegar sus proyectos, agrupados por marca. Toca su nombre para abrir su ficha.": "Tap a client to expand its projects, grouped by brand. Tap its name to open its card.", "El tipo sale de la ficha de cada proyecto; si no tiene, se deduce del nombre (\"Caso…\" → Casos, \"Licitación…\" → Licitaciones, el resto → Comercial).": "The type comes from each project card; if it has none, it is inferred from the name (\"Caso…\" → Case studies, \"Licitación…\" → Tenders, the rest → Commercial).", "Toca su nombre para abrir su ficha y crearle uno.": "Tap its name to open its card and create one.", "Reparto por cliente": "Split by client", "Ordenar por proyecto": "Sort by project", "Jornada de referencia": "Reference workday", "Qué proyectos mostrar": "Which projects to show", "Filtrar por complejidad": "Filter by complexity", "Ordenar por complejidad": "Sort by complexity", "Trabajaron fin de semana": "Worked on weekends", "Sin cliente identificado": "No client identified", "Ordenar por entrega final": "Sort by final delivery", "Ordenar por próximo avance": "Sort by next milestone", "cliente → marca → proyecto": "client → brand → project", "Sin cupo (cola > 2 semanas)": "No room (queue > 2 weeks)", "Guardar horas de esta semana": "Save this week's hours", "Los cambios se guardan solos": "Changes save automatically", "8 h al día · 40 h por semana": "8 h a day · 40 h a week", "Clientes, marcas y proyectos": "Clients, brands and projects", "usan default por complejidad": "use the complexity default", "ocupados con 1 o 2 proyectos": "busy with 1 or 2 projects", "Proyectos sin horas estimadas": "Projects without estimated hours", "Volver a las horas automáticas": "Back to automatic hours", "L–V 8:30–5:30 · 1 h de almuerzo": "Mon–Fri 8:30–5:30 · 1 h lunch", "Personas con exceso esta semana": "People over hours this week", "Compensatorio sugerido (equipo)": "Suggested comp time (team)", "Fin de semana · el reloj no corre": "Weekend · the clock stops", "Horas estimadas cargada en la ficha": "Estimated hours set in the card", "Proyectos activos (horas estimadas)": "Active projects (estimated hours)", "Guardar esta semana en el histórico": "Save this week to history", "Buscar por proyecto, cliente o marca": "Search by project, client or brand", "toca una barra para ver sus proyectos": "tap a bar to see its projects", "Las horas corren solas, como un reloj.": "Hours run on their own, like a clock.", "Sin horas estimadas — usando default de medio": "No estimated hours — using the medium default", "Sin horas estimadas — usando default de complejo": "No estimated hours — using the complex default", "Horas sumadas a mano por encima de lo automático": "Hours added by hand on top of the automatic ones", "sin estimar": "not estimated", "El": "The", "Mis datos": "My details", "Sobre mí": "About me", "Correo": "Email", "Teléfono": "Phone", "Notas": "Notes",
     "Proyecto modificado": "Project modified", "Los cambios se guardan al cerrar la ventana o con el botón.": "Changes are saved when you close the window or with the button.", "Recetas": "Recipes", "Nuevo grupo": "New group", "Skills y software": "Skills and software", "Taxonomía sugerida": "Suggested naming", "Editar": "Edit",
     // reportes
     "Generar reporte": "Generate report", "Reporte del cliente": "Client report", "Todos los clientes": "All clients", "Vista previa": "Preview", "Descargar PDF": "Download PDF",
@@ -20885,6 +20898,15 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const sec = document.createElement("section"); sec.className = "pm-sec lg-psec"; sec.__n = n; sec.__r = ref; sec.__m = flag;
     sec.innerHTML = `<h3>Logros${L1.length ? ` · ${L1.length}` : ""}</h3>${L1.length ? `<div class="lg-pc">${TIERS.map((T, i) => cnt[i] ? `<span style="--tc:${T.c}"><i></i>${T.n} ${cnt[i]}</span>` : "").join("")}</div><div class="lg-pg">${chips}</div>${L1.length > oculto ? `<button type="button" class="btn-ghost sm lg-mas" onclick="pxpLogroMas()">${todo ? "Ver menos" : `Ver ${L1.length - oculto} más`}</button>` : ""}` : `<p class="note">Todavía no tiene logros. Se ganan solos con el trabajo en el tablero.</p>`}`;
     if (cur) cur.replaceWith(sec); else { const col = body.querySelector(".pp-cols > .ppc:last-child"), ret = body.querySelector(".ret-sec"); if (col) col.appendChild(sec); else if (ret) ret.before(sec); else body.appendChild(sec); }
+    unaFila(sec, L1.length - oculto, todo);
+  }
+  // v194 · De grupo y de equipo: una sola fila; lo que no cabe se suma al botón "Ver N más"
+  function unaFila(sec, extra, todo) {
+    if (todo) return; let h = 0;
+    sec.querySelectorAll(".lg-pb:not(.full) .lg-pbi").forEach((g) => { const it = Array.from(g.children); if (!it.length) return; const t0 = it[0].offsetTop; it.forEach((x) => { if (x.offsetTop > t0 + 4) { x.classList.add("lg-x"); h++; } }); });
+    if (!h) return; const n = extra + h; let b = sec.querySelector(".lg-mas");
+    if (!b) { sec.insertAdjacentHTML("beforeend", `<button type="button" class="btn-ghost sm lg-mas" onclick="pxpLogroMas()"></button>`); b = sec.querySelector(".lg-mas"); }
+    b.textContent = `Ver ${n} más`;
   }
   // Reparte las cajas del perfil entre las dos columnas para que no queden huecos (la lista de proyectos puede crecer)
   const RANK = (e) => (e.classList.contains("c-r") ? 0 : e.classList.contains("r1") ? 1 : e.classList.contains("pc-sec") ? 2.5 : e.classList.contains("r3") ? 2 : e.classList.contains("r2") ? 3 : e.classList.contains("sk-sec") ? 4 : e.classList.contains("lg-psec") ? 5 : 6);

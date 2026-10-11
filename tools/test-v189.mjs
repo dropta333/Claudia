@@ -7,12 +7,12 @@ await page.goto("file://" + path.resolve("dist/preview.html")); await page.waitF
 await page.evaluate(() => { window.pxpSaveBase = function () { }; try { localStorage.setItem("pxp_lg_off", "1"); } catch (e) { } enterApp({ name: "Bastián Torres" }, "preview"); });
 await page.waitForTimeout(1800); await page.evaluate(() => { for (let i = 0; i < 6; i++) try { pxpLogroCerrar(); } catch (e) { } switchView("traffic"); });
 const ok = [], fail = []; const check = (n, c) => (c ? ok : fail).push(n);
-await page.evaluate(() => { Object.keys(localStorage).filter(k => /pxp_pv_v3|pxp_vista_proy/.test(k)).forEach(k => localStorage.removeItem(k)); switchView("projects"); }); await page.waitForTimeout(1000);
+await page.evaluate(() => { Object.keys(localStorage).filter(k => /pxp_pv_v[34]|pxp_vista_proy/.test(k)).forEach(k => localStorage.removeItem(k)); switchView("projects"); }); await page.waitForTimeout(1000);
 const st = () => page.evaluate(() => ({ fichas: document.querySelectorAll("#proj-wrap .pvc").length, bloques: document.querySelectorAll("#proj-wrap .pvc-blk").length, grupo: document.querySelector(".pvx-grp select").value,
   vista: (document.querySelector(".pvx-vista button.on") || {}).textContent, alcance: (document.querySelector(".pvx-scope button.on") || {}).textContent, entregados: [...document.querySelectorAll("#proj-wrap .pvc")].filter(c => c.classList.contains("entregado")).length,
   filtrosVisibles: !document.querySelector("#pvx-f").hidden, n: (document.querySelector(".pvx-fbtn b") || {}).textContent || "" }));
 let r = await st();
-check(`por defecto: fichas, activos y por cliente (${JSON.stringify(r)})`, /Fichas/.test(r.vista) && /Activos/.test(r.alcance) && r.grupo === "cliente" && r.bloques > 0);
+check(`por defecto: fichas, activos y sin agrupar (v194) (${JSON.stringify(r)})`, /Fichas/.test(r.vista) && /Activos/.test(r.alcance) && r.grupo === "none");
 check("activos: sin entregados", r.entregados === 0);
 check("filtros escondidos al inicio", !r.filtrosVisibles);
 const act = r.fichas;
