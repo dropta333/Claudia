@@ -2,6 +2,8 @@
 
 Versión: **v189** · 10 oct 2026 · Responsable: Bastián Torres
 
+## v199 · Clientes: "Trabajo por cliente" y "Tipo de proyecto" lado a lado; selector Semanas/Meses/Año compartido (window.__cliPer) en las dos gráficas y en "Ver tablas de datos" (pxpCliGrupos, pxpCliTablasPer, periodoCli)
+
 ## v197–v198 · Clientes: árbol primero, semana solo en Activos (desplegable), Reparto/Tipos en 2 columnas y más bajos; Logros: cabecera compacta, conteo por nivel grande, últimos al lado del progreso; Home personal: estado en 2 columnas; Dashboard: Disponibilidad muestra a todos los "cargado" (antes solo 1–2 proyectos) y sin leyenda
 
 ## v196 · Proyectos: Plegar/Desplegar todos ya no falla tras visitar Horas/Capacidad/Repositorio (pvAll limitado a #proj-wrap); "Filtrar por" en la barra principal, etiquetas y Ordenar por en la fila de estados; Capacidad en fichas respeta Por cargo/Sin agrupar y la búsqueda (pxpGrpSt), botones fijos; Reportes en mosaico (rp-mos)

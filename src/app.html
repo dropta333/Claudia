@@ -6733,6 +6733,24 @@ body.pxp-personal #home-wrap .est-row .en{grid-area:n;font-size:20px}
 
 /* ═════ v198 · Dashboard sin la leyenda de colores (Disponibilidad ya trae sus etiquetas) ═════ */
 body[data-view="dashboard"] .legend-d,body[data-view="dashboard"] .legend-row{display:none!important}
+
+/* ═════ v199 · Clientes: Trabajo por cliente y Tipo de proyecto lado a lado, con semanas / meses / año ═════ */
+#cli-wrap .pxp-grid > [data-pxpcli]{grid-column:span 6}
+#cli-wrap .pxp-grid > .cli-tps{grid-column:span 6}
+#cli-wrap .cli-tools{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+#cli-wrap .seg.cli-per{margin:0 0 10px;display:inline-flex!important;width:auto!important;align-self:flex-start}
+#cli-wrap .cli-tools .seg.cli-per{margin:0}
+#cli-wrap .tables .tbl-n{display:block;font:500 10.5px/1.2 var(--sans);letter-spacing:0;text-transform:none;color:var(--muted);opacity:.8}
+#cli-wrap .tables .seg.cli-per{margin:6px 0 12px}
+.tp1{display:flex;flex-direction:column;gap:8px;padding:4px 0 10px}
+.tp1-h{font:600 13px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.tp1-r{display:grid;grid-template-columns:150px minmax(0,1fr) 54px;align-items:center;gap:12px}
+.tp1-r.z{opacity:.4}
+.tp1-n{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tp1-b{height:8px;border-radius:99px;background:color-mix(in srgb,var(--text) 8%,transparent);overflow:hidden}
+.tp1-b i{display:block;height:100%;border-radius:inherit;background:var(--c)}
+.tp1-r b{font:600 17px/1 var(--display);text-align:right;color:var(--c)}
+@media (max-width:1100px){#cli-wrap .pxp-grid > [data-pxpcli],#cli-wrap .pxp-grid > .cli-tps{grid-column:1/-1}}
 </style>
 </head>
 <body>
@@ -10823,6 +10841,23 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       </div>`;
   };
 
+  // v199 · Periodos de la pestaña Clientes: semanas, meses o año (las gráficas y las tablas comparten el selector)
+  const MES_C = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+  window.pxpCliGrupos = function (per, semanas) {
+    if (per === "semana") return semanas.map(ww => ({ label: WEEKS[ww].label, ws: [ww] }));
+    const out = [], idx = {};
+    semanas.forEach(ww => { const d = new Date(weekDates(ww)[0] + "T00:00:00"), k = per === "anio" ? String(d.getFullYear()) : d.getFullYear() + "-" + d.getMonth(); if (!(k in idx)) { idx[k] = out.length; out.push({ label: per === "anio" ? String(d.getFullYear()) : MES_C[d.getMonth()] + " " + d.getFullYear(), ws: [] }); } out[idx[k]].ws.push(ww); });
+    return out;
+  };
+  window.pxpCliPerSeg = () => `<div class="seg cli-per" role="group" aria-label="Periodo">${[["semana", "Semanas"], ["mes", "Meses"], ["anio", "Año"]].map(([v, l]) => `<button type="button" class="${(window.__cliPer || "semana") === v ? "on" : ""}" onclick="pxpCliPer('${v}')">${l}</button>`).join("")}</div>`;
+  window.pxpCliPer = function (v) { window.__cliPer = v; const y = scrollY; renderClientes(); scrollTo(0, y); };
+  window.pxpCliTablasPer = function (G, topFilas, TIPO_C, per) {
+    const tabla = (head, rows, fn) => `<div class="proj-table-wrap"><table class="horas-table"><thead><tr><th class="htd-nombre" style="text-align:left">${head}</th>${G.map(g => `<th>${esc(g.label)}<small class="tbl-n">${g.ws.length} sem.</small></th>`).join("")}</tr></thead><tbody>${rows.map(r => `<tr><td class="htd-nombre"><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:9px;height:9px;border-radius:50%;background:${r.color};flex-shrink:0;display:inline-block"></span>${esc(r.label)}</span></td>${G.map(g => { const v = fn(g, r.label); return `<td class="${v == null ? "pt-muted" : ""}">${v == null ? "—" : v + "%"}</td>`; }).join("")}</tr>`).join("")}</tbody></table></div>`;
+    const pctDe = (calc) => (g, label) => { let tot = 0, n = 0; g.ws.forEach(ww => { const p = calc(ww); tot += p.total; const e = p.entries.find(x => String(x.label).toUpperCase() === String(label).toUpperCase()); if (e) n += e.count; }); return tot ? Math.round(n / tot * 1000) / 10 : null; };
+    return `<div class="tbl-h">Por cliente</div>${tabla("Cliente", topFilas, pctDe(porcentajesPorCliente))}<div class="tbl-h">Por tipo</div>${tabla("Tipo", Object.keys(TIPO_C).map(t => ({ label: t, color: TIPO_C[t] })), pctDe(porcentajesPorTipo))}
+      <p class="note" style="margin:10px 0 0">% de asignaciones en Tráfico sumando todas las semanas de cada ${per === "anio" ? "año" : "mes"}.</p>`;
+  };
+
   // ═════════ CLIENTES ═════════
   window.renderClientes = function () {
     const wrap = document.getElementById("cli-wrap");
@@ -10880,22 +10915,27 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       : `<div class="chart-scroll"><svg class="pxp-chart" viewBox="0 0 ${W} ${H}" style="min-width:${Math.min(W, 900)}px">${grid}${cols}</svg></div>
          ${legendHtml(topC.map(c => ({ label: c, value: "", color: clientColor(c) })).concat([{ label: "Otros / sin cliente", value: "", color: "var(--muted2)" }]), "inline")}`;
 
-    // Líneas: tipo de proyecto por semana
+    // v199 · Tipo de proyecto por semana / mes / año (mismo selector que las tablas y "Trabajo por cliente")
+    const PER = window.__cliPer || "semana", G = pxpCliGrupos(PER, semanas), segPer = pxpCliPerSeg();
+    const aggTipo = (g, t) => { let tot = 0, n = 0; g.ws.forEach(ww => { const p = porcentajesPorTipo(ww); tot += p.total; const e = p.entries.find(x => x.label === t); if (e) n += e.count; }); return tot ? Math.round(n / tot * 1000) / 10 : 0; };
     let lines = "";
-    if (semanas.length) {
-      const LW = Math.max(1100, semanas.length * 70), LH = 210, lp = { l: 34, r: 12, t: 12, b: 28 };
-      const xs = (i) => lp.l + (semanas.length === 1 ? (LW - lp.l - lp.r) / 2 : i * (LW - lp.l - lp.r) / (semanas.length - 1));
+    if (G.length === 1) {   // un solo periodo (p. ej. el año): barras por tipo
+      const g = G[0], vals = Object.keys(TIPO_C).map(t => ({ t, v: aggTipo(g, t) })).sort((a, b) => b.v - a.v);
+      lines = `<div class="tp1"><div class="tp1-h">${esc(g.label)}</div>${vals.map(x => `<div class="tp1-r${x.v ? "" : " z"}" style="--c:${TIPO_C[x.t]}"><span class="tp1-n">${esc(x.t)}</span><span class="tp1-b"><i style="width:${x.v}%"></i></span><b>${x.v}%</b></div>`).join("")}</div>`;
+    } else if (G.length) {
+      const LW = Math.max(640, G.length * 70), LH = 250, lp = { l: 40, r: 18, t: 14, b: 30 };
+      const xs = (i) => lp.l + (G.length === 1 ? (LW - lp.l - lp.r) / 2 : i * (LW - lp.l - lp.r) / (G.length - 1));
       const ys = (v) => lp.t + (LH - lp.t - lp.b) * (1 - v / 100);
-      const gl = [0, 50, 100].map(g => `<line x1="${lp.l}" x2="${LW - lp.r}" y1="${ys(g)}" y2="${ys(g)}" class="gl"/><text x="${lp.l - 6}" y="${ys(g) + 4}" text-anchor="end" class="ax">${g}%</text>`).join("");
+      const gl = [0, 50, 100].map(v => `<line x1="${lp.l}" x2="${LW - lp.r}" y1="${ys(v)}" y2="${ys(v)}" class="gl"/><text x="${lp.l - 6}" y="${ys(v) + 4}" text-anchor="end" class="ax">${v}%</text>`).join("");
       const series = Object.keys(TIPO_C).map(t => {
-        const pts = semanas.map((ww, i) => { const e = porcentajesPorTipo(ww).entries.find(x => x.label === t); return [xs(i), ys(e ? e.pct : 0), e ? e.pct : 0, ww]; });
+        const pts = G.map((g, i) => { const v = aggTipo(g, t); return [xs(i), ys(v), v, g.label]; });
         return `<polyline fill="none" stroke="${TIPO_C[t]}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" points="${pts.map(p => p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" ")}"/>` +
-          pts.map(p => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="4.5" fill="var(--surface)" stroke="${TIPO_C[t]}" stroke-width="2.5" data-tip="<b>${esc(WEEKS[p[3]].label)}</b><br>${t} · ${p[2]}%"/>`).join("");
+          pts.map(p => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="4.5" fill="var(--surface)" stroke="${TIPO_C[t]}" stroke-width="2.5" data-tip="<b>${esc(p[3])}</b><br>${t} · ${p[2]}%"/>`).join("");
       }).join("");
-      const labs = semanas.map((ww, i) => `<text x="${xs(i).toFixed(1)}" y="${LH - 8}" text-anchor="middle" class="ax${ww === w ? " cur" : ""}">${esc(WEEKS[ww].label)}</text>`).join("");
-      lines = `<div class="chart-scroll"><svg class="pxp-chart" viewBox="0 0 ${LW} ${LH}" style="min-width:${Math.min(LW, 900)}px">${gl}${series}${labs}</svg></div>
-        ${legendHtml(Object.keys(TIPO_C).map(t => ({ label: t, value: "", color: TIPO_C[t] })), "inline")}`;
+      const labs = G.map((g, i) => `<text x="${xs(i).toFixed(1)}" y="${LH - 8}" text-anchor="${i === 0 ? "start" : i === G.length - 1 ? "end" : "middle"}" class="ax${g.ws.includes(w) ? " cur" : ""}">${esc(g.label)}</text>`).join("");
+      lines = `<div class="chart-scroll"><svg class="pxp-chart" viewBox="0 0 ${LW} ${LH}" style="min-width:0">${gl}${series}${labs}</svg></div>`;
     }
+    if (lines) lines = segPer + lines + (G.length === 1 ? "" : legendHtml(Object.keys(TIPO_C).map(t => ({ label: t, value: "", color: TIPO_C[t] })), "inline"));
 
     // Tablas originales, plegadas
     const topFilas = ranking.slice(0, 8).map(c => ({ label: c, color: clientColor(c) }));
@@ -10908,8 +10948,9 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
         ${panel("Reparto por cliente", donut, "c7", _anio ? "Todo 2026 · por proyectos" : `${esc(WEEKS[w].label)}`)}
         ${panel("Tipos de proyecto", tipo, "c5", _anio ? "Todo 2026 · por proyectos" : `${esc(WEEKS[w].label)}`)}
         ${panel("Evolución por cliente", evo, "c12", "% de asignaciones por semana")}
-        ${panel("Tipo de proyecto por semana", lines || `<div class="home-empty">Sin semanas con tráfico.</div>`, "c12")}
-        <details class="home-panel c12 tables"><summary class="hp-title">Ver tablas de datos<span class="hp-extra">por semana</span></summary><div class="tbl-h">Por cliente</div>${tablaCli}<div class="tbl-h">Por tipo</div>${tablaTipo}</details>
+        ${panel("Tipo de proyecto", lines || `<div class="home-empty">Sin semanas con tráfico.</div>`, "c6 cli-tps", { semana: "por semana", mes: "por mes", anio: "por año" }[PER])}
+        <details class="home-panel c12 tables" id="cli-tablas"${window.__cliTabOpen ? " open" : ""} ontoggle="window.__cliTabOpen=this.open"><summary class="hp-title">Ver tablas de datos<span class="hp-extra">${{ semana: "por semana", mes: "por mes", anio: "por año" }[PER]}</span></summary>
+          ${segPer}${PER === "semana" ? `<div class="tbl-h">Por cliente</div>${tablaCli}<div class="tbl-h">Por tipo</div>${tablaTipo}` : pxpCliTablasPer(G, topFilas, TIPO_C, PER)}</details>
       </div>`;
   };
 
@@ -12417,16 +12458,31 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     personas: "Cuántas personas del equipo están asignadas a proyectos que siguen en marcha de cada cliente.",
   };
   let scope = null;                       // en el Home usa el período del Home; en Clientes, su selector
+  // v199 · proyectos con asignaciones en Tráfico dentro del periodo, y rango de fechas para las horas
+  function periodoCli() {
+    const per = window.__cliPer || "semana", ws = semanasConTrafico(), cw = ws.includes(currentWeek) ? currentWeek : ws[ws.length - 1];
+    if (cw == null) return null;
+    const d0 = new Date(weekDates(cw)[0] + "T00:00:00");
+    const enPer = (ww) => { if (per === "semana") return ww === cw; const d = new Date(weekDates(ww)[0] + "T00:00:00"); return per === "mes" ? d.getFullYear() === d0.getFullYear() && d.getMonth() === d0.getMonth() : d.getFullYear() === d0.getFullYear(); };
+    const sel = ws.filter(enPer), keys = new Set();
+    sel.forEach(ww => TEAM.forEach(p => (p.weeks[ww] || []).forEach(raw => keys.add(projectKey(raw)))));
+    const iso = (d) => d.toISOString().slice(0, 10);
+    let desde, hasta;
+    if (per === "semana") { desde = weekDates(cw)[0]; const f = new Date(d0); f.setDate(f.getDate() + 6); hasta = iso(f); }
+    else if (per === "mes") { desde = iso(new Date(d0.getFullYear(), d0.getMonth(), 1, 12)); hasta = iso(new Date(d0.getFullYear(), d0.getMonth() + 1, 0, 12)); }
+    else { desde = d0.getFullYear() + "-01-01"; hasta = d0.getFullYear() + "-12-31"; }
+    return { modo: "per", keys: Array.from(keys), desde, hasta };
+  }
   function cliData() {
     const map = new Map(), per = scope;
     const get = (c) => { const label = (c || "").trim() || "Sin cliente"; const k = norm(label); if (!map.has(k)) map.set(k, { label, est: { cotizado: 0, preproduccion: 0, rodaje: 0, en_produccion: 0, revision: 0, standby: 0, entregado: 0 }, horas: 0, ppl: new Set() }); return map.get(k); };
-    (per ? (per.modo === "activos" ? getAllKnownProjectKeys() : window.pxpPerKeys()) : (window.pxpCliKeys ? pxpCliKeys() : getAllKnownProjectKeys())).forEach(k => {
+    (per ? (per.keys ? per.keys : per.modo === "activos" ? getAllKnownProjectKeys() : window.pxpPerKeys()) : (window.pxpCliKeys ? pxpCliKeys() : getAllKnownProjectKeys())).forEach(k => {
       const p = PROJECTS[k] || {}, o = get(p.cliente), e = p.estadoGeneral || "en_produccion";
       if (o.est[e] !== undefined) o.est[e]++;
       if (e !== "entregado" || (per && per.modo !== "activos")) { ROLE_FIELDS.forEach(rf => pxpRolePeople(p, rf.key).forEach(x => o.ppl.add(normName(x)))); (p.pms || []).forEach(pm => o.ppl.add(normName(pm))); }
     });
     const mp = per && per.modo === "mes" ? "2026-" + String(per.mes + 1).padStart(2, "0") : "";
-    Object.values(PROJECTS).forEach(p => { const h = (p.horasLog || []).filter(x => !mp || String(x.fecha || "").startsWith(mp)).reduce((s, x) => s + (parseFloat(x.horas) || 0), 0); if (h > 0) get(p.cliente).horas += h; });
+    Object.values(PROJECTS).forEach(p => { const h = (p.horasLog || []).filter(x => (!mp || String(x.fecha || "").startsWith(mp)) && (!per || !per.desde || (String(x.fecha || String(x.ts || "").slice(0, 10)) >= per.desde && String(x.fecha || String(x.ts || "").slice(0, 10)) <= per.hasta))).reduce((s, x) => s + (parseFloat(x.horas) || 0), 0); if (h > 0) get(p.cliente).horas += h; });
     return Array.from(map.values()).map(o => {
       const segs = metric === "proyectos" ? EST.map(([k, l, c]) => ({ label: l, value: o.est[k], color: c }))
         : [{ label: metric === "horas" ? "Horas" : "Personas", value: metric === "horas" ? r1(o.horas) : o.ppl.size, color: window.pxpClientColor(o.label) }];
@@ -12462,14 +12518,15 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   }
   function cliPanelHtml(compact) {
     scope = compact && window.pxpPer ? window.pxpPer() : null;
+    if (!compact) scope = periodoCli();   // v199 · en la pestaña Clientes: semana actual, mes actual o año
     const data = cliData();
     const seg = [["proyectos", "Proyectos"], ["horas", "Horas trabajadas"], ["personas", "Personas asignadas"]].map(([v, l]) => `<button class="${metric === v ? "on" : ""}" onclick="pxpCliMetric('${v}')">${l}</button>`).join("");
     const legend = metric === "proyectos" ? `<ul class="pxp-legend inline">${EST.map(([k, l, c]) => `<li><span class="sw" style="background:${c}"></span><span class="nm">${l}</span></li>`).join("")}</ul>` : "";
     return `<div class="hp-title">Trabajo por cliente<span class="hp-extra">toca una barra para ver sus proyectos</span></div>
       ${compact && window.pxpPerSelHtml ? pxpPerSelHtml() : ""}
-      <div class="cli-tools"><div class="seg" role="group" aria-label="Qué medir">${seg}</div></div>
+      <div class="cli-tools"><div class="seg" role="group" aria-label="Qué medir">${seg}</div>${compact ? "" : window.pxpCliPerSeg()}</div>
       <p class="note" style="margin:10px 0 8px">${EXPL[metric]}</p>
-      ${data.length ? chartSvg(data, compact) : `<div class="home-empty">Todavía no hay datos para mostrar. Asigna clientes en las fichas de los proyectos.</div>`}${legend}`;
+      ${data.length ? chartSvg(data, true) : `<div class="home-empty">Todavía no hay datos para mostrar. Asigna clientes en las fichas de los proyectos.</div>`}${legend}`;
   }
   function cliPanel() { return Array.from(document.querySelectorAll("#cli-wrap .home-panel")).find(p => p.dataset.pxpcli || /Evoluci[oó]n por cliente/.test((p.querySelector(".hp-title") || {}).textContent || "")); }
   window.pxpCliMetric = function (m) { metric = m; document.querySelectorAll("[data-pxpcli]").forEach(p => { p.innerHTML = cliPanelHtml(!!p.closest("#home-wrap")); }); };
@@ -18853,7 +18910,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     "Agregar imagen del proyecto": "Add project image", "Cambiar imagen": "Change image", "Sugerencias": "Suggestions", "Avance por etapas": "Progress by stage", "Notas": "Notes", "Adjuntar": "Attach", "Bloqueadores": "Blockers", "+ Reportar bloqueador": "+ Report blocker", "Revisiones y enlaces": "Reviews and links", "+ Agregar enlace": "+ Add link", "Ruta en el share": "Share path", "+ Agregar ruta": "+ Add path", "Copiar ruta": "Copy path", "Editar ficha completa": "Edit full card", "Revisar": "Review", "Descargar": "Download", "Cronograma": "Schedule", "Piezas por tipo": "Pieces by type", "Adaptaciones por país": "Adaptations by country", "Agregar etapa": "Add stage", "+ Agregar etapa": "+ Add stage", "Usar etapas típicas": "Use typical stages",
     "Pendiente": "Pending", "Con cambios": "Changes requested", "En curso": "In progress", "Revisión": "Review", "Datos del proyecto": "Project details", "Color": "Color", "Nota": "Note", "Historial": "History", "Horas trabajadas en el proyecto": "Hours worked on the project",
 
-    "Por tipo": "By type", "proyectos": "projects", "proyecto": "project", "% de asignaciones en Tráfico": "% of assignments in Traffic", "Ordenar por": "Sort by", "trabajó de más": "worked overtime", "horas estimadas": "estimated hours", "Semanas de cola": "Queue weeks", "Color por cargo": "Color by role", "tipo de proyecto": "project type", "Todo el año 2026": "Whole year 2026", "Filtrar por tipo": "Filter by type", "Vista de la lista": "List view", "Ordenar por estado": "Sort by status", "Filtrar por estado": "Filter by status", "Ordenar por tiempo": "Sort by time", "Ordenar por inicio": "Sort by start", "Ordenar por cliente": "Sort by client", "Ver tablas de datos": "View data tables", "Filtrar por agencia": "Filter by agency", "Le caben por semana": "Fits per week", "Filtrar por cliente": "Filter by client", "clientes": "clients", "Limpiar": "Clear", "Últimos": "Latest", "Agrupar": "Group", "Filtrar por": "Filter by", "Ordenar": "Sort", "Buscar…": "Search…", "Sin resultados": "No results", "Abrir o cerrar todos": "Open or close all", "Quitar": "Remove", "Abrir todos": "Open all", "Ver menos": "See less", "Cerrar todos": "Close all", "Ver todos": "See all", "Qué proyectos ver": "Which projects to show", "Toca un cliente para desplegar sus proyectos, agrupados por marca. Toca su nombre para abrir su ficha.": "Tap a client to expand its projects, grouped by brand. Tap its name to open its card.", "El tipo sale de la ficha de cada proyecto; si no tiene, se deduce del nombre (\"Caso…\" → Casos, \"Licitación…\" → Licitaciones, el resto → Comercial).": "The type comes from each project card; if it has none, it is inferred from the name (\"Caso…\" → Case studies, \"Licitación…\" → Tenders, the rest → Commercial).", "Toca su nombre para abrir su ficha y crearle uno.": "Tap its name to open its card and create one.", "Reparto por cliente": "Split by client", "Ordenar por proyecto": "Sort by project", "Jornada de referencia": "Reference workday", "Qué proyectos mostrar": "Which projects to show", "Filtrar por complejidad": "Filter by complexity", "Ordenar por complejidad": "Sort by complexity", "Trabajaron fin de semana": "Worked on weekends", "Sin cliente identificado": "No client identified", "Ordenar por entrega final": "Sort by final delivery", "Ordenar por próximo avance": "Sort by next milestone", "cliente → marca → proyecto": "client → brand → project", "Sin cupo (cola > 2 semanas)": "No room (queue > 2 weeks)", "Guardar horas de esta semana": "Save this week's hours", "Los cambios se guardan solos": "Changes save automatically", "8 h al día · 40 h por semana": "8 h a day · 40 h a week", "Clientes, marcas y proyectos": "Clients, brands and projects", "usan default por complejidad": "use the complexity default", "ocupados con 1 o 2 proyectos": "busy with 1 or 2 projects", "Proyectos sin horas estimadas": "Projects without estimated hours", "Volver a las horas automáticas": "Back to automatic hours", "L–V 8:30–5:30 · 1 h de almuerzo": "Mon–Fri 8:30–5:30 · 1 h lunch", "Personas con exceso esta semana": "People over hours this week", "Compensatorio sugerido (equipo)": "Suggested comp time (team)", "Fin de semana · el reloj no corre": "Weekend · the clock stops", "Horas estimadas cargada en la ficha": "Estimated hours set in the card", "Proyectos activos (horas estimadas)": "Active projects (estimated hours)", "Guardar esta semana en el histórico": "Save this week to history", "Buscar por proyecto, cliente o marca": "Search by project, client or brand", "toca una barra para ver sus proyectos": "tap a bar to see its projects", "Las horas corren solas, como un reloj.": "Hours run on their own, like a clock.", "Sin horas estimadas — usando default de medio": "No estimated hours — using the medium default", "Sin horas estimadas — usando default de complejo": "No estimated hours — using the complex default", "Horas sumadas a mano por encima de lo automático": "Hours added by hand on top of the automatic ones", "sin estimar": "not estimated", "El": "The", "Mis datos": "My details", "Sobre mí": "About me", "Correo": "Email", "Teléfono": "Phone", "Notas": "Notes",
+    "Por tipo": "By type", "proyectos": "projects", "proyecto": "project", "% de asignaciones en Tráfico": "% of assignments in Traffic", "Ordenar por": "Sort by", "trabajó de más": "worked overtime", "horas estimadas": "estimated hours", "Semanas de cola": "Queue weeks", "Color por cargo": "Color by role", "tipo de proyecto": "project type", "Todo el año 2026": "Whole year 2026", "Filtrar por tipo": "Filter by type", "Vista de la lista": "List view", "Ordenar por estado": "Sort by status", "Filtrar por estado": "Filter by status", "Ordenar por tiempo": "Sort by time", "Ordenar por inicio": "Sort by start", "Ordenar por cliente": "Sort by client", "Ver tablas de datos": "View data tables", "Filtrar por agencia": "Filter by agency", "Le caben por semana": "Fits per week", "Filtrar por cliente": "Filter by client", "clientes": "clients", "Limpiar": "Clear", "Semanas": "Weeks", "Meses": "Months", "Año": "Year", "por mes": "by month", "por año": "by year", "por semana": "by week", "Últimos": "Latest", "Agrupar": "Group", "Filtrar por": "Filter by", "Ordenar": "Sort", "Buscar…": "Search…", "Sin resultados": "No results", "Abrir o cerrar todos": "Open or close all", "Quitar": "Remove", "Abrir todos": "Open all", "Ver menos": "See less", "Cerrar todos": "Close all", "Ver todos": "See all", "Qué proyectos ver": "Which projects to show", "Toca un cliente para desplegar sus proyectos, agrupados por marca. Toca su nombre para abrir su ficha.": "Tap a client to expand its projects, grouped by brand. Tap its name to open its card.", "El tipo sale de la ficha de cada proyecto; si no tiene, se deduce del nombre (\"Caso…\" → Casos, \"Licitación…\" → Licitaciones, el resto → Comercial).": "The type comes from each project card; if it has none, it is inferred from the name (\"Caso…\" → Case studies, \"Licitación…\" → Tenders, the rest → Commercial).", "Toca su nombre para abrir su ficha y crearle uno.": "Tap its name to open its card and create one.", "Reparto por cliente": "Split by client", "Ordenar por proyecto": "Sort by project", "Jornada de referencia": "Reference workday", "Qué proyectos mostrar": "Which projects to show", "Filtrar por complejidad": "Filter by complexity", "Ordenar por complejidad": "Sort by complexity", "Trabajaron fin de semana": "Worked on weekends", "Sin cliente identificado": "No client identified", "Ordenar por entrega final": "Sort by final delivery", "Ordenar por próximo avance": "Sort by next milestone", "cliente → marca → proyecto": "client → brand → project", "Sin cupo (cola > 2 semanas)": "No room (queue > 2 weeks)", "Guardar horas de esta semana": "Save this week's hours", "Los cambios se guardan solos": "Changes save automatically", "8 h al día · 40 h por semana": "8 h a day · 40 h a week", "Clientes, marcas y proyectos": "Clients, brands and projects", "usan default por complejidad": "use the complexity default", "ocupados con 1 o 2 proyectos": "busy with 1 or 2 projects", "Proyectos sin horas estimadas": "Projects without estimated hours", "Volver a las horas automáticas": "Back to automatic hours", "L–V 8:30–5:30 · 1 h de almuerzo": "Mon–Fri 8:30–5:30 · 1 h lunch", "Personas con exceso esta semana": "People over hours this week", "Compensatorio sugerido (equipo)": "Suggested comp time (team)", "Fin de semana · el reloj no corre": "Weekend · the clock stops", "Horas estimadas cargada en la ficha": "Estimated hours set in the card", "Proyectos activos (horas estimadas)": "Active projects (estimated hours)", "Guardar esta semana en el histórico": "Save this week to history", "Buscar por proyecto, cliente o marca": "Search by project, client or brand", "toca una barra para ver sus proyectos": "tap a bar to see its projects", "Las horas corren solas, como un reloj.": "Hours run on their own, like a clock.", "Sin horas estimadas — usando default de medio": "No estimated hours — using the medium default", "Sin horas estimadas — usando default de complejo": "No estimated hours — using the complex default", "Horas sumadas a mano por encima de lo automático": "Hours added by hand on top of the automatic ones", "sin estimar": "not estimated", "El": "The", "Mis datos": "My details", "Sobre mí": "About me", "Correo": "Email", "Teléfono": "Phone", "Notas": "Notes",
     "Proyecto modificado": "Project modified", "Los cambios se guardan al cerrar la ventana o con el botón.": "Changes are saved when you close the window or with the button.", "Recetas": "Recipes", "Nuevo grupo": "New group", "Skills y software": "Skills and software", "Taxonomía sugerida": "Suggested naming", "Editar": "Edit",
     // reportes
     "Generar reporte": "Generate report", "Reporte del cliente": "Client report", "Todos los clientes": "All clients", "Vista previa": "Preview", "Descargar PDF": "Download PDF",
