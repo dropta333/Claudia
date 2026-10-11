@@ -2,6 +2,8 @@
 
 Versión: **v189** · 10 oct 2026 · Responsable: Bastián Torres
 
+## v192 · Clientes vuelven al diseño de 3 columnas (logo grande, marcas) con desplegable; Proyectos en vista personal ya no muestra todo al plegar/filtrar; Tráfico: el mosaico dejaba de reacomodarse sin fin
+
 ## v191 · Capacidad en mosaico (grupos se acomodan sin huecos, fichas con 3 proyectos y "+N más"); vista personal: caja de entregas corta (5 próximas + 2 vencidas)
 
 ## v190 · Clientes: "Mars" y "MARS" se unen en las gráficas; Reparto por cliente con donut grande + ranking + "Otros"; Tipos de proyecto en lista con barras; desplegable por cliente (Activos por defecto)

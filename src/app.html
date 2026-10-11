@@ -6540,30 +6540,15 @@ body:not(.trf-tabla) #main-grid > .card:not(.span-all){padding:16px 16px 14px!im
 .ct-acc{display:flex;gap:14px}
 .ct-lnk{all:unset;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
 .ct-lnk:hover{color:var(--text)}
-.ct-lnk:hover{text-decoration:underline}
-.ctree2{columns:2 430px;column-gap:12px}
-#view-clientes .ctree2 .cnode{break-inside:avoid;display:block;margin:0 0 10px;padding:0;border:1px solid var(--border);border-left:4px solid var(--cc);border-top-width:1px;border-radius:14px;background:var(--bg);overflow:hidden}
-#view-clientes .ctree2 .cnode.nocli{border-left-style:dashed}
-#view-clientes .ctree2 .cn-h{display:grid!important;grid-template-columns:auto minmax(0,1fr) auto auto;grid-template-areas:"logo name bar chev" "logo meta bar chev";align-items:center;column-gap:12px;row-gap:2px;margin:0!important;padding:10px 14px!important;border:0!important;border-radius:0;background:linear-gradient(90deg,color-mix(in srgb,var(--cc) 12%,transparent),transparent 70%);cursor:pointer;list-style:none}
-#view-clientes .ctree2 .cn-h::-webkit-details-marker{display:none}
-#view-clientes .ctree2 .cn-h:hover{background:linear-gradient(90deg,color-mix(in srgb,var(--cc) 22%,transparent),transparent 80%)}
-#view-clientes .ctree2 .cn-h .cav{grid-area:logo}
-#view-clientes .ctree2 .cn-h .sw{grid-area:logo;width:34px;height:34px;border-radius:10px;background:var(--muted2)}
-#view-clientes .ctree2 .cn-h .cav .av{--s:40px!important;border-radius:11px!important;font-size:16px!important}
-#view-clientes .ctree2 .cn-h b,#view-clientes .ctree2 .cn-h .cn-link{grid-area:name;font-size:18px!important;line-height:1.05!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-#view-clientes .ctree2 .cn-h .ct-m{grid-area:meta;margin:0;font-size:12.5px;color:var(--muted)}
-#view-clientes .ctree2 .cn-h > .ct-bar{grid-area:bar;margin:0;display:flex;gap:2px;width:90px;height:6px;border-radius:99px;overflow:hidden;background:color-mix(in srgb,var(--text) 6%,transparent)}
-.ct-bar i{display:block;background:var(--c)}
-#view-clientes .ctree2 .cn-h > .ct-chev{grid-area:chev;margin:0 4px 0 0;width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg) translate(-2px,-2px);transition:transform .2s}
-#view-clientes details.cnode[open] > summary > .ct-chev{transform:rotate(225deg) translate(-2px,-2px)}
-.ct-body{padding:2px 14px 12px}
-.ct-body .mnode:first-child{border-top:0}
-.ct-body.solo .mn{display:none}
-.ct-body.solo .mnode{padding-top:10px}
-.pchip .ct-e{width:7px;height:7px;border-radius:50%;background:var(--c);margin:0 9px 0 -3px;flex:none}
+#view-clientes .ctree summary.cn-h{list-style:none;cursor:pointer;position:relative;padding-right:44px!important}
+#view-clientes .ctree summary.cn-h::-webkit-details-marker{display:none}
+#view-clientes .ctree summary.cn-h::after{content:"";position:absolute;right:18px;top:50%;width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:translateY(-30%) rotate(-135deg);transition:transform .2s}
+#view-clientes .ctree details.cnode:not([open]) > summary.cn-h::after{transform:translateY(-70%) rotate(45deg)}
+#view-clientes .cn-h > span.sw{grid-area:logo;width:14px;height:14px}
+#view-clientes .ctree details.cnode:not([open]) > summary.cn-h{margin-bottom:-4px!important}
+#view-clientes .ctree summary.cn-h:hover::after{border-color:var(--text)}
 .pchip.done{opacity:.6}
 .ct-foot{margin:4px 0 0}
-@media (max-width:760px){.ctree2{columns:1}.ct-bar{width:54px}#view-clientes .ctree2 .cn-h{column-gap:10px;padding:10px 12px!important}}
 
 /* ═════ v191 · Capacidad en mosaico · fichas con 3 proyectos ═════ */
 #cap-wrap .cap-mos.on{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));grid-auto-rows:4px;column-gap:16px;row-gap:0;align-items:start}
@@ -10822,10 +10807,10 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   // v190 · Un desplegable por cliente con sus proyectos (por defecto solo los activos)
   const CT_ACT = (e) => e !== "entregado" && e !== "aprobado";
   const ctAlc = () => { try { return localStorage.getItem("pxp_ct_alc") || "activos"; } catch (e) { return "activos"; } };
-  const ctOpen = window.__ctOpen = window.__ctOpen || new Set();
+  const ctCerr = window.__ctCerr = window.__ctCerr || new Set();
   window.pxpCtAlc = function (v) { try { localStorage.setItem("pxp_ct_alc", v); } catch (e) {} renderClientes(); };
-  window.pxpCtToggle = function (d) { const k = d.dataset.ck; if (d.open) ctOpen.add(k); else ctOpen.delete(k); };
-  window.pxpCtTodos = function (abrir) { document.querySelectorAll("#cli-wrap .ctree2 details.cnode").forEach(d => { d.open = abrir; window.pxpCtToggle(d); }); };
+  window.pxpCtToggle = function (d) { const k = d.dataset.ck; if (d.open) ctCerr.delete(k); else ctCerr.add(k); };
+  window.pxpCtTodos = function (abrir) { document.querySelectorAll("#cli-wrap .ctree details.cnode").forEach(d => { d.open = abrir; window.pxpCtToggle(d); }); };
   function clientTreeHtml() {
     const alc = ctAlc(), tree = {};
     const keys = new Set(getAllKnownProjectKeys()); Object.keys(PROJECTS).forEach(k => keys.add(k));
@@ -10848,25 +10833,19 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     if (alc === "activos") clientes = clientes.filter(c => tree[c].act);
     if (tree[""] && nOf("")) clientes.push("");
     const nAct = Object.values(tree).reduce((a, t) => a + t.act, 0), nTot = Object.values(tree).reduce((a, t) => a + t.tot, 0);
-    const ORD = ["cotizado", "preproduccion", "rodaje", "en_produccion", "revision", "standby", "entregado", "aprobado"];
-    const EC = { cotizado: "var(--muted2)", preproduccion: "#7B61FF", rodaje: "#E11D48", en_produccion: "var(--brand)", revision: "var(--yellow)", standby: "var(--muted)", entregado: "var(--green)", aprobado: "#2BB673" };
-    const EL = { preproduccion: "Preproducción", rodaje: "Rodaje", revision: "Revisión", en_produccion: "Postproducción", cotizado: "Cotizado", standby: "Standby", entregado: "Entregado", aprobado: "Aprobado" };
-    const bar = (t) => `<span class="ct-bar">${ORD.filter(e => t.est[e] && (alc !== "activos" || CT_ACT(e))).map(e => `<i style="flex:${t.est[e]};--c:${EC[e]}" data-tip="${EL[e]} · ${t.est[e]}"></i>`).join("")}</span>`;
     const head = `<div class="ct-bar0"><span class="seg ct-seg" role="group" aria-label="Qué proyectos ver"><button class="${alc === "activos" ? "on" : ""}" onclick="pxpCtAlc('activos')">Activos <b>${nAct}</b></button><button class="${alc !== "activos" ? "on" : ""}" onclick="pxpCtAlc('todos')">Todos <b>${nTot}</b></button></span>
       <span class="ct-acc"><button class="ct-lnk" onclick="pxpCtTodos(true)">Abrir todos</button><button class="ct-lnk" onclick="pxpCtTodos(false)">Cerrar todos</button></span></div>`;
-    return head + `<div class="ctree2">${clientes.map(c => {
+    return head + `<div class="ctree">${clientes.map(c => {
       const node = tree[c], n = nOf(c);
       const marcas = Object.entries(node.marcas).sort((a, b) => (a[0] === "") - (b[0] === "") || a[1].label.localeCompare(b[1].label));
       const nm = marcas.filter(m => m[0]).length;
       const col = c ? window.pxpClientColor(node.label) : "var(--muted2)";
       const ck = c || "__sin";
-      return `<details class="cnode${c ? "" : " nocli"}" data-ck="${esc(ck)}" style="--cc:${col}"${ctOpen.has(ck) ? " open" : ""} ontoggle="pxpCtToggle(this)">
-        <summary class="cn-h">${c ? `<span class="cav">${window.pxpAvatar ? window.pxpAvatar("client", node.label, 34) : ""}</span>` : `<span class="sw"></span>`}<b>${esc(node.label)}</b><span class="ct-m">${n} proyecto${n !== 1 ? "s" : ""}${alc === "activos" ? " activo" + (n !== 1 ? "s" : "") : ""}${nm ? ` · ${nm} marca${nm !== 1 ? "s" : ""}` : ""}</span>${bar(node)}<span class="ct-chev" aria-hidden="true"></span></summary>
-        <div class="ct-body${marcas.length === 1 && !marcas[0][0] ? " solo" : ""}">
-        ${marcas.map(([mk, m]) => `<div class="mnode${mk ? "" : " nomarca"}"><div class="mn">${esc(m.label)}</div><div class="pchips">${m.projects.sort((a, b) => (ORD.indexOf(a.estado) - ORD.indexOf(b.estado)) || a.nombre.localeCompare(b.nombre)).map(p => `<span class="pchip${p.estado === "standby" ? " sb" : ""}${CT_ACT(p.estado) ? "" : " done"}" style="--pc:${window.pxpProjectColor(p.key)}"><button class="pd" title="Cambiar el color del proyecto" onclick="pxpOpenColor(event,'project','${jsq(p.key)}')"></button><button class="pn" onclick="openProjectFicha('${jsq(p.key)}')" title="Abrir ficha">${esc(p.nombre)}</button><span class="ct-e" style="--c:${EC[p.estado] || "var(--muted)"}" title="${EL[p.estado] || ""}"></span></span>`).join("")}</div></div>`).join("")}
-        ${c && !marcas.length ? `<p class="note" style="margin:8px 0 0">Aún no tiene proyectos. Toca su nombre para abrir su ficha y crearle uno.</p>` : ""}
+      return `<details class="cnode${c ? "" : " nocli"}" data-ck="${esc(ck)}" style="--cc:${col}"${ctCerr.has(ck) ? "" : " open"} ontoggle="pxpCtToggle(this)">
+        <summary class="cn-h">${c ? `<button class="cav" title="Cambiar la imagen o el color del cliente" onclick="pxpOpenColor(event,'client','${jsq(node.label)}')">${window.pxpAvatar ? window.pxpAvatar("client", node.label, 34) : ""}</button>` : `<span class="sw"></span>`}<b>${esc(node.label)}</b><span>${n} proyecto${n !== 1 ? "s" : ""}${alc === "activos" ? " activo" + (n !== 1 ? "s" : "") : ""}${c ? ` · ${nm} marca${nm !== 1 ? "s" : ""}` : ""}</span></summary>
+        ${marcas.map(([mk, m]) => `<div class="mnode${mk ? "" : " nomarca"}"><div class="mn">${esc(m.label)}</div><div class="pchips">${m.projects.sort((a, b) => a.nombre.localeCompare(b.nombre)).map(p => `<span class="pchip${p.estado === "standby" ? " sb" : ""}${CT_ACT(p.estado) ? "" : " done"}" style="--pc:${window.pxpProjectColor(p.key)}"><button class="pd" title="Cambiar el color del proyecto" onclick="pxpOpenColor(event,'project','${jsq(p.key)}')"></button><button class="pn" onclick="openProjectFicha('${jsq(p.key)}')" title="Abrir ficha">${esc(p.nombre)}</button></span>`).join("")}</div></div>`).join("")}
+        ${c && !marcas.length ? `<p class="note" style="margin:8px 0 0">Aún no tiene proyectos. Ábrelo con un clic en su nombre para crearle uno.</p>` : ""}
         ${c ? "" : `<p class="note">Abre cada ficha y asígnale cliente y marca para que quede dentro de su cliente.</p>`}
-        </div>
       </details>`;
     }).join("")}</div>${sinAct ? `<p class="note ct-foot">${sinAct} cliente${sinAct !== 1 ? "s" : ""} sin proyectos activos · <button class="ct-lnk" onclick="pxpCtAlc('todos')">Ver todos</button></p>` : ""}`;
   }
@@ -10879,7 +10858,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const sec = document.createElement("section");
     sec.className = "home-panel c12";
     sec.innerHTML = `<div class="hp-title">Clientes, marcas y proyectos<span class="hp-extra">cliente → marca → proyecto</span></div>
-      <p class="note" style="margin:0 0 12px">Toca un cliente para desplegar sus proyectos, agrupados por marca. Toca su nombre para abrir su ficha.</p>
+      <p class="note" style="margin:0 0 14px">Cada cliente muestra sus marcas y los proyectos de cada una. La marca se asigna en la ficha del proyecto (campo "Marca"); si la marca ya existe en otro proyecto, el cliente se completa solo. Toca la flecha de un cliente para cerrarlo o abrirlo.</p>
       ${clientTreeHtml()}`;
     grid.insertBefore(sec, grid.children[2] || null);
   };
@@ -16516,7 +16495,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       try { return fn.apply(this, arguments); } finally { PROJECTS = all; RODAJES = allR; window.getAllKnownProjectKeys = oG; }
     };
   }
-  ["renderProjects", "renderClientes", "pxpOpenClient", "pxpCliModo", "pxpCliModoAnio", "pxpCliMetric"].forEach(n => { if (typeof window[n] === "function") window[n] = scoped(window[n], () => window.pxpVistaPersonal()); });
+  // v192 · también los filtros, la búsqueda y plegar/desplegar grupos (repintan solo la lista)
+  ["renderProjects", "renderClientes", "pxpOpenClient", "pxpCliModo", "pxpCliModoAnio", "pxpCliMetric", "pvSet", "pvToggle", "pvAll"].forEach(n => { if (typeof window[n] === "function") window[n] = scoped(window[n], () => window.pxpVistaPersonal()); });
 
   // ── Estadísticas personales para el Equipo creativo (en el Home) ──
   function entradas() {
@@ -18217,7 +18197,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const g = document.getElementById("main-grid"); if (!g || !g.querySelector(":scope > .card.tcard")) return;
     const items = Array.from(g.children);
     const limpiar = () => { g.classList.remove("trf-mas"); g.style.removeProperty("row-gap"); g.style.removeProperty("grid-auto-rows"); items.forEach((el) => { el.style.gridColumn = ""; el.style.gridRow = ""; }); };
-    if (!g.offsetParent) return;
+    if (!g.offsetParent) { g.__w = 0; if (window.ResizeObserver && ro) ro.observe(g); return; }
     // se mide la altura natural de cada ficha (sin estirarse a la más alta de su fila)
     g.classList.remove("trf-mas"); g.style.removeProperty("row-gap"); g.style.removeProperty("grid-auto-rows"); g.classList.add("trf-med"); items.forEach((el) => { el.style.gridRow = ""; el.style.gridColumn = ""; });
     const cs = getComputedStyle(g), n = cs.gridTemplateColumns.split(" ").filter(Boolean).length;
@@ -18227,18 +18207,23 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     g.classList.remove("trf-med"); g.classList.add("trf-mas"); g.style.setProperty("row-gap", "0px", "important"); g.style.setProperty("grid-auto-rows", U + "px", "important");
     let col = new Array(n).fill(1);   // siguiente fila libre de cada columna (las filas de la rejilla empiezan en 1)
     items.forEach((el, i) => {
-      const h = alturas[i]; if (h < 0) { el.style.gridColumn = ""; el.style.gridRow = ""; return; }
+      const h = alturas[i]; if (h < 0) { el.style.gridColumn = ""; el.style.gridRow = ""; el.__h = 0; return; }
       const span = Math.max(1, Math.ceil((h + (h ? gap : 0)) / U));
       const ancho = el.classList.contains("tcard") ? 1 : 0;   // títulos y barras: todo el ancho
-      if (!ancho) { const top = Math.max(...col); el.style.gridColumn = "1 / -1"; el.style.gridRow = `${top} / span ${span}`; col = col.map(() => top + span); return; }
+      if (!ancho) { const top = Math.max(...col); el.style.gridColumn = "1 / -1"; el.style.gridRow = `${top} / span ${span}`; col = col.map(() => top + span); el.__h = h; return; }
       let c = 0; for (let k = 1; k < n; k++) if (col[k] < col[c]) c = k;
       el.style.gridColumn = String(c + 1); el.style.gridRow = `${col[c]} / span ${span}`; col[c] += span; el.__h = h;
     });
-    if (window.ResizeObserver) { if (!ro) ro = new ResizeObserver((es) => { if (es.some((e) => Math.abs((e.target.__h || 0) - e.contentRect.height) > 1)) pedir(); }); ro.disconnect(); items.forEach((el) => ro.observe(el)); }
+    // v192 · se compara con la altura real (con borde) y también se vigila la rejilla: si cambia de ancho o vuelve a verse, se reacomoda
+    g.__w = g.clientWidth;
+    if (window.ResizeObserver) { if (!ro) ro = new ResizeObserver((es) => { if (es.some((e) => e.target === g0() ? Math.abs((e.target.__w || 0) - e.target.clientWidth) > 1 : Math.abs((e.target.__h || 0) - e.target.getBoundingClientRect().height) > 1)) pedir(); }); ro.disconnect(); ro.observe(g); items.forEach((el) => ro.observe(el)); }
   }
+  const g0 = () => document.getElementById("main-grid");
   const pedir = () => { if (!raf) raf = requestAnimationFrame(acomodar); };
   if (window.pxpOnDom) pxpOnDom(() => { const g = document.getElementById("main-grid"); if (g && g.querySelector(":scope > .card.tcard")) pedir(); }, { childList: true, subtree: true });
   window.addEventListener("resize", pedir);
+  try { document.fonts && document.fonts.ready.then(pedir); } catch (e) { }
+  const oSV = window.switchView; if (typeof oSV === "function") window.switchView = function (v) { const r = oSV.apply(this, arguments); if (v === "traffic") { pedir(); setTimeout(pedir, 120); } return r; };
   window.pxpTraficoMosaico = acomodar;
 })();
 
