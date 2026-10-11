@@ -174,3 +174,12 @@ Sube de nuevo la carpeta `trafico-netlify` (arrastrar a Netlify). Los datos del 
 - Los logros ya alcanzados se registran como "base" la primera vez que alguien entra y no se celebran.
 - La función `state.mjs` ahora guarda solo lo que cambió y revisa la versión con un registro pequeño (`state-meta`): es compatible con los datos que ya tienes.
 
+## Asistente con IA (opcional, v212)
+El asistente del avatar funciona sin IA. Para conectarlo a la IA aprobada por Publicis, agrega estas variables en Netlify (Site configuration → Environment variables) y vuelve a publicar. La clave nunca llega al navegador.
+- **Azure OpenAI:** `AI_PROVIDER=azure`, `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_KEY`, `AZURE_OPENAI_DEPLOYMENT` (opcional `AZURE_OPENAI_API_VERSION`, por defecto 2024-10-21).
+- **API compatible con OpenAI** (gateway interno): `AI_PROVIDER=compatible`, `AI_BASE_URL`, `AI_API_KEY`, `AI_MODEL`.
+Sin variables, `/api/ai` responde que no está configurada y el asistente sigue con sus reglas. El modelo solo elige acciones; los permisos, las confirmaciones y Deshacer son los mismos de siempre.
+
+## Sala de juntas (prototipo, v212)
+Funciona sin servidor adicional: caminar, sentarse, burbujas de chat, proyectar un proyecto en el TV y el mapa de clientes. Hoy se comparte entre pestañas del mismo navegador y con compañeros de demostración. Cámara, micrófono y pantalla se ven solo en tu equipo. Cuando TI apruebe el servicio de llamadas, se conecta con `PXP_SALA.setProvider({...})` (ver HANDOFF.md).
+

@@ -1,6 +1,19 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v211** · 11 oct 2026 · Resumen general en `HANDOFF-COMPLETO.md` · Responsable: Bastián Torres
+Versión: **v212** · 11 oct 2026 · Resumen general en `HANDOFF-COMPLETO.md` · Responsable: Bastián Torres
+
+## v212 · Sala de juntas (prototipo), IA lista para conectar y perfil con foto más grande
+- **Sala** (`view-sala`, pestaña después de Team; capa `<style id="sala-v212">` + `<script id="sala-js">`): sala pixel en picado de 320×200 px lógicos.
+  - Mesa grande al centro con 10 puestos (4 atrás de frente, 4 adelante de espaldas, 2 en los extremos). Clic en el piso para caminar (rodea la mesa), clic en una silla para sentarse; también con las flechas o WASD.
+  - El chat sale como burbuja sobre el avatar y queda en "Conversación". "Proyectar" muestra un proyecto en el TV (16:9 exacto); clic en el TV lo abre en grande.
+  - Corcho de la derecha = mapa: una nota por cliente (los 5 con más proyectos activos), un pin por proyecto e hilos al centro. Al pasar muestra cliente, proyectos y personas; al hacer clic abre todos los clientes con sus proyectos y su equipo.
+  - Paleta según la hora con transición suave: mañana cálida, mediodía neutro, tarde dorada, atardecer, noche fría. De noche se apagan las luces y se prende la de la mesa si hay gente sentada. El chip de la hora permite ver la sala a otras horas (vista previa).
+  - Cámara (reemplaza la cara del avatar), micrófono (indicador de voz) y pantalla (en el TV) funcionan solo en el equipo de cada quien.
+  - Transporte: mensajes `{t:"hi"|"state"|"mv"|"say"|"st"|"proj"|"bye"}`. Hoy viajan entre pestañas (BroadcastChannel) y hay compañeros de demostración (se apagan con la casilla). Para el servicio de llamadas: `PXP_SALA.setProvider({ connect({me,onMessage}), send(msg), setMic(on,stream), setCam(on,stream), setScreen(on,stream), leave() })`; también `PXP_SALA.state()`, `PXP_SALA.say(t)`, `PXP_SALA.hora(h|null)`.
+- **IA lista** (`netlify/functions/ai.mjs`, ruta `/api/ai`): apagada sin variables. Azure OpenAI o API compatible con OpenAI (variables en LEEME). El navegador nunca ve la clave. `PXA_AGENT.tools()` entrega 12 herramientas; cada una se traduce a una frase que el intérprete ya entiende, así permisos, confirmaciones y Deshacer son los mismos. Las reglas responden primero; solo lo que no entienden va al modelo.
+- **Asistente:** la caja de "Pídeme algo" ya no usa `<form>` (en visores incrustados el envío estaba bloqueado). Muestra "…" mientras piensa. Sabe ir a la Sala.
+- **Perfil:** foto de 112 px (132 px en triángulos, con el triángulo más lleno) y botones de cambiar/quitar foto debajo, sin taparla.
+- Pruebas: `node tools/test-v212.mjs` (26 comprobaciones, con cámara y micrófono simulados) y `python3 tools/netlify-e2e-prep.py && node tools/ai-e2e.mjs /tmp/nfmock` (11: apagada sin variables, 403 desde otro sitio, la clave solo en el servidor, herramienta → misma tarjeta de confirmación).
 
 ## v211 · Avatar pixel personal y asistente sin modelo
 - **Avatar 32×32 en picado** que cada persona crea y edita (Administración no puede cambiarlo). Se guarda en `persona.avatar` (`{v:1, hair, hc, eyes, fh, skin, fit, oc, dc, gl, fc, lc, acc, ac, ears, sh, pin, pc}`; `dc`/`pc` nulos = color del grupo).

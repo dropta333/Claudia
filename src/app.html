@@ -23454,7 +23454,7 @@ button.pm-pxa{cursor:pointer}
       rec.onend = () => { mic.classList.remove("on"); mic.setAttribute("aria-pressed", "false"); rec = null; if (inp.value.trim()) send(); };
       try { rec.start(); } catch (e) { rec = null; mic.classList.remove("on"); }
     };
-    const ask = async v => { you.hidden = false; you.textContent = v; setChips([]); setCard(null);
+    const ask = async v => { you.hidden = false; you.textContent = v; setChips([]); setCard(null); clearInterval(timer); t.textContent = "…";
       let r; try { r = opts.onAsk ? await Promise.resolve(opts.onAsk(v)) : { text: REPLIES[Math.floor(Math.random() * REPLIES.length)] }; } catch (e) { r = { text: "Se me cayó el render. ¿Me lo repites?" }; } show(r); };
     /* sin <form>: en vistas incrustadas (sandbox sin allow-forms) el envío de formularios está bloqueado */
     function send() { const v = inp.value.trim(); if (!v) { inp.focus(); return; } inp.value = ""; ac.hidden = true; ask(v); }
@@ -23496,7 +23496,7 @@ button.pm-pxa{cursor:pointer}
   const hist = (k, texto) => { const p = P()[k]; if (!p) return; (p.historial = p.historial || []).push({ ts: new Date().toISOString(), usuario: me(), texto: texto + " · con el asistente" }); };
   const EST = { pendiente: "Pendiente", en_curso: "En curso", revision: "En revisión", listo: "Lista" };
   const ESTP = { cotizado: "Cotizado", preproduccion: "Preproducción", rodaje: "Rodaje", en_produccion: "Postproducción", postproduccion: "Postproducción", revision: "Revisión", entregado: "Entregado", aprobado: "Aprobado", standby: "Standby" };
-  const VIEWS = [[/\b(home|inicio)\b/, "home", "Home"], [/\bdashboard|tablero\b/, "dashboard", "Dashboard"], [/\btrafico\b/, "traffic", "Tráfico"], [/\bproyectos\b/, "projects", "Proyectos"], [/\b(team|equipo)\b/, "team", "Team"],
+  const VIEWS = [[/\bsala\b/, "sala", "la Sala de juntas"], [/\b(home|inicio)\b/, "home", "Home"], [/\bdashboard|tablero\b/, "dashboard", "Dashboard"], [/\btrafico\b/, "traffic", "Tráfico"], [/\bproyectos\b/, "projects", "Proyectos"], [/\b(team|equipo)\b/, "team", "Team"],
     [/\bclientes?\b/, "clientes", "Clientes"], [/\bcapacidad\b/, "capacidad", "Capacidad"], [/\bmis horas\b/, "mishoras", "Mis horas"], [/\bhoras\b/, "horas", "Horas"], [/\breportes?\b/, "reportes", "Reportes"], [/\blicencias?\b/, "licencias", "Licencias"], [/\blogros?\b/, "logros", "Logros"], [/\brepositorio\b/, "repositorio", "Repositorio"]];
   const go = v => { try { window.PXA_AGENT._close(); switchView(v); window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) { } };
   const openP = k => { try { window.PXA_AGENT._close(); pxpOpenProject(k); } catch (e) { } };
@@ -23604,7 +23604,7 @@ button.pm-pxa{cursor:pointer}
     chips: [["Mis pendientes", "mis pendientes"], ["¿Quién está libre?", "quién está libre esta semana"], ["Registrar horas", "registra 2 horas hoy"], ["Nueva tarea", "crea una tarea revisar color mañana"], ["Ir a Reportes", "ve a reportes"]]
       .map(([l, q]) => ({ label: l, ghost: true, onClick: () => window.PXA_AGENT._ask(q) })) };
 
-  function ask(raw) {
+  function ask(raw, noAI) {
     const text = String(raw || "").trim(), t = N(text);
     if (!t) return HELP;
     const k = findProject(text), ppl = findPeople(text), fecha = parseDate(text), h = parseHours(text);
@@ -23722,13 +23722,52 @@ button.pm-pxa{cursor:pointer}
       if (hits.length) return { text: hits.length === 1 ? "Lo encontré:" : `Encontré ${hits.length}:`, chips: hits.map(kk => ({ label: pName(kk), sub: tit(P()[kk].cliente || "") + " · " + (ESTP[P()[kk].estadoGeneral] || ""), onClick: () => openP(kk) })) };
       return { text: `No encuentro «${q}». Prueba con # para elegir de la lista.` };
     }
+    if (AI.on && !noAI) return aiAsk(text);
     const tw = words(text);
     if (tw.length) { const hits = activos().filter(kk => words((P()[kk].nombre || "") + " " + (P()[kk].cliente || "")).some(w => tw.includes(w))).slice(0, 6);
       if (hits.length) return { text: hits.length === 1 ? "¿Hablas de este?" : "¿Cuál de estos?", chips: hits.map(kk => ({ label: pName(kk), sub: tit(P()[kk].cliente || "") + " · " + (ESTP[P()[kk].estadoGeneral] || ""), onClick: () => window.PXA_AGENT._ask("#" + pName(kk)) })) }; }
     return { text: "Esa no la tengo en el guion todavía. Mira lo que sí sé hacer:", chips: HELP.chips };
   }
 
-  window.PXA_AGENT = { ask, mentions, _show: () => { }, _say: () => { }, _ask: () => { }, _close: () => { } };
+  /* ---------- IA aprobada (se activa sola cuando /api/ai responde enabled) ----------
+     El modelo no toca datos: elige una herramienta y esta se traduce a una frase que el intérprete de arriba ya entiende,
+     así las confirmaciones, permisos y Deshacer son exactamente los mismos con o sin IA. */
+  const TOOLS = [
+    ["buscar_proyecto", "Busca un proyecto por nombre, cliente o marca y resume su estado.", { consulta: "texto a buscar" }, ["consulta"], a => `#${a.consulta}`],
+    ["mis_pendientes", "Lista las etapas activas de la persona que pregunta.", {}, [], () => "mis pendientes"],
+    ["quien_esta_libre", "Dice quién del equipo está libre esta semana.", {}, [], () => "quién está libre"],
+    ["resumen_persona", "Resume rol, carga y etapas de una persona del equipo.", { persona: "nombre de la persona" }, ["persona"], a => `@${a.persona}`],
+    ["abrir_vista", "Abre una vista del tablero.", { vista: "home | dashboard | trafico | proyectos | team | sala | clientes | capacidad | horas | mis horas | reportes | licencias | logros | repositorio" }, ["vista"], a => `ve a ${a.vista}`],
+    ["registrar_horas", "Registra horas trabajadas en una etapa (pide confirmación).", { horas: "número de horas", proyecto: "nombre del proyecto (opcional)", etapa: "nombre de la etapa (opcional)", fecha: "AAAA-MM-DD (opcional, hoy por defecto)", nota: "nota (opcional)" }, ["horas"], a => `registra ${a.horas} horas${a.etapa ? ` en ${a.etapa}` : ""}${a.proyecto ? ` #${a.proyecto}` : ""} ${a.fecha || "hoy"}${a.nota ? ` nota: ${a.nota}` : ""}`],
+    ["crear_tarea", "Crea una tarea (pide confirmación).", { texto: "qué hay que hacer", persona: "para quién (opcional)", proyecto: "proyecto (opcional)", fecha: "AAAA-MM-DD (opcional)" }, ["texto"], a => `crea una tarea ${a.texto}${a.persona ? ` para @${a.persona}` : ""}${a.proyecto ? ` #${a.proyecto}` : ""}${a.fecha ? ` ${a.fecha}` : ""}`],
+    ["crear_etapa", "Agrega una etapa al cronograma de un proyecto (solo Administración; pide confirmación).", { proyecto: "proyecto", nombre: "nombre de la etapa", responsable: "persona (opcional)", fecha: "AAAA-MM-DD (opcional)" }, ["proyecto", "nombre"], a => `crea una etapa ${a.nombre} en #${a.proyecto}${a.fecha ? ` ${a.fecha}` : ""}${a.responsable ? ` para @${a.responsable}` : ""}`],
+    ["cambiar_estado_etapa", "Cambia el estado de una etapa (pide confirmación).", { etapa: "nombre de la etapa", proyecto: "proyecto (opcional)", estado: "pendiente | en curso | revisión | lista" }, ["etapa", "estado"], a => `pasa ${a.etapa}${a.proyecto ? ` #${a.proyecto}` : ""} a ${a.estado}`],
+    ["cambiar_estado_proyecto", "Pone un proyecto en standby, aprobado o cotizado (solo Administración; pide confirmación).", { proyecto: "proyecto", estado: "standby | aprobado | cotizado" }, ["proyecto", "estado"], a => `pon #${a.proyecto} en ${a.estado}`],
+    ["nuevo_proyecto", "Abre la ficha de proyecto nuevo (solo Administración).", { nombre: "nombre", cliente: "cliente (opcional)" }, ["nombre"], a => `crea un proyecto ${a.nombre}${a.cliente ? ` para ${a.cliente}` : ""}`],
+    ["reportes", "Abre la vista de reportes.", {}, [], () => "reportes"],
+  ];
+  const toolSchemas = () => TOOLS.map(([name, description, props, req]) => ({ type: "function", function: { name, description, parameters: { type: "object", properties: Object.fromEntries(Object.entries(props).map(([k, d]) => [k, { type: k === "horas" ? "number" : "string", description: d }])), required: req } } }));
+  function runTool(name, args) { const t = TOOLS.find(x => x[0] === name); if (!t) return { text: "Esa acción no la tengo." }; let phrase = ""; try { phrase = t[4](args || {}); } catch (e) { } return phrase ? ask(phrase, true) : HELP; }
+  const AI = { on: false, url: "/api/ai", hist: [] };
+  function ctx() {
+    const st = myStages().slice(0, 8).map(x => `${x.e.nombre} (${pName(x.k)}, ${EST[x.e.estado] || x.e.estado}${x.e.fecha ? ", vence " + x.e.fecha : ""})`);
+    return `Hoy es ${hoy()}. Hablas con ${tit(me())}${admin() ? " (Administración)" : ""}. Proyectos activos: ${activos().slice(0, 60).map(pName).join(", ")}. Sus etapas: ${st.join("; ") || "ninguna"}.`;
+  }
+  async function aiAsk(text) {
+    const sys = "Eres el asistente del tablero Tráfico Post de Publicis Production (postproducción). Responde en español, en una o dos frases cortas, con un toque de jerga de post. Para consultar o cambiar algo usa SIEMPRE una herramienta; nunca inventes datos, nombres ni fechas. Si falta un dato, pregúntalo. " + ctx();
+    AI.hist.push({ role: "user", content: text }); AI.hist = AI.hist.slice(-8);
+    try {
+      const r = await fetch(AI.url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ messages: [{ role: "system", content: sys }].concat(AI.hist), tools: toolSchemas() }) });
+      const j = await r.json(); if (!r.ok || !j.message) throw new Error(j && j.error || "IA");
+      const m = j.message, call = (m.tool_calls || [])[0];
+      if (call && call.function) { let args = {}; try { args = JSON.parse(call.function.arguments || "{}"); } catch (e) { } AI.hist.push({ role: "assistant", content: `(usé ${call.function.name})` }); return runTool(call.function.name, args); }
+      AI.hist.push({ role: "assistant", content: m.content || "" });
+      return { text: m.content || "Listo." };
+    } catch (e) { return { text: "La IA no me respondió. Mientras tanto, esto sí lo sé hacer:", chips: HELP.chips }; }
+  }
+  try { if (/^https?:/.test(location.protocol)) fetch(AI.url, { cache: "no-store" }).then(r => r.ok ? r.json() : null).then(j => { AI.on = !!(j && j.enabled); }).catch(() => { }); } catch (e) { }
+
+  window.PXA_AGENT = { ask, mentions, tools: () => toolSchemas(), runTool, ai: () => AI.on, _show: () => { }, _say: () => { }, _ask: () => { }, _close: () => { } };
 })();
 </script>
 <script id="pxa-integ">/* ═════ v211 · Avatares PXA · integración (tarjeta Home, ventana de persona, cabezas en lugar de siglas) ═════ */
@@ -23978,6 +24017,778 @@ button.pm-pxa{cursor:pointer}
   let q = 0; const run = () => { q = 0; homeCard(); homeState(); personHead(); teamCards(); };
   new MutationObserver(() => { if (!q) q = requestAnimationFrame(run); }).observe(document.body, { childList: true, subtree: true });
   run();
+})();
+</script>
+<!-- ═════ v212 · Sala de juntas (prototipo) y perfil con foto más grande ═════ -->
+<style id="sala-v212">/* ═════ v212 · Perfil: foto más grande (triángulos más llenos) y acciones debajo, sin tapar la foto ═════ */
+#pxp-person .ph-avw{display:flex;flex-direction:column;align-items:center;gap:8px}
+#pxp-person .ph-avw .av{--s:112px!important}
+#pxp-person .ph-avw .av[data-sh="tri"],#pxp-person .ph-avw .av[data-sh="trid"]{--s:132px!important}
+#pxp-person .ph-avw .av[data-sh="tri"]{--sh:polygon(50% 2%,99% 94%,1% 94%)}
+#pxp-person .ph-avw .av[data-sh="trid"]{--sh:polygon(50% 98%,1% 6%,99% 6%)}
+#pxp-person .ph-avw .av.shp:not(.ini)[data-sh="tri"] > .avi img{transform:translateY(16%) scale(1.04)}
+#pxp-person .ph-avw .av.shp:not(.ini)[data-sh="trid"] > .avi img{transform:translateY(-14%) scale(1.04)}
+#pxp-person .ph-acts{position:static!important;display:flex;justify-content:center;gap:6px}
+#pxp-person .ph-act{width:28px;height:28px;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+@media (max-width:600px){#pxp-person .ph-avw .av{--s:112px!important}#pxp-person .ph-avw .av[data-sh="tri"],#pxp-person .ph-avw .av[data-sh="trid"]{--s:128px!important}}
+
+/* ═════ v212 · Sala de juntas ═════ */
+.sl-wrap{display:flex;flex-direction:column;gap:14px}
+.sl-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.sl-head h2{margin:0;font:700 30px/1 var(--display);letter-spacing:.02em;text-transform:uppercase}
+.sl-head p{margin:6px 0 0;color:var(--muted);font-size:14px}
+.sl-hr{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sl-badge{font:600 11.5px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;padding:6px 10px;border-radius:8px;background:color-mix(in srgb,var(--majorelle) 18%,transparent);color:var(--text);border:1px solid color-mix(in srgb,var(--majorelle) 40%,var(--border))}
+.sl-demo{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;color:var(--muted);cursor:pointer}
+.sl-demo input{accent-color:var(--majorelle);width:16px;height:16px}
+.sl-main{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:14px;align-items:start}
+.sl-stage{position:relative;width:100%;aspect-ratio:320/200;border-radius:14px;overflow:hidden;border:1px solid var(--border);background:#241f38;container-type:inline-size;cursor:pointer;touch-action:manipulation;box-shadow:0 18px 50px -24px rgba(36,31,56,.55)}
+.sl-stage:focus-visible{outline:2px solid var(--brand);outline-offset:3px}
+[data-theme="light"] .sl-stage:focus-visible{outline-color:var(--majorelle)}
+.sl-stage canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;display:block}
+.sl-ov{position:absolute;inset:0;pointer-events:none}
+/* --u = 1 píxel lógico de la sala */
+.sl-stage{--u:calc(100cqw / 320);max-width:calc((100vh - 230px) * 320 / 200);min-width:min(100%,560px);justify-self:center}
+.sl-e{position:absolute;width:calc(var(--u)*32);height:calc(var(--u)*32);translate:-50% 0}
+.sl-tag{position:absolute;left:50%;top:calc(var(--u)*var(--ty,33));transform:translateX(-50%);display:inline-flex;align-items:center;gap:3px;white-space:nowrap;padding:calc(var(--u)*.8) calc(var(--u)*2.6);border-radius:calc(var(--u)*2);background:rgba(20,18,32,.72);color:#fff;font:600 clamp(9px,calc(var(--u)*4.4),13px)/1.1 var(--sans);letter-spacing:.01em}
+.sl-e.me .sl-tag{background:#F3FF57;color:#141218}
+.sl-mic{display:inline-block;width:.9em;height:.9em;border-radius:50%;background:#64d861;box-shadow:0 0 0 2px rgba(100,216,97,.25)}
+.sl-mic[hidden]{display:none}
+.sl-spk{position:absolute;left:50%;top:calc(var(--u)*4);width:calc(var(--u)*20);height:calc(var(--u)*20);transform:translateX(-50%);border-radius:50%;box-shadow:0 0 0 calc(var(--u)*1.2) #64d861,0 0 calc(var(--u)*6) rgba(100,216,97,.6);opacity:0;transition:opacity .15s}
+.sl-e.spk .sl-spk{opacity:1;animation:slSpk .9s ease-in-out infinite}
+@keyframes slSpk{50%{box-shadow:0 0 0 calc(var(--u)*2) #64d861,0 0 calc(var(--u)*10) rgba(100,216,97,.35)}}
+.sl-cam{position:absolute;left:50%;top:calc(var(--u)*1);width:calc(var(--u)*22);height:calc(var(--u)*22);transform:translateX(-50%);border-radius:50%;overflow:hidden;display:none;background:#141218;box-shadow:0 0 0 calc(var(--u)*1.2) var(--c,#F3FF57),0 calc(var(--u)*1.5) calc(var(--u)*4) rgba(0,0,0,.4)}
+.sl-e.cam .sl-cam{display:block}
+.sl-cam video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);display:block}
+.sl-bub{position:absolute;translate:-50% -100%;z-index:3;animation:pxaTip .3s steps(4) both}
+.sl-bub .pxb-i{padding:clamp(4px,calc(var(--u)*2),9px) clamp(7px,calc(var(--u)*3.4),13px) clamp(6px,calc(var(--u)*2.6),11px);max-width:clamp(110px,calc(var(--u)*72),220px);width:max-content;font-size:clamp(10px,calc(var(--u)*4.4),14px);line-height:1.15;font-weight:600;text-transform:uppercase;letter-spacing:.02em;text-wrap:balance}
+.sl-bub .pxb-t{left:50%;margin-left:-6px}
+.sl-bub.out{animation:pxaTipOut .35s steps(4) both}
+.sl-tv{position:absolute;overflow:hidden;cursor:zoom-in;color:#F3FF57;background:#141220}
+.sl-tv video{width:100%;height:100%;object-fit:contain;display:block;background:#000}
+.sl-idle{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*2);font-family:"Pixelify Sans",var(--display),sans-serif;text-align:center;background:repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0 1px,transparent 1px 3px)}
+.sl-idle b{font-size:clamp(10px,calc(var(--u)*5.6),20px);line-height:1;text-transform:uppercase;letter-spacing:.04em}
+.sl-idle span{font-size:clamp(8px,calc(var(--u)*3.6),12px);color:#b9b3d8}
+.sl-tv .sl-pc{padding:calc(var(--u)*3) calc(var(--u)*3.4);color:#f4f4f5;font-size:clamp(7px,calc(var(--u)*2.7),11px);height:100%;box-sizing:border-box;display:flex;flex-direction:column;gap:calc(var(--u)*1.4)}
+.sl-pc-h{display:flex;flex-direction:column}
+.sl-pc-h b{font:700 1.5em/1.05 var(--display);text-transform:uppercase;letter-spacing:.02em;color:#F3FF57;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sl-pc-h span{color:#b9b3d8}
+.sl-pc-bar{height:max(3px,calc(var(--u)*1.6));background:rgba(255,255,255,.12);border-radius:9px;overflow:hidden}
+.sl-pc-bar i{display:block;height:100%;background:#F3FF57}
+.sl-pc-n{color:#d8d4ef}
+.sl-pc ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1px}
+.sl-pc li{display:flex;justify-content:space-between;gap:8px;white-space:nowrap}
+.sl-pc li span{overflow:hidden;text-overflow:ellipsis}
+.sl-pc li em{font-style:normal;color:#b9b3d8}
+.sl-toast{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);max-width:90%;padding:8px 14px;border-radius:10px;background:rgba(20,18,32,.9);color:#fff;font-size:13px;text-align:center;pointer-events:none}
+.sl-toast[hidden]{display:none}
+.sl-card{position:absolute;transform:translate(-50%,calc(-100% - 6px));z-index:5;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:150px;padding:12px 14px;border-radius:12px;background:var(--surface);border:1px solid var(--border2);box-shadow:0 14px 34px rgba(0,0,0,.35);color:var(--text);cursor:default;text-align:center}
+.sl-card img{width:48px;height:48px;image-rendering:pixelated}
+.sl-card b{font:700 15px/1.1 var(--sans)}
+.sl-card small{color:var(--muted);font-size:12.5px}
+.sl-card em{font-style:normal;font:600 10.5px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.sl-card button{all:unset;cursor:pointer;margin-top:6px;padding:6px 12px;border-radius:8px;background:var(--brand);color:#111;font:600 13px/1 var(--sans)}
+[data-theme="light"] .sl-card button{background:var(--majorelle);color:#fff}
+.sl-card button:focus-visible{outline:2px solid var(--majorelle);outline-offset:2px}
+.sl-side{display:flex;flex-direction:column;gap:8px;padding:14px;border:1px solid var(--border);border-radius:14px;background:var(--surface);max-height:100%;min-width:0}
+.sl-side h3{margin:2px 0 0;display:flex;align-items:center;gap:8px;font:600 12.5px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.sl-side h3 b{padding:3px 7px;border-radius:7px;background:var(--surface2);color:var(--text);letter-spacing:0}
+.sl-ppl{list-style:none;margin:0 0 6px;padding:0;display:flex;flex-direction:column;gap:2px;max-height:250px;overflow:auto}
+.sl-ppl li{display:grid;grid-template-columns:30px minmax(0,1fr) auto auto;align-items:center;gap:8px;padding:5px 6px;border-radius:9px;cursor:pointer}
+.sl-ppl li:hover{background:var(--surface2)}
+.sl-ppl img{width:30px;height:30px;image-rendering:pixelated;border-radius:8px;background:var(--surface2)}
+.sl-ppl span{display:flex;flex-direction:column;min-width:0}
+.sl-ppl b{font:600 13.5px/1.2 var(--sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sl-ppl b em{font-style:normal;font:600 10px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.sl-ppl small{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sl-ppl i{display:grid;place-items:center;width:22px;height:22px;color:var(--muted2);opacity:.75}
+.sl-ppl i.on{color:var(--green);opacity:1}
+.sl-ppl i svg{width:15px;height:15px}
+.sl-projs{margin:0;font-size:12.5px;color:var(--muted)}
+.sl-projs:empty{display:none}
+.sl-log{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;max-height:180px;overflow:auto;font-size:13px}
+.sl-log li{line-height:1.3}
+.sl-log b{font-weight:600}
+.sl-log time{color:var(--muted2);font-size:11px;margin-left:2px}
+.sl-log .sl-empty{color:var(--muted)}
+.sl-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px;border:1px solid var(--border);border-radius:14px;background:var(--surface)}
+.sl-ctl{display:flex;gap:6px;flex-wrap:wrap}
+.sl-b{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:7px;padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);font:600 13px/1 var(--sans);color:var(--text);transition:background .15s,border-color .15s}
+.sl-b:hover{border-color:var(--muted)}
+.sl-b i{display:grid;place-items:center}
+.sl-b svg{width:17px;height:17px}
+.sl-b.on{background:color-mix(in srgb,var(--green) 18%,var(--surface2));border-color:color-mix(in srgb,var(--green) 55%,var(--border))}
+#sl-scr.on{background:color-mix(in srgb,var(--majorelle) 22%,var(--surface2));border-color:var(--majorelle)}
+.sl-b:focus-visible,.sl-chat button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.sl-chat{flex:1;min-width:240px;max-width:520px;display:flex;align-items:center;gap:6px;padding:3px 3px 3px 12px;border-radius:12px;border:1px solid var(--border2);background:var(--surface2)}
+.sl-chat:focus-within{border-color:var(--majorelle)}
+.sl-chat input{all:unset;flex:1;min-width:0;padding:8px 0;font:500 14px/1.3 var(--sans);color:var(--text)}
+.sl-chat input::placeholder{color:var(--muted)}
+.sl-chat button{all:unset;cursor:pointer;display:grid;place-items:center;width:36px;height:36px;border-radius:9px;background:#F3FF57;color:#111}
+.sl-chat button svg{width:18px;height:18px}
+.sl-pick{position:absolute;z-index:40;margin-top:6px;width:min(340px,90vw);padding:8px;border-radius:12px;background:var(--surface);border:1px solid var(--border2);box-shadow:0 18px 40px rgba(0,0,0,.35)}
+.sl-ctl{position:relative}
+.sl-pick input{box-sizing:border-box;width:100%;padding:9px 11px;border-radius:9px;border:1px solid var(--border2);background:var(--surface2);color:var(--text);font:500 14px/1.2 var(--sans)}
+.sl-pick ul{list-style:none;margin:6px 0 0;padding:0;max-height:260px;overflow:auto}
+.sl-pick li button{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;width:100%;padding:8px 10px;border-radius:8px}
+.sl-pick li button:hover,.sl-pick li button:focus-visible{background:var(--surface2)}
+.sl-pick li b{font:600 13.5px/1.2 var(--sans)}
+.sl-pick li small{color:var(--muted);font-size:12px}
+.sl-pick-x{all:unset;cursor:pointer;display:block;margin-top:6px;padding:8px 10px;border-radius:8px;color:var(--red);font:600 13px/1 var(--sans)}
+.sl-note{margin:0;color:var(--muted);font-size:12.5px}
+.sl-noav{margin-top:10px;width:fit-content;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 14px;border-radius:12px;border:1px dashed var(--border2);font-size:13.5px}
+.sl-noav button{all:unset;cursor:pointer;padding:7px 12px;border-radius:9px;background:var(--brand);color:#111;font:600 13px/1 var(--sans)}
+[data-theme="light"] .sl-noav button{background:var(--majorelle);color:#fff}
+.sl-big{position:fixed;inset:0;z-index:1400;background:rgba(10,8,18,.72);display:grid;place-items:center;padding:24px}
+.sl-big-b{position:relative;width:min(960px,100%);aspect-ratio:16/9;max-height:80vh;background:#141220;border:6px solid #07060b;border-radius:10px;box-shadow:0 30px 80px rgba(0,0,0,.6);--u:calc(min(960px,100vw - 48px) / 80)}
+.sl-big-c{position:absolute;inset:0;overflow:hidden}
+.sl-big-c video{width:100%;height:100%;object-fit:contain}
+.sl-big-c .sl-pc{padding:28px 34px;font-size:16px;gap:10px;color:#f4f4f5;height:100%;box-sizing:border-box;display:flex;flex-direction:column}
+.sl-big-c .sl-pc-bar{height:8px}
+.sl-big-x{all:unset;cursor:pointer;position:absolute;top:-44px;right:0;color:#fff;font:600 18px/1 system-ui;width:36px;height:36px;display:grid;place-items:center;border-radius:9px;background:rgba(255,255,255,.12)}
+.sl-big-o{all:unset;cursor:pointer;position:absolute;right:16px;bottom:16px;padding:9px 14px;border-radius:9px;background:#F3FF57;color:#111;font:600 13.5px/1 var(--sans)}
+.sl-side section{display:flex;flex-direction:column;gap:8px;min-width:0}
+@media (max-width:1100px){.sl-main{grid-template-columns:1fr}.sl-side{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px}.sl-ppl,.sl-log{max-height:190px}}
+@media (max-width:760px){.sl-side{grid-template-columns:1fr}.sl-head h2{font-size:24px}.sl-b span{display:none}.sl-b{padding:10px}.sl-chat{min-width:0;flex-basis:100%;max-width:none}.sl-stage{border-radius:10px}}
+@media (prefers-reduced-motion:reduce){.sl-e.spk .sl-spk,.sl-bub,.sl-bub.out{animation:none}}
+.sl-hora{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:7px;padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);font:600 12.5px/1 var(--sans);color:var(--text)}
+.sl-hora i{width:14px;height:14px;border-radius:4px;border:1px solid rgba(0,0,0,.25)}
+.sl-hora em{font-style:normal;font:600 10px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--majorelle)}
+.sl-hora:hover{border-color:var(--muted)}
+.sl-hora:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.sl-map{position:absolute;z-index:2}
+.sl-mn{all:unset;position:absolute;width:calc(var(--u)*14);height:calc(var(--u)*11);translate:-50% -50%;cursor:pointer;border-radius:calc(var(--u)*1.5)}
+.sl-mn.hub{width:calc(var(--u)*8);height:calc(var(--u)*8);border-radius:50%}
+.sl-mn:hover,.sl-mn:focus-visible{box-shadow:0 0 0 2px #F3FF57,0 0 12px rgba(243,255,87,.6)}
+.sl-mn::after{content:attr(data-tip);position:absolute;right:0;top:calc(100% + 6px);white-space:nowrap;padding:5px 9px;border-radius:7px;background:rgba(20,18,32,.92);color:#fff;font:600 12px/1.1 var(--sans);opacity:0;pointer-events:none;transition:opacity .12s;z-index:4}
+.sl-mn:hover::after,.sl-mn:focus-visible::after{opacity:1}
+.sl-mp{position:fixed;inset:0;z-index:1400;background:rgba(10,8,18,.6);display:grid;place-items:center;padding:20px}
+.sl-mp-b{width:min(1040px,100%);max-height:86vh;overflow:auto;background:var(--surface);border:1px solid var(--border2);border-radius:16px;box-shadow:0 30px 80px rgba(0,0,0,.45)}
+.sl-mp-b header{position:sticky;top:0;display:flex;align-items:baseline;gap:12px;padding:18px 20px 14px;background:var(--surface);border-bottom:1px solid var(--border);z-index:1}
+.sl-mp-b h3{margin:0;font:700 22px/1 var(--display);text-transform:uppercase;letter-spacing:.03em}
+.sl-mp-b header p{margin:0;color:var(--muted);font-size:13px}
+.sl-mp-x{all:unset;cursor:pointer;margin-left:auto;width:32px;height:32px;display:grid;place-items:center;border-radius:9px;color:var(--muted)}
+.sl-mp-x:hover{background:var(--surface2);color:var(--text)}
+.sl-mp-x:focus-visible{outline:2px solid var(--brand)}
+.sl-mp-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;padding:16px 20px 20px}
+.sl-mp-c{border:1px solid var(--border);border-radius:12px;padding:12px;background:var(--surface2);border-top:4px solid var(--nc)}
+.sl-mp-c.on{box-shadow:0 0 0 2px var(--nc)}
+.sl-mp-c h4{margin:0 0 8px;display:flex;justify-content:space-between;align-items:center;font:700 15px/1.1 var(--display);text-transform:uppercase;letter-spacing:.04em}
+.sl-mp-c h4 span{font:600 12px/1 var(--sans);color:var(--muted);background:var(--surface);padding:3px 7px;border-radius:6px}
+.sl-mp-c ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.sl-mp-c li button{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;width:100%;padding:6px 8px;border-radius:8px}
+.sl-mp-c li button:hover,.sl-mp-c li button:focus-visible{background:var(--surface)}
+.sl-mp-c li b{font:600 13px/1.2 var(--sans)}
+.sl-mp-c li small{font-size:11.5px;color:var(--muted)}
+.sl-mp-t{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+.sl-mp-p{all:unset;cursor:pointer;border-radius:8px;background:var(--surface);padding:2px}
+.sl-mp-p img{width:28px;height:28px;image-rendering:pixelated;display:block}
+.sl-mp-p:hover,.sl-mp-p:focus-visible{box-shadow:0 0 0 2px var(--majorelle)}
+</style>
+<script id="sala-js">/* ═════ v212 · Sala de juntas (prototipo): los avatares entran, caminan, se sientan, hablan en burbujas y proyectan en el TV ═════
+   Todo lo que viaja entre personas pasa por un "transporte" con mensajes simples ({t:"hi"|"mv"|"say"|"st"|"proj"|"bye", …}).
+   Hoy: entre pestañas del mismo navegador (BroadcastChannel) y compañeros simulados (modo demostración).
+   Cuando TI apruebe el servicio de llamadas: PXP_SALA.setProvider({...}) entrega presencia, chat, voz, video y pantalla con los mismos mensajes.
+   Cámara, micrófono y pantalla funcionan ya, pero solo en tu equipo (no se transmiten). */
+(function () {
+  if (!window.PXA) return;
+  const W = 320, H = 200;
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const nn = s => (window.normName ? normName(s) : String(s || "").toLowerCase().trim());
+  const me = () => (typeof currentUser !== "undefined" ? currentUser : "");
+  const tit = t => String(t || "").toLowerCase().replace(/(^|[\s(-])\S/g, m => m.toUpperCase());
+  const find = n => { try { const f = window.pxpFindPerson && pxpFindPerson(n); return f && f.p; } catch (e) { return null; } };
+  const grp = p => { try { const g = pxpGrupo(p); return { name: g, color: pxpCargoColor(g), shape: pxpGrupoForma(g) }; } catch (e) { return { name: "", color: "#6c4cff", shape: "circle" }; } };
+  const people = () => [].concat(typeof TEAM !== "undefined" ? TEAM : []).filter(p => p && p.name && p.tipoMiembro !== "externo");
+  const R = (a, b) => a + Math.random() * (b - a);
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  const reduce = () => window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const isDark = () => { const r = document.documentElement; return r.dataset.theme ? r.dataset.theme === "dark" : !(window.matchMedia && matchMedia("(prefers-color-scheme: light)").matches); };
+  const L = (es, en) => (window.pxpLang === "en" ? en : es);
+
+  /* ---------- geometría: mesa grande casi cuadrada al centro, sala limpia (píxeles lógicos; los pies de cada avatar son su punto) ---------- */
+  const TABLE = { x: 72, y: 88, w: 176, h: 52 };
+  const SEATS = [];
+  [100, 140, 180, 220].forEach(x => SEATS.push({ x, y: TABLE.y + 8, view: "front", ax: x, ay: 66, side: "back" }));
+  SEATS.push({ x: 56, y: 124, view: "front", ax: 42, ay: 126, side: "end" }, { x: 264, y: 124, view: "front", ax: 278, ay: 126, side: "end" });
+  [100, 140, 180, 220].forEach(x => SEATS.push({ x, y: TABLE.y + TABLE.h + 22, view: "back", ax: x, ay: 178, side: "front" }));
+  const BLOCK = [{ x: 62, y: 78, w: 196, h: 94 }, { x: 0, y: 54, w: 22, h: 14 }];
+  const BOUNDS = { x0: 8, x1: 312, y0: 62, y1: 190 };
+  const DOOR = { x: 160, y: 196 };
+  const TV = { x: 120, y: 3, w: 80, h: 45 };   // 16:9 exacto
+  const BOARD = { x: 222, y: 5, w: 90, h: 42 };
+  const inBlock = (x, y, m) => BLOCK.some(b => x > b.x - (m || 0) && x < b.x + b.w + (m || 0) && y > b.y - (m || 0) && y < b.y + b.h + (m || 0));
+  const clampP = (x, y) => [Math.max(BOUNDS.x0, Math.min(BOUNDS.x1, x)), Math.max(BOUNDS.y0, Math.min(BOUNDS.y1, y))];
+  const segFree = (a, b) => { const n = Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / 3); for (let i = 1; i < n; i++) { const t = i / n; if (inBlock(a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, 1)) return false; } return true; };
+  function route(a, b) {
+    if (segFree(a, b)) return [b];
+    const nodes = [a, b]; BLOCK.forEach(o => { const m = 5; [[o.x - m, o.y - m], [o.x + o.w + m, o.y - m], [o.x - m, o.y + o.h + m], [o.x + o.w + m, o.y + o.h + m]].forEach(([x, y]) => { if (x >= BOUNDS.x0 && x <= BOUNDS.x1 && y >= BOUNDS.y0 && y <= BOUNDS.y1 && !inBlock(x, y)) nodes.push([x, y]); }); });
+    const d = nodes.map(() => Infinity), prev = nodes.map(() => -1), done = nodes.map(() => false); d[0] = 0;
+    for (;;) { let u = -1; d.forEach((v, i) => { if (!done[i] && v < Infinity && (u < 0 || v < d[u])) u = i; }); if (u < 0 || u === 1) break; done[u] = true;
+      nodes.forEach((n, v) => { if (done[v] || v === u) return; if (!segFree(nodes[u], n)) return; const nd = d[u] + Math.hypot(n[0] - nodes[u][0], n[1] - nodes[u][1]); if (nd < d[v]) { d[v] = nd; prev[v] = u; } }); }
+    if (prev[1] < 0) return [b];
+    const out = []; for (let v = 1; v > 0; v = prev[v]) out.unshift(nodes[v]); return out;
+  }
+
+  /* ---------- paleta según la hora: mañana cálida, mediodía neutro, tarde dorada, atardecer, noche fría ---------- */
+  const PAL = {
+    noche: { ol: "#0d0f1f", wallHi: "#39406a", wall: "#2c3256", wallLo: "#232847", trim: "#3b4370", trimLo: "#2a305a", floor: "#283052", floorMk: "#202744", rug: "#323b66", rugIn: "#2b3359", rugHi: "#3d477a", wood: "#4b4560", woodHi: "#5a5474", woodLo: "#3a354c", woodDk: "#2b2738", chair: "#23263d", chairHi: "#343854", plant: "#2f5a5a", plantHi: "#3d6f6c", pot: "#4a4050", metal: "#5a6080", paper: "#8a90b0", sky1: "#0b1030", sky2: "#141c48", sky3: "#1f2a60", curtain: "#3a4270", curtainLo: "#2c3358", frame: "#1a1d33", board: "#5a5f86", cork: "#4a4560" },
+    manana: { ol: "#3b2418", wallHi: "#fbe7c8", wall: "#f4d6a8", wallLo: "#e8c08a", trim: "#d9925a", trimLo: "#b8743f", floor: "#e3a466", floorMk: "#d08e52", rug: "#c9824a", rugIn: "#b9733f", rugHi: "#dc9a62", wood: "#a5643a", woodHi: "#c07c4c", woodLo: "#8a5030", woodDk: "#6b3b22", chair: "#6b4a3c", chairHi: "#85604e", plant: "#6f9a4a", plantHi: "#8bb35a", pot: "#b86e3e", metal: "#b8a48e", paper: "#fff4e0", sky1: "#f6c38a", sky2: "#fad9a8", sky3: "#fdebc8", curtain: "#f2b84a", curtainLo: "#d9973a", frame: "#8a5030", board: "#fffaf0", cork: "#d9a873" },
+    mediodia: { ol: "#22202e", wallHi: "#f2f0f5", wall: "#e6e3ec", wallLo: "#d6d2e0", trim: "#b9b3c9", trimLo: "#9d97b0", floor: "#d4d0dc", floorMk: "#c4bfd0", rug: "#b8b1cc", rugIn: "#aaa2c2", rugHi: "#c8c2da", wood: "#8c6a54", woodHi: "#a3806a", woodLo: "#725440", woodDk: "#574030", chair: "#3e3c4a", chairHi: "#55526a", plant: "#4f9a6a", plantHi: "#63b07c", pot: "#c4a888", metal: "#a0a0b0", paper: "#ffffff", sky1: "#8fbcef", sky2: "#aed0f4", sky3: "#cfe3f8", curtain: "#d9d4e6", curtainLo: "#bdb6d0", frame: "#4a4658", board: "#ffffff", cork: "#cdb69a" },
+    dorada: { ol: "#2e1608", wallHi: "#fcd59c", wall: "#f6c27e", wallLo: "#e8a660", trim: "#d4783c", trimLo: "#b35e2a", floor: "#e07a3a", floorMk: "#c9672c", rug: "#a85a2c", rugIn: "#96501f", rugHi: "#bd6a38", wood: "#a24e24", woodHi: "#c0643a", woodLo: "#84401c", woodDk: "#612c12", chair: "#5a3424", chairHi: "#774634", plant: "#7a8a38", plantHi: "#97a648", pot: "#b45a2a", metal: "#c49a70", paper: "#fff0d0", sky1: "#f08a3a", sky2: "#f6a54e", sky3: "#fbc676", curtain: "#f6b33a", curtainLo: "#d9902a", frame: "#6a3416", board: "#fff4dc", cork: "#d08a4a" },
+    atardecer: { ol: "#1c1028", wallHi: "#b78aa8", wall: "#9a7096", wallLo: "#7e5a80", trim: "#6e4f80", trimLo: "#573f6a", floor: "#7a5878", floorMk: "#684a68", rug: "#6a4c74", rugIn: "#5c4066", rugHi: "#7a5a86", wood: "#6a4450", woodHi: "#805464", woodLo: "#54363f", woodDk: "#3e2730", chair: "#3a2a44", chairHi: "#4e3a5a", plant: "#4a6a5a", plantHi: "#5a806a", pot: "#7a5060", metal: "#8a7a9a", paper: "#e8d8e8", sky1: "#3a2a6a", sky2: "#a05a8a", sky3: "#f08a6a", curtain: "#b07a9a", curtainLo: "#8a5a7c", frame: "#3a2440", board: "#d8cce0", cork: "#8a6a7a" },
+  };
+  const KEYS = [[0, "noche"], [5.5, "noche"], [7, "manana"], [10, "manana"], [12, "mediodia"], [15, "mediodia"], [17, "dorada"], [18.6, "atardecer"], [19.8, "noche"], [24, "noche"]];
+  const MOMENTO = { noche: ["Noche", "Night"], manana: ["Mañana", "Morning"], mediodia: ["Mediodía", "Midday"], dorada: ["Tarde dorada", "Golden hour"], atardecer: ["Atardecer", "Dusk"] };
+  const hora = () => S.hora != null ? S.hora : (d => d.getHours() + d.getMinutes() / 60)(new Date());
+  function paleta(h) {
+    let i = 0; while (i < KEYS.length - 2 && h >= KEYS[i + 1][0]) i++;
+    const [h0, a] = KEYS[i], [h1, b] = KEYS[i + 1], t = h1 > h0 ? Math.max(0, Math.min(1, (h - h0) / (h1 - h0))) : 0, A = PAL[a], B = PAL[b], out = {};
+    Object.keys(A).forEach(k => { out[k] = t <= 0 ? A[k] : t >= 1 ? B[k] : mix(A[k], B[k], t); });
+    out.momento = t < .5 ? a : b; out.noche = h >= 19.8 || h < 6; out.sol = h >= 6.5 && h < 18.4; return out;
+  }
+
+  /* ---------- mapa del tablero (clientes → proyectos → equipo) ---------- */
+  const NOTE_C = ["#F3FF57", "#ff8fb8", "#7fd0ff", "#b7a8ff", "#ffb36b"];
+  const SLOTS = [[229, 9], [295, 9], [229, 33], [295, 33], [262, 37]];
+  function mapaData() {
+    const P = typeof PROJECTS !== "undefined" ? PROJECTS : {}, by = {};
+    Object.keys(P).forEach(k => { const p = P[k]; if (!p || p.archivadoEn || p.estadoGeneral === "aprobado") return; const c = tit(p.cliente || L("Sin cliente", "No client")); (by[c] = by[c] || []).push(k); });
+    return Object.keys(by).sort((a, b) => by[b].length - by[a].length).slice(0, 5).map((c, i) => {
+      const team = new Set(); by[c].forEach(k => (P[k].etapas || []).forEach(e => [].concat(e.resp || []).forEach(r => r && team.add(nn(r)))));
+      return { cliente: c, proyectos: by[c], team: [...team], color: NOTE_C[i], slot: SLOTS[i] };
+    });
+  }
+
+  /* ---------- dibujo: contorno parejo, esquinas redondeadas, paleta única ---------- */
+  let bg = null, bgKey = "";
+  function drawBg() {
+    const h = hora(), M = mapaData(), key = Math.round(h * 12) + "|" + (window.pxpLang || "es") + "|" + M.map(m => m.cliente + m.proyectos.length).join(",");
+    if (bg && bgKey === key) return bg; bgKey = key; S.mapa = M;
+    const C = paleta(h); S.pal = C;
+    bg = document.createElement("canvas"); bg.width = W; bg.height = H; const x = bg.getContext("2d");
+    const R0 = (c, a, b, w, hh) => { x.fillStyle = c; x.fillRect(a, b, w, hh); };
+    const rbox = (a, b, w, hh, f, hi, lo) => { R0(C.ol, a, b - 1, w, hh + 2); R0(C.ol, a - 1, b, w + 2, hh); R0(f, a, b, w, hh); if (hi) R0(hi, a + 1, b, w - 2, 1); if (lo) R0(lo, a + 1, b + hh - 1, w - 2, 1); };
+    // pared con zócalo
+    R0(C.wall, 0, 0, W, 50); R0(C.wallHi, 0, 0, W, 2);
+    for (let i = 20; i < W; i += 40) R0(C.wallLo, i, 4, 1, 44);
+    R0(C.ol, 0, 49, W, 1); R0(C.trim, 0, 50, W, 6); R0(C.trimLo, 0, 55, W, 1); R0(C.ol, 0, 56, W, 1);
+    // piso liso con marcas sueltas
+    R0(C.floor, 0, 57, W, H - 57);
+    let sd = 7; const rnd = n => { sd = (sd * 9301 + 49297) % 233280; return Math.floor(sd / 233280 * n); };
+    for (let i = 0; i < 38; i++) { const a = rnd(W - 6), b = 62 + rnd(H - 72); R0(C.floorMk, a, b, 3, 1); R0(C.floorMk, a + 1, b - 1, 1, 1); }
+    // alfombra
+    rbox(48, 74, 224, 108, C.rug); R0(C.rugHi, 51, 77, 218, 1); R0(C.rugHi, 51, 178, 218, 1); R0(C.rugHi, 51, 77, 1, 102); R0(C.rugHi, 268, 77, 1, 102);
+    for (let i = 56; i < 266; i += 10) { R0(C.rugIn, i, 80, 4, 2); R0(C.rugIn, i + 1, 79, 2, 1); R0(C.rugIn, i, 174, 4, 2); R0(C.rugIn, i + 1, 176, 2, 1); }
+    // ventana con cortinas (cielo y astro según la hora)
+    rbox(14, 6, 50, 34, C.sky2); R0(C.sky1, 14, 6, 50, 11); R0(C.sky3, 14, 28, 50, 12);
+    if (C.sol) { const p = Math.max(0, Math.min(1, (h - 6.5) / 12)); R0(C.paper, 20 + Math.round(p * 36), 30 - Math.round(Math.sin(p * Math.PI) * 18), 4, 4); }
+    else { R0(C.board, 50, 10, 4, 4); R0(C.sky1, 52, 9, 3, 3); [[20, 12], [30, 9], [40, 18], [58, 22]].forEach(([a, b]) => R0(C.board, a, b, 1, 1)); }
+    for (let i = 0; i < 50; i++) { const hh = Math.round(5 + 3 * Math.sin(i / 6) + 2 * Math.sin(i / 2.3)); R0(C.plant, 14 + i, 40 - hh, 1, hh); }
+    R0(C.ol, 38, 6, 1, 34); R0(C.ol, 14, 22, 50, 1);
+    [[9, 0], [57, 1]].forEach(([a]) => { rbox(a, 4, 10, 38, C.curtain); for (let j = 0; j < 3; j++) R0(C.curtainLo, a + 2 + j * 3, 6, 1, 35); });
+    rbox(10, 41, 58, 2, C.woodHi);
+    // repisa con premios
+    rbox(74, 28, 34, 2, C.wood, C.woodHi);
+    rbox(78, 19, 6, 8, "#e8b84a", "#ffe08a"); rbox(89, 21, 5, 6, "#c9c9d4", "#ffffff"); rbox(99, 18, 5, 9, "#e8b84a", "#ffe08a");
+    rbox(80, 7, 22, 7, C.paper); R0(C.trimLo, 83, 9, 15, 1); R0(C.trimLo, 83, 11, 10, 1);
+    // TV 16:9
+    R0(C.ol, TV.x - 2, TV.y - 2, TV.w + 4, TV.h + 4); R0("#141220", TV.x, TV.y, TV.w, TV.h); R0("#F3FF57", TV.x + TV.w - 3, TV.y + TV.h + 1, 2, 1);
+    // reloj
+    rbox(206, 12, 10, 10, C.paper);
+    // mapa: corcho con notas por cliente, hilos al centro y un pin por proyecto
+    const B = BOARD; rbox(B.x, B.y, B.w, B.h, C.cork); R0(C.frame, B.x, B.y + B.h - 1, B.w, 1);
+    for (let i = 0; i < 26; i++) R0(mix(C.cork, C.ol, .12), B.x + 2 + rnd(B.w - 4), B.y + 2 + rnd(B.h - 4), 1, 1);
+    const hub = [B.x + B.w / 2, B.y + 20];
+    x.globalAlpha = .55; M.forEach(m => { const [a, b] = m.slot, n = Math.max(Math.abs(hub[0] - a), Math.abs(hub[1] - b)); for (let i = 0; i <= n; i++) R0(C.ol, Math.round(a + (hub[0] - a) * i / n), Math.round(b + (hub[1] - b) * i / n), 1, 1); }); x.globalAlpha = 1;
+    R0(C.ol, hub[0] - 3, hub[1] - 3, 6, 6); R0("#F3FF57", hub[0] - 2, hub[1] - 2, 4, 4);
+    M.forEach(m => { const [a, b] = m.slot; rbox(a - 6, b - 4, 12, 8, m.color); R0("rgba(0,0,0,.12)", a - 5, b + 3, 10, 1); R0(mix(m.color, C.ol, .35), a - 4, b - 1, 6, 1); R0(mix(m.color, C.ol, .35), a - 4, b + 1, 4, 1);
+      m.proyectos.slice(0, 6).forEach((_, j) => { const px = a - 6 + j * 2 + (j > 2 ? 2 : 0); R0(C.ol, px, b - 6, 1, 1); R0("#d23b3b", px, b - 7, 1, 1); }); });
+    // planta (esquina superior izquierda, junto a la ventana)
+    rbox(4, 45, 14, 11, C.pot, C.trim, C.woodLo); [[0, 30, 10, 14], [9, 26, 9, 18], [4, 20, 8, 12]].forEach(([a, b, w, hh], i) => { R0(C.ol, a - 1, b - 1, w + 2, hh + 2); R0(i % 2 ? C.plant : C.plantHi, a, b, w, hh); R0(C.plant, a, b + hh - 2, w, 2); });
+    // respaldos detrás de la gente (fila de atrás y extremos)
+    SEATS.filter(s => s.side === "back" || s.side === "end").forEach(s => { rbox(s.x - 8, s.y - 24, 16, 10, C.chair, C.chairHi); });
+    // muro frontal con la puerta
+    R0(C.ol, 0, 192, 142, 8); R0(C.ol, 178, 192, W - 178, 8); R0(C.floorMk, 142, 194, 36, 6); R0("#F3FF57", 146, 193, 28, 1);
+    return bg;
+  }
+  function drawTable(x) {
+    const C = S.pal || paleta(hora()), T = TABLE, used = new Set([...S.ents.values()].map(e => e.seat));
+    const R0 = (c, a, b, w, hh) => { x.fillStyle = c; x.fillRect(a, b, w, hh); };
+    const rbox = (a, b, w, hh, f, hi) => { R0(C.ol, a, b - 1, w, hh + 2); R0(C.ol, a - 1, b, w + 2, hh); R0(f, a, b, w, hh); if (hi) R0(hi, a + 1, b, w - 2, 1); };
+    // sombra
+    R0("rgba(0,0,0,.16)", T.x + 4, T.y + T.h + 8, T.w - 8, 3);
+    // canto (frente) y cubierta con esquinas redondeadas de 2 px
+    R0(C.ol, T.x + 2, T.y - 1, T.w - 4, T.h + 9); R0(C.ol, T.x, T.y + 1, T.w, T.h + 5); R0(C.ol, T.x - 1, T.y + 2, T.w + 2, T.h + 3);
+    R0(C.woodLo, T.x + 1, T.y + T.h, T.w - 2, 5); R0(C.woodDk, T.x + 1, T.y + T.h + 4, T.w - 2, 1); R0(C.woodDk, T.x + 1, T.y + T.h, T.w - 2, 1);
+    R0(C.wood, T.x + 2, T.y, T.w - 4, T.h); R0(C.wood, T.x, T.y + 2, T.w, T.h - 3); R0(C.wood, T.x + 1, T.y + 1, T.w - 2, T.h - 1);
+    R0(C.woodHi, T.x + 2, T.y, T.w - 4, 1); R0(C.woodHi, T.x, T.y + 2, 1, T.h - 4);
+    // vetas suaves y bandas laterales
+    for (let i = 0; i < T.w - 30; i += 34) { R0(C.woodLo, T.x + 12 + i, T.y + 6, 14, 1); R0(C.woodLo, T.x + 24 + i, T.y + T.h - 7, 12, 1); }
+    // centro: panel de cuero con altavoz de conferencias (luz verde si alguien tiene el micrófono abierto)
+    const cx = T.x + T.w / 2, cy = T.y + T.h / 2;
+    R0(mix(C.woodLo, C.ol, .25), T.x + 46, cy - 9, T.w - 92, 18); R0(mix(C.wood, C.woodLo, .6), T.x + 47, cy - 8, T.w - 94, 16);
+    const mic = [...S.ents.values()].some(e => e.mic);
+    rbox(cx - 6, cy - 3, 12, 6, "#2b2b33"); R0("#3c3c46", cx - 5, cy - 3, 10, 1); R0(mic ? "#64d861" : "#5a5a66", cx - 3, cy + 1, 6, 1);
+    rbox(cx - 30, cy - 2, 5, 6, C.paper); R0(C.plant, cx - 32, cy - 7, 9, 5); R0(C.plantHi, cx - 30, cy - 8, 4, 2);
+    rbox(cx + 22, cy - 2, 3, 5, "#bfe3f2"); rbox(cx + 27, cy - 1, 3, 4, "#bfe3f2");
+    // en cada puesto: portátil si está ocupado, libreta si está libre
+    SEATS.forEach((s, i) => {
+      let px, py; if (s.side === "back") { px = s.x; py = T.y + 3; } else if (s.side === "front") { px = s.x; py = T.y + T.h - 9; } else { px = s.x < cx ? T.x + 10 : T.x + T.w - 10; py = cy - 3; }
+      if (used.has(i)) { if (s.side === "front") { rbox(px - 6, py, 12, 5, C.metal); R0(C.noche ? "#9fd0ff" : mix(C.metal, "#ffffff", .5), px - 5, py + 1, 10, 3); } else { rbox(px - 6, py, 12, 6, C.metal, mix(C.metal, "#ffffff", .3)); R0(C.paper, px - 1, py + 2, 2, 2); } }
+      else { rbox(px - 4, py + 1, 8, 5, C.paper); R0(C.trimLo, px - 3, py + 3, 5, 1); }
+      if (i % 3 === 1 && s.side !== "end") { rbox(px + 8, py + 1, 3, 4, C.paper); R0(C.woodLo, px + 8, py + 2, 3, 1); }
+    });
+  }
+  function drawFrontChair(x, s) { const C = S.pal; const R0 = (c, a, b, w, hh) => { x.fillStyle = c; x.fillRect(a, b, w, hh); };
+    R0(C.ol, s.x - 8, s.y - 5, 16, 11); R0(C.ol, s.x - 9, s.y - 4, 18, 9); R0(C.chair, s.x - 8, s.y - 4, 16, 9); R0(C.chairHi, s.x - 7, s.y - 4, 14, 1);
+    R0(C.ol, s.x - 1, s.y + 6, 2, 3); R0(C.ol, s.x - 6, s.y + 9, 12, 1); }
+  function drawSofaFront() { }
+  function drawClock(x) { const C = S.pal, cx = 211, cy = 17, h0 = hora(), m = Math.floor((h0 % 1) * 60), hh = (h0 % 12);
+    x.fillStyle = C.paper; x.fillRect(207, 13, 9, 9);
+    const hand = (a, len, c) => { x.fillStyle = c; for (let i = 0; i <= len; i++) x.fillRect(Math.round(cx + Math.sin(a) * i), Math.round(cy - Math.cos(a) * i), 1, 1); };
+    hand(m / 60 * Math.PI * 2, 4, C.ol); hand(hh / 12 * Math.PI * 2, 3, "#624AFF"); }
+  /* luces: de noche todo oscuro; si hay gente en la mesa se prende la luz sobre ella; el TV siempre brilla */
+  function drawLight(x) {
+    const C = S.pal; if (!C) return;
+    const enMesa = [...S.ents.values()].some(e => e.seat >= 0);
+    if (C.sol && (C.momento === "manana" || C.momento === "dorada")) {
+      x.save(); x.globalCompositeOperation = "soft-light"; x.fillStyle = C.momento === "manana" ? "rgba(255,230,170,.55)" : "rgba(255,180,90,.55)";
+      x.beginPath(); x.moveTo(14, 57); x.lineTo(64, 57); x.lineTo(122, 130); x.lineTo(58, 130); x.closePath(); x.fill(); x.restore();
+    }
+    if (!C.noche) return;
+    x.save(); x.globalCompositeOperation = "multiply"; x.fillStyle = enMesa ? "rgba(70,80,140,.55)" : "rgba(40,46,96,.8)"; x.fillRect(0, 0, W, H); x.restore();
+    x.save(); x.globalCompositeOperation = "screen";
+    const glow = (cx, cy, r, c) => { const g = x.createRadialGradient(cx, cy, 0, cx, cy, r); g.addColorStop(0, c); g.addColorStop(1, "rgba(0,0,0,0)"); x.fillStyle = g; x.fillRect(cx - r, cy - r, r * 2, r * 2); };
+    glow(TV.x + TV.w / 2, TV.y + TV.h + 6, 64, "rgba(120,140,255,.3)");
+    if (enMesa) glow(160, 114, 118, "rgba(255,205,140,.42)");
+    x.restore();
+  }
+
+  /* ---------- sprites: frente (del núcleo) y espalda (cabeza cubierta con pelo, nuca en piel) ---------- */
+  const hex2 = h => [1, 3, 5].map(i => parseInt(h.substr(i, 2), 16));
+  const mix = (a, b, t) => { const x = hex2(a), y = hex2(b); return "#" + x.map((v, i) => Math.round(v + (y[i] - v) * t).toString(16).padStart(2, "0")).join(""); };
+  const LONG = new Set(["melena", "lacio", "ondas", "rizos", "trenza", "coleta", "coletas", "bob", "afro", "rizado", "gorro"]);
+  const sprites = new Map();
+  function sprite(cfg, g, pose) {
+    const key = JSON.stringify([cfg, g && g.color, g && g.shape, pose]); if (sprites.has(key)) return sprites.get(key);
+    if (sprites.size > 600) sprites.clear();
+    const back = pose.back, c = PXA.norm(cfg);
+    const cv = PXA.render(back ? Object.assign({}, c, { gl: "ninguna", fh: "ninguno" }) : c, { br: pose.br, blink: pose.blink, dx: pose.dx, walk: pose.walk }, back ? Object.assign({}, g, { nopin: true }) : g);
+    if (back) {
+      const x = cv.getContext("2d"), im = x.getImageData(0, 0, 32, 23), d = im.data, P = PXA.data.P, s = c.skin;
+      const face = [s, mix(s, "#000000", .14), mix(s, "#ffffff", .4), mix(s, "#e0707a", .35), P.E, P.e, P.W, P.r, P.l].filter(Boolean).map(h => hex2(String(h).slice(0, 7)).join(","));
+      const bald = c.hair === "calvo", hairC = hex2(bald ? mix(s, "#000000", .1) : c.hc), hairS = hex2(bald ? mix(s, "#000000", .2) : mix(c.hc, "#000000", .3)), nape = hex2(mix(s, "#000000", .14));
+      let low = -1; const hit = [];
+      for (let y = 0; y < 23; y++) for (let x0 = 0; x0 < 32; x0++) { const i = (y * 32 + x0) * 4; if (d[i + 3] < 200) continue; if (face.includes(d[i] + "," + d[i + 1] + "," + d[i + 2])) { hit.push([x0, y]); if (y > low) low = y; } }
+      hit.forEach(([x0, y]) => { const i = (y * 32 + x0) * 4, col = (!LONG.has(c.hair) && !bald && y >= low - 1) ? nape : (y === low - 2 && !LONG.has(c.hair) ? hairS : hairC); d[i] = col[0]; d[i + 1] = col[1]; d[i + 2] = col[2]; });
+      x.putImageData(im, 0, 0);
+    }
+    const out = document.createElement("canvas"); out.width = out.height = 32; out.getContext("2d").drawImage(cv, 0, 0);
+    sprites.set(key, out); return out;
+  }
+  /* avatar provisional (para quien todavía no crea el suyo): estable a partir del nombre */
+  function cfgFor(p) {
+    if (p && p.avatar) return p.avatar;
+    const D = PXA.data.D, Pp = PXA.data.P; let h = 0; String(p && p.name || "x").split("").forEach(ch => { h = (h * 31 + ch.charCodeAt(0)) >>> 0; });
+    const r = n => { h = (h * 1103515245 + 12345) >>> 0; return (h >>> 8) % n; };
+    const ks = o => Object.keys(o);
+    return { v: 1, hair: ks(D.hair).filter(k => k !== "gorro")[r(ks(D.hair).length - 1)], hc: Pp.hair[r(Pp.hair.length)], eyes: ks(D.eyes)[r(ks(D.eyes).length)], fh: "ninguno", skin: Pp.skin[r(Pp.skin.length)],
+      fit: ks(D.fit)[r(ks(D.fit).length)], oc: Pp.fit[r(Pp.fit.length)], dc: null, gl: r(3) === 0 ? ks(D.glasses)[1 + r(ks(D.glasses).length - 1)] : "ninguna", fc: Pp.frame[r(Pp.frame.length)], acc: "ninguno", ac: Pp.acc[0], ears: "ninguno", lc: null, sh: "#3b2a24", pin: null, pc: null };
+  }
+
+  /* ---------- estado ---------- */
+  const S = { ents: new Map(), myId: "", proj: null, projBy: "", log: [], demo: true, raf: 0, last: 0, keys: new Set(), mounted: false, media: { mic: null, cam: null, screen: null } };
+  let tr = null; // transporte activo
+  const myEnt = () => S.ents.get(S.myId);
+
+  function mkEnt(o) {
+    const p = find(o.name) || { name: o.name };
+    const e = Object.assign({ id: nn(o.name), name: o.name, cfg: cfgFor(p), g: grp(p), role: p.alias || p.role || "", x: DOOR.x, y: DOOR.y, path: [], seat: -1, walkT: 0, step: 1, br: 0, brT: R(800, 2400), blink: 0, blinkT: R(1200, 4000), dx: 0, dxT: R(3000, 8000), mic: false, cam: false, speaking: 0, demo: false, back: false }, o);
+    e.el = document.createElement("div"); e.el.className = "sl-e"; e.el.innerHTML = `<span class="sl-spk"></span><span class="sl-cam"></span><span class="sl-tag"><i class="sl-mic" hidden></i><b></b></span>`;
+    e.el.querySelector("b").textContent = tit(String(o.name).split(" ")[0]) + (o.id === S.myId || nn(o.name) === S.myId ? " · " + L("tú", "you") : "");
+    e.el.style.setProperty("--c", e.g.color || "#F3FF57"); $("sl-ov").appendChild(e.el); S.ents.set(e.id, e); return e;
+  }
+  function rmEnt(id) { const e = S.ents.get(id); if (!e) return; e.el.remove(); if (e.bub) e.bub.remove(); S.ents.delete(id); }
+  const seatOf = i => SEATS[i];
+  const seatTaken = (i, but) => [...S.ents.values()].some(e => e.seat === i && e.id !== but);
+
+  function walkTo(e, x, y, seat) {
+    if (e.seat >= 0) { const s = seatOf(e.seat); e.x = s.ax; e.y = s.ay; e.seat = -1; }
+    [x, y] = clampP(x, y); if (inBlock(x, y)) return false;
+    e.path = route([e.x, e.y], [x, y]); e.goSeat = seat == null ? -1 : seat; return true;
+  }
+  function sitAt(e, i) { if (seatTaken(i, e.id)) return false; const s = seatOf(i); return walkTo(e, s.ax, s.ay, i); }
+
+  /* ---------- transporte ---------- */
+  const PROVIDER = { impl: null };
+  function send(m) { m.from = S.myId; try { if (PROVIDER.impl && PROVIDER.impl.send) PROVIDER.impl.send(m); else if (tr) tr.postMessage(m); } catch (e) { } }
+  function onMsg(m) {
+    if (!m || m.from === S.myId) return;
+    let e = S.ents.get(m.from);
+    if (m.t === "hi" || m.t === "state") { if (!e) e = mkEnt({ name: m.name, x: m.x, y: m.y }); if (m.seat >= 0) { e.seat = m.seat; const s = seatOf(m.seat); e.x = s.x; e.y = s.y; } else { e.x = m.x; e.y = m.y; } e.mic = !!m.mic; e.cam = false; if (m.t === "hi") sendState(); people_(); if (m.proj && !S.proj) setProj(m.proj, m.name, true); return; }
+    if (!e) return;
+    if (m.t === "mv") { if (m.seat >= 0) sitAt(e, m.seat); else walkTo(e, m.x, m.y); }
+    else if (m.t === "say") say(e, m.text);
+    else if (m.t === "st") { e.mic = !!m.mic; e.speaking = m.spk ? 1 : 0; people_(); }
+    else if (m.t === "proj") setProj(m.k, e.name, true);
+    else if (m.t === "bye") { rmEnt(m.from); people_(); }
+  }
+  const sendState = () => { const e = myEnt(); if (e) send({ t: "state", name: e.name, x: e.x, y: e.y, seat: e.seat, mic: e.mic, proj: S.projBy === e.name ? S.proj : null }); };
+  function openTransport() {
+    if (PROVIDER.impl) return;
+    try { tr = new BroadcastChannel("pxp-sala-v1"); tr.onmessage = ev => onMsg(ev.data); } catch (e) { tr = null; }
+  }
+
+  /* ---------- burbujas, registro y proyección ---------- */
+  function say(e, text) {
+    text = String(text || "").trim().slice(0, 140); if (!text) return;
+    S.log.push({ ts: Date.now(), name: e.name, text }); if (S.log.length > 60) S.log.shift(); renderLog();
+    if (e.bub) e.bub.remove();
+    const b = document.createElement("div"); b.className = "sl-bub pxb"; b.innerHTML = `<span class="pxb-o"><span class="pxb-i"></span></span>${PXA.TAIL}`; b.querySelector(".pxb-i").textContent = text;
+    $("sl-ov").appendChild(b); e.bub = b; e.bubT = performance.now() + 4200 + text.length * 70;
+    if (e.demo) { e.speaking = 1; setTimeout(() => { e.speaking = 0; }, 900 + text.length * 40); }
+  }
+  function renderLog() {
+    const l = $("sl-log"); if (!l) return;
+    l.innerHTML = S.log.slice(-40).map(m => `<li><b>${esc(tit(String(m.name).split(" ")[0]))}</b> ${esc(m.text)} <time>${new Date(m.ts).toLocaleTimeString("es-CO", { hour: "numeric", minute: "2-digit" })}</time></li>`).join("") || `<li class="sl-empty">${L("Aquí queda lo que se dice en la sala.", "What's said in the room stays here.")}</li>`;
+    l.scrollTop = l.scrollHeight;
+  }
+  const ESTP = { cotizado: "Cotizado", preproduccion: "Preproducción", rodaje: "Rodaje", en_produccion: "Postproducción", postproduccion: "Postproducción", revision: "Revisión", entregado: "Entregado", aprobado: "Aprobado", standby: "Standby" };
+  const fD = f => { try { return new Date(f + "T00:00:00").toLocaleDateString("es-CO", { day: "numeric", month: "short" }); } catch (e) { return f; } };
+  function projHTML(k, big) {
+    const p = (typeof PROJECTS !== "undefined" && PROJECTS[k]) || null; if (!p) return "";
+    const et = p.etapas || [], done = et.filter(e => e.estado === "listo").length, pct = et.length ? Math.round(done / et.length * 100) : 0;
+    const next = et.filter(e => e.estado !== "listo").sort((a, b) => (a.fecha || "9").localeCompare(b.fecha || "9")).slice(0, big ? 5 : 3);
+    let fin = ""; try { fin = window.pxpEntregaFinal ? pxpEntregaFinal(p) : ""; } catch (e) { }
+    return `<div class="sl-pc"><div class="sl-pc-h"><b>${esc(p.nombre || k)}</b><span>${esc(tit(p.cliente || ""))} · ${esc(ESTP[p.estadoGeneral] || p.estadoGeneral || "")}</span></div>
+      <div class="sl-pc-bar"><i style="width:${pct}%"></i></div><div class="sl-pc-n">${done}/${et.length} ${L("etapas listas", "stages done")}${fin ? ` · ${L("entrega", "delivery")} ${fD(fin)}` : ""}</div>
+      <ul>${next.map(e => `<li><span>${esc(e.nombre || "")}</span><em>${e.fecha ? fD(e.fecha) : ""}</em></li>`).join("")}</ul></div>`;
+  }
+  function setProj(k, by, remote) {
+    if (S.media.screen && k) stopScreen();
+    S.proj = k || null; S.projBy = k ? by : ""; paintTV();
+    if (!remote) send({ t: "proj", k: S.proj });
+    const s = $("sl-projs"); if (s) s.textContent = S.proj ? `${tit(String(by).split(" ")[0])} ${L("proyecta", "is showing")} ${(PROJECTS[S.proj] || {}).nombre || ""}` : "";
+  }
+  function paintTV() {
+    const tv = $("sl-tv"); if (!tv) return;
+    if (S.media.screen) { if (!tv.querySelector("video")) { tv.innerHTML = ""; const v = document.createElement("video"); v.muted = true; v.autoplay = true; v.playsInline = true; v.srcObject = S.media.screen; tv.appendChild(v); v.play().catch(() => { }); } tv.dataset.mode = "screen"; return; }
+    if (S.proj) { tv.innerHTML = projHTML(S.proj); tv.dataset.mode = "proj"; return; }
+    const n = S.ents.size; tv.dataset.mode = "idle";
+    tv.innerHTML = `<div class="sl-idle"><b>${L("Sala de juntas", "Meeting room")}</b><span>${n} ${n === 1 ? L("persona", "person") : L("personas", "people")} · ${new Date().toLocaleTimeString("es-CO", { hour: "numeric", minute: "2-digit" })}</span></div>`;
+  }
+
+  /* ---------- medios locales (no se transmiten hasta conectar el servicio de llamadas) ---------- */
+  function note(t) { const n = $("sl-toast"); if (!n) return; n.textContent = t; n.hidden = false; clearTimeout(n._t); n._t = setTimeout(() => { n.hidden = true; }, 4200); }
+  const mErr = (e, what) => note(e && e.name === "NotAllowedError" ? L(`No hay permiso para ${what}. Revísalo en el candado de la barra de direcciones.`, `No permission for ${what}.`) : L(`No pude abrir ${what} en esta vista. Ábrela en el navegador.`, `Couldn't open ${what} here.`));
+  let actx = null, anal = null, buf = null;
+  async function toggleMic() {
+    const e = myEnt(); if (!e) return;
+    if (S.media.mic) { S.media.mic.getTracks().forEach(t => t.stop()); S.media.mic = null; e.mic = false; e.speaking = 0; anal = null; }
+    else { try { S.media.mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); e.mic = true;
+        try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); const src = actx.createMediaStreamSource(S.media.mic); anal = actx.createAnalyser(); anal.fftSize = 512; buf = new Uint8Array(anal.fftSize); src.connect(anal); } catch (er) { anal = null; }
+      } catch (er) { mErr(er, L("el micrófono", "the microphone")); return; } }
+    if (PROVIDER.impl && PROVIDER.impl.setMic) try { PROVIDER.impl.setMic(e.mic, S.media.mic); } catch (er) { }
+    send({ t: "st", mic: e.mic }); bar(); people_();
+  }
+  async function toggleCam() {
+    const e = myEnt(); if (!e) return;
+    if (S.media.cam) { S.media.cam.getTracks().forEach(t => t.stop()); S.media.cam = null; e.cam = false; const c = e.el.querySelector(".sl-cam"); c.innerHTML = ""; }
+    else { try { S.media.cam = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 320 }, height: { ideal: 320 }, facingMode: "user" } }); e.cam = true;
+        const v = document.createElement("video"); v.muted = true; v.autoplay = true; v.playsInline = true; v.srcObject = S.media.cam; const c = e.el.querySelector(".sl-cam"); c.innerHTML = ""; c.appendChild(v); v.play().catch(() => { });
+      } catch (er) { mErr(er, L("la cámara", "the camera")); return; } }
+    if (PROVIDER.impl && PROVIDER.impl.setCam) try { PROVIDER.impl.setCam(e.cam, S.media.cam); } catch (er) { }
+    bar(); people_();
+  }
+  function stopScreen() { if (S.media.screen) S.media.screen.getTracks().forEach(t => t.stop()); S.media.screen = null; const tv = $("sl-tv"); if (tv) tv.innerHTML = ""; if (PROVIDER.impl && PROVIDER.impl.setScreen) try { PROVIDER.impl.setScreen(false, null); } catch (er) { } paintTV(); bar(); }
+  async function toggleScreen() {
+    if (S.media.screen) { stopScreen(); return; }
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) { note(L("Este navegador no permite compartir pantalla.", "This browser can't share the screen.")); return; }
+    try { S.media.screen = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false }); } catch (er) { if (er && er.name !== "NotAllowedError") mErr(er, L("la pantalla", "the screen")); return; }
+    S.media.screen.getVideoTracks()[0].onended = stopScreen; S.proj = null; const tv = $("sl-tv"); if (tv) tv.innerHTML = "";
+    if (PROVIDER.impl && PROVIDER.impl.setScreen) try { PROVIDER.impl.setScreen(true, S.media.screen); } catch (er) { }
+    paintTV(); bar(); note(L("Tu pantalla se ve en el TV. Por ahora solo en tu equipo.", "Your screen is on the TV. Only on your device for now."));
+  }
+
+  /* ---------- compañeros simulados (modo demostración) ---------- */
+  const LINES = ["¿Ya salió el render?", "Versión 7, la buena", "¿Quién tiene el EDL?", "Frame.io actualizado", "Le subo dos puntos al contraste", "El cliente pidió el logo más grande", "Hagamos un pase de color", "El audio quedó perfecto", "¿Cerramos la entrega hoy?", "Necesito el master en ProRes", "Ojo con los safe areas", "Me encanta ese corte", "¿Lo vemos en el TV?", "Subo la referencia al repo", "Mañana rodamos temprano", "Ese plano pide un respiro", "Cafecito y seguimos"];
+  let demoT = [];
+  function demoStart() {
+    demoStop(); if (!S.demo) return;
+    const mine = S.myId, pool = people().filter(p => nn(p.name) !== mine).sort(() => Math.random() - .5).sort((a, b) => (!!b.avatar) - (!!a.avatar)).slice(0, 6);
+    pool.forEach((p, i) => demoT.push(setTimeout(() => {
+      if (!S.demo || S.ents.has(nn(p.name))) return; const e = mkEnt({ name: p.name, demo: true }); e.x = DOOR.x + R(-6, 6); e.y = DOOR.y;
+      const free = SEATS.map((s, j) => j).filter(j => !seatTaken(j)); const j = pick(free.filter(j => SEATS[j].side !== "sofa").length && Math.random() < .85 ? free.filter(j => SEATS[j].side !== "sofa") : free);
+      if (j != null) sitAt(e, j); people_(); paintTV();
+    }, 900 + i * R(1400, 2600))));
+    const chat = () => { if (!S.demo) return; const d = [...S.ents.values()].filter(e => e.demo && !e.path.length); if (d.length) say(pick(d), pick(LINES)); demoT.push(setTimeout(chat, R(5500, 11000))); };
+    demoT.push(setTimeout(chat, 7000));
+    const wander = () => { if (!S.demo) return; const d = [...S.ents.values()].filter(e => e.demo && !e.path.length); if (d.length) { const e = pick(d);
+        if (e.seat >= 0) { walkTo(e, R(26, 50), R(72, 80)); demoT.push(setTimeout(() => { const f = SEATS.map((s, j) => j).filter(j => !seatTaken(j)); if (f.length && S.ents.has(e.id)) sitAt(e, pick(f)); }, R(7000, 12000))); } }
+      demoT.push(setTimeout(wander, R(16000, 26000))); };
+    demoT.push(setTimeout(wander, 18000));
+  }
+  function demoStop() { demoT.forEach(clearTimeout); demoT = []; [...S.ents.values()].filter(e => e.demo).forEach(e => rmEnt(e.id)); }
+
+  /* ---------- bucle ---------- */
+  function update(dt) {
+    const now = performance.now();
+    // teclado (flechas / WASD)
+    const me_ = myEnt();
+    if (me_ && S.keys.size) {
+      let vx = 0, vy = 0; if (S.keys.has("l")) vx--; if (S.keys.has("r")) vx++; if (S.keys.has("u")) vy--; if (S.keys.has("d")) vy++;
+      if (vx || vy) { if (me_.seat >= 0) { const s = seatOf(me_.seat); me_.x = s.ax; me_.y = s.ay; me_.seat = -1; } me_.path = []; const sp = 52 * dt / 1000, n = Math.hypot(vx, vy);
+        const nx = me_.x + vx / n * sp, ny = me_.y + vy / n * sp, [cx, cy] = clampP(nx, ny);
+        if (!inBlock(cx, cy)) { me_.x = cx; me_.y = cy; } else if (!inBlock(cx, me_.y)) me_.x = cx; else if (!inBlock(me_.x, cy)) me_.y = cy;
+        me_.moving = true; me_.back = vy < 0 && Math.abs(vy) >= Math.abs(vx); me_.kbT = now; }
+    }
+    S.ents.forEach(e => {
+      if (e.path.length) {
+        const [tx, ty] = e.path[0], dx = tx - e.x, dy = ty - e.y, d = Math.hypot(dx, dy), sp = 46 * dt / 1000;
+        e.back = dy < -0.5 && Math.abs(dy) > Math.abs(dx) * .8;
+        if (d <= sp) { e.x = tx; e.y = ty; e.path.shift(); if (!e.path.length && e.goSeat >= 0) { if (!seatTaken(e.goSeat, e.id)) { e.seat = e.goSeat; const s = seatOf(e.seat); e.x = s.x; e.y = s.y; e.goSeat = -1; } else if (e.demo) { const f = SEATS.map((s, j) => j).filter(j => !seatTaken(j, e.id)); e.goSeat = -1; if (f.length) { f.sort((a, b) => Math.hypot(SEATS[a].ax - e.x, SEATS[a].ay - e.y) - Math.hypot(SEATS[b].ax - e.x, SEATS[b].ay - e.y)); sitAt(e, f[0]); } } else { e.goSeat = -1; say(e, L("Uy, alguien se sentó primero", "Oops, someone took that seat")); } if (e.id === S.myId) { bar(); sendState(); } } }
+        else { e.x += dx / d * sp; e.y += dy / d * sp; }
+        e.moving = true;
+      } else if (!(e.id === S.myId && S.keys.size)) e.moving = false;
+      if (e.moving) { e.walkT += dt; if (e.walkT > 170) { e.walkT = 0; e.step = e.step === 1 ? 2 : 1; } }
+      if (!reduce()) {
+        e.brT -= dt; if (e.brT <= 0) { e.br = e.br ? 0 : 1; e.brT = e.br ? R(700, 1000) : R(2400, 4600); }
+        e.blinkT -= dt; if (e.blinkT <= 0) { e.blink = e.blink ? 0 : 1; e.blinkT = e.blink ? 120 : R(2600, 5600); }
+        e.dxT -= dt; if (e.dxT <= 0) { e.dx = e.dx ? 0 : (Math.random() < .5 ? -1 : 1); e.dxT = e.dx ? R(700, 1400) : R(5000, 11000); }
+      }
+      if (e.bub && now > e.bubT) { const b = e.bub; e.bub = null; b.classList.add("out"); setTimeout(() => b.remove(), 400); }
+    });
+    // nivel del micrófono propio
+    if (me_ && anal && buf) { anal.getByteTimeDomainData(buf); let s = 0; for (let i = 0; i < buf.length; i++) { const v = (buf[i] - 128) / 128; s += v * v; } const rms = Math.sqrt(s / buf.length), spk = rms > .045;
+      if (spk !== !!me_.speaking) { me_.speaking = spk ? 1 : 0; send({ t: "st", mic: true, spk }); } }
+    if (me_ && me_.moving && (!me_._sent || now - me_._sent > 400)) { me_._sent = now; send({ t: "mv", x: Math.round(me_.path.length ? me_.path[me_.path.length - 1][0] : me_.x), y: Math.round(me_.path.length ? me_.path[me_.path.length - 1][1] : me_.y), seat: me_.goSeat >= 0 ? me_.goSeat : -1 }); }
+  }
+  function frame(x) {
+    x.imageSmoothingEnabled = false; x.clearRect(0, 0, W, H); x.drawImage(drawBg(), 0, 0); drawClock(x); horaChip(); mapaHot();
+    const ents = [...S.ents.values()];
+    const items = ents.map(e => {
+      const s = e.seat >= 0 ? seatOf(e.seat) : null, back = s ? s.view === "back" : e.back;
+      const z = s ? (s.side === "back" ? TABLE.y - 1 : s.side === "front" ? s.y + .2 : s.y + .2) : e.y;
+      return { z, draw: () => { const top = s && s.side === "sofa" ? s.y - 30 : (s ? s.y - 30 : e.y - 30);
+        const spr = sprite(e.cfg, e.g, { back, br: e.moving ? 0 : e.br, blink: back ? 0 : e.blink, dx: back ? 0 : e.dx, walk: e.moving ? e.step : 0 });
+        if (!s) { x.fillStyle = "rgba(0,0,0,.0)"; }
+        x.drawImage(spr, Math.round((s ? s.x : e.x) - 16), Math.round(top)); e._top = Math.round(top); e._cx = Math.round(s ? s.x : e.x); } };
+    });
+    items.push({ z: TABLE.y + TABLE.h + 2, draw: () => drawTable(x) });
+    SEATS.forEach(s => { if (s.side === "front") items.push({ z: s.y + .5, draw: () => drawFrontChair(x, s) }); });
+        items.sort((a, b) => a.z - b.z).forEach(i => i.draw());
+    drawLight(x);
+  }
+  function overlays() {
+    const st = $("sl-stage"); if (!st) return;
+    S.ents.forEach(e => {
+      if (e._cx == null) return;
+      const s = e.seat >= 0 ? seatOf(e.seat) : null;
+      e.el.style.left = (e._cx / W * 100) + "%"; e.el.style.top = (e._top / H * 100) + "%";
+      const tagY = s ? (s.side === "back" ? (TABLE.y + 11 - e._top) : s.side === "front" ? 39 : 33) : 33;
+      e.el.style.setProperty("--ty", tagY);
+      e.el.classList.toggle("spk", !!e.speaking); e.el.classList.toggle("cam", !!e.cam); e.el.classList.toggle("me", e.id === S.myId); e.el.classList.toggle("seated", !!s);
+      e.el.querySelector(".sl-mic").hidden = !e.mic;
+      if (e.bub) { e.bub.style.left = (e._cx / W * 100) + "%"; e.bub.style.top = ((e._top + 2) / H * 100) + "%"; }
+    });
+  }
+  function loop(t) {
+    S.raf = 0; const v = $("view-sala"); if (!v || !v.classList.contains("active") && getComputedStyle(v).display === "none") return;
+    const dt = Math.min(64, t - (S.last || t)); S.last = t; update(dt);
+    const cv = $("sl-cv"); if (cv) frame(cv.getContext("2d")); overlays();
+    if (!S._tv || t - S._tv > 30000) { S._tv = t; if (!S.proj && !S.media.screen) paintTV(); }
+    S.raf = requestAnimationFrame(loop);
+  }
+  const run = () => { if (!S.raf) { S.last = 0; S.raf = requestAnimationFrame(loop); } };
+
+  let chipK = "";
+  function horaChip(force) { const c = $("sl-hora"); if (!c || !S.pal) return; const h = hora(), k = S.pal.momento + (S.hora == null ? "" : "*") + Math.floor(h * 4); if (!force && k === chipK) return; chipK = k;
+    const hh = Math.floor(h), mm = Math.floor((h % 1) * 60), t = new Date(2000, 0, 1, hh, mm).toLocaleTimeString("es-CO", { hour: "numeric", minute: "2-digit" });
+    c.innerHTML = `<i style="background:${S.pal.wall};box-shadow:inset -5px 0 0 ${S.pal.floor}"></i>${esc(L(...MOMENTO[S.pal.momento]))} · ${esc(t)}${S.hora == null ? "" : ` <em>${L("vista previa", "preview")}</em>`}`; }
+  /* mapa: notas del corcho con detalle al pasar y vista grande al hacer clic */
+  let mapK = "";
+  function mapaHot() {
+    const box = $("sl-map"); if (!box || !S.mapa) return; const k = S.mapa.map(m => m.cliente + m.proyectos.length).join("|"); if (k === mapK) return; mapK = k;
+    const pct = (v, o, l) => ((v - o) / l * 100) + "%";
+    box.innerHTML = S.mapa.map((m, i) => `<button type="button" class="sl-mn" data-i="${i}" style="left:${pct(m.slot[0], BOARD.x, BOARD.w)};top:${pct(m.slot[1], BOARD.y, BOARD.h)}" data-tip="${esc(m.cliente)} · ${m.proyectos.length} ${m.proyectos.length === 1 ? L("proyecto", "project") : L("proyectos", "projects")} · ${m.team.length} ${m.team.length === 1 ? L("persona", "person") : L("personas", "people")}" aria-label="${esc(m.cliente)}"></button>`).join("")
+      + `<button type="button" class="sl-mn hub" style="left:50%;top:${pct(BOARD.y + 20, BOARD.y, BOARD.h)}" data-tip="${L("Mapa de proyectos", "Project map")}" aria-label="${L("Abrir el mapa de proyectos", "Open project map")}"></button>`;
+    box.onclick = ev => { const b = ev.target.closest(".sl-mn"); if (!b) return; ev.stopPropagation(); mapaBig(b.dataset.i != null ? +b.dataset.i : -1); };
+  }
+  function mapaBig(focus) {
+    const P = typeof PROJECTS !== "undefined" ? PROJECTS : {}, by = {};
+    Object.keys(P).forEach(k => { const p = P[k]; if (!p || p.archivadoEn || p.estadoGeneral === "aprobado") return; const c = tit(p.cliente || L("Sin cliente", "No client")); (by[c] = by[c] || []).push(k); });
+    const cls = Object.keys(by).sort((a, b) => by[b].length - by[a].length), fc = focus >= 0 && S.mapa[focus] ? S.mapa[focus].cliente : null;
+    const colorOf = c => { const m = (S.mapa || []).find(x => x.cliente === c); return m ? m.color : "var(--border2)"; };
+    const card = c => { const team = new Set(); by[c].forEach(k => (P[k].etapas || []).forEach(e => [].concat(e.resp || []).forEach(r => r && team.add(r))));
+      const heads = [...team].slice(0, 8).map(n => { const p = find(n) || { name: n }; return `<button type="button" class="sl-mp-p" data-p="${esc(p.name)}" title="${esc(tit(p.name))}"><img src="${PXA.headURL(cfgFor(p), null, 36)}" alt=""></button>`; }).join("");
+      return `<section class="sl-mp-c${c === fc ? " on" : ""}" style="--nc:${colorOf(c)}"><h4>${esc(c)} <span>${by[c].length}</span></h4><ul>${by[c].map(k => { const e = (P[k].etapas || []).filter(x => x.estado !== "listo").sort((a, b) => (a.fecha || "9").localeCompare(b.fecha || "9"))[0];
+        return `<li><button type="button" data-k="${esc(k)}"><b>${esc(P[k].nombre || k)}</b><small>${esc(ESTP[P[k].estadoGeneral] || "")}${e && e.fecha ? ` · ${esc(e.nombre || "")} ${fD(e.fecha)}` : ""}</small></button></li>`; }).join("")}</ul>${heads ? `<div class="sl-mp-t">${heads}</div>` : ""}</section>`; };
+    const ov = document.createElement("div"); ov.className = "sl-mp"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", L("Mapa de proyectos", "Project map"));
+    ov.innerHTML = `<div class="sl-mp-b"><header><h3>${L("Mapa de proyectos", "Project map")}</h3><p>${cls.length} ${L("clientes", "clients")} · ${Object.values(by).reduce((n, a) => n + a.length, 0)} ${L("proyectos activos", "active projects")}</p><button type="button" class="sl-mp-x" aria-label="${L("Cerrar", "Close")}">✕</button></header><div class="sl-mp-g">${(fc ? [fc].concat(cls.filter(c => c !== fc)) : cls).map(card).join("")}</div></div>`;
+    document.body.appendChild(ov);
+    const close = () => { ov.remove(); document.removeEventListener("keydown", k); }; const k = ev => { if (ev.key === "Escape") close(); };
+    document.addEventListener("keydown", k); ov.querySelector(".sl-mp-x").onclick = close; ov.onclick = ev => { if (ev.target === ov) return close();
+      const pj = ev.target.closest("[data-k]"); if (pj) { close(); try { pxpOpenProject(pj.dataset.k); } catch (e) { } return; }
+      const pe = ev.target.closest("[data-p]"); if (pe) { close(); try { pxpOpenPerson(pe.dataset.p); } catch (e) { } } };
+    setTimeout(() => ov.querySelector(".sl-mp-x").focus(), 30);
+  }
+  /* ---------- interfaz ---------- */
+  const IC = {
+    mic: '<path d="M9 5a3 3 0 0 1 6 0v6a3 3 0 0 1-6 0z"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4M8 21h8"/>',
+    micOff: '<path d="M3 3l18 18"/><path d="M9 9v2a3 3 0 0 0 5 2.2M15 9.3V5a3 3 0 0 0-5.7-1.3"/><path d="M5 10a7 7 0 0 0 11.5 5.4M19 10a7 7 0 0 1-.6 2.8M12 17v4M8 21h8"/>',
+    cam: '<rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3"/>',
+    camOff: '<path d="M3 3l18 18"/><path d="M16 16H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h1M10 6h4a2 2 0 0 1 2 2v3l5-3v9"/>',
+    screen: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
+    proj: '<path d="M4 5h16v10H4z"/><path d="M8 19l4-4l4 4"/>',
+    seat: '<path d="M6 4v10h12V4"/><path d="M5 14h14M7 14v6M17 14v6"/>',
+    send: '<path d="M5 12h14M13 6l6 6l-6 6"/>',
+    log: '<path d="M5 6h14M5 12h14M5 18h9"/>',
+    room: '<rect x="5" y="9" width="14" height="6" rx="1"/><circle cx="8" cy="5.5" r="1.6"/><circle cx="12" cy="5.5" r="1.6"/><circle cx="16" cy="5.5" r="1.6"/><path d="M8 15v4M16 15v4"/>',
+  };
+  const svg = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+  function bar() {
+    const e = myEnt(), b = $("sl-bar"); if (!b) return;
+    const set = (id, on, ico, icoOff, a, z) => { const x = $(id); if (!x) return; x.classList.toggle("on", !!on); x.setAttribute("aria-pressed", on ? "true" : "false"); x.querySelector("i").innerHTML = svg(on || !icoOff ? ico : icoOff); x.querySelector("span").textContent = on ? a : z; };
+    set("sl-mic", e && e.mic, IC.mic, IC.micOff, L("Mic encendido", "Mic on"), L("Micrófono", "Microphone"));
+    set("sl-camb", e && e.cam, IC.cam, IC.camOff, L("Cámara encendida", "Camera on"), L("Cámara", "Camera"));
+    set("sl-scr", !!S.media.screen, IC.screen, null, L("Dejar de compartir", "Stop sharing"), L("Pantalla", "Screen"));
+    set("sl-seat", e && e.seat >= 0, IC.seat, null, L("Levantarme", "Stand up"), L("Sentarme", "Sit down"));
+  }
+  function people_() {
+    const ul = $("sl-ppl"); if (!ul) return; const list = [...S.ents.values()].sort((a, b) => (b.id === S.myId) - (a.id === S.myId) || a.name.localeCompare(b.name));
+    $("sl-n").textContent = list.length;
+    ul.innerHTML = list.map(e => `<li data-id="${esc(e.id)}"><img src="${PXA.headURL(e.cfg, null, 44)}" alt=""><span><b>${esc(tit(e.name))}${e.id === S.myId ? ` <em>${L("tú", "you")}</em>` : ""}</b><small>${esc(e.role)}${e.demo ? ` · ${L("demo", "demo")}` : ""}</small></span><i class="${e.mic ? "on" : ""}" title="${e.mic ? L("Micrófono encendido", "Mic on") : L("Micrófono apagado", "Mic off")}">${svg(e.mic ? IC.mic : IC.micOff)}</i><i class="${e.cam ? "on" : ""}" title="${e.cam ? L("Cámara encendida", "Camera on") : L("Cámara apagada", "Camera off")}">${svg(e.cam ? IC.cam : IC.camOff)}</i></li>`).join("");
+    paintTV();
+  }
+  function chatSend() { const i = $("sl-in"); const v = i.value.trim(); if (!v) { i.focus(); return; } i.value = ""; const e = myEnt(); if (!e) return; say(e, v); send({ t: "say", text: v }); }
+  function projPicker() {
+    const ex = document.querySelector(".sl-pick"); if (ex) { ex.remove(); return; }
+    const ks = Object.keys(typeof PROJECTS !== "undefined" ? PROJECTS : {}).filter(k => !PROJECTS[k].archivadoEn && PROJECTS[k].estadoGeneral !== "aprobado");
+    const box = document.createElement("div"); box.className = "sl-pick"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", L("Proyectar un proyecto", "Show a project"));
+    box.innerHTML = `<input type="search" placeholder="${L("Busca un proyecto para proyectar", "Find a project to show")}" aria-label="${L("Buscar proyecto", "Search project")}"><ul></ul>${S.proj ? `<button type="button" class="sl-pick-x">${L("Apagar el TV", "Turn TV off")}</button>` : ""}`;
+    $("sl-projb").after(box);
+    const ul = box.querySelector("ul"), inp = box.querySelector("input");
+    const draw = () => { const q = nn(inp.value); ul.innerHTML = ks.filter(k => !q || nn(PROJECTS[k].nombre || k).includes(q) || nn(PROJECTS[k].cliente).includes(q)).slice(0, 8).map(k => `<li><button type="button" data-k="${esc(k)}"><b>${esc(PROJECTS[k].nombre || k)}</b><small>${esc(tit(PROJECTS[k].cliente || ""))}</small></button></li>`).join(""); };
+    draw(); inp.oninput = draw; setTimeout(() => inp.focus(), 30);
+    ul.onclick = ev => { const b = ev.target.closest("[data-k]"); if (!b) return; setProj(b.dataset.k, me()); box.remove(); const e = myEnt(); if (e) say(e, L("Les proyecto ", "Showing ") + (PROJECTS[b.dataset.k].nombre || "")); };
+    const x = box.querySelector(".sl-pick-x"); if (x) x.onclick = () => { setProj(null, me()); box.remove(); };
+    box.addEventListener("keydown", ev => { if (ev.key === "Escape") { box.remove(); $("sl-projb").focus(); } });
+  }
+  function tvBig() {
+    if (!S.proj && !S.media.screen) return;
+    const ov = document.createElement("div"); ov.className = "sl-big"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", L("TV en grande", "TV enlarged"));
+    ov.innerHTML = `<div class="sl-big-b"><button type="button" class="sl-big-x" aria-label="${L("Cerrar", "Close")}">✕</button><div class="sl-big-c"></div>${S.proj ? `<button type="button" class="sl-big-o">${L("Abrir proyecto", "Open project")}</button>` : ""}</div>`;
+    document.body.appendChild(ov); const c = ov.querySelector(".sl-big-c");
+    if (S.media.screen) { const v = document.createElement("video"); v.muted = true; v.autoplay = true; v.playsInline = true; v.srcObject = S.media.screen; c.appendChild(v); v.play().catch(() => { }); } else c.innerHTML = projHTML(S.proj, true);
+    const close = () => { ov.remove(); document.removeEventListener("keydown", k); }; const k = ev => { if (ev.key === "Escape") close(); };
+    document.addEventListener("keydown", k); ov.querySelector(".sl-big-x").onclick = close; ov.onclick = ev => { if (ev.target === ov) close(); };
+    const o = ov.querySelector(".sl-big-o"); if (o) o.onclick = () => { const kk = S.proj; close(); try { pxpOpenProject(kk); } catch (e) { } };
+  }
+  function personCard(e, cx, cy) {
+    document.querySelectorAll(".sl-card").forEach(x => x.remove());
+    const c = document.createElement("div"); c.className = "sl-card"; c.innerHTML = `<img src="${PXA.headURL(e.cfg, null, 56)}" alt=""><b>${esc(tit(e.name))}</b><small>${esc(e.role)}</small>${e.demo ? `<em>${L("Simulado", "Simulated")}</em>` : ""}<button type="button">${L("Ver ficha", "View profile")}</button>`;
+    $("sl-stage").appendChild(c); c.style.left = (cx / W * 100) + "%"; c.style.top = (cy / H * 100) + "%";
+    c.querySelector("button").onclick = () => { c.remove(); try { pxpOpenPerson(e.name); } catch (er) { } };
+    setTimeout(() => document.addEventListener("pointerdown", function h(ev) { if (!c.contains(ev.target)) { c.remove(); document.removeEventListener("pointerdown", h); } }), 0);
+  }
+  function stageClick(ev) {
+    const st = $("sl-stage"), r = st.getBoundingClientRect(), x = (ev.clientX - r.left) / r.width * W, y = (ev.clientY - r.top) / r.height * H, e = myEnt(); if (!e) return;
+    if (ev.target.closest(".sl-card,.sl-pick,.sl-map")) return;
+    if (x >= TV.x && x <= TV.x + TV.w && y >= TV.y && y <= TV.y + TV.h) { tvBig(); return; }
+    // ¿clic sobre alguien?
+    const who = [...S.ents.values()].find(o => o.id !== S.myId && o._cx != null && Math.abs(x - o._cx) < 9 && y > o._top + 3 && y < o._top + 30);
+    if (who) { personCard(who, who._cx, who._top); return; }
+    // ¿una silla?
+    const si = SEATS.findIndex(s => Math.abs(x - s.x) < 11 && y > s.y - 26 && y < s.y + 8);
+    if (si >= 0) { if (seatTaken(si, e.id)) { say(e, L("Esa silla está ocupada", "That seat is taken")); return; } sitAt(e, si); send({ t: "mv", seat: si }); return; }
+    if (y < BOUNDS.y0 - 6) return;
+    if (walkTo(e, x, y)) send({ t: "mv", x: Math.round(x), y: Math.round(y), seat: -1 });
+  }
+
+  function mount() {
+    const nav = $("tab-nav"); if (!nav) return;
+    if (!nav.querySelector('[data-view="sala"]')) {
+      const b = document.createElement("button"); b.className = "tab-btn"; b.dataset.view = "sala"; b.setAttribute("onclick", "switchView('sala')");
+      b.innerHTML = `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${IC.room}</svg>${L("Sala", "Room")}`;
+      const ref = nav.querySelector('[data-view="team"]'); if (ref) ref.after(b); else nav.appendChild(b);
+    }
+    if ($("view-sala")) return;
+    const host = $("view-logros") || $("view-repositorio") || $("view-team"); if (!host) return;
+    host.insertAdjacentHTML("afterend", `<div class="view" id="view-sala"><div class="proj-wrap sl-wrap">
+      <div class="sl-head"><div><h2>${L("Sala de juntas", "Meeting room")}</h2><p>${L("Haz clic en el piso para caminar o en una silla para sentarte. También con las flechas.", "Click the floor to walk or a chair to sit. Arrow keys work too.")}</p></div>
+        <div class="sl-hr"><button type="button" class="sl-hora" id="sl-hora" title="${L("Ver la sala a otra hora", "See the room at another time")}"></button><span class="sl-badge">${L("Prototipo", "Prototype")}</span><label class="sl-demo"><input type="checkbox" id="sl-demo" checked> ${L("Compañeros de demostración", "Demo teammates")}</label></div></div>
+      <div class="sl-main">
+        <div class="sl-stage" id="sl-stage" tabindex="0" role="application" aria-label="${L("Sala de juntas. Flechas para caminar.", "Meeting room. Arrow keys to walk.")}">
+          <canvas id="sl-cv" width="${W}" height="${H}"></canvas>
+          <div class="sl-tv" id="sl-tv" style="left:${TV.x / W * 100}%;top:${TV.y / H * 100}%;width:${TV.w / W * 100}%;height:${TV.h / H * 100}%" title="${L("Clic para ver en grande", "Click to enlarge")}"></div>
+          <div class="sl-map" id="sl-map" style="left:${BOARD.x / W * 100}%;top:${BOARD.y / H * 100}%;width:${BOARD.w / W * 100}%;height:${BOARD.h / H * 100}%"></div><div class="sl-ov" id="sl-ov"></div><div class="sl-toast" id="sl-toast" role="status" hidden></div>
+        </div>
+        <aside class="sl-side"><section><h3>${L("En la sala", "In the room")} <b id="sl-n">0</b></h3><ul class="sl-ppl" id="sl-ppl"></ul><p class="sl-projs" id="sl-projs"></p></section>
+          <section><h3>${L("Conversación", "Conversation")}</h3><ul class="sl-log" id="sl-log"></ul></section></aside>
+      </div>
+      <div class="sl-bar" id="sl-bar">
+        <div class="sl-ctl">
+          <button type="button" class="sl-b" id="sl-mic"><i></i><span></span></button>
+          <button type="button" class="sl-b" id="sl-camb"><i></i><span></span></button>
+          <button type="button" class="sl-b" id="sl-scr"><i></i><span></span></button>
+          <button type="button" class="sl-b" id="sl-projb"><i>${svg(IC.proj)}</i><span>${L("Proyectar", "Show project")}</span></button>
+          <button type="button" class="sl-b" id="sl-seat"><i></i><span></span></button>
+        </div>
+        <div class="sl-chat"><input id="sl-in" type="text" enterkeyhint="send" maxlength="140" autocomplete="off" placeholder="${L("Escribe a la sala…", "Write to the room…")}" aria-label="${L("Mensaje para la sala", "Message to the room")}"><button type="button" id="sl-send" aria-label="${L("Enviar", "Send")}">${svg(IC.send)}</button></div>
+      </div>
+      <p class="sl-note">${L("Voz, video y pantalla compartida llegan cuando TI apruebe el servicio de llamadas. Por ahora tu cámara, tu micrófono y tu pantalla solo se ven en tu equipo.", "Voice, video and screen sharing arrive once IT approves the calling service. For now your camera, mic and screen are only visible on your device.")}</p>
+    </div></div>`);
+    $("sl-stage").addEventListener("click", stageClick);
+    const PRE = [null, 8, 12.5, 17.2, 18.9, 22];
+    $("sl-hora").onclick = () => { const i = PRE.indexOf(S.hora == null ? null : S.hora); S.hora = PRE[(i + 1) % PRE.length]; bgKey = ""; horaChip(true); };
+    $("sl-mic").onclick = toggleMic; $("sl-camb").onclick = toggleCam; $("sl-scr").onclick = toggleScreen; $("sl-projb").onclick = projPicker;
+    $("sl-seat").onclick = () => { const e = myEnt(); if (!e) return; if (e.seat >= 0) { const s = seatOf(e.seat); e.seat = -1; e.x = s.ax; e.y = s.ay; walkTo(e, s.ax, s.side === "back" ? 63 : s.side === "front" ? 184 : s.ay); bar(); sendState(); return; }
+      let best = -1, bd = 1e9; SEATS.forEach((s, i) => { if (seatTaken(i, e.id)) return; const d = Math.hypot(s.ax - e.x, s.ay - e.y); if (d < bd) { bd = d; best = i; } }); if (best >= 0) { sitAt(e, best); send({ t: "mv", seat: best }); } };
+    $("sl-send").onclick = chatSend; $("sl-in").addEventListener("keydown", ev => { if (ev.key === "Enter" && !ev.isComposing) { ev.preventDefault(); chatSend(); } ev.stopPropagation(); });
+    $("sl-demo").onchange = ev => { S.demo = ev.target.checked; try { localStorage.setItem("pxp_sala_demo", S.demo ? "1" : "0"); } catch (e) { } if (S.demo) demoStart(); else demoStop(); people_(); };
+    $("sl-ppl").onclick = ev => { const li = ev.target.closest("li[data-id]"); if (!li) return; const e = S.ents.get(li.dataset.id); if (e && e.id !== S.myId) personCard(e, e._cx, e._top); };
+    const KM = { ArrowLeft: "l", ArrowRight: "r", ArrowUp: "u", ArrowDown: "d", a: "l", d: "r", w: "u", s: "d", A: "l", D: "r", W: "u", S: "d" };
+    $("sl-stage").addEventListener("keydown", ev => { const k = KM[ev.key]; if (k) { ev.preventDefault(); S.keys.add(k); } else if (ev.key === "Enter") { $("sl-in").focus(); } });
+    $("sl-stage").addEventListener("keyup", ev => { const k = KM[ev.key]; if (k) { S.keys.delete(k); if (!S.keys.size) sendState(); } });
+    $("sl-stage").addEventListener("blur", () => S.keys.clear());
+    try { S.demo = localStorage.getItem("pxp_sala_demo") !== "0"; } catch (e) { } $("sl-demo").checked = S.demo;
+    bar(); renderLog();
+  }
+  function enter() {
+    mount(); if (!$("view-sala")) return;
+    const id = nn(me()); if (!id) return;
+    if (S.myId !== id) { [...S.ents.keys()].forEach(rmEnt); S.myId = id; }
+    if (!myEnt()) { const e = mkEnt({ name: me() }); e.x = DOOR.x; e.y = DOOR.y; walkTo(e, DOOR.x + 18, 180); openTransport();
+      send({ t: "hi", name: me(), x: e.x, y: e.y, seat: -1, mic: false });
+      if (S.demo) demoStart(); }
+    else { const e = myEnt(), p = find(me()); if (p) { e.cfg = cfgFor(p); e.g = grp(p); } }
+    people_(); bar(); paintTV(); run();
+    const ed = !(find(me()) || {}).avatar; const hint = $("sl-noav");
+    if (ed && !hint && window.pxpAvatarEditor) { const n = document.createElement("div"); n.id = "sl-noav"; n.className = "sl-noav"; n.innerHTML = `<span>${L("Entraste con un avatar provisional.", "You came in with a temporary avatar.")}</span><button type="button">${L("Crear mi avatar", "Create my avatar")}</button>`; document.querySelector(".sl-head > div").appendChild(n); n.querySelector("button").onclick = () => { pxpAvatarEditor(me()); }; }
+    else if (!ed && hint) hint.remove();
+  }
+  addEventListener("pagehide", () => send({ t: "bye" }));
+
+  /* proveedor del servicio de llamadas: se conecta con estos mismos mensajes */
+  window.PXP_SALA = {
+    version: 1,
+    /* impl: { connect({me, onMessage}) → Promise, send(msg), setMic(on, stream), setCam(on, stream), setScreen(on, stream), leave() } */
+    hora: h => { S.hora = h == null ? null : +h; bgKey = ""; },
+    setProvider(impl) { PROVIDER.impl = impl; if (tr) { try { tr.close(); } catch (e) { } tr = null; } if (impl && impl.connect) return impl.connect({ me: me(), onMessage: onMsg }); },
+    state: () => ({ me: S.myId, people: [...S.ents.values()].map(e => ({ id: e.id, name: e.name, x: Math.round(e.x), y: Math.round(e.y), seat: e.seat, mic: e.mic, cam: e.cam, demo: e.demo })), proj: S.proj, log: S.log.slice() }),
+    say: t => { const e = myEnt(); if (e) { say(e, t); send({ t: "say", text: t }); } },
+    seats: SEATS.length,
+  };
+
+  const oSw = window.switchView;
+  if (typeof oSw === "function") window.switchView = function (name) { const r = oSw.apply(this, arguments); if (name === "sala") { try { enter(); } catch (e) { console.error(e); } } return r; };
+  const tryMount = () => { try { if (me()) mount(); } catch (e) { } };
+  const oEnter = window.enterApp; if (typeof oEnter === "function") window.enterApp = function () { const r = oEnter.apply(this, arguments); setTimeout(tryMount, 1900); return r; };
+  let rt = null; const oRender = window.render; if (typeof oRender === "function") window.render = function () { const r = oRender.apply(this, arguments); clearTimeout(rt); rt = setTimeout(tryMount, 950); return r; };
+  if (window.pxpOnDom) pxpOnDom(() => { const nav = $("tab-nav"); if (nav && me() && !nav.querySelector('[data-view="sala"]')) tryMount(); }, { childList: true, subtree: true });
+  (function arranque() { let n = 0; const iv = setInterval(() => { if (me() && $("tab-nav")) { clearInterval(iv); setTimeout(tryMount, 1300); } else if (++n > 80) clearInterval(iv); }, 500); })();
 })();
 </script>
 </body>
