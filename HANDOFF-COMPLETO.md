@@ -1,6 +1,6 @@
 # Handoff completo · Tráfico Post · Publicis Postproducción
 
-**Versión actual:** v209 · 11 oct 2026
+**Versión actual:** v210 · 11 oct 2026
 **Responsable:** Bastián Torres (Administración)
 **Repositorio:** `dropta333/claudia` · rama de trabajo `claude/friendly-johnson-4bo3zq`, que también es la rama principal.
 
@@ -42,11 +42,10 @@ Este documento sirve para retomar el proyecto en otra conversación sin perder c
   - El resto de las gráficas va en el bloque plegable **"Más gráficas"**, que se recuerda por persona.
 - **Vista Personal:**
   - **Cabecera:** la tarjeta de perfil con foto, estado, logros, KPIs (proyectos en curso, etapas pendientes, próxima entrega, horas de la semana), skills y software.
-  - **Mosaico sin huecos:**
+  - **Mosaico a 3 columnas sin huecos** (sin bloques plegables):
     - Estado de los proyectos, en dos columnas.
     - Próximas entregas y etapas: 5 próximas, 2 vencidas y "Ver más".
-    - Mis gráficas: horas por semana, horas por proyecto, etapas, proyectos activos y "Mi carga · próximas semanas".
-  - **Barra "Mis gráficas" (v209):** va al pie de la columna más corta y muestra u oculta las gráficas. Se recuerda por persona.
+    - Gráficas personales: horas por semana, horas por proyecto, etapas, proyectos activos y "Mi carga · próximas semanas".
 
 ### Dashboard (Administración)
 - Disponibilidad del equipo, agrupada por estado (incluye "Ocupados"). Cada columna muestra 4 filas y "Ver N más".
@@ -169,7 +168,7 @@ Este documento sirve para retomar el proyecto en otra conversación sin perder c
   - `pxpCapMosaico`: el mosaico de Capacidad.
   - `pxpTeamPack`: el reparto de los grupos de Team.
 - **Pruebas** (Playwright, con el Chromium del entorno):
-  - `node tools/test-vNNN.mjs`: una prueba por versión, de la v164 a la v209.
+  - `node tools/test-vNNN.mjs`: una prueba por versión, de la v164 a la v210.
   - `node tools/smoke.mjs`: recorre todas las vistas, como admin y como creativo, en escritorio y celular.
   - Conviene correr subconjuntos dirigidos, porque la suite completa tarda mucho.
 - **Pruebas de punta a punta de Netlify:** `tools/netlify-e2e.mjs`, `tools/migrate-e2e.mjs` y `tools/extractor-e2e.mjs`.
@@ -210,7 +209,7 @@ Este documento sirve para retomar el proyecto en otra conversación sin perder c
 
 ---
 
-## 6. Historial resumido de esta etapa (v190 → v209)
+## 6. Historial resumido de esta etapa (v190 → v210)
 
 - **v190–v192:**
   - Clientes: unión sin distinguir mayúsculas, nuevo Reparto, desplegables, vuelta al diseño de 3 columnas.
@@ -244,11 +243,14 @@ Este documento sirve para retomar el proyecto en otra conversación sin perder c
   - Tipo de integrante solo para Administración.
 - **v208:**
   - Tráfico: las fichas se reacomodan al instante al repintar, con un vigilante del DOM.
-  - Home personal con "Mis gráficas" plegable.
+  - Home personal con "Mis gráficas" plegable (descartado en la v210).
 - **v209:**
-  - Home personal vuelve al mosaico sin huecos y "Mis gráficas" queda como una barra compacta al pie de la columna más corta.
+  - Prueba de "Mis gráficas" como barra compacta (descartada en la v210).
   - Team: la foto se alinea con el nombre y el cargo, el nombre es más grande y las skills van a todo el ancho.
   - Se agrega este documento.
+- **v210:**
+  - Home personal vuelve exactamente al diseño de la v207, a 3 columnas, sin "Mis gráficas". Se borraron el código y el CSS de ese ajuste.
+  - **Decisión de Bastián:** no volver a proponer plegar las gráficas del Home personal.
 
 ---
 

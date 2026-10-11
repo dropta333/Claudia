@@ -1,4 +1,4 @@
-// Prueba v208: Tráfico no se desacomoda al repintar (semana, búsqueda, idioma, tema) · Home personal con "Mis gráficas" plegable
+// Prueba v209/v210: Tráfico sin desacomodo · Home personal como en la v207 (3 columnas, sin "Mis gráficas") · fichas de Team con foto alineada
 import { createRequire } from "node:module"; import { execSync } from "node:child_process"; import path from "node:path";
 const req = createRequire(import.meta.url); let pw; try { pw = req("playwright"); } catch { pw = req(execSync("npm root -g").toString().trim() + "/playwright"); }
 const b = await pw.chromium.launch(); const page = await (await b.newContext({ viewport: { width: 1600, height: 900 } })).newPage();
@@ -12,16 +12,9 @@ for (const [n, f] of [["semana anterior", () => setWeek(currentWeek - 1)], ["sem
   await page.evaluate(f); await page.waitForTimeout(40);
   check(`Tráfico: ${n} → sin fichas montadas ni un instante`, (await ov()) === 0);
 }
-await page.evaluate(() => { try { localStorage.removeItem("pxp_hm_mis_" + normName(currentUser)); } catch (e) { } pxpHomeModo("personal"); switchView("home"); }); await page.waitForTimeout(1500);
-const st = () => page.evaluate(() => { const m = document.querySelector("#home-wrap .hm-more[data-k]"); const t = [...document.querySelectorAll("#home-wrap .ps-tile")]; return m ? { on: m.dataset.on, enCol: !!m.closest(".ht-col"), vis: t.filter(x => x.offsetParent).length, n: t.length, tilesEnCol: t.every(x => x.closest(".ht-col")) } : null; });
-let s = await st(); check(`Home personal: gráficas en el mosaico como antes, visibles (${JSON.stringify(s)})`, s && s.on === "1" && s.vis > 0 && s.tilesEnCol && s.enCol);
-check("Home personal: sin hueco grande bajo la columna más corta", await page.evaluate(() => { const cs = [...document.querySelectorAll("#home-wrap .home-tiles > .ht-col")]; if (cs.length < 2) return true; const h = cs.map(c => c.offsetHeight); return Math.max(...h) - Math.min(...h) < 420; }));
-await page.click("#home-wrap .hm-more[data-k] .hm-more-b"); await page.waitForTimeout(600); s = await st();
-check(`Home personal: Ocultar quita las gráficas (${JSON.stringify(s)})`, s && s.on === "0" && s.n === 0 && s.enCol);
-await page.evaluate(() => { pxpHomeModo("global"); pxpHomeModo("personal"); switchView("home"); }); await page.waitForTimeout(1200); s = await st();
-check("Home personal: se recuerda oculto", s && s.on === "0");
-await page.click("#home-wrap .hm-more[data-k] .hm-more-b"); await page.waitForTimeout(600); s = await st();
-check("Home personal: Mostrar las devuelve", s && s.on === "1" && s.vis > 0);
+await page.evaluate(() => { pxpHomeModo("personal"); switchView("home"); }); await page.waitForTimeout(1500);
+check("Home personal: sin barra Mis gráficas y gráficas en el mosaico", await page.evaluate(() => !document.querySelector("#home-wrap .hm-more") && [...document.querySelectorAll("#home-wrap .ps-tile")].every(x => x.closest(".ht-col"))));
+check("Home personal: tres columnas", await page.evaluate(() => document.querySelectorAll("#home-wrap .home-tiles > .ht-col").length === 3));
 await page.evaluate(() => { pxpHomeModo("global"); switchView("team"); }); await page.waitForTimeout(1000);
 const tm = await page.evaluate(() => { const r = [...document.querySelectorAll("#view-team .team-row")].filter(x => x.offsetParent); return r.map(x => { const a = x.querySelector(".team-name .av").getBoundingClientRect(), n = x.querySelector(".team-name").getBoundingClientRect(), sk = x.querySelector(".sk-mini.tm"); return { top: Math.abs(a.top - n.top), sk: sk ? Math.abs(sk.getBoundingClientRect().left - a.left) : 0, fs: parseFloat(getComputedStyle(x.querySelector(".team-name")).fontSize) }; }); });
 check(`Team: foto alineada arriba con el nombre (${tm.length} fichas)`, tm.length > 0 && tm.every(x => x.top < 8));

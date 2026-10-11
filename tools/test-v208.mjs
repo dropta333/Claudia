@@ -1,4 +1,4 @@
-// Prueba v208: Tráfico no se desacomoda al repintar (semana, búsqueda, idioma, tema) · Home personal con "Mis gráficas" plegable
+// Prueba v208: Tráfico no se desacomoda al repintar (semana, búsqueda, idioma, tema)
 import { createRequire } from "node:module"; import { execSync } from "node:child_process"; import path from "node:path";
 const req = createRequire(import.meta.url); let pw; try { pw = req("playwright"); } catch { pw = req(execSync("npm root -g").toString().trim() + "/playwright"); }
 const b = await pw.chromium.launch(); const page = await (await b.newContext({ viewport: { width: 1600, height: 900 } })).newPage();

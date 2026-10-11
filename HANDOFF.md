@@ -2,7 +2,9 @@
 
 Versión: **v209** · 11 oct 2026 · Resumen general en `HANDOFF-COMPLETO.md` · Responsable: Bastián Torres
 
-## v209 · Home personal vuelve al mosaico sin huecos; "Mis gráficas" es una barra compacta al pie de la columna más corta (pxp_hm_mis_<usuario>, data-on); Team: foto alineada con nombre (23 px) y cargo, skills a todo el ancho; HANDOFF-COMPLETO.md
+## v210 · Home personal vuelve exactamente al mosaico de la v207 a 3 columnas: sin "Mis gráficas" (código y CSS de v208–v209 eliminados)
+
+## v209 · Team: foto alineada con nombre (23 px) y cargo, skills a todo el ancho; HANDOFF-COMPLETO.md
 
 ## v208 · Tráfico: decorar + acomodar sincrónico al repintar, vigilante del #main-grid y limpieza del mosaico sin fichas
 
