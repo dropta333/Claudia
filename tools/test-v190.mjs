@@ -15,7 +15,7 @@ check(`Mars aparece una sola vez (${JSON.stringify(mars)})`, mars.length === 1 &
 check("ranking de clientes con barras", (await page.$$("#cli-wrap .rc-l li")).length > 0);
 check("donut grande", await page.$eval("#cli-wrap .rcx .rc-d svg", s => s.getBoundingClientRect().width >= 220));
 check("tipos en lista con barras", (await page.$$("#cli-wrap .tp-l li")).length >= 5);
-const alt = await page.evaluate(() => { const ps = [...document.querySelectorAll("#cli-wrap .pxp-grid > .home-panel")].slice(0, 2).map(p => p.getBoundingClientRect()); return ps.map(r => Math.round(r.height)); });
+const alt = await page.evaluate(() => { const ps = [...document.querySelectorAll("#cli-wrap .pxp-grid > .home-panel")].filter(p => /^(Reparto por cliente|Tipos de proyecto)/.test(p.querySelector(".hp-title").textContent.trim())).map(p => p.getBoundingClientRect()); return ps.map(r => Math.round(r.height)); });
 check(`las dos cajas con la misma altura (${alt})`, Math.abs(alt[0] - alt[1]) < 2);
 await page.screenshot({ path: "dist/shots/v190-clientes.png", clip: await page.$eval("#cli-wrap .pxp-grid", g => { const r = g.getBoundingClientRect(); return { x: r.x, y: r.y + scrollY, width: r.width, height: 640 }; }), fullPage: true });
 // desplegables
