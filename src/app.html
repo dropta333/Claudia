@@ -6829,6 +6829,36 @@ body[data-view="dashboard"] .legend-d,body[data-view="dashboard"] .legend-row{di
 #dash-wrap .lb-more{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:6px 14px;border-radius:99px;border:1px solid var(--border);background:var(--surface);font:600 12px/1 var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);transition:color .15s,border-color .15s}
 #dash-wrap .lb-more:hover{color:var(--text);border-color:var(--border2)}
 #dash-wrap .lb-more .i{width:14px;height:14px}
+
+/* ═════ v206 · Cabecera del perfil ═════ */
+#pxp-person .pm-head.ph2{gap:22px;padding:24px 26px;background:radial-gradient(120% 140% at 0% 0%,color-mix(in srgb,var(--gc,var(--brand)) 22%,transparent),transparent 55%),var(--surface);border-bottom:1px solid color-mix(in srgb,var(--gc,var(--border)) 30%,var(--border))}
+#pxp-person .ph-avw{position:relative;flex:none}
+#pxp-person .ph-acts{position:absolute;right:-8px;bottom:-6px;display:flex;gap:5px}
+#pxp-person .ph-act{all:unset;box-sizing:border-box;cursor:pointer;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--surface);border:1px solid var(--border2);color:var(--text);box-shadow:0 4px 12px rgba(0,0,0,.35);transition:transform .15s,background .15s,color .15s}
+#pxp-person .ph-act:hover{transform:scale(1.08);background:var(--gc,var(--brand));color:#111;border-color:transparent}
+#pxp-person .ph-act.del:hover{background:var(--red);color:#fff}
+#pxp-person .ph-act:focus-visible,#pxp-person .ph-pen:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+#pxp-person .ph-act .i{width:15px;height:15px}
+#pxp-person .pm-head.ph2 .pm-id > p{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:10px}
+#pxp-person .ph-role{display:inline-flex;align-items:center;gap:10px;padding:6px 8px 6px 14px;border-radius:12px;border:1px solid color-mix(in srgb,var(--gc,var(--brand)) 45%,var(--border));background:color-mix(in srgb,var(--gc,var(--brand)) 14%,var(--surface))}
+#pxp-person .ph-role-t{font:600 17px/1.15 var(--sans);color:var(--text)}
+#pxp-person .ph-grp{font:600 11.5px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;padding:5px 9px;border-radius:8px;background:color-mix(in srgb,var(--gc,var(--brand)) 26%,transparent);color:var(--text)}
+#pxp-person .ph-pen{all:unset;box-sizing:border-box;cursor:pointer;display:grid;place-items:center;width:32px;height:32px;border-radius:10px;border:1px solid var(--border);color:var(--muted);transition:color .15s,border-color .15s,background .15s}
+#pxp-person .ph-pen:hover{color:var(--text);border-color:var(--border2);background:var(--surface2)}
+#pxp-person .ph-pen .i{width:15px;height:15px}
+#pxp-person .pm-head.ph2 .pm-links{margin-top:10px}
+#pxp-person .ph-state{padding:5px 12px;border-radius:99px;background:color-mix(in srgb,var(--text) 6%,transparent);border:1px solid var(--border);font-size:13.5px}
+
+/* ═════ v206 · Red de proyectos: leyenda en una sola línea ═════ */
+.mm-legend.nx-leg{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;align-items:center;gap:6px 14px;padding:8px 12px;margin:12px 0 0;border:1px solid var(--border);border-radius:12px;background:color-mix(in srgb,var(--text) 3%,transparent);font-size:13px;white-space:nowrap}
+.mm-legend.nx-leg::-webkit-scrollbar{display:none}
+.mm-legend.nx-leg li{flex:none}
+.mm-legend.nx-leg .nx-lh{font:600 11px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);opacity:.8}
+.mm-legend.nx-leg .nx-sep{width:1px;height:16px;background:var(--border2);margin:0 4px}
+.mm-legend.nx-leg .nx-q{margin-left:auto}
+.nx-info{all:unset;cursor:help;display:grid;place-items:center;width:20px;height:20px;border-radius:50%;border:1px solid var(--border2);font:700 11px/1 var(--sans);color:var(--muted)}
+.nx-info:hover{color:var(--text)}
+@media (max-width:600px){#pxp-person .pm-head.ph2{flex-wrap:wrap;padding-right:52px}#pxp-person .ph-role{flex-wrap:wrap;row-gap:6px}#pxp-person .ph-role-t{font-size:15px}#pxp-person .ph-grp,#pxp-person .ph-state{white-space:nowrap}}
 </style>
 </head>
 <body>
@@ -12092,6 +12122,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
             <input type="text" id="pm-grupo-nuevo" placeholder="Nombre del grupo nuevo" hidden onkeydown="if(event.key==='Enter')pxpSetGrupo('__crear')"><button class="btn-add" id="pm-grupo-ok" hidden onclick="pxpSetGrupo('__crear')">Crear</button></div>
           <p class="note" style="margin-top:8px">Su cargo es <b>${esc(p.role || "Casa de audio")}</b>. El grupo solo define dónde aparece en Team, Dashboard, Horas y Capacidad.</p>
           ${(() => { const tm = p.tipoMiembro || "interno", adm = !window.pxpPuedeEditar || pxpPuedeEditar(), TM = [["interno", "Interno", "Equipo de post"], ["freelance", "Freelance", "Apoyo externo de post"], ["externo", "Externo", "Fuera del equipo de post"]];
+            if (!adm) return "";   // v206 · solo Administración ve y cambia el tipo de integrante
             return `<div class="pm-tm"><span class="pe-l">Tipo de integrante</span><div class="seg pm-tms" role="group" aria-label="Tipo de integrante">${TM.map(([v, l, d]) => `<button type="button" class="${tm === v ? "on" : ""}" aria-pressed="${tm === v}" onclick="pxpSetTipoMiembro('${v}')" ${adm ? "" : "disabled"}><b>${l}</b><small>${d}</small></button>`).join("")}</div>
               ${tm === "externo" ? `<p class="note">No aparece en Traffic, Dashboard, Capacidad ni Horas. Igual se le pueden asignar proyectos.</p>` : tm === "freelance" ? `<p class="note">Aparece en Traffic, Dashboard, Capacidad y Horas, marcado como freelance.</p>` : ""}</div>`; })()}</section>
         <section class="pm-sec"><h3>Sus proyectos <span class="cnt">${projs.length}</span></h3>
@@ -14364,10 +14395,12 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const core = `<g class="mm-core" style="--pc2:${center.color}">
       <circle cx="${cx}" cy="${cy}" r="66" class="mm-orbit o1" style="stroke:${center.color}"/><circle cx="${cx}" cy="${cy}" r="78" class="mm-orbit o2" style="stroke:${center.color}"/>
       ${shape(csh, cx, cy, 54 / cE, "mm-cc", `fill:color-mix(in srgb,${center.color} 16%,var(--surface));stroke:${center.color}`)}${cimg}</g>`;
-    const legend = Object.entries(used).map(([t, sh]) => `<li><svg viewBox="-16 -16 32 32" aria-hidden="true">${shape(sh, 0, 0, 9, "mm-lg", `stroke:var(--text);fill:color-mix(in srgb,var(--text) 14%,transparent)`)}</svg>${esc(t)}</li>`).join("")
-      + Object.entries(EST).filter(([k]) => items.some(x => x.estado === k)).map(([, [l, c]]) => `<li><span class="nx-dot" style="background:${c}"></span>${l}</li>`).join("");
+    // v206 · leyenda en una sola línea: "Forma = tipo" · "Punto = estado" (la explicación va en el ícono ?)
+    const legT = Object.entries(used).map(([t, sh]) => `<li><svg viewBox="-16 -16 32 32" aria-hidden="true">${shape(sh, 0, 0, 9, "mm-lg", `stroke:var(--text);fill:color-mix(in srgb,var(--text) 14%,transparent)`)}</svg>${esc(t)}</li>`).join("");
+    const legE = Object.entries(EST).filter(([k]) => items.some(x => x.estado === k)).map(([, [l, c]]) => `<li><span class="nx-dot" style="background:${c}"></span>${l}</li>`).join("");
+    const legend = `<li class="nx-lh">Forma · tipo</li>${legT}<li class="nx-sep" aria-hidden="true"></li><li class="nx-lh">Punto · estado</li>${legE}<li class="nx-q"><button type="button" class="nx-info" data-tip="La forma de cada proyecto indica su tipo, el color es el del proyecto y el punto pequeño su estado. Toca un proyecto para abrirlo." aria-label="Cómo leer la red">?</button></li>`;
     return `<div class="mm-wrap"><svg class="mm nx${two ? " big" : ""}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Red de proyectos de ${esc(center.nombre)}"><g class="mm-bg">${dots}${mesh}</g>${links}${core}${nodes}</svg></div>
-      <ul class="mm-legend">${legend}</ul><p class="note" style="margin-top:6px">La forma de cada proyecto indica su tipo, el color es el del proyecto y el punto pequeño su estado. Toca un proyecto para abrirlo.</p>`;
+      <ul class="mm-legend nx-leg">${legend}</ul>`;
   }
   function projItem(k, subFn) {
     const p = getProjectDisplay(k);
@@ -18819,6 +18852,47 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
 })();
 
 // ════════════════════════════════════════════════════════════════
+// v206 · Cabecera del perfil: cargo destacado (con el color del grupo) y acciones con ícono
+//   (cambiar foto / quitar foto sobre la foto; lápiz para el nombre del cargo)
+// ════════════════════════════════════════════════════════════════
+(function () {
+  "use strict";
+  const CAM = "<svg class='i' viewBox='0 0 24 24' aria-hidden='true'><path d='M4 8.5h3l1.5-2.5h7L17 8.5h3a1 1 0 0 1 1 1V18a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5a1 1 0 0 1 1-1z'/><circle cx='12' cy='13.5' r='3.5'/></svg>";
+  const DEL = "<svg class='i' viewBox='0 0 24 24' aria-hidden='true'><path d='M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13'/></svg>";
+  const PEN = "<svg class='i' viewBox='0 0 24 24' aria-hidden='true'><path d='M4 20h4L19 9l-4-4L4 16z'/><path d='m13.5 6.5 4 4'/></svg>";
+  function decorar() {
+    const h = document.querySelector("#pxp-person .pm-head"); if (!h || h.dataset.v206) return;
+    h.dataset.v206 = "1"; h.classList.add("ph2");
+    const avb = h.querySelector(".pm-av"), av = avb && avb.querySelector(".av");
+    const gc = av ? (av.style.getPropertyValue("--gc") || av.style.getPropertyValue("--c")).trim() : ""; if (gc) h.style.setProperty("--gc", gc);
+    const grupo = av ? av.dataset.g || "" : "";
+    // foto: envoltorio con acciones encima
+    const bCam = Array.from(h.querySelectorAll(".pm-links .linkbtn")).find(b => /pxpPersonPhoto\(\)/.test(b.getAttribute("onclick") || ""));
+    const bDel = Array.from(h.querySelectorAll(".pm-links .linkbtn")).find(b => /pxpPersonPhotoRemove/.test(b.getAttribute("onclick") || ""));
+    if (avb && (bCam || bDel)) {
+      const w = document.createElement("div"); w.className = "ph-avw"; avb.before(w); w.appendChild(avb);
+      const acts = document.createElement("div"); acts.className = "ph-acts";
+      if (bCam) { bCam.className = "ph-act"; bCam.innerHTML = CAM; bCam.title = "Cambiar foto"; bCam.setAttribute("aria-label", "Cambiar foto"); acts.appendChild(bCam); }
+      if (bDel && av && av.querySelector("img")) { bDel.className = "ph-act del"; bDel.innerHTML = DEL; bDel.title = "Quitar foto"; bDel.setAttribute("aria-label", "Quitar foto"); acts.appendChild(bDel); } else if (bDel) bDel.remove();
+      w.appendChild(acts);
+    }
+    // cargo: etiqueta destacada + lápiz
+    const p = h.querySelector(".pm-id > p"), rt = p && p.querySelector(".pm-role-t");
+    if (p && rt) {
+      const chip = document.createElement("span"); chip.className = "ph-role";
+      chip.innerHTML = `<span class="ph-role-t"></span>`; chip.firstChild.textContent = rt.textContent.trim();
+      const ro = p.querySelector(".pm-role-o");
+      if (grupo || ro) { const g = document.createElement("span"); g.className = "ph-grp"; g.textContent = grupo || ro.textContent.replace(/^·\s*/, ""); chip.appendChild(g); }
+      rt.replaceWith(chip); if (ro) ro.remove();
+      const rb = p.querySelector(".pm-role-btn"); if (rb) { rb.className = "ph-pen"; rb.innerHTML = PEN; rb.title = "Cambiar nombre del cargo"; rb.setAttribute("aria-label", "Cambiar nombre del cargo"); chip.after(rb); }
+    }
+    const st = h.querySelector(".pm-state"); if (st) st.classList.add("ph-state");
+  }
+  if (window.pxpOnDom) pxpOnDom(() => { try { decorar(); } catch (e) { console.error(e); } }, { childList: true, subtree: true });
+  window.pxpPerfilCabecera = decorar;
+})();
+
+// ════════════════════════════════════════════════════════════════
 // v184 · Copias completas y migración entre servidores
 //   · "Descargar copia" guarda TODO (antes faltaban licencias, logros, temas y otras claves de META).
 //   · "Restaurar copia" combina con lo actual: no borra nada de lo nuevo y agrega lo que falte.
@@ -19073,7 +19147,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     "Agregar imagen del proyecto": "Add project image", "Cambiar imagen": "Change image", "Sugerencias": "Suggestions", "Avance por etapas": "Progress by stage", "Notas": "Notes", "Adjuntar": "Attach", "Bloqueadores": "Blockers", "+ Reportar bloqueador": "+ Report blocker", "Revisiones y enlaces": "Reviews and links", "+ Agregar enlace": "+ Add link", "Ruta en el share": "Share path", "+ Agregar ruta": "+ Add path", "Copiar ruta": "Copy path", "Editar ficha completa": "Edit full card", "Revisar": "Review", "Descargar": "Download", "Cronograma": "Schedule", "Piezas por tipo": "Pieces by type", "Adaptaciones por país": "Adaptations by country", "Agregar etapa": "Add stage", "+ Agregar etapa": "+ Add stage", "Usar etapas típicas": "Use typical stages",
     "Pendiente": "Pending", "Con cambios": "Changes requested", "En curso": "In progress", "Revisión": "Review", "Datos del proyecto": "Project details", "Color": "Color", "Nota": "Note", "Historial": "History", "Horas trabajadas en el proyecto": "Hours worked on the project",
 
-    "Por tipo": "By type", "proyectos": "projects", "proyecto": "project", "% de asignaciones en Tráfico": "% of assignments in Traffic", "Ordenar por": "Sort by", "trabajó de más": "worked overtime", "horas estimadas": "estimated hours", "Semanas de cola": "Queue weeks", "Color por cargo": "Color by role", "tipo de proyecto": "project type", "Todo el año 2026": "Whole year 2026", "Filtrar por tipo": "Filter by type", "Vista de la lista": "List view", "Ordenar por estado": "Sort by status", "Filtrar por estado": "Filter by status", "Ordenar por tiempo": "Sort by time", "Ordenar por inicio": "Sort by start", "Ordenar por cliente": "Sort by client", "Ver tablas de datos": "View data tables", "Filtrar por agencia": "Filter by agency", "Le caben por semana": "Fits per week", "Filtrar por cliente": "Filter by client", "clientes": "clients", "Limpiar": "Clear", "Plegar o desplegar el grupo": "Collapse or expand the group", "Esta semana": "This week", "Próximo": "Next", "Realizado": "Done", "No hay rodajes programados.": "No shoots scheduled.", "Gráficas": "Charts", "Semanas": "Weeks", "Meses": "Months", "Año": "Year", "por mes": "by month", "por año": "by year", "por semana": "by week", "Últimos": "Latest", "Agrupar": "Group", "Filtrar por": "Filter by", "Ordenar": "Sort", "Buscar…": "Search…", "Sin resultados": "No results", "Abrir o cerrar todos": "Open or close all", "Quitar": "Remove", "Abrir todos": "Open all", "Ver menos": "See less", "Cerrar todos": "Close all", "Ver todos": "See all", "Qué proyectos ver": "Which projects to show", "Toca un cliente para desplegar sus proyectos, agrupados por marca. Toca su nombre para abrir su ficha.": "Tap a client to expand its projects, grouped by brand. Tap its name to open its card.", "El tipo sale de la ficha de cada proyecto; si no tiene, se deduce del nombre (\"Caso…\" → Casos, \"Licitación…\" → Licitaciones, el resto → Comercial).": "The type comes from each project card; if it has none, it is inferred from the name (\"Caso…\" → Case studies, \"Licitación…\" → Tenders, the rest → Commercial).", "Toca su nombre para abrir su ficha y crearle uno.": "Tap its name to open its card and create one.", "Reparto por cliente": "Split by client", "Ordenar por proyecto": "Sort by project", "Jornada de referencia": "Reference workday", "Qué proyectos mostrar": "Which projects to show", "Filtrar por complejidad": "Filter by complexity", "Ordenar por complejidad": "Sort by complexity", "Trabajaron fin de semana": "Worked on weekends", "Sin cliente identificado": "No client identified", "Ordenar por entrega final": "Sort by final delivery", "Ordenar por próximo avance": "Sort by next milestone", "cliente → marca → proyecto": "client → brand → project", "Sin cupo (cola > 2 semanas)": "No room (queue > 2 weeks)", "Guardar horas de esta semana": "Save this week's hours", "Los cambios se guardan solos": "Changes save automatically", "8 h al día · 40 h por semana": "8 h a day · 40 h a week", "Clientes, marcas y proyectos": "Clients, brands and projects", "usan default por complejidad": "use the complexity default", "ocupados con 1 o 2 proyectos": "busy with 1 or 2 projects", "Proyectos sin horas estimadas": "Projects without estimated hours", "Volver a las horas automáticas": "Back to automatic hours", "L–V 8:30–5:30 · 1 h de almuerzo": "Mon–Fri 8:30–5:30 · 1 h lunch", "Personas con exceso esta semana": "People over hours this week", "Compensatorio sugerido (equipo)": "Suggested comp time (team)", "Fin de semana · el reloj no corre": "Weekend · the clock stops", "Horas estimadas cargada en la ficha": "Estimated hours set in the card", "Proyectos activos (horas estimadas)": "Active projects (estimated hours)", "Guardar esta semana en el histórico": "Save this week to history", "Buscar por proyecto, cliente o marca": "Search by project, client or brand", "toca una barra para ver sus proyectos": "tap a bar to see its projects", "Las horas corren solas, como un reloj.": "Hours run on their own, like a clock.", "Sin horas estimadas — usando default de medio": "No estimated hours — using the medium default", "Sin horas estimadas — usando default de complejo": "No estimated hours — using the complex default", "Horas sumadas a mano por encima de lo automático": "Hours added by hand on top of the automatic ones", "sin estimar": "not estimated", "El": "The", "Mis datos": "My details", "Sobre mí": "About me", "Correo": "Email", "Teléfono": "Phone", "Notas": "Notes",
+    "Por tipo": "By type", "proyectos": "projects", "proyecto": "project", "% de asignaciones en Tráfico": "% of assignments in Traffic", "Ordenar por": "Sort by", "trabajó de más": "worked overtime", "horas estimadas": "estimated hours", "Semanas de cola": "Queue weeks", "Color por cargo": "Color by role", "tipo de proyecto": "project type", "Todo el año 2026": "Whole year 2026", "Filtrar por tipo": "Filter by type", "Vista de la lista": "List view", "Ordenar por estado": "Sort by status", "Filtrar por estado": "Filter by status", "Ordenar por tiempo": "Sort by time", "Ordenar por inicio": "Sort by start", "Ordenar por cliente": "Sort by client", "Ver tablas de datos": "View data tables", "Filtrar por agencia": "Filter by agency", "Le caben por semana": "Fits per week", "Filtrar por cliente": "Filter by client", "clientes": "clients", "Limpiar": "Clear", "Forma · tipo": "Shape · type", "Punto · estado": "Dot · status", "Cómo leer la red": "How to read the network", "Cambiar foto": "Change photo", "Quitar foto": "Remove photo", "Cambiar nombre del cargo": "Rename role", "Plegar o desplegar el grupo": "Collapse or expand the group", "Esta semana": "This week", "Próximo": "Next", "Realizado": "Done", "No hay rodajes programados.": "No shoots scheduled.", "Gráficas": "Charts", "Semanas": "Weeks", "Meses": "Months", "Año": "Year", "por mes": "by month", "por año": "by year", "por semana": "by week", "Últimos": "Latest", "Agrupar": "Group", "Filtrar por": "Filter by", "Ordenar": "Sort", "Buscar…": "Search…", "Sin resultados": "No results", "Abrir o cerrar todos": "Open or close all", "Quitar": "Remove", "Abrir todos": "Open all", "Ver menos": "See less", "Cerrar todos": "Close all", "Ver todos": "See all", "Qué proyectos ver": "Which projects to show", "Toca un cliente para desplegar sus proyectos, agrupados por marca. Toca su nombre para abrir su ficha.": "Tap a client to expand its projects, grouped by brand. Tap its name to open its card.", "El tipo sale de la ficha de cada proyecto; si no tiene, se deduce del nombre (\"Caso…\" → Casos, \"Licitación…\" → Licitaciones, el resto → Comercial).": "The type comes from each project card; if it has none, it is inferred from the name (\"Caso…\" → Case studies, \"Licitación…\" → Tenders, the rest → Commercial).", "Toca su nombre para abrir su ficha y crearle uno.": "Tap its name to open its card and create one.", "Reparto por cliente": "Split by client", "Ordenar por proyecto": "Sort by project", "Jornada de referencia": "Reference workday", "Qué proyectos mostrar": "Which projects to show", "Filtrar por complejidad": "Filter by complexity", "Ordenar por complejidad": "Sort by complexity", "Trabajaron fin de semana": "Worked on weekends", "Sin cliente identificado": "No client identified", "Ordenar por entrega final": "Sort by final delivery", "Ordenar por próximo avance": "Sort by next milestone", "cliente → marca → proyecto": "client → brand → project", "Sin cupo (cola > 2 semanas)": "No room (queue > 2 weeks)", "Guardar horas de esta semana": "Save this week's hours", "Los cambios se guardan solos": "Changes save automatically", "8 h al día · 40 h por semana": "8 h a day · 40 h a week", "Clientes, marcas y proyectos": "Clients, brands and projects", "usan default por complejidad": "use the complexity default", "ocupados con 1 o 2 proyectos": "busy with 1 or 2 projects", "Proyectos sin horas estimadas": "Projects without estimated hours", "Volver a las horas automáticas": "Back to automatic hours", "L–V 8:30–5:30 · 1 h de almuerzo": "Mon–Fri 8:30–5:30 · 1 h lunch", "Personas con exceso esta semana": "People over hours this week", "Compensatorio sugerido (equipo)": "Suggested comp time (team)", "Fin de semana · el reloj no corre": "Weekend · the clock stops", "Horas estimadas cargada en la ficha": "Estimated hours set in the card", "Proyectos activos (horas estimadas)": "Active projects (estimated hours)", "Guardar esta semana en el histórico": "Save this week to history", "Buscar por proyecto, cliente o marca": "Search by project, client or brand", "toca una barra para ver sus proyectos": "tap a bar to see its projects", "Las horas corren solas, como un reloj.": "Hours run on their own, like a clock.", "Sin horas estimadas — usando default de medio": "No estimated hours — using the medium default", "Sin horas estimadas — usando default de complejo": "No estimated hours — using the complex default", "Horas sumadas a mano por encima de lo automático": "Hours added by hand on top of the automatic ones", "sin estimar": "not estimated", "El": "The", "Mis datos": "My details", "Sobre mí": "About me", "Correo": "Email", "Teléfono": "Phone", "Notas": "Notes",
     "Proyecto modificado": "Project modified", "Los cambios se guardan al cerrar la ventana o con el botón.": "Changes are saved when you close the window or with the button.", "Recetas": "Recipes", "Nuevo grupo": "New group", "Skills y software": "Skills and software", "Taxonomía sugerida": "Suggested naming", "Editar": "Edit",
     // reportes
     "Generar reporte": "Generate report", "Reporte del cliente": "Client report", "Todos los clientes": "All clients", "Vista previa": "Preview", "Descargar PDF": "Download PDF",
