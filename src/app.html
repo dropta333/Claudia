@@ -2560,7 +2560,8 @@ header.top .eyebrow{display:inline-flex;align-items:center;gap:8px}
 th.th-salud{white-space:nowrap}
 td.td-salud{white-space:nowrap;padding-left:10px!important}
 td.td-salud .plant .pt b{font-size:14px}
-#pxp-person .pxn-sec svg,#pxp-client .pxn-sec svg{max-width:620px!important;max-height:300px;margin:0 auto;display:block}
+#pxp-person .pxn-sec svg,#pxp-client .pxn-sec svg{max-width:680px!important;max-height:380px;margin:0 auto;display:block}
+#pxp-person .pxn-sec svg.big,#pxp-client .pxn-sec svg.big{max-width:100%!important;max-height:min(620px,72vh)}
 .pxp-personal .tab-btn[data-view="traffic"],.pxp-personal .tab-btn[data-view="dashboard"],.pxp-personal .tab-btn[data-view="capacidad"],.pxp-personal .tab-btn[data-view="horas"]{display:none!important}
 .pxp-personal .tab-btn[data-view="mishoras"]{display:inline-flex}
 .pxp-personal button[onclick*="pxpCliMetric('horas')"]{display:none}
@@ -5032,6 +5033,13 @@ body.trf-tabla #main-grid > .section-label{display:none!important}
 .lg-pc span{display:inline-flex;align-items:center;gap:6px}
 .lg-pc i{width:8px;height:8px;border-radius:50%;background:var(--tc)}
 .lg-pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:12px 8px}
+/* v188 · bloques por tipo: individuales a lo ancho; grupo y equipo en la misma fila */
+.lg-psec .lg-pg{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:14px 18px!important}
+.lg-psec .lg-pb{min-width:0}
+.lg-psec .lg-pb.full{grid-column:1/-1}
+.lg-psec .lg-pb .lg-ph{margin:0 0 8px}
+.lg-psec .lg-pbi{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:10px 6px}
+@media (max-width:520px){ .lg-psec .lg-pg{grid-template-columns:1fr!important} }
 .lg-pi{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
 .lg-pi small{font:500 13px/1.2 var(--sans);color:var(--muted);max-width:92px}
 .lg-ph{grid-column:1/-1;margin:8px 0 0;font:600 13px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--muted2)}
@@ -11605,14 +11613,17 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
         ${t.fecha ? `<span class="td${late ? " late" : ""}">${late ? "Vencida · " : ""}${esc(t.fecha.slice(8, 10) + "/" + t.fecha.slice(5, 7))}</span>` : ""}
         <button class="xbtn" title="Borrar tarea" onclick="pxpTaskDel('${t.id}')">${ICON.x}</button></div>`;
     };
-    const rows = projs.map(x => {
+    const rowsArr = projs.map(x => {
       const pr = getProjectDisplay(x.key), est = pr.estadoGeneral || "en_produccion", cx = pr.complejidad || "medio";
       return `<div class="pm-proj" style="--pc:${window.pxpProjectColor(x.key)}">
         <button class="pn" onclick="pxpClosePerson();openProjectFicha('${ea(x.key)}')" title="Abrir la ficha del proyecto">${esc(x.nombre)}${pr.cliente ? `<small>${esc(pr.cliente)}</small>` : ""}</button>
         ${estadoSelectHtml(x.key, est)}
         <button class="proj-pill ${cx}" onclick="cycleProjComplejidad('${ea(x.key)}')" title="Cambiar complejidad">${cx}</button>
         <button class="xbtn" title="Quitar de su lista" onclick="pxpPersonRemove('${ea(x.key)}')">${removing === x.key ? "¿Quitar?" : ICON.x}</button></div>`;
-    }).join("");
+    });
+    // v188 · Con muchos proyectos se ven los primeros 6 y el resto en "Ver más" (no empuja el resto de la ventana hacia abajo)
+    const PMV = 6, abiertoP = !!((window.__pmProjAbiertos || {})[normName(p.name)]);
+    const rows = rowsArr.length > PMV + 1 ? rowsArr.slice(0, PMV).join("") + `<details class="tl-more pj-nmore pm-pmore"${abiertoP ? " open" : ""} ontoggle="(window.__pmProjAbiertos=window.__pmProjAbiertos||{})['${ea(normName(p.name))}']=this.open"><summary><span class="nm-c">Ver ${rowsArr.length - PMV} proyectos más</span><span class="nm-o">Ver menos</span></summary>${rowsArr.slice(PMV).join("")}</details>` : rowsArr.join("");
     // proyectos disponibles para asignar, agrupados por cliente
     const byCli = {};
     getAllKnownProjectKeys().forEach(k => { if (have.has(k)) return; const pr = getProjectDisplay(k); if (pr.estadoGeneral === "entregado") return; const c = (pr.cliente || "").trim() || "Sin cliente"; (byCli[c] = byCli[c] || []).push({ k, n: pr.nombre || k }); });
@@ -13859,9 +13870,10 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   function netSvg(center, items) {
     const shape = window.pxpShapeSvg, poly = window.pxpPoly;
     if (!items.length) return `<div class="empty-cta"><b>Sin proyectos activos</b>Cuando tenga proyectos asignados aparecerán aquí, conectados a su alrededor.</div>`;
-    const n = items.length, two = false, W = 640, H = n > 12 ? 470 : n > 8 ? 420 : 350, cx = W / 2, cy = H / 2 + 2, rx = W / 2 - 84, ry = H / 2 - 74;
+    // v188 · Con muchos proyectos: lienzo más ancho y dos anillos alternados para que no quede todo diminuto
+    const n = items.length, two = n > 12, W = two ? 1040 : 640, H = two ? (n > 24 ? 660 : 580) : n > 8 ? 420 : 350, cx = W / 2, cy = H / 2 + 2, rx = W / 2 - (two ? 110 : 84), ry = H / 2 - (two ? 78 : 74);
     const uid = "nx" + Math.random().toString(36).slice(2, 7);
-    const pos = items.map((_, i) => { const a = -Math.PI / 2 + (i / n) * Math.PI * 2 + (n % 2 ? 0 : Math.PI / n), f = two ? (i % 2 ? 0.66 : 1) : 1; return { a, x: cx + rx * f * Math.cos(a), y: cy + ry * f * Math.sin(a) }; });
+    const pos = items.map((_, i) => { const a = -Math.PI / 2 + (i / n) * Math.PI * 2 + (n % 2 ? 0 : Math.PI / n), f = two ? (i % 2 ? 0.6 : 1) : 1; return { a, x: cx + rx * f * Math.cos(a), y: cy + ry * f * Math.sin(a) }; });
     let mesh = "", dots = "", links = "", nodes = "";
     if (n > 2) pos.forEach((q, i) => { const m = pos[(i + 1) % n]; mesh += `<line x1="${q.x.toFixed(1)}" y1="${q.y.toFixed(1)}" x2="${m.x.toFixed(1)}" y2="${m.y.toFixed(1)}" class="mm-mesh"/>`; });
     for (let i = 0; i < 24; i++) { const a = (i * 137.5) * Math.PI / 180, rr = 60 + ((i * 53) % 150); dots += `<circle cx="${(cx + rr * 1.7 * Math.cos(a)).toFixed(1)}" cy="${(cy + rr * .85 * Math.sin(a)).toFixed(1)}" r="${(1 + (i % 3) * .6).toFixed(1)}" class="mm-dot" style="animation-delay:${(i % 7) * .45}s"/>`; }
@@ -13872,7 +13884,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       links += `<path id="${uid}p${i}" d="M${cx},${cy} Q${mx.toFixed(1)},${my.toFixed(1)} ${x.toFixed(1)},${y.toFixed(1)}" data-i="${i}" class="mm-l" style="stroke:url(#${uid}g${i});animation-delay:${(i * 0.08).toFixed(2)}s"/>
         <linearGradient id="${uid}g${i}" gradientUnits="userSpaceOnUse" x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}"><stop offset="0" stop-color="${center.color}" stop-opacity=".9"/><stop offset="1" stop-color="${it.color}" stop-opacity=".95"/></linearGradient>
         <circle r="3.2" class="mm-pulse" style="fill:${it.color}"><animateMotion dur="${(2.4 + (i % 3) * 0.5).toFixed(1)}s" begin="${(0.6 + i * 0.21).toFixed(2)}s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" calcMode="spline" keySplines=".4 0 .2 1"><mpath href="#${uid}p${i}"/></animateMotion></circle>`;
-      const ly = up ? y - 38 : y + 44, ly2 = up ? y - 54 : y + 59, mx2 = n > 8 ? 14 : 18, lab = it.nombre.length > mx2 ? it.nombre.slice(0, mx2 - 1) + "…" : it.nombre;
+      const ly = up ? y - 38 : y + 44, ly2 = up ? y - 54 : y + 59, mx2 = two ? 16 : n > 8 ? 14 : 18, lab = it.nombre.length > mx2 ? it.nombre.slice(0, mx2 - 1) + "…" : it.nombre;
       const inner = it.photo ? `<clipPath id="${uid}c${i}"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="15"/></clipPath><image href="${it.photo}" x="${(x - 15).toFixed(1)}" y="${(y - 15).toFixed(1)}" width="30" height="30" clip-path="url(#${uid}c${i})" preserveAspectRatio="xMidYMid slice"/>`
         : `<text x="${x.toFixed(1)}" y="${(y + 5).toFixed(1)}" text-anchor="middle" class="mm-i">${esc(initials(it.nombre))}</text>`;
       nodes += `<g class="mm-n clk${it.estado === "standby" ? " sb" : ""}" data-i="${i}" data-pkey="${esc(it.key)}" tabindex="0" role="button" aria-label="Abrir ${esc(it.nombre)}" style="--rc:${it.color};animation-delay:${(0.25 + i * 0.07).toFixed(2)}s"><g class="mm-f" style="animation-duration:${(3.6 + (i % 4) * 0.7).toFixed(1)}s;animation-delay:${(-(i * 1.1) % 4).toFixed(1)}s">
@@ -13889,7 +13901,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       ${shape(csh, cx, cy, 54 / cE, "mm-cc", `fill:color-mix(in srgb,${center.color} 16%,var(--surface));stroke:${center.color}`)}${cimg}</g>`;
     const legend = Object.entries(used).map(([t, sh]) => `<li><svg viewBox="-16 -16 32 32" aria-hidden="true">${shape(sh, 0, 0, 9, "mm-lg", `stroke:var(--text);fill:color-mix(in srgb,var(--text) 14%,transparent)`)}</svg>${esc(t)}</li>`).join("")
       + Object.entries(EST).filter(([k]) => items.some(x => x.estado === k)).map(([, [l, c]]) => `<li><span class="nx-dot" style="background:${c}"></span>${l}</li>`).join("");
-    return `<div class="mm-wrap"><svg class="mm nx" viewBox="0 0 ${W} ${H}" role="img" aria-label="Red de proyectos de ${esc(center.nombre)}"><g class="mm-bg">${dots}${mesh}</g>${links}${core}${nodes}</svg></div>
+    return `<div class="mm-wrap"><svg class="mm nx${two ? " big" : ""}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Red de proyectos de ${esc(center.nombre)}"><g class="mm-bg">${dots}${mesh}</g>${links}${core}${nodes}</svg></div>
       <ul class="mm-legend">${legend}</ul><p class="note" style="margin-top:6px">La forma de cada proyecto indica su tipo, el color es el del proyecto y el punto pequeño su estado. Toca un proyecto para abrirlo.</p>`;
   }
   function projItem(k, subFn) {
@@ -20481,7 +20493,10 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const L1 = mios(n).sort((a, b) => S_ORD[a.s] - S_ORD[b.s] || b.tier - a.tier || fi(a) - fi(b) || (b.ts || "").localeCompare(a.ts || "")).filter((x, i, arr) => !x.fam || arr.findIndex((y) => y.fam === x.fam && y.s === x.s) === i);
     const cnt = [0, 0, 0, 0]; L1.forEach((x) => cnt[x.tier]++);
     const oc = {}, oculto = L1.filter((x) => (oc[x.s] = (oc[x.s] || 0) + 1) <= PF_MAX).length, todo = flag, cuenta = {}, vis = todo ? L1 : L1.filter((x) => (cuenta[x.s] = (cuenta[x.s] || 0) + 1) <= PF_MAX); let ult = "";
-    const chips = vis.map((x) => `${x.s !== ult ? (ult = x.s, `<h4 class="lg-ph">${S_TIT[x.s]}</h4>`) : ""}<span class="lg-pi" tabindex="0" data-lgt="${esc(x.k)}">${embN(x.s, x.tier, iconoDe(x), 48, false, imgDe(x), 0)}<small>${esc(x.nombre)}</small></span>`).join("");
+    // v188 · Individuales arriba (fila completa); de grupo y de equipo lado a lado: la caja queda menos alta
+    const chip = (x) => `<span class="lg-pi" tabindex="0" data-lgt="${esc(x.k)}">${embN(x.s, x.tier, iconoDe(x), 48, false, imgDe(x), 0)}<small>${esc(x.nombre)}</small></span>`;
+    const tipos = [...new Set(vis.map((x) => x.s))], ancho = (t) => t === "ind" || tipos.filter((u) => u !== "ind").length < 2;
+    const chips = tipos.map((t) => `<div class="lg-pb${ancho(t) ? " full" : ""}"><h4 class="lg-ph">${S_TIT[t]}</h4><div class="lg-pbi">${vis.filter((x) => x.s === t).map(chip).join("")}</div></div>`).join(""); ult = "";
     const sec = document.createElement("section"); sec.className = "pm-sec lg-psec"; sec.__n = n; sec.__r = ref; sec.__m = flag;
     sec.innerHTML = `<h3>Logros${L1.length ? ` · ${L1.length}` : ""}</h3>${L1.length ? `<div class="lg-pc">${TIERS.map((T, i) => cnt[i] ? `<span style="--tc:${T.c}"><i></i>${T.n} ${cnt[i]}</span>` : "").join("")}</div><div class="lg-pg">${chips}</div>${L1.length > oculto ? `<button type="button" class="btn-ghost sm lg-mas" onclick="pxpLogroMas()">${todo ? "Ver menos" : `Ver ${L1.length - oculto} más`}</button>` : ""}` : `<p class="note">Todavía no tiene logros. Se ganan solos con el trabajo en el tablero.</p>`}`;
     if (cur) cur.replaceWith(sec); else { const col = body.querySelector(".pp-cols > .ppc:last-child"), ret = body.querySelector(".ret-sec"); if (col) col.appendChild(sec); else if (ret) ret.before(sec); else body.appendChild(sec); }
