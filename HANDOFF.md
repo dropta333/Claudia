@@ -1,6 +1,19 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v209** · 11 oct 2026 · Resumen general en `HANDOFF-COMPLETO.md` · Responsable: Bastián Torres
+Versión: **v211** · 11 oct 2026 · Resumen general en `HANDOFF-COMPLETO.md` · Responsable: Bastián Torres
+
+## v211 · Avatar pixel personal y asistente sin modelo
+- **Avatar 32×32 en picado** que cada persona crea y edita (Administración no puede cambiarlo). Se guarda en `persona.avatar` (`{v:1, hair, hc, eyes, fh, skin, fit, oc, dc, gl, fc, lc, acc, ac, ears, sh, pin, pc}`; `dc`/`pc` nulos = color del grupo).
+  - Editor en 4 pestañas (Cara, Pelo, Ropa, Accesorios), cintas de color, pin del grupo editable (forma, color, "Sin pin"), borrador en `localStorage` (`pxa-draft:<nombre>`) y aviso de cambios sin guardar.
+  - Se ve en la tarjeta del Home (camina en laptop, frases y recordatorios cada 30–45 s, brillo del color del grupo), en la ventana de la persona, en las fichas de Team (animación desincronizada, 72 px) y en lugar de las iniciales cuando no hay foto.
+  - Estado en una sola píldora: Automático según la carga o fijado a mano (`semaforo` / `semaforoFijo`).
+  - La pantalla de carga se mantiene hasta que el tablero queda armado (máximo 3 s, aunque no carguen las fuentes).
+- **Asistente sin modelo** (`window.PXA_AGENT`, capa `<script id="pxa-agent">`): entiende pedidos en español con los datos del tablero. Buscar y resumir proyectos y personas, mis pendientes, quién está libre, navegar, registrar horas (con el formulario oficial), crear tareas y etapas, cambiar estado de etapa o de proyecto, abrir proyecto nuevo y reportes.
+  - Toda escritura pide confirmación, respeta los permisos de siempre (`pxpPuedeEditar`, `pxpPuedeRegistrar`) y deja **Deshacer**. Los cambios quedan en el historial con "· con el asistente".
+  - `@` sugiere personas y `#` proyectos; micrófono con dictado del navegador (es-CO), sin servicios externos.
+  - Cuando llegue la IA aprobada, este catálogo de acciones se le entrega como herramientas.
+- Código: capa al final de `src/app.html` (`<style id="pxa-v211">`, `pxa-core`, `pxa-agent`, `pxa-integ`); traducciones al inglés en CAPA 31 (`// v211`).
+- Prueba: `node tools/test-v211.mjs` (21 comprobaciones: Home, editor, asistente, @, confirmación, deshacer, permisos, Team y celular).
 
 ## v210 · Home personal vuelve exactamente al mosaico de la v207 a 3 columnas: sin "Mis gráficas" (código y CSS de v208–v209 eliminados)
 
