@@ -2,6 +2,8 @@
 
 Versión: **v189** · 10 oct 2026 · Responsable: Bastián Torres
 
+## v193 · Licencias: barra integrada (buscar + acciones / estados + filtros + ordenar) con desplegables diseñados (data-dd, hoja en celular); Clientes: botones Abrir/Cerrar todos y Ver todos
+
 ## v192 · Clientes vuelven al diseño de 3 columnas (logo grande, marcas) con desplegable; Proyectos en vista personal ya no muestra todo al plegar/filtrar; Tráfico: el mosaico dejaba de reacomodarse sin fin
 
 ## v191 · Capacidad en mosaico (grupos se acomodan sin huecos, fichas con 3 proyectos y "+N más"); vista personal: caja de entregas corta (5 próximas + 2 vencidas)
