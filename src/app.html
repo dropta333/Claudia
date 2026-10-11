@@ -5009,6 +5009,65 @@ body.trf-tabla #main-grid > .section-label{display:none!important}
 .skc-more{display:inline-grid;place-items:center;min-width:28px;height:28px;padding:0 6px;border-radius:99px;border:1px solid var(--border);font:700 11.5px/1 var(--sans);color:var(--muted);background:var(--surface2)}
 .gm-card header span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .gm-card h4{overflow-wrap:anywhere}
+/* v189 · Proyectos: barra de filtros y vistas simple */
+#proj-wrap > .pvx{grid-column:1/-1;grid-row:1;display:flex;flex-direction:column;gap:10px}
+.pvx-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r-m);background:var(--surface)}
+.pvx-scope{flex:none}
+.pvx-scope button b{margin-left:6px;font-weight:700;opacity:.7}
+.pvx-q{flex:1 1 220px;min-width:0;max-width:none!important;margin:0!important}
+.pvx-fbtn{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 14px;border-radius:var(--r-s);border:1px solid var(--border);background:var(--surface2);font:600 13px/1 var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--text)}
+.pvx-fbtn .i{width:16px;height:16px}
+.pvx-fbtn b{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 5px;border-radius:99px;background:var(--brand);color:#0B0B0F;font:700 12px/1 var(--sans);letter-spacing:0}
+.pvx-fbtn.on{border-color:var(--text)}
+.pvx-fbtn:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.pvx-r{display:flex;align-items:center;gap:10px;margin-left:auto}
+.pvx-vista button{display:inline-flex;align-items:center;gap:6px}
+.pvx-vista .i{width:16px;height:16px}
+.pvx-grp{display:inline-flex;align-items:center;gap:8px;font:600 12px/1 var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.pvx-grp select{font:600 13.5px/1.1 var(--sans);letter-spacing:0;text-transform:none;padding:9px 30px 9px 12px;border-radius:var(--r-s);border:1px solid var(--border);background:var(--surface2);color:var(--text)}
+.pvx-f{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;padding:10px 12px;border:1px dashed var(--border2);border-radius:var(--r-m);background:var(--surface)}
+.pvx-fsel{flex:0 1 260px;min-width:0;font:600 14px/1.1 var(--sans);padding:9px 30px 9px 12px;border-radius:var(--r-s);border:1px solid var(--border);background:var(--surface2);color:var(--text)}
+.pvx-tags{display:flex;flex-wrap:wrap;gap:6px}
+.pvx-tag{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:99px;background:color-mix(in srgb,var(--brand) 22%,var(--surface2));border:1px solid color-mix(in srgb,var(--brand) 55%,var(--border));font:600 13px/1 var(--sans);color:var(--text)}
+.pvx-tag span{font-weight:500;color:var(--muted)}
+.pvx-tag i{font-style:normal;opacity:.6}
+.pvx-tag:hover i{opacity:1}
+.pvx-f #pv-clear{margin-left:auto}
+.pvx-f[hidden]{display:none}
+
+.pvx-chips{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0!important}
+.pvx-chips .pv-new{display:none!important}
+.pvx-new{flex:none;white-space:nowrap}
+.pvx-gl{display:inline-flex;gap:12px;margin-left:8px;padding-left:12px;border-left:1px solid var(--border)}
+#proj-wrap > #pv-list{grid-row:2!important}
+@media (max-width:900px){
+  .pvx-r{margin-left:0;width:100%;justify-content:space-between}
+  .pvx-fsel{flex:1 1 100%}
+}
+@media (max-width:640px){
+  .pvx-bar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
+  .pvx-scope{grid-column:1/-1;display:flex!important;width:100%}
+  .pvx-scope button{flex:1}
+  .pvx-q{grid-column:1;flex:none;width:auto}
+  .pvx-fbtn{grid-column:2}
+  .pvx-r{grid-column:1/-1;display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;width:100%}
+  .pvx-vista{display:inline-flex!important;flex-direction:row!important}
+  .pvx-vista span{display:none}
+  .pvx-grp{min-width:0}
+  .pvx-grp select{width:100%;min-width:0}
+  .pvx-new{grid-column:1/-1;justify-content:center}
+  .pvx-f #pv-clear{margin-left:0}
+  .pvx-gl{margin-left:0;padding-left:0;border-left:0}
+}
+/* v189 · "Ver más" de a 5 */
+.vm-list > .vm-h{display:none!important}
+.vm-list.pe-list{display:flex;flex-direction:column;gap:8px}
+.vm-list.pm-projs{display:flex;flex-direction:column;gap:8px}
+.vm-btn{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin:8px 0 2px;padding:7px 14px;border:1px solid var(--border);border-radius:99px;background:var(--surface2);font:600 13px/1 var(--sans);color:var(--text)}
+.vm-btn::before{content:"+";font-weight:700;color:var(--text)}
+.vm-btn span{font-weight:500;color:var(--muted)}
+.vm-btn:hover{border-color:var(--border2)}
+.vm-btn:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 .pj-dot.bloqueada{border-color:#F0476B;background:color-mix(in srgb,#F0476B 30%,var(--surface))}
 .pj-dot.revision,.pj-dot.ajustes{border-color:var(--sc,#FF9F43);background:color-mix(in srgb,#FF9F43 30%,var(--surface))}
 
@@ -11551,6 +11610,23 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   const ET_SUG = ["Offline", "Color", "Online", "Audio", "Revisión", "Entrega"];
   const ET_LBL = { pendiente: ["Pendiente", "var(--muted)"], en_curso: ["En curso", "var(--blue)"], bloqueada: ["Bloqueada", "#F0476B"], ajustes: ["En ajustes", "#FF9F43"], revision: ["En revisión", "#61B3FF"], listo: ["Listo", "var(--green)"] };
   const fCorta = (s) => s ? s.slice(8, 10) + "/" + s.slice(5, 7) : "";
+  // v189 · "Ver más" de a 5: lista con los primeros visibles y un botón que muestra otros 5 cada vez (al final, "Ver menos")
+  const VM = 5;
+  function verMas(key, items, cls) {
+    const n = items.length; if (n <= VM + 1) return `<div class="vm-list ${cls || ""}">${items.join("")}</div>`;
+    const vis = Math.min(n, Math.max(VM, ((window.__vm || {})[key]) || VM));
+    return `<div class="vm-list ${cls || ""}" data-vm="${esc(key)}">${items.map((h, i) => i < vis ? h : h.replace(/^(\s*<\w+[^>]*?\bclass=")/, "$1vm-h ")).join("")}</div>${vmBtn(vis, n)}`;
+  }
+  const vmBtn = (vis, n) => `<button type="button" class="vm-btn" onclick="pxpVerMas(this)">${vis >= n ? "Ver menos" : `Ver ${Math.min(VM, n - vis)} más <span>· quedan ${n - vis}</span>`}</button>`;
+  window.pxpVerMas = function (btn) {
+    const list = btn.previousElementSibling; if (!list) return;
+    const it = Array.from(list.children), n = it.length, vis = it.filter(e => !e.classList.contains("vm-h")).length;
+    const nuevo = vis >= n ? VM : Math.min(n, vis + VM);
+    it.forEach((e, i) => e.classList.toggle("vm-h", i >= nuevo));
+    (window.__vm = window.__vm || {})[list.dataset.vm] = nuevo;
+    btn.outerHTML = vmBtn(nuevo, n);
+    if (nuevo === VM) list.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  };
   function etapasPersona(p, projs) {
     const adm = !window.pxpPuedeEditar || pxpPuedeEditar(), me = normName(p.name), t0 = today();
     const L = [];
@@ -11577,7 +11653,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
         <small class="note">Empieza cuando termine la última etapa del proyecto. Las fechas se ajustan después en el proyecto.</small></div>`;
     }
     return `<section class="pm-sec pe-sec"><h3>Etapas <span class="cnt">${act.length} activa${act.length !== 1 ? "s" : ""}</span>${adm && !(asig && asig.n === me) ? `<button type="button" class="linkbtn pe-add" onclick="pxpPeA('new','${ea(p.name)}')">+ Asignar etapa</button>` : ""}</h3>
-      ${form}${act.length ? `<div class="pe-list">${act.map(row).join("")}</div>` : (form ? "" : `<p class="note">${adm ? "No tiene etapas activas. Asígnale una con “+ Asignar etapa”." : "No tiene etapas activas asignadas."}</p>`)}
+      ${form}${act.length ? verMas("e:" + normName(p.name), act.map(row), "pe-list") : (form ? "" : `<p class="note">${adm ? "No tiene etapas activas. Asígnale una con “+ Asignar etapa”." : "No tiene etapas activas asignadas."}</p>`)}
       ${hechas.length ? `<details class="tl-more"><summary>Terminadas (${hechas.length})</summary><div class="pe-list">${hechas.slice(0, 20).map(row).join("")}</div></details>` : ""}</section><section class="pm-sec pc-sec cr-sec"><h3>Cronograma</h3>${pxpCronoPersona(p.name)}</section>`;
   }
   window.pxpPeA = async function (a, v, silent) {
@@ -11621,9 +11697,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
         <button class="proj-pill ${cx}" onclick="cycleProjComplejidad('${ea(x.key)}')" title="Cambiar complejidad">${cx}</button>
         <button class="xbtn" title="Quitar de su lista" onclick="pxpPersonRemove('${ea(x.key)}')">${removing === x.key ? "¿Quitar?" : ICON.x}</button></div>`;
     });
-    // v188 · Con muchos proyectos se ven los primeros 6 y el resto en "Ver más" (no empuja el resto de la ventana hacia abajo)
-    const PMV = 6, abiertoP = !!((window.__pmProjAbiertos || {})[normName(p.name)]);
-    const rows = rowsArr.length > PMV + 1 ? rowsArr.slice(0, PMV).join("") + `<details class="tl-more pj-nmore pm-pmore"${abiertoP ? " open" : ""} ontoggle="(window.__pmProjAbiertos=window.__pmProjAbiertos||{})['${ea(normName(p.name))}']=this.open"><summary><span class="nm-c">Ver ${rowsArr.length - PMV} proyectos más</span><span class="nm-o">Ver menos</span></summary>${rowsArr.slice(PMV).join("")}</details>` : rowsArr.join("");
+    // v189 · Con muchos proyectos se ven 5 y "Ver más" muestra otros 5 cada vez
+    const rows = rowsArr.length ? verMas("p:" + normName(p.name), rowsArr, "pm-projs") : "";
     // proyectos disponibles para asignar, agrupados por cliente
     const byCli = {};
     getAllKnownProjectKeys().forEach(k => { if (have.has(k)) return; const pr = getProjectDisplay(k); if (pr.estadoGeneral === "entregado") return; const c = (pr.cliente || "").trim() || "Sin cliente"; (byCli[c] = byCli[c] || []).push({ k, n: pr.nombre || k }); });
@@ -11715,9 +11790,9 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   });
 
   // ═════════ PROYECTOS: agrupados por cliente y ordenables ═════════
-  const PV_KEY = "pxp_pv_v2";
+  const PV_KEY = "pxp_pv_v3";   // v189 · nuevos valores por defecto: activos y agrupados por cliente
 
-  let pv = Object.assign({ group: "none", sort: "nombre", dir: 1, gdir: 1, complejidad: "", tipo: "", agencia: "", collapsed: {} }, (() => { try { return JSON.parse(localStorage.getItem(PV_KEY) || "{}"); } catch (e) { return {}; } })());
+  let pv = Object.assign({ group: "cliente", alcance: "activos", fopen: false, sort: "nombre", dir: 1, gdir: 1, complejidad: "", tipo: "", agencia: "", collapsed: {} }, (() => { try { return JSON.parse(localStorage.getItem(PV_KEY) || "{}"); } catch (e) { return {}; } })());
   if (pv.sort === "etapa") pv.sort = "avance";
   const pvSave = () => { try { localStorage.setItem(PV_KEY, JSON.stringify(pv)); } catch (e) { } };
   const ORD_EST = { cotizado: 0, preproduccion: 0.5, rodaje: 1, en_produccion: 2, revision: 3, standby: 4, entregado: 5, aprobado: 6 };
@@ -11759,6 +11834,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
 
   function applyFilters(keys) {
     let rows = keys.map(k => ({ key: k, p: getProjectDisplay(k) }));
+    if (pv.alcance !== "todos" && !projectsFilter.estado) rows = rows.filter(r => (r.p.estadoGeneral || "en_produccion") !== "entregado");   // v189 · Activos: sin los entregados
     if (projectsFilter.estado) rows = rows.filter(r => (r.p.estadoGeneral || "en_produccion") === projectsFilter.estado);
     if (projectsFilter.cliente) rows = rows.filter(r => (r.p.cliente || "") === projectsFilter.cliente);
     if (pv.complejidad) rows = rows.filter(r => (r.p.complejidad || "medio") === pv.complejidad);
@@ -11852,6 +11928,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     ids.forEach(id => pv.collapsed[id] = closed); pvSave(); refreshList();
   };
   window.pvGroup = function (g) { pv.group = g; if (g === "cliente" && pv.sort === "cliente") pv.sort = "nombre"; if (g !== "cliente" && pv.sort === "marca") pv.sort = "nombre"; pvSave(); renderProjects(); };
+  window.pvAlcance = function (v) { pv.alcance = v; if (v === "activos" && projectsFilter.estado === "entregado") projectsFilter.estado = ""; pvSave(); renderProjects(); };
+  window.pvFiltros = function () { pv.fopen = !pv.fopen; pvSave(); const f = $("pvx-f"), b = document.querySelector(".pvx-fbtn"); if (f) f.hidden = !pv.fopen; if (b) { b.classList.toggle("on", pv.fopen); b.setAttribute("aria-expanded", String(pv.fopen)); } };
   window.pvGdir = function () { pv.gdir = -(pv.gdir || 1); pvSave(); renderProjects(); };
   window.pvClear = function () { projectsFilter = { estado: "", cliente: "", persona: "", search: "" }; pv.complejidad = ""; pv.tipo = ""; pv.agencia = ""; pvSave(); renderProjects(); };
   window.pvSet = function (field, v) { if (field === "complejidad" || field === "tipo" || field === "agencia") { pv[field] = v; pvSave(); } else projectsFilter[field] = v; refreshList(); };
@@ -11863,21 +11941,38 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     keys.forEach(k => { const e = (PROJECTS[k] && PROJECTS[k].estadoGeneral) || "en_produccion"; if (cnt[e] !== undefined) cnt[e]++; });
     const chip = (e, l, cls) => `<button class="pv-chip${projectsFilter.estado === e ? " on" : ""} ${cls}" onclick="pvSet('estado','${projectsFilter.estado === e ? "" : e}');renderProjects()"><b>${cnt[e]}</b> ${l}</button>`;
     const gbtn = (v, l) => `<button class="${pv.group === v ? "on" : ""}" onclick="pvGroup('${v}')">${l}</button>`;
+    // v189 · Barra simple: Activos/Todos · buscar · Filtros (desplegable) · vista · agrupar
+    const nFil = [projectsFilter.estado, projectsFilter.cliente, projectsFilter.persona, pv.complejidad, pv.tipo, pv.agencia].filter(Boolean).length;
+    const activos = keys.filter(k => ((PROJECTS[k] && PROJECTS[k].estadoGeneral) || "en_produccion") !== "entregado").length;
+    const vista = window.pxpVistaProyActual ? pxpVistaProyActual() : "fichas";
+    const IV = { fichas: "<svg class='i' viewBox='0 0 24 24' aria-hidden='true'><rect x='4' y='4' width='7' height='7' rx='1.5'/><rect x='13' y='4' width='7' height='7' rx='1.5'/><rect x='4' y='13' width='7' height='7' rx='1.5'/><rect x='13' y='13' width='7' height='7' rx='1.5'/></svg>", filas: "<svg class='i' viewBox='0 0 24 24' aria-hidden='true'><path d='M4 6h16M4 12h16M4 18h16'/></svg>", filtro: "<svg class='i' viewBox='0 0 24 24' aria-hidden='true'><path d='M4 5h16l-6 7.5V19l-4-2v-4.5z'/></svg>" };
+    const GR = [["cliente", "Cliente"], ["agencia", "Agencia"], ["tipo", "Tipo"], ["estado", "Estado"], ["none", "Sin agrupar"]];
     wrap.innerHTML = `
-      <div class="pv-bar">
-        <label class="pv-search">${ICON.search}<input type="text" id="pv-search" placeholder="Buscar por proyecto, cliente o marca" value="${esc(projectsFilter.search)}" oninput="pvSet('search',this.value)" aria-label="Buscar"></label>
-        <select onchange="pvSet('estado',this.value)" aria-label="Filtrar por estado"><option value="">Todos los estados</option>${["cotizado", "preproduccion", "rodaje", "en_produccion", "revision", "standby", "entregado"].map(e => `<option value="${e}" ${projectsFilter.estado === e ? "selected" : ""}>${EST_LBL[e]}</option>`).join("")}</select>
-        <select onchange="pvSet('cliente',this.value)" aria-label="Filtrar por cliente"><option value="">Todos los clientes</option>${clientes.map(c => `<option value="${esc(c)}" ${projectsFilter.cliente === c ? "selected" : ""}>${esc(c)}</option>`).join("")}</select>
-        <select onchange="pvSet('complejidad',this.value)" aria-label="Filtrar por complejidad"><option value="">Toda complejidad</option>${["simple", "medio", "complejo"].map(c => `<option value="${c}" ${pv.complejidad === c ? "selected" : ""}>${c[0].toUpperCase() + c.slice(1)}</option>`).join("")}</select>
-        <select onchange="pvSet('tipo',this.value)" aria-label="Filtrar por tipo"><option value="">Todos los tipos</option>${window.pxpTipos.map(t => `<option value="${t}" ${pv.tipo === t ? "selected" : ""}>${t}</option>`).join("")}</select>
-        <select onchange="pvSet('agencia',this.value)" aria-label="Filtrar por agencia"><option value="">Todas las agencias</option>${window.pxpAgencias().map(a => `<option value="${esc(a)}" ${norm(pv.agencia) === norm(a) ? "selected" : ""}>${esc(a)}</option>`).join("")}</select>
-        <button class="btn-ghost sm" id="pv-clear" onclick="pvClear()" ${hasFilters() ? "" : "hidden"}>Limpiar filtros</button>
-      </div>
-      <div class="pv-bar2">
-        <div class="pv-chips"><span class="pv-tot"><b>${cnt.total}</b> proyectos</span>${chip("cotizado", "cotizados", "c-gray")}${chip("preproduccion", "en preproducción", "c-mint")}${chip("rodaje", "en rodaje", "c-orange")}${chip("en_produccion", "en postproducción", "c-blue")}${chip("revision", "en revisión", "c-sky")}${chip("standby", "en standby", "c-pink")}${chip("entregado", "entregados", "c-green")}
-          ${projectsFilter.persona ? `<span class="filter-chip">Responsable: ${esc(projectsFilter.persona)} <button onclick="pvClear()">✕ quitar</button></span>` : ""}</div>
-        <div class="pv-tools"><span class="seg-l">Agrupar por</span><div class="seg" role="group" aria-label="Agrupar">${gbtn("cliente", "Cliente")}${gbtn("agencia", "Agencia")}${gbtn("tipo", "Tipo")}${gbtn("estado", "Estado")}${gbtn("none", "Sin agrupar")}</div>
-          ${pv.group === "cliente" ? `<button class="linkbtn" onclick="pvGdir()" title="Cambiar el orden de los clientes">Clientes ${(pv.gdir || 1) > 0 ? "A → Z" : "Z → A"}</button>` : ""}${pv.group !== "none" ? `<button class="linkbtn" onclick="pvAll(true)">Esconder todos</button><button class="linkbtn" onclick="pvAll(false)">Mostrar todos</button>` : ""}</div>
+      <div class="pvx">
+        <div class="pvx-bar">
+          <div class="seg pvx-scope" role="group" aria-label="Qué proyectos ver"><button class="${pv.alcance !== "todos" ? "on" : ""}" onclick="pvAlcance('activos')">Activos <b>${activos}</b></button><button class="${pv.alcance === "todos" ? "on" : ""}" onclick="pvAlcance('todos')">Todos <b>${keys.length}</b></button></div>
+          <label class="pv-search pvx-q">${ICON.search}<input type="text" id="pv-search" placeholder="Buscar proyecto, cliente o marca" value="${esc(projectsFilter.search)}" oninput="pvSet('search',this.value)" aria-label="Buscar"></label>
+          <button type="button" class="pvx-fbtn${pv.fopen ? " on" : ""}${nFil ? " has" : ""}" onclick="pvFiltros()" aria-expanded="${!!pv.fopen}" aria-controls="pvx-f">${IV.filtro}Filtros${nFil ? `<b>${nFil}</b>` : ""}</button>
+          <div class="pvx-r">
+            <div class="seg pvx-vista" role="group" aria-label="Vista"><button class="${vista !== "filas" ? "on" : ""}" onclick="pxpVistaProy('fichas')" aria-label="Fichas" data-tip="Fichas">${IV.fichas}<span>Fichas</span></button><button class="${vista === "filas" ? "on" : ""}" onclick="pxpVistaProy('filas')" aria-label="Filas" data-tip="Filas">${IV.filas}<span>Filas</span></button></div>
+            <label class="pvx-grp"><span>Agrupar</span><select onchange="pvGroup(this.value)" aria-label="Agrupar por">${GR.map(([v, l]) => `<option value="${v}" ${pv.group === v ? "selected" : ""}>${l}</option>`).join("")}</select></label>
+            ${typeof pxpPuedeEditar !== "function" || pxpPuedeEditar() ? `<button type="button" class="btn-new proj pvx-new" onclick="pxpNewProject()"><svg class='i' viewBox='0 0 24 24' aria-hidden='true'><path d='M12 5v14M5 12h14'/></svg><span>Nuevo proyecto</span></button>` : ""}
+          </div>
+        </div>
+        <div class="pvx-f" id="pvx-f" ${pv.fopen ? "" : "hidden"}>
+          ${(() => {   // v189 · un solo selector con todos los filtros agrupados; los aplicados quedan como etiquetas
+            const F = [["estado", "Estado", ["cotizado", "preproduccion", "rodaje", "en_produccion", "revision", "standby", "entregado"].map(e => [e, EST_LBL[e]]), projectsFilter.estado],
+              ["cliente", "Cliente", clientes.map(c => [c, c]), projectsFilter.cliente], ["agencia", "Agencia", window.pxpAgencias().map(a => [a, a]), pv.agencia],
+              ["tipo", "Tipo", window.pxpTipos.map(t => [t, t]), pv.tipo], ["complejidad", "Complejidad", ["simple", "medio", "complejo"].map(c => [c, c[0].toUpperCase() + c.slice(1)]), pv.complejidad]];
+            const sel = `<select class="pvx-fsel" onchange="if(this.value){const i=this.value.indexOf('|');pvSet(this.value.slice(0,i),this.value.slice(i+1));renderProjects()}" aria-label="Agregar un filtro"><option value="">Filtrar por…</option>${F.map(([k, l, ops, cur]) => `<optgroup label="${l}">${ops.map(([v, t]) => `<option value="${k}|${esc(v)}" ${cur && norm(cur) === norm(v) ? "disabled" : ""}>${esc(t)}</option>`).join("")}</optgroup>`).join("")}</select>`;
+            const tags = F.filter(f => f[3]).map(([k, l, ops, cur]) => { const o = ops.find(x => norm(x[0]) === norm(cur)); return `<button type="button" class="pvx-tag" onclick="pvSet('${k}','');renderProjects()" aria-label="Quitar filtro ${l}"><span>${l}:</span> ${esc(o ? o[1] : cur)} <i aria-hidden="true">✕</i></button>`; }).join("");
+            return sel + (tags ? `<div class="pvx-tags">${tags}</div>` : "");
+          })()}
+          <button class="linkbtn" id="pv-clear" onclick="pvClear()" ${hasFilters() ? "" : "hidden"}>Limpiar filtros</button>
+        </div>
+        <div class="pv-chips pvx-chips">${chip("cotizado", "cotizados", "c-gray")}${chip("preproduccion", "en preproducción", "c-mint")}${chip("rodaje", "en rodaje", "c-orange")}${chip("en_produccion", "en postproducción", "c-blue")}${chip("revision", "en revisión", "c-sky")}${chip("standby", "en standby", "c-pink")}${chip("entregado", "entregados", "c-green")}
+          ${projectsFilter.persona ? `<span class="filter-chip">Responsable: ${esc(projectsFilter.persona)} <button onclick="pvClear()">✕ quitar</button></span>` : ""}
+          ${pv.group !== "none" ? `<span class="pvx-gl">${pv.group === "cliente" ? `<button class="linkbtn" onclick="pvGdir()" title="Cambiar el orden de los clientes">${(pv.gdir || 1) > 0 ? "A → Z" : "Z → A"}</button>` : ""}<button class="linkbtn" onclick="pvAll(true)">Plegar todos</button><button class="linkbtn" onclick="pvAll(false)">Desplegar todos</button></span>` : ""}</div>
       </div>
       <div id="pv-list"></div>`;
     refreshList();
@@ -14834,6 +14929,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
 
   // ═════════ PROYECTOS: vista Filas / Fichas (se recuerda por persona y navegador) ═════════
   window.pxpVistaProy = function (v) { setPref("pxp_vista_proy_v2", v); renderProjects(); };
+  window.pxpVistaProyActual = () => pref("pxp_vista_proy_v2", "fichas");
   const oRP = window.renderProjects;
   window.renderProjects = function () {
     const r = oRP.apply(this, arguments);
@@ -18338,6 +18434,8 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     "Mi carga": "My load", "próximas semanas": "upcoming weeks", "Cuando tengas etapas asignadas verás aquí cuántas horas te esperan cada semana.": "When you have stages assigned, you'll see here how many hours await you each week.", "Ver menos": "Show less",
     "Traer datos de otro servidor": "Import from another server", "Migración": "Migration", "Dirección del tablero antiguo": "Old board address", "Descargar copia de lo actual primero": "Download a backup of the current data first", "Traer y combinar": "Import and merge", "Hecho": "Done",
     "Leyendo el tablero antiguo…": "Reading the old board…", "Guardando…": "Saving…", "Copia completa descargada (incluye licencias, logros y todos los ajustes).": "Full backup downloaded (includes licenses, achievements and all settings).",
+    "Activos": "Active", "Filtros": "Filters", "Agrupar": "Group", "Plegar todos": "Collapse all", "Desplegar todos": "Expand all", "Buscar proyecto, cliente o marca": "Search project, client or brand", "Qué proyectos ver": "Which projects to show",
+    "Activos": "Active", "Filtros": "Filters", "Agrupar": "Group", "Plegar todos": "Collapse all", "Desplegar todos": "Expand all", "Buscar proyecto, cliente o marca": "Search project, client or brand", "Filtrar por…": "Filter by…", "Complejidad": "Complexity", "Agencia": "Agency", "Estado": "Status", "Tipo": "Type", "Cliente": "Client",
     "Otorgar logro": "Give achievement", "Míos": "Mine", "Mi grupo": "My group", "Especial": "Special", "Personal": "Personal", "Quitar": "Remove",
     ": quedan guardados aquí (no se borran) pero ya no aparecen en Traffic ni suman en los totales de \"proyectos\" del tablero.": ": they're kept here (not deleted) but no longer appear in Traffic or count in the board's \"projects\" totals.",
     "En el repositorio": "In the repository", "Línea de tiempo": "Timeline", "cuándo se trabajó cada proyecto y con quién": "when each project was worked on and with whom", "Por fecha": "By date",
@@ -18351,6 +18449,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     [/^(\d+) personas de post$/, (m, n) => `${n} post people`], [/^Lograste (\d+) logros? nuevos?$/, (m, n) => `You earned ${n} new achievement${n === "1" ? "" : "s"}`], [/^Última actualización: (.+)$/, (m, a) => `Last update: ${a}`],
     [/^(.*)Todos los derechos reservados\.$/, (m, a) => `${a}All rights reserved.`], [/^(.+) \(cliente por confirmar\)$/, (m, a) => `${a} (client to be confirmed)`],
     [/^Ver (\d+) notas? más$/, (m, n) => `Show ${n} more note${n === "1" ? "" : "s"}`], [/^Ver menos$/, () => "Show less"],
+    [/^Ver (\d+) más · quedan (\d+)$/, (m, a, b) => `Show ${a} more · ${b} left`], [/^· quedan (\d+)$/, (m, b) => `· ${b} left`], [/^Ver (\d+) más$/, (m, a) => `Show ${a} more`],
     [/^salió el (.+)$/, (m, d) => `left on ${trText(d) || d}`], [/^(.+?) Cuenta las asignaciones en Tráfico con el tipo elegido en cada proyecto; si no tiene, se deduce del nombre\.$/, (m, w) => `${/^Semana /.test(w) ? fecha(w.replace(/^Semana /, "Week ")) : w} Counts Traffic assignments with the type chosen in each project; if it has none, it's inferred from the name.`]
   );
   function trText(raw) {

@@ -7,8 +7,8 @@ await page.goto("file://" + path.resolve("dist/preview.html")); await page.waitF
 await page.evaluate(() => { window.pxpSaveBase = function () { }; try { localStorage.setItem("pxp_lg_off", "1"); } catch (e) { } enterApp({ name: "Bastián Torres" }, "preview"); });
 await page.waitForTimeout(1800); await page.evaluate(() => { for (let i = 0; i < 6; i++) try { pxpLogroCerrar(); } catch (e) { } switchView("traffic"); });
 const ok = [], fail = []; const check = (n, c) => (c ? ok : fail).push(n);
-await page.evaluate(() => { localStorage.setItem("pxp_vista_proy_v2", "fichas"); switchView("projects"); }); await page.waitForTimeout(1000);
-const agrupar = async (t) => { for (const x of await page.$$("#view-projects .pv-tools button")) if (new RegExp("^" + t + "$", "i").test((await x.innerText()).trim())) { await x.click(); break; } await page.waitForTimeout(900); };
+await page.evaluate(() => { switchView("projects"); pvAlcance("todos"); }); await page.waitForTimeout(1000);
+const agrupar = async (t) => { const v = { cliente: "cliente", agencia: "agencia", estado: "estado", tipo: "tipo", "sin agrupar": "none" }[t.toLowerCase()]; await page.selectOption(".pvx-grp select", v); await page.waitForTimeout(900); };
 const revisar = () => page.evaluate(() => {
   const g = document.querySelector("#proj-wrap .pvc-grid.pvc-blocks"); if (!g) return null;
   const cols = getComputedStyle(g).gridTemplateColumns.split(" ").length, bs = [...g.querySelectorAll(":scope > .pvc-blk")];

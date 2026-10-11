@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v188** · 10 oct 2026 · Responsable: Bastián Torres
+Versión: **v189** · 10 oct 2026 · Responsable: Bastián Torres
 
 ## Cómo está armado ahora
 - **Una sola fuente:** `src/app.html`, con todo el CSS y las capas JS.
@@ -210,6 +210,8 @@ Versión: **v188** · 10 oct 2026 · Responsable: Bastián Torres
 - **v187:** ingreso en Netlify: la lista agrupa por equipo antes de entrar (precargarGrupos lee /api/state y calcula los grupos sin tocar los datos; antes todos caían en "Otros"). Proyectos en fichas agrupadas: cada grupo en un bloque (.pvc-blk) que ocupa las columnas que necesita, lado a lado con grid dense. Ventana de grupo: selector de formas en 2 filas de 10 (5 por fila en celular), encabezado que no se tapa en celular, forma elegida más visible; tarjetas con skills compactas (pxpSkillsCompact, íconos con nombre al pasar el cursor y +N). Las redes por cargo (roleStyle) usan la forma elegida para el grupo. Prueba: tools/test-v187.mjs y el ingreso en tools/netlify-e2e.mjs.
 
 - **v188:** ventana de persona: la red de proyectos con más de 12 proyectos usa un lienzo ancho y dos anillos alternados (svg.big ocupa todo el ancho); "Sus proyectos" muestra 6 y el resto en "Ver N proyectos más" (recuerda si estaba abierto por persona); Logros: individuales a lo ancho y de grupo y de equipo en la misma fila (.lg-pb).
+
+- **v189:** Proyectos: barra nueva (.pvx) con Activos/Todos (pv.alcance; Activos oculta los entregados salvo que se filtre por ese estado), buscador, botón Filtros (un solo selector con todos los filtros agrupados; los aplicados quedan como etiquetas con ✕), vista Fichas/Filas, Agrupar (desplegable) y Nuevo proyecto. Preferencias en pxp_pv_v3 con valores por defecto: fichas, activos, por cliente. Ventana de persona: Sus proyectos y Etapas con "Ver 5 más" (verMas/pxpVerMas, recuerda cuántos por persona). Prueba: tools/test-v189.mjs.
 
 ## No cambiar sin consultar
 - El ZIP de Netlify va sin datos, y no se guarda nada antes de cargar los datos del servidor.
