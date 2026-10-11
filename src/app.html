@@ -3196,7 +3196,7 @@ g.rv-s{stroke-width:4}
 .gm-forma button{all:unset;cursor:pointer;display:grid;place-items:center;width:34px;height:34px;border-radius:9px;border:1px solid var(--border);background:var(--bg)}
 .gm-forma button svg{width:22px;height:22px;overflow:visible}
 .gm-forma button .gb-s{fill:color-mix(in srgb,var(--text) 10%,transparent);stroke:var(--muted);stroke-width:1.8;stroke-linejoin:round}
-.gm-forma button.on{border-color:var(--brand)}
+.gm-forma button.on{border:2px solid var(--text)!important;background:color-mix(in srgb,var(--brand) 22%,var(--bg))}
 .gm-forma button.on .gb-s{stroke:var(--brand);fill:color-mix(in srgb,var(--brand) 22%,transparent)}
 .gm-forma button:focus-visible{outline:2px solid var(--brand)}
 .gm-body{padding:20px 22px}
@@ -4641,10 +4641,19 @@ body.trf-tabla #main-grid > .section-label{display:none!important}
 /* ═════ v83 · Formas en filas parejas y gestión de integrantes en la ventana del grupo ═════ */
 .gf-sh-row{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px!important}
 .gf-sh-row button{width:100%!important}
-.gm-forma{display:grid!important;grid-template-columns:auto repeat(15,minmax(0,1fr));align-items:center;gap:6px!important}
-.gm-forma > span{padding-right:6px;white-space:nowrap}
-.gm-forma button{width:100%!important;min-width:0}
-@media (max-width:900px){ .gm-forma{grid-template-columns:repeat(5,minmax(0,1fr))} .gm-forma > span{grid-column:1/-1} }
+/* v187 · Selector de formas: la etiqueta arriba y las 20 formas en una rejilla pareja que se adapta al ancho */
+.gm-forma{display:grid!important;grid-template-columns:repeat(10,minmax(0,46px));justify-content:start;align-items:center;gap:6px!important}
+@media (max-width:600px){ .gm-forma{grid-template-columns:repeat(5,minmax(0,1fr))} }
+/* encabezado de la ventana de grupo en celular: el título completo y "Editar grupo" debajo */
+@media (max-width:600px){
+  .gm-head{flex-wrap:wrap;row-gap:10px}
+  .gm-head .pm-id{flex:1 1 calc(100% - 150px);min-width:0}
+  .gm-head .pm-id h2{white-space:normal;overflow-wrap:anywhere;font-size:clamp(22px,7.4vw,30px);line-height:1.05}
+  .gm-head > .btn-ghost{order:9;margin-left:70px}
+}
+.gm-forma > span{grid-column:1/-1;padding:0 0 2px;white-space:nowrap}
+.gm-forma button{width:100%!important;min-width:0;height:auto!important;aspect-ratio:1;max-height:46px}
+.gm-forma button svg{width:60%!important;height:60%!important}
 .gm-forma.in{grid-template-columns:repeat(5,minmax(0,1fr))}
 .gm-card{position:relative}
 .gm-x{position:absolute;top:10px;right:10px;width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;font-size:13px;opacity:.55;transition:opacity .15s,background .15s}
@@ -4989,6 +4998,16 @@ body.trf-tabla #main-grid > .section-label{display:none!important}
 #main-grid.trf-med{align-items:start!important}
 #main-grid.trf-mas{grid-auto-rows:4px!important;row-gap:0!important;align-items:start!important}
 #main-grid.trf-mas > *{margin-top:0!important;margin-bottom:0!important}
+/* v187 · Tarjetas de la ventana de grupo: skills compactas (íconos) y textos ordenados */
+.gm-sk{display:flex!important;flex-direction:column;gap:8px}
+.gm-sk .skc-row{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:0}
+.gm-sk .skc-row .sk-l{flex:none;font:700 10.5px/1 var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.gm-sk .skc-row .sk-list{display:flex;flex-wrap:wrap;gap:4px;min-width:0}
+.gm-sk .skc.sm{padding:0!important;width:28px;height:28px;display:inline-grid;place-items:center;border-radius:50%}
+.gm-sk .skc.sm .ski,.gm-sk .skc.sm .swm{width:20px!important;height:20px!important}
+.skc-more{display:inline-grid;place-items:center;min-width:28px;height:28px;padding:0 6px;border-radius:99px;border:1px solid var(--border);font:700 11.5px/1 var(--sans);color:var(--muted);background:var(--surface2)}
+.gm-card header span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gm-card h4{overflow-wrap:anywhere}
 .pj-dot.bloqueada{border-color:#F0476B;background:color-mix(in srgb,#F0476B 30%,var(--surface))}
 .pj-dot.revision,.pj-dot.ajustes{border-color:var(--sc,#FF9F43);background:color-mix(in srgb,#FF9F43 30%,var(--surface))}
 
@@ -12284,7 +12303,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     "Master": { cat: "Mastering / Data", shape: "trid" },
     "Casa de Audio": { cat: "Audio", shape: "ring" },
   };
-  const roleStyle = (label) => { const r = ROLE_STYLE[label] || { cat: "Otros", shape: "circle" }; return { ...r, color: (window.pxpCargoColor ? window.pxpCargoColor(r.cat) : "#8E8E96") }; };
+  const roleStyle = (label) => { const r = ROLE_STYLE[label] || { cat: "Otros", shape: "circle" }; return { ...r, shape: (window.pxpGrupoForma && window.pxpGrupoForma(r.cat)) || r.shape, color: (window.pxpCargoColor ? window.pxpCargoColor(r.cat) : "#8E8E96") }; };   // v187 · forma del grupo
   function poly(n, cx, cy, r, rot) { const pts = []; for (let i = 0; i < n; i++) { const a = rot + i * Math.PI * 2 / n; pts.push((cx + r * Math.cos(a)).toFixed(1) + "," + (cy + r * Math.sin(a)).toFixed(1)); } return pts.join(" "); }
   const EXT = { hex: 1.1, square: 1, diamond: 1.22, tri: 1.3, trid: 1.3, penta: 1.14, octa: 1.08, star: 1.3, ring: 1.12, circle: 1, hexh: 1.1, shield: 1.12, leaf: 1, drop: 1.05, cross: 1.08, hepta: 1.1, kite: 1.2, para: 1.1, burst: 1.18, arch: 1 };
   // Rectángulo con radios distintos por esquina (hoja, gota)
@@ -15311,7 +15330,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const title = document.querySelector('#view-team .team-section-title[data-g="Audio"]'); if (!title) return;
     const sec = title.closest(".team-section"), list = window.pxpCasas();
     if (!list.length && !can()) return;
-    const rows = list.map(c => `<div class="team-row casa-row"><span class="av ini casa-av" style="--s:30px;--c:#A06BFF">${esc(c.name.slice(0, 2))}</span><span class="team-name">${esc(c.name)}</span><span class="team-role">Casa de audio${c.members.length ? " · " + esc(c.members.map(n => n.split(" ")[0]).join(", ")) : ""}</span>
+    const rows = list.map(c => `<div class="team-row casa-row">${(() => { const gc = window.pxpCargoColor ? pxpCargoColor("Audio") : "#A06BFF", sh = window.pxpGrupoForma ? pxpGrupoForma("Audio") : "circle"; return `<span class="av shp ini casa-av" data-sh="${sh}" data-g="Audio" style="--s:30px;--c:${gc};--gc:${gc}"><span class="avi">${esc(c.name.slice(0, 2))}</span></span>`; })()}<span class="team-name">${esc(c.name)}</span><span class="team-role">Casa de audio${c.members.length ? " · " + esc(c.members.map(n => n.split(" ")[0]).join(", ")) : ""}</span>
       <span class="team-total" onclick="filterProjectsByPerson('${ea(c.name)}')" title="Ver sus proyectos en Proyectos">${casaCount(c)} proyecto${casaCount(c) === 1 ? "" : "s"} ↗</span>${can() ? `<button class="grp-edit" onclick="pxpCasaEdit('${ea(c.name)}')" aria-label="Editar la casa ${esc(c.name)}" data-tip="Editar casa de audio">${IC.pen}</button>` : ""}</div>`).join("");
     sec.insertAdjacentHTML("beforeend", `<div class="casas" id="team-casas"><div class="casas-h">${IC.bld}Casas de audio<span>las casas que aparecen en las fichas de los proyectos</span>${can() ? `<button class="linkbtn" onclick="pxpCasaEdit('')">+ Agregar casa</button>` : ""}</div>${rows || `<p class="note" style="margin:6px 0 0">Todavía no hay casas de audio.</p>`}</div>`);
   }
@@ -18484,6 +18503,12 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     return (sk.length ? `<div class="sk-row"><span class="sk-l">${L("Skills", "Skills")}</span><div class="sk-list">${sk.map(s => skChip(s)).join("")}</div></div>` : "")
       + (sw.length ? `<div class="sk-row"><span class="sk-l">${L("Software y plataformas", "Software and platforms")}</span><div class="sk-list">${sw.map(s => swChip(s)).join("")}</div></div>` : "");
   };
+  // v187 · Versión compacta para tarjetas (ventana de grupo): solo íconos, con el nombre al pasar el cursor, y "+N" si hay muchas
+  window.pxpSkillsCompact = function (p, max) {
+    const { sk, sw } = skillsDe(p), M = max || 8;
+    const fila = (lista, chip, l) => lista.length ? `<div class="skc-row"><span class="sk-l">${l}</span><div class="sk-list">${lista.slice(0, M).map(x => chip(x, true)).join("")}${lista.length > M ? `<span class="skc-more" data-tip="${esc(lista.slice(M).join(" · "))}">+${lista.length - M}</span>` : ""}</div></div>` : "";
+    return fila(sk, skChip, L("Skills", "Skills")) + fila(sw, swChip, L("Software", "Software"));
+  };
   // ── Caja "Skills y software" en la ventana de cada persona (la persona edita las suyas; Administración, las de todos) ──
   let skEdit = null;
   function skSection(p) {
@@ -18536,7 +18561,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const ms = miembros(g).sort((a, b) => a.name.localeCompare(b.name, "es")), c = window.pxpCargoColor ? pxpCargoColor(g) : "#888";
     const card = (p) => { const d = window.pxpDispBadge ? pxpDispBadge(p) : ""; return `<article class="gm-card" style="--gc:${c}" tabindex="0" onclick="pxpGrupoCerrar();pxpOpenPerson('${ea(p.name)}')" onkeydown="if(event.key==='Enter'){pxpGrupoCerrar();pxpOpenPerson('${ea(p.name)}')}">
         <header>${window.pxpAvatar ? pxpAvatar("person", p.name, 44) : ""}<div><h4>${esc(titulo(p.alias || p.name))}</h4><span>${esc(p.role || "")}</span></div>${d}</header>
-        ${(p.skills || []).length || (p.software || []).length ? `<div class="gm-sk">${window.pxpSkillsFull(p)}</div>` : `<p class="note">${L("Sin skills registradas", "No skills yet")}</p>`}</article>`; };
+        ${(p.skills || []).length || (p.software || []).length ? `<div class="gm-sk">${window.pxpSkillsCompact ? pxpSkillsCompact(p, 8) : window.pxpSkillsFull(p)}</div>` : `<p class="note">${L("Sin skills registradas", "No skills yet")}</p>`}</article>`; };
     gm.innerHTML = `<div class="pm-box gm-box"><header class="pm-head gm-head" style="--gc:${c}">${window.pxpGrupoBadge(g, 56, true)}<div class="pm-id"><span class="pm-k">${L("Grupo", "Group")}</span><h2>${esc(GL(g))}</h2><span>${ms.length} ${L(ms.length === 1 ? "integrante" : "integrantes", ms.length === 1 ? "member" : "members")}</span></div>
       ${can() ? `<button type="button" class="btn-ghost sm" onclick="pxpGrupoCerrar();pxpGrupoEdit('${ea(g)}')">${L("Editar grupo", "Edit group")}</button>` : ""}<button class="ficha-close" onclick="pxpGrupoCerrar()" aria-label="${L("Cerrar", "Close")}">✕</button></header>
       ${can() ? `<div class="gm-forma"><span>${L("Forma del grupo", "Group shape")}</span>${SHAPES.map(f => `<button type="button" class="${formaDe(g) === f ? "on" : ""}" aria-pressed="${formaDe(g) === f}" onclick="pxpGrupoForma('${ea(g)}','${f}')" aria-label="${f}"><svg viewBox="0 0 24 24">${window.pxpShapeSvg ? pxpShapeSvg(f, 12, 12, 7.5, "gb-s", "") : ""}</svg></button>`).join("")}</div>` : ""}

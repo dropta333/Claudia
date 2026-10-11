@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v186** · 10 oct 2026 · Responsable: Bastián Torres
+Versión: **v187** · 10 oct 2026 · Responsable: Bastián Torres
 
 ## Cómo está armado ahora
 - **Una sola fuente:** `src/app.html`, con todo el CSS y las capas JS.
@@ -206,6 +206,8 @@ Versión: **v186** · 10 oct 2026 · Responsable: Bastián Torres
 - **v185:** extractor de datos (tools/extractor/extractor.html, va en el ZIP como public/extractor.html): un botón de favoritos que, abierto en cualquier sitio del tablero, descarga restauracion-completa-….json con el estado completo y los adjuntos dentro (base64). "Restaurar copia" sube esos adjuntos al sitio nuevo, cambia los ids y combina. No requiere tocar el sitio antiguo. Prueba: tools/extractor-e2e.mjs.
 
 - **v186:** Tráfico en fichas como mosaico (pxpTraficoMosaico): rejilla de filas de 4 px y cada ficha con grid-row/grid-column explícitos en la columna más corta; los títulos ocupan todo el ancho; se recalcula con cambios del DOM, al cambiar el tamaño de la ventana y con un ResizeObserver. En la tabla de Tráfico la columna N.º va primera. Prueba: tools/test-v186.mjs.
+
+- **v187:** ingreso en Netlify: la lista agrupa por equipo antes de entrar (precargarGrupos lee /api/state y calcula los grupos sin tocar los datos; antes todos caían en "Otros"). Proyectos en fichas agrupadas: cada grupo en un bloque (.pvc-blk) que ocupa las columnas que necesita, lado a lado con grid dense. Ventana de grupo: selector de formas en 2 filas de 10 (5 por fila en celular), encabezado que no se tapa en celular, forma elegida más visible; tarjetas con skills compactas (pxpSkillsCompact, íconos con nombre al pasar el cursor y +N). Las redes por cargo (roleStyle) usan la forma elegida para el grupo. Prueba: tools/test-v187.mjs y el ingreso en tools/netlify-e2e.mjs.
 
 ## No cambiar sin consultar
 - El ZIP de Netlify va sin datos, y no se guarda nada antes de cargar los datos del servidor.

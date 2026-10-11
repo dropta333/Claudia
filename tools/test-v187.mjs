@@ -24,5 +24,13 @@ const antes = (await revisar()).fichas; await page.click("#proj-wrap .pvc-blk .p
 const r2 = await revisar(); check("plegar un grupo esconde sus fichas y se reacomoda", r2 && r2.fichas < antes && r2.encima === 0);
 await agrupar("Sin agrupar"); check("sin agrupar: rejilla normal", await page.evaluate(() => !!document.querySelector("#proj-wrap .pvc-grid:not(.pvc-blocks) .pvc")));
 await page.setViewportSize({ width: 700, height: 1000 }); await agrupar("Cliente"); const r3 = await revisar(); check("pantalla angosta: una columna", r3 && r3.cols === 1 && r3.encima === 0);
+// grupo Audio: cambiar la forma desde su ventana se ve en sus integrantes, en las casas de audio y en el título
+await page.setViewportSize({ width: 1440, height: 1000 });
+await page.evaluate(() => { const k = Object.keys(PROJECTS)[0]; PROJECTS[k].casaAudio = "Estudio Prueba"; switchView("team"); }); await page.waitForTimeout(900);
+await page.click('#view-team .team-section-title[data-g="Audio"] .tst'); await page.waitForTimeout(700);
+const bs = await page.$$(".gm-forma button"); let burst = null; for (const x of bs) if ((await x.getAttribute("aria-label")) === "burst") burst = x; await burst.click(); await page.waitForTimeout(900);
+const au = await page.evaluate(() => { document.querySelectorAll(".open").forEach(e => e.classList.remove("open")); switchView("team"); const h = document.createElement("div"); h.innerHTML = pxpAvatar("person", AUDIO[0].name, 30);
+  const casas = [...document.querySelectorAll("#team-casas .casa-av")].map(e => e.dataset.sh); return { meta: (META.grupoForma || {}).Audio, avatar: h.firstElementChild.dataset.sh, casas }; });
+check(`Audio cambia de forma (${JSON.stringify(au)})`, au.meta === "burst" && au.avatar === "burst" && au.casas.every(x => x === "burst"));
 console.log(JSON.stringify({ ok, fail, errs: errs.slice(0, 5) }, null, 1));
 await b.close(); process.exit(fail.length || errs.length ? 1 : 0);
