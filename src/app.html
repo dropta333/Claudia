@@ -3683,7 +3683,6 @@ html{scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--text) 28%,tran
 #proj-wrap > .pv-bar2 > .pv-tools > .pv-vista{grid-column:1/-1;display:grid!important;align-items:center}
 #proj-wrap > .pv-bar2 > .pv-tools > .pv-vista > .seg{width:100%}
 .legend-d{display:none!important}
-body[data-view="dashboard"]:not(.pxp-ro):not(.pxp-personal) .legend-d{display:block!important}
 #proj-wrap > .pv-bar::before,#proj-wrap > .pv-bar2 > .pv-tools::before{content:none!important;display:none!important}
 #proj-wrap{grid-template-columns:minmax(0,1.7fr) minmax(0,1fr)!important;gap:12px 14px!important}
 #proj-wrap > .pv-bar{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:8px!important;padding:12px 14px!important;align-content:center}
@@ -6687,17 +6686,22 @@ select.dd-src{position:absolute!important;width:1px!important;height:1px!importa
 #lg-wrap .lg-h1 .seg button{display:inline-flex;align-items:center;gap:8px}
 #lg-wrap .lg-prog{flex:1 1 220px;min-width:180px;display:flex;flex-direction:column;gap:6px}
 #lg-wrap .lg-pt{display:flex;align-items:baseline;gap:8px}
-#lg-wrap .lg-pt b{font:600 24px/1 var(--display)}
+#lg-wrap .lg-pt b{font:600 32px/1 var(--display);background:linear-gradient(90deg,#E0925A,#FFC800,#6FF3FF);-webkit-background-clip:text;background-clip:text;color:transparent}
 #lg-wrap .lg-pt span{font:600 12px/1 var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 #lg-wrap .lg-info{all:unset;cursor:help;display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;border:1px solid var(--border2);font:700 11px/1 var(--sans);color:var(--muted);margin-left:4px;align-self:center}
 #lg-wrap .lg-pb2{height:6px;border-radius:99px;background:color-mix(in srgb,var(--text) 8%,transparent);overflow:hidden}
 #lg-wrap .lg-pb2 i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#CD7F32,#C0C0C0,#F5C542,#9BE7FF)}
 #lg-wrap .lg-h1 .lg-cnt{flex:none}
-#lg-wrap .lg-give{flex:none;margin-left:auto}
+#lg-wrap .lg-give{flex:none;margin-left:0}
 #lg-wrap .lg-h2{display:flex;align-items:center;gap:14px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
 #lg-wrap .lg-hl{flex:none;font:600 12px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);writing-mode:horizontal-tb}
-#lg-wrap .lg-h2 .lg-rec{flex:1;margin:0;padding:0;border:0;background:none;min-width:0}
-@media (max-width:760px){#lg-wrap .lg-h1 .seg{width:100%;overflow-x:auto}#lg-wrap .lg-give{width:100%;justify-content:center}#lg-wrap .lg-h2{flex-direction:column;align-items:flex-start}}
+#lg-wrap .lg-h2 .lg-prog{flex:1 1 260px}
+#lg-wrap .lg-last{flex:0 1 auto;display:flex;align-items:center;gap:10px;min-width:0;padding-left:16px;border-left:1px solid var(--border)}
+#lg-wrap .lg-h2 .lg-rec{display:flex;gap:6px;margin:0;padding:0;border:0;background:none;min-width:0;overflow-x:auto;scrollbar-width:none}
+#lg-wrap .lg-h2 .lg-r{flex:none;cursor:default;transition:transform .15s}
+#lg-wrap .lg-h2 .lg-r:hover{transform:translateY(-2px) scale(1.06)}
+#lg-wrap .lg-h1 .lg-cnt{margin-left:auto}
+@media (max-width:760px){#lg-wrap .lg-h1 .seg{width:100%;overflow-x:auto}#lg-wrap .lg-give{width:100%;justify-content:center}#lg-wrap .lg-h2{flex-direction:column;align-items:stretch}#lg-wrap .lg-h2 .lg-prog{flex:none}#lg-wrap .lg-last{padding-left:0;border-left:0}}
 
 /* ═════ v197 · Home personal: "Estado de los proyectos" en dos columnas, más bajo ═════ */
 #cli-wrap .view-note.wk-off{display:none!important}
@@ -6707,6 +6711,28 @@ body.pxp-personal #home-wrap .est-row .dot{grid-area:d}
 body.pxp-personal #home-wrap .est-row .el{grid-area:l;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 body.pxp-personal #home-wrap .est-row .eb{grid-area:b;height:5px}
 body.pxp-personal #home-wrap .est-row .en{grid-area:n;font-size:20px}
+
+/* ═════ v198 · Clientes: Reparto y Tipos más bajos, en varias columnas ═════ */
+.rcx{grid-template-columns:minmax(150px,190px) minmax(0,1fr);gap:20px}
+.rc-l.c2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-flow:column;grid-template-rows:repeat(4,auto);gap:2px 14px}
+.rc-l.c2 button{padding:6px 8px}
+.rc-d svg.pxp-donut{max-width:190px}
+.tp-l.c2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-flow:column;grid-template-rows:repeat(5,auto);gap:4px 22px;flex:none}
+.tp-l.c2 li{grid-template-columns:46px minmax(0,1fr) auto;padding:4px 2px;column-gap:10px}
+.tp-l.c2 .tp-p{font-size:21px}
+@media (max-width:1100px){.rc-l.c2,.tp-l.c2{grid-auto-flow:row;grid-template-rows:none;grid-template-columns:1fr}}
+
+/* ═════ v198 · Logros: conteo por nivel más llamativo ═════ */
+#lg-wrap .lg-tiers{display:flex;gap:8px;margin-left:auto}
+#lg-wrap .lg-tier{display:grid;grid-template-columns:auto auto;grid-template-areas:"i n" "i t";align-items:center;column-gap:9px;row-gap:1px;padding:7px 14px 7px 9px;border-radius:14px;border:1px solid color-mix(in srgb,var(--tc) 45%,var(--border));background:linear-gradient(135deg,color-mix(in srgb,var(--tc) 20%,transparent),color-mix(in srgb,var(--tc) 4%,transparent))}
+#lg-wrap .lg-tier i{grid-area:i;width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0 8%,var(--tc) 36%,color-mix(in srgb,var(--tc) 55%,#000) 100%);box-shadow:0 0 0 2px color-mix(in srgb,var(--tc) 35%,transparent),0 0 14px color-mix(in srgb,var(--tc) 45%,transparent)}
+#lg-wrap .lg-tier b{grid-area:n;font:600 22px/1 var(--display);color:var(--text)}
+#lg-wrap .lg-tier small{grid-area:t;font:600 10.5px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+#lg-wrap .lg-tier.cero{opacity:.45;filter:saturate(.5)}
+@media (max-width:760px){#lg-wrap .lg-tiers{margin-left:0;width:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}#lg-wrap .lg-tier{padding:6px 8px;column-gap:6px}#lg-wrap .lg-tier i{width:18px;height:18px}#lg-wrap .lg-tier b{font-size:18px}}
+
+/* ═════ v198 · Dashboard sin la leyenda de colores (Disponibilidad ya trae sus etiquetas) ═════ */
+body[data-view="dashboard"] .legend-d,body[data-view="dashboard"] .legend-row{display:none!important}
 </style>
 </head>
 <body>
@@ -10818,14 +10844,14 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       : `<div class="rcx">
           <div class="rc-d">${donutSvg(top.map(e => ({ label: e.label, value: e.count, color: clientColor(e.label), unit: _u, onclick: go(e.label) })).concat(nResto ? [{ label: `Otros ${resto.length}`, value: nResto, color: "var(--muted2)", unit: _u }] : []), String(pc.total), _u)}
             <div class="rc-k"><b>${pc.entries.length}</b><span>clientes</span></div></div>
-          <ol class="rc-l">${top.map((e, i) => `<li><button onclick="${go(e.label)}" style="--c:${clientColor(e.label)};--w:${(e.count / maxC * 100).toFixed(1)}%"><span class="rc-n">${i + 1}</span><span class="rc-nm">${esc(e.label)}</span><span class="rc-v"><b>${e.pct}%</b> · ${e.count}</span><span class="rc-b"><i></i></span></button></li>`).join("")}</ol>
+          <ol class="rc-l c2">${top.map((e, i) => `<li><button onclick="${go(e.label)}" style="--c:${clientColor(e.label)};--w:${(e.count / maxC * 100).toFixed(1)}%"><span class="rc-n">${i + 1}</span><span class="rc-nm">${esc(e.label)}</span><span class="rc-v"><b>${e.pct}%</b> · ${e.count}</span><span class="rc-b"><i></i></span></button></li>`).join("")}</ol>
         </div>
         ${resto.length ? `<div class="rc-o"><div class="rc-oh"><b>Otros ${resto.length}</b><span>${pctOf(nResto)}% · ${nResto}</span></div><div class="rc-oc">${resto.map(e => `<button onclick="${go(e.label)}" style="--c:${/^sin cliente/i.test(e.label) ? "var(--muted2)" : clientColor(e.label)}" data-tip="<b>${esc(e.label)}</b><br>${e.pct}% · ${e.count} ${_u}">${esc(e.label)}<small>${e.count}</small></button>`).join("")}</div></div>` : ""}`;
 
     const ptS = pt.entries.slice().sort((a, b) => b.count - a.count), maxT = Math.max(1, ...ptS.map(e => e.count));
     const tipo = pt.total === 0 ? `<div class="home-empty">Sin asignaciones para esta semana.</div>` : `
       ${stackBar(ptS.map(e => ({ label: e.label, value: e.count, color: TIPO_C[e.label], unit: _u })))}
-      <ul class="tp-l">${ptS.map(e => `<li class="${e.count ? "" : "z"}" style="--c:${TIPO_C[e.label]};--w:${(e.count / maxT * 100).toFixed(1)}%"><span class="tp-p">${Math.round(e.pct)}<small>%</small></span><span class="tp-nm">${esc(e.label)}</span><span class="tp-cn">${e.count}</span><span class="tp-b"><i></i></span></li>`).join("")}</ul>
+      <ul class="tp-l c2">${ptS.map(e => `<li class="${e.count ? "" : "z"}" style="--c:${TIPO_C[e.label]};--w:${(e.count / maxT * 100).toFixed(1)}%"><span class="tp-p">${Math.round(e.pct)}<small>%</small></span><span class="tp-nm">${esc(e.label)}</span><span class="tp-cn">${e.count}</span><span class="tp-b"><i></i></span></li>`).join("")}</ul>
       <p class="note">El tipo sale de la ficha de cada proyecto; si no tiene, se deduce del nombre ("Caso…" → Casos, "Licitación…" → Licitaciones, el resto → Comercial).</p>`;
 
     // Columnas apiladas por semana (100%)
@@ -13320,15 +13346,15 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       if (lib) {
         const roster = rosterThisWeek().filter(x => esRolOperativoDePost(x.role));
         const libres = roster.filter(x => x.status === "libre");
-        const poca = roster.filter(x => x.status === "cargado" && x.count <= 2).sort((a, b) => a.count - b.count);
+        const poca = roster.filter(x => x.status === "cargado").sort((a, b) => a.count - b.count || a.name.localeCompare(b.name));   // v198 · todos los que están en amarillo (antes solo 1 o 2 proyectos y el resto no salía en ninguna columna)
         const chip = (x, extra) => `<button class="lb-chip" data-pname="${esc(x.name)}" style="--rc:${window.pxpCargoColor(pxpGrupoNombre(x.name, x.role))}">${av("person", x.name, 30)}<span class="lb-t"><b>${esc(x.name)}</b><small>${esc(x.role)}${extra || ""}</small></span></button>`;
         lib.className = "home-panel c12 lb-panel";
         lib.innerHTML = `<div class="hp-title">Quién puede tomar trabajo<span class="hp-extra">${esc(WEEKS[currentWeek].label)}</span></div>
           <div class="lb-cols" style="grid-template-columns:minmax(250px,${Math.max(1, libres.length)}fr) minmax(250px,${Math.max(1, poca.length)}fr)">
             <div class="lb-col"><div class="lb-h"><span class="dot libre"></span>Libres <b>${libres.length}</b></div>
               ${libres.length ? `<div class="lb-list">${libres.map(x => chip(x)).join("")}</div>` : `<p class="note" style="margin:0">Nadie está libre esta semana.</p>`}</div>
-            <div class="lb-col"><div class="lb-h"><span class="dot cargado"></span>Con espacio <b>${poca.length}</b><span class="lb-hint">ocupados con 1 o 2 proyectos</span></div>
-              ${poca.length ? `<div class="lb-list">${poca.map(x => chip(x, ` · ${x.count} proyecto${x.count !== 1 ? "s" : ""}`)).join("")}</div>` : `<p class="note" style="margin:0">Nadie con poca carga.</p>`}</div>
+            <div class="lb-col"><div class="lb-h"><span class="dot cargado"></span>Ocupados <b>${poca.length}</b><span class="lb-hint">en amarillo según el semáforo · de menos a más proyectos</span></div>
+              ${poca.length ? `<div class="lb-list">${poca.map(x => chip(x, ` · ${x.count} proyecto${x.count !== 1 ? "s" : ""}`)).join("")}</div>` : `<p class="note" style="margin:0">Nadie en amarillo esta semana.</p>`}</div>
           </div>`;
       }
       if (aus) aus.classList.remove("c6"), aus.classList.add("c12", "aus-wide");
@@ -18807,7 +18833,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     "Tipo": "Type", "Tipo de proyecto": "Project type", "Tipos de proyecto": "Project types", "Comercial": "Commercial", "Casos": "Case studies", "Licitaciones": "Tenders", "Contenido Digital": "Digital content", "Animatic": "Animatic", "Estático": "Static", "Recetas": "Recipes", "Banner web": "Web banner", "Automatización": "Automation", "Aprobados del mes": "Approved this month", "Reporte del cliente": "Client report", "Automático": "Automatic", "Todos los tipos": "All types", "Todas las agencias": "All agencies",
     // carga y disponibilidad
     "Carga": "Load", "Libre": "Free", "Ocupado": "Busy", "Sobrecarga": "Overloaded", "Sobresaturado": "Overloaded", "libre": "free", "cargado": "busy", "saturado": "overloaded", "Libres": "Free", "Ocupados": "Busy", "Cargados": "Busy", "Saturados": "Overloaded", "Disponible": "Available", "Disponibles": "Available", "Apoyo parcial": "Partial support", "No disponible": "Unavailable", "Latente": "Latent", "Semáforo de carga": "Load signal",
-    "Con espacio": "With room", "en rojo según el semáforo": "in red according to the signal", "pueden tomar trabajo": "can take work", "con trabajo asignado": "with assigned work", "necesitan apoyo": "need support", "en el equipo": "on the team",
+    "Con espacio": "With room", "Ocupados": "Busy", "en amarillo según el semáforo · de menos a más proyectos": "in yellow according to the signal · fewest projects first", "Nadie en amarillo esta semana.": "Nobody in yellow this week.", "en rojo según el semáforo": "in red according to the signal", "pueden tomar trabajo": "can take work", "con trabajo asignado": "with assigned work", "necesitan apoyo": "need support", "en el equipo": "on the team",
     // ausencias
     "Ausencia": "Absence", "Ausencias": "Absences", "Vacaciones": "Vacation", "Permiso": "Leave", "Enfermedad": "Sick leave", "Off": "Off", "Compensatorio": "Comp time", "Licencia de paternidad": "Paternity leave", "Licencia de maternidad": "Maternity leave", "Lic. paternidad": "Paternity leave", "Lic. maternidad": "Maternity leave", "Comp.": "Comp.", "— Ninguna —": "— None —", "Ausencia registrada": "Absence recorded", "Quitar esta ausencia": "Remove this absence", "+ Registrar ausencia": "+ Record absence", "Poner fechas": "Set dates",
     // proyectos y tablas
@@ -20926,16 +20952,18 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
           <div class="lg-c-m"><span>${v} / ${sig || f.g[3]}</span><span class="lg-pips">${TIERS.map((T, i) => `<i class="${i < t ? "on" : ""}" style="--pc:${T.c}" title="${T.n}${k0(i) && !k0(i).b ? " · " + hace(k0(i).ts) : ""}"></i>`).join("")}</span></div></div></article>`;
     }).join("");
     const esp = lista.filter((x) => x.esp).map((x) => `<article class="lg-c" style="--tc:${TIERS[x.tier].c}"><div class="lg-c-e">${emb(x.s, x.tier, "star", 76, false, imgDe(x))}</div><div class="lg-c-b"><h4>${esc(x.nombre)}</h4><p>${esc(x.esp.msg || "")}</p><div class="lg-c-m"><span>Especial · ${x.s === "team" ? "Todo el equipo" : x.s === "grp" ? "Grupo" : "Personal"} · ${hace(x.ts)}</span>${esAdmin() ? `<button type="button" class="lg-del${delEsp === x.esp.id ? " on" : ""}" onclick="pxpLogroEspDel('${x.esp.id}')" aria-label="Quitar este logro">${delEsp === x.esp.id ? "¿Quitar para todos?" : "Quitar"}</button>` : ""}</div></div></article>`).join("");
-    const recientes = lista.slice(0, 8).map((x) => `<span class="lg-r" title="${esc(x.nombre + " · " + TIERS[x.tier].n)}">${emb(x.s, x.tier, iconoDe(x), 44, false, imgDe(x))}<small>${hace(x.ts)}</small></span>`).join("");
+    const recientes = lista.slice(0, 8).map((x) => `<span class="lg-r" tabindex="0" data-tip="<b>${esc(x.nombre)}</b> · ${esc(TIERS[x.tier].n)}<br>${esc(hace(x.ts))}">${emb(x.s, x.tier, iconoDe(x), 40, false, imgDe(x))}</span>`).join("");
     // v197 · Sin título grande: una sola caja con pestañas, progreso, acción y últimos desbloqueos
     const NOTA = "Se ganan solos con tu trabajo en el tablero: etapas cerradas, horas registradas, notas y proyectos entregados. Hay logros individuales, de tu grupo y de todo el equipo, en cuatro niveles.";
     const pctT = total ? Math.round(ganados / total * 100) : 0;
     w.innerHTML = `<section class="lg-head">
         <div class="lg-h1"><div class="seg" role="group" aria-label="Tipo de logro">${[["ind", "Míos", "ind"], ["grp", "Mi grupo" + (g ? " · " + GL(g) : ""), "grp"], ["team", "Equipo de Post", "team"]].map(([k, t, s]) => `<button type="button" class="${SEL === k ? "on" : ""}" aria-pressed="${SEL === k}" onclick="pxpLogrosSel('${k}')">${emb(s, 1, "star", 18)}<span>${esc(t)}</span></button>`).join("")}</div>
-          <div class="lg-prog"><div class="lg-pt"><b>${ganados}</b><span>de ${total} · ${pctT}%</span><button type="button" class="lg-info" data-tip="${esc(NOTA)}" aria-label="${esc(NOTA)}">?</button></div><div class="lg-pb2"><i style="width:${pctT}%"></i></div></div>
-          <div class="lg-cnt">${TIERS.map((T, i) => `<span class="lg-cn" style="--tc:${T.c}" title="${T.n}"><i></i>${cnt[i]}</span>`).join("")}</div>
+          <div class="lg-cnt lg-tiers">${TIERS.map((T, i) => `<span class="lg-tier${cnt[i] ? "" : " cero"}" style="--tc:${T.c}"><i aria-hidden="true"></i><b>${cnt[i]}</b><small>${T.n}</small></span>`).join("")}</div>
           ${esAdmin() ? `<button class="btn-new proj lg-give" onclick="pxpLogroOtorgar()"><svg class="i" viewBox="0 0 24 24" aria-hidden="true">${IC.star}</svg>Otorgar logro</button>` : ""}</div>
-        ${recientes ? `<div class="lg-h2"><span class="lg-hl">Últimos</span><div class="lg-rec" aria-label="Últimos desbloqueos">${recientes}</div></div>` : ""}
+        <div class="lg-h2">
+          <div class="lg-prog"><div class="lg-pt"><b>${ganados}</b><span>de ${total} · ${pctT}%</span><button type="button" class="lg-info" data-tip="${esc(NOTA)}" aria-label="${esc(NOTA)}">?</button></div><div class="lg-pb2"><i style="width:${pctT}%"></i></div></div>
+          ${recientes ? `<div class="lg-last"><span class="lg-hl">Últimos</span><div class="lg-rec" aria-label="Últimos desbloqueos">${recientes}</div></div>` : ""}
+        </div>
       </section>
       <div class="lg-grid">${tarj}${esp}</div>`;
   }
