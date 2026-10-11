@@ -1750,7 +1750,7 @@ table.pv-table .status-pill{max-width:150px}
 .tt-n:focus-visible{outline:2px solid var(--brand);border-radius:6px}
 .tt-st{display:inline-flex;align-items:center;gap:7px;font:600 14px/1 var(--display);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
 .tt-st i{width:10px;height:10px;border-radius:50%;background:var(--c);box-shadow:0 0 8px color-mix(in srgb,var(--c) 50%,transparent)}
-.tt-num{font:600 16px/1 var(--display);text-align:center}
+.tt-num{font:600 16px/1 var(--display);text-align:center;width:56px}
 .tt-ps{display:flex;flex-wrap:wrap;gap:6px}
 .tt-p{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 8px;border:1px solid var(--border);border-radius:99px;font-size:13.5px;font-weight:600;background:var(--bg);max-width:200px}
 .tt-p::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--pc);flex:none}
@@ -1758,7 +1758,7 @@ table.pv-table .status-pill{max-width:150px}
 .tt-more{font:600 13.5px/1 var(--display);color:var(--muted);padding:5px 6px}
 .trf-vista{display:inline-flex;align-items:center;gap:8px;margin-right:6px}
 @media (max-width:760px){
-  .tt-table th:nth-child(3),.tt-table td:nth-child(3),.tt-table th:nth-child(4),.tt-table td:nth-child(4){display:none}
+  .tt-table th:nth-child(4),.tt-table td:nth-child(4),.tt-table th:nth-child(5),.tt-table td:nth-child(5){display:none}
 }
 @media (min-width:901px){
   #proj-wrap.pv-cards table.pv-table tbody tr:not(.pv-g){grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -1830,8 +1830,8 @@ table.pv-table .status-pill{max-width:150px}
 .tt-sem .tt-st small{font:400 13px var(--sans);text-transform:none;letter-spacing:0;color:var(--muted)}
 .tt-sem .tt-st{color:var(--c)}
 @media (max-width:760px){
-  .tt-table th:nth-child(3),.tt-table td:nth-child(3){display:none}
-  .tt-table th:nth-child(4),.tt-table td:nth-child(4){display:table-cell}
+  .tt-table th:nth-child(4),.tt-table td:nth-child(4){display:none}
+  .tt-table th:nth-child(5),.tt-table td:nth-child(5){display:table-cell}
 }
 .sc-panel{border-color:color-mix(in srgb,var(--red) 35%,var(--border))}
 .sc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
@@ -4976,6 +4976,10 @@ body.trf-tabla #main-grid > .section-label{display:none!important}
 .mig-a{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:18px}
 .mig-x{all:unset;cursor:pointer;position:absolute;top:14px;right:16px;width:30px;height:30px;display:grid;place-items:center;border-radius:50%;color:var(--muted)}
 .mig-x:hover{background:var(--surface2);color:var(--text)}
+/* v186 · Tráfico en mosaico */
+#main-grid.trf-med{align-items:start!important}
+#main-grid.trf-mas{grid-auto-rows:4px!important;row-gap:0!important;align-items:start!important}
+#main-grid.trf-mas > *{margin-top:0!important;margin-bottom:0!important}
 .pj-dot.bloqueada{border-color:#F0476B;background:color-mix(in srgb,#F0476B 30%,var(--surface))}
 .pj-dot.revision,.pj-dot.ajustes{border-color:var(--sc,#FF9F43);background:color-mix(in srgb,#FF9F43 30%,var(--surface))}
 
@@ -14833,14 +14837,13 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       const lb = LBL[st] || [(AUSENCIA_LABELS && AUSENCIA_LABELS[st]) || st, STATUS_COLOR[st] || "var(--muted)"];
       const ks = personKeys(f).filter(k => (getProjectDisplay(k).estadoGeneral || "en_produccion") !== "entregado");
       const chips = ks.slice(0, 4).map(k => `<button class="tt-p" style="--pc:${window.pxpProjectColor(k)}" onclick="openProjectFicha('${ea(k)}')">${esc(getProjectDisplay(k).nombre || k)}</button>`).join("") + (ks.length > 4 ? `<span class="tt-more" data-tip="${esc(ks.slice(4).map(k => getProjectDisplay(k).nombre || k).join("<br>"))}">+${ks.length - 4}</span>` : "");
-      rows += `<tr><td><button class="tt-n" data-pname="${esc(p.name)}">${av(p.name, 30)}<span><b>${esc(p.name)}</b><small>${esc(p.alias || p.role || "")}</small></span></button></td>
+      rows += `<tr><td class="tt-num">${ks.length}</td><td><button class="tt-n" data-pname="${esc(p.name)}">${av(p.name, 30)}<span><b>${esc(p.name)}</b><small>${esc(p.alias || p.role || "")}</small></span></button></td>
         <td>${semHtml(f, p, st)}</td>
         <td>${cx ? `<span class="proj-pill ${cx}">${cx}</span>` : `<span class="pt-muted">—</span>`}</td>
-        <td><span class="tt-ps">${chips || `<span class="pt-muted">Sin proyectos</span>`}</span></td>
-        <td class="tt-num">${ks.length}</td></tr>`;
+        <td><span class="tt-ps">${chips || `<span class="pt-muted">Sin proyectos</span>`}</span></td></tr>`;
     });
     const bar = $("trf-sort");
-    const html = `<div class="proj-table-wrap" id="trf-table"><table class="proj-table tt-table"><thead><tr><th>Persona</th><th>Carga</th><th>Complejidad</th><th>Proyectos</th><th>N.º</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    const html = `<div class="proj-table-wrap" id="trf-table"><table class="proj-table tt-table"><thead><tr><th class="tt-num">N.º</th><th>Persona</th><th>Carga</th><th>Complejidad</th><th>Proyectos</th></tr></thead><tbody>${rows}</tbody></table></div>`;
     if (bar) bar.insertAdjacentHTML("afterend", html); else grid.insertAdjacentHTML("afterbegin", html);
   }
   function trafficToggle() {
@@ -17930,6 +17933,44 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
 
 </script>
 <script>
+// ════════════════════════════════════════════════════════════════
+// v186 · Tráfico en fichas como mosaico: cada ficha va a la columna más corta (sin huecos),
+//   respetando el orden de lectura; los títulos de sección ocupan todo el ancho.
+// ════════════════════════════════════════════════════════════════
+(function () {
+  "use strict";
+  const U = 4;   // alto de cada fila de la rejilla (px)
+  let raf = 0, ro = null;
+  function acomodar() {
+    raf = 0;
+    const g = document.getElementById("main-grid"); if (!g || !g.querySelector(":scope > .card.tcard")) return;
+    const items = Array.from(g.children);
+    const limpiar = () => { g.classList.remove("trf-mas"); g.style.removeProperty("row-gap"); g.style.removeProperty("grid-auto-rows"); items.forEach((el) => { el.style.gridColumn = ""; el.style.gridRow = ""; }); };
+    if (!g.offsetParent) return;
+    // se mide la altura natural de cada ficha (sin estirarse a la más alta de su fila)
+    g.classList.remove("trf-mas"); g.style.removeProperty("row-gap"); g.style.removeProperty("grid-auto-rows"); g.classList.add("trf-med"); items.forEach((el) => { el.style.gridRow = ""; el.style.gridColumn = ""; });
+    const cs = getComputedStyle(g), n = cs.gridTemplateColumns.split(" ").filter(Boolean).length;
+    if (n < 2) { g.classList.remove("trf-med"); limpiar(); return; }
+    const gap = parseFloat(cs.rowGap) || 16;
+    const alturas = items.map((el) => (getComputedStyle(el).display === "none" ? -1 : el.getBoundingClientRect().height));
+    g.classList.remove("trf-med"); g.classList.add("trf-mas"); g.style.setProperty("row-gap", "0px", "important"); g.style.setProperty("grid-auto-rows", U + "px", "important");
+    let col = new Array(n).fill(1);   // siguiente fila libre de cada columna (las filas de la rejilla empiezan en 1)
+    items.forEach((el, i) => {
+      const h = alturas[i]; if (h < 0) { el.style.gridColumn = ""; el.style.gridRow = ""; return; }
+      const span = Math.max(1, Math.ceil((h + (h ? gap : 0)) / U));
+      const ancho = el.classList.contains("tcard") ? 1 : 0;   // títulos y barras: todo el ancho
+      if (!ancho) { const top = Math.max(...col); el.style.gridColumn = "1 / -1"; el.style.gridRow = `${top} / span ${span}`; col = col.map(() => top + span); return; }
+      let c = 0; for (let k = 1; k < n; k++) if (col[k] < col[c]) c = k;
+      el.style.gridColumn = String(c + 1); el.style.gridRow = `${col[c]} / span ${span}`; col[c] += span; el.__h = h;
+    });
+    if (window.ResizeObserver) { if (!ro) ro = new ResizeObserver((es) => { if (es.some((e) => Math.abs((e.target.__h || 0) - e.contentRect.height) > 1)) pedir(); }); ro.disconnect(); items.forEach((el) => ro.observe(el)); }
+  }
+  const pedir = () => { if (!raf) raf = requestAnimationFrame(acomodar); };
+  if (window.pxpOnDom) pxpOnDom(() => { const g = document.getElementById("main-grid"); if (g && g.querySelector(":scope > .card.tcard")) pedir(); }, { childList: true, subtree: true });
+  window.addEventListener("resize", pedir);
+  window.pxpTraficoMosaico = acomodar;
+})();
+
 // ════════════════════════════════════════════════════════════════
 // v184 · Copias completas y migración entre servidores
 //   · "Descargar copia" guarda TODO (antes faltaban licencias, logros, temas y otras claves de META).

@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v185** · 10 oct 2026 · Responsable: Bastián Torres
+Versión: **v186** · 10 oct 2026 · Responsable: Bastián Torres
 
 ## Cómo está armado ahora
 - **Una sola fuente:** `src/app.html`, con todo el CSS y las capas JS.
@@ -204,6 +204,8 @@ Versión: **v185** · 10 oct 2026 · Responsable: Bastián Torres
 - **v184:** copias completas y migración. Antes "Descargar copia" solo guardaba algunas claves de META (se perdían licencias, logros, temas…); ahora guarda todo. "Restaurar copia" combina con lo actual (pxpCombinarEstado: lo actual manda, se agregan proyectos, personas, listas con id e historiales que falten, y claves de META vacías) y acepta también los datos crudos de /api/state. Nueva función netlify/functions/migrate.mjs (POST /api/migrate {from} lee el tablero antiguo; {from, file} copia un adjunto, por partes si pesa más de 4,5 MB; solo https://*.netlify.app y solo desde el propio tablero). En la barra inferior (solo Netlify y Administración): "Traer datos de otro servidor". Pruebas: tools/nf-server.mjs (servidor local), tools/migrate-e2e.mjs (dos servidores: antiguo y nuevo).
 
 - **v185:** extractor de datos (tools/extractor/extractor.html, va en el ZIP como public/extractor.html): un botón de favoritos que, abierto en cualquier sitio del tablero, descarga restauracion-completa-….json con el estado completo y los adjuntos dentro (base64). "Restaurar copia" sube esos adjuntos al sitio nuevo, cambia los ids y combina. No requiere tocar el sitio antiguo. Prueba: tools/extractor-e2e.mjs.
+
+- **v186:** Tráfico en fichas como mosaico (pxpTraficoMosaico): rejilla de filas de 4 px y cada ficha con grid-row/grid-column explícitos en la columna más corta; los títulos ocupan todo el ancho; se recalcula con cambios del DOM, al cambiar el tamaño de la ventana y con un ResizeObserver. En la tabla de Tráfico la columna N.º va primera. Prueba: tools/test-v186.mjs.
 
 ## No cambiar sin consultar
 - El ZIP de Netlify va sin datos, y no se guarda nada antes de cargar los datos del servidor.
