@@ -1,4 +1,4 @@
-// Prueba v212–v213: Sala de juntas (entrar, caminar, sentarse, burbujas, proyectar, cámara/mic/pantalla locales, demo, proveedor),
+// Prueba v212–v214: Sala de juntas (entrar, caminar, sentarse, burbujas, proyectar, cámara/mic/pantalla locales, demo, proveedor),
 // perfil con foto más grande y acciones debajo, asistente que lleva a la Sala y catálogo de herramientas para la IA.
 import { createRequire } from "node:module"; import { execSync } from "node:child_process"; import path from "node:path";
 const req = createRequire(import.meta.url); let pw; try { pw = req("playwright"); } catch { pw = req(execSync("npm root -g").toString().trim() + "/playwright"); }
@@ -42,10 +42,21 @@ check("Sala: flechas del teclado mueven mi avatar", await page.evaluate(x => PXP
 await page.fill("#sl-in", "Arrancamos la revisión"); await page.keyboard.press("Enter"); await page.waitForTimeout(300);
 check("Sala: el mensaje sale como burbuja sobre mi avatar", await page.evaluate(() => [...document.querySelectorAll(".sl-bub")].some(b => /Arrancamos la revisión/.test(b.textContent))));
 check("Sala: queda en la conversación", await page.evaluate(() => /Arrancamos la revisión/.test(document.getElementById("sl-log").textContent)));
-await page.click("#sl-projb"); await page.waitForTimeout(200); await page.fill(".sl-pick input", "dra"); await page.waitForTimeout(200); await page.click(".sl-pick li button"); await page.waitForTimeout(400);
-check("Sala: proyectar muestra en el TV la misma ficha de Proyectos, entera", await page.evaluate(() => { const tv = document.getElementById("sl-tv"), c = tv.querySelector(".pvc"); if (!c || !/DRACULA/i.test(c.textContent)) return false; const a = tv.getBoundingClientRect(), b = c.getBoundingClientRect(); return b.left >= a.left - 1 && b.right <= a.right + 1 && b.top >= a.top - 1 && b.bottom <= a.bottom + 1; }));
-await page.click("#sl-tv"); await page.waitForTimeout(300);
-check("Sala: clic en el TV abre la ficha en grande", await page.evaluate(() => !!document.querySelector(".sl-big .pvc")));
+await page.click("#sl-projb"); await page.waitForTimeout(300);
+check("Proyectar: selector con pestañas Proyectos, Clientes, Personas y Gráficas", await page.evaluate(() => document.querySelectorAll(".sl-pj-tabs [data-t]").length === 4 && document.querySelectorAll(".sl-pj-g .sl-tl").length > 5));
+await page.fill(".sl-pj-q", "dra"); await page.waitForTimeout(200); await page.click(".sl-pj-g .sl-tl"); await page.waitForTimeout(600);
+check("Proyectar: vista previa 16:9 con la ventana real del proyecto", await page.evaluate(() => { const p = document.querySelector(".sl-pj-prev"), r = p.getBoundingClientRect(); return !!p.querySelector(".sl-frame .pm-box .pj-head") && Math.abs(r.width / r.height - 16 / 9) < .04; }));
+await page.click(".sl-pj-tabs [data-t=per]"); await page.waitForTimeout(200); await page.click(".sl-pj-g .sl-tl"); await page.waitForTimeout(600);
+check("Proyectar: también la ventana de una persona", await page.evaluate(() => !!document.querySelector(".sl-pj-prev .sl-frame .pm-box .pm-head")));
+await page.click(".sl-pj-tabs [data-t=chart]"); await page.waitForTimeout(200); await page.click(".sl-pj-g .sl-tl"); await page.waitForTimeout(600);
+check("Proyectar: y la gráfica de disponibilidad del equipo", await page.evaluate(() => !!document.querySelector(".sl-pj-prev .sl-frame .lb-panel")));
+await page.click(".sl-pj-tabs [data-t=cli]"); await page.waitForTimeout(200); await page.click(".sl-pj-g .sl-tl"); await page.waitForTimeout(600);
+check("Proyectar: y la ventana de un cliente", await page.evaluate(() => !!document.querySelector(".sl-pj-prev .sl-frame .pm-box")));
+await page.click(".sl-pj-tabs [data-t=proj]"); await page.waitForTimeout(200); await page.fill(".sl-pj-q", "dra"); await page.waitForTimeout(200); await page.keyboard.press("Enter"); await page.waitForTimeout(700);
+check("Proyectar: Enter proyecta y el TV muestra la ventana llenando el 16:9", await page.evaluate(() => { const tv = document.getElementById("sl-tv"), f = tv.querySelector(".sl-frame"); if (!f || !/DRACULA/i.test(f.textContent)) return false; const a = tv.getBoundingClientRect(), b = f.getBoundingClientRect(); return Math.abs(a.width - b.width) < 2 && Math.abs(a.height - b.height) < 2; }));
+check("Proyectar: ninguna ventana quedó abierta por detrás", await page.evaluate(() => !document.querySelector(".pxp-modal.open") && !document.documentElement.classList.contains("sl-cap")));
+await page.click("#sl-tv"); await page.waitForTimeout(400);
+check("Sala: clic en el TV abre la ventana en grande", await page.evaluate(() => !!document.querySelector(".sl-big .sl-frame .pm-box")));
 await page.keyboard.press("Escape"); await page.waitForTimeout(200);
 check("Sala: TV en formato 16:9", await page.evaluate(() => { const r = document.getElementById("sl-tv").getBoundingClientRect(); return Math.abs(r.width / r.height - 16 / 9) < .03; }));
 await page.hover(".sl-mn[data-i='0']"); await page.waitForTimeout(250);

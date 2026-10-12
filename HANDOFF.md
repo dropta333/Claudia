@@ -1,6 +1,14 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v213** · 11 oct 2026 · Resumen general en `HANDOFF-COMPLETO.md` · Responsable: Bastián Torres
+Versión: **v214** · 11 oct 2026 · Resumen general en `HANDOFF-COMPLETO.md` · Responsable: Bastián Torres
+
+## v214 · Sala: proyectar ventanas reales en 16:9 (proyecto, cliente, persona y gráficas) con un selector visual; sofás compactos
+- **Proyectar** abre un selector con pestañas Proyectos · Clientes · Personas · Gráficas, buscador, fichas visuales (color del proyecto y estado, avatar del cliente o la persona) y vista previa 16:9. Clic = vista previa; doble clic o Enter = proyectar; flechas para moverse. "Apagar el TV" cuando hay algo proyectado.
+- Lo proyectado es la **ventana real** de la plataforma: `capture(ref)` la abre sin mostrarla (clase `sl-cap` en `<html>`), copia su `.pm-box` y la cierra. Los estilos que dependen de un id (`#pxp-proj`, `#pxp-client`, `#pxp-person`, `#dash-wrap`) y de `.pxp-modal` se copian una vez a clases (`scopeCss`). Se muestra en un cuadro de 1280×720 escalado con `zoom` al tamaño del TV; en grande se puede bajar para ver toda la ventana. "Abrir en la plataforma" abre la ventana de verdad.
+- Gráficas: "Disponibilidad del equipo" (`#dash-wrap .lb-panel`) y "Carga por persona" (panel del Dashboard).
+- Referencias: `"proj:CLAVE" | "cli:Nombre" | "per:Nombre" | "chart:disp" | "chart:carga"`; viajan igual por `/api/sala` y por el adaptador (una clave sin prefijo se lee como proyecto).
+- **Sofás** más pequeños (22×48 px), con brazos redondeados, costura, cojín lima y patas; siguen con 2 puestos cada uno.
+- Prueba: `node tools/test-v214.mjs` (34).
 
 ## v213 · Sala: personas reales, fichas de Proyectos y Clientes, terraza con ciudad, sofás y conversación más alta
 - **Presencia real** (`netlify/functions/sala.mjs`, `/api/sala`): cada persona guarda su propia ficha `p/<id>` en Blobs (`trafico-sala`): posición, silla, micrófono, cámara, últimos mensajes (15 min) y proyección. GET/POST devuelven a los demás vivos (latido en los últimos 20 s); los viejos se borran solos. En el tablero, `NET` (sala-js) late cada 2,5 s con gente / 6 s sola, solo con la pestaña Sala visible; al cerrar se despide con `keepalive`. Sin servidor (vista previa) sigue el canal entre pestañas.

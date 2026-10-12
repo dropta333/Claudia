@@ -36,7 +36,7 @@ await B.evaluate(() => document.getElementById("sl-stage").scrollIntoView({ bloc
 const r = await B.evaluate(() => document.getElementById("sl-stage").getBoundingClientRect().toJSON());
 await B.mouse.click(r.x + r.width * [100, 140, 180, 220][sx] / 320, r.y + r.height * 86 / 200); await B.waitForTimeout(11000);
 check("Juliana se sienta y Bastián la ve sentada en el mismo puesto", await A.evaluate(i => { const j = PXP_SALA.state().people.find(x => /juliana/i.test(x.name)); return j && j.seat === i; }, sx));
-await A.click("#sl-projb"); await A.waitForTimeout(200); await A.fill(".sl-pick input", "dra"); await A.waitForTimeout(200); await A.click(".sl-pick li button"); await B.waitForTimeout(4500);
+await A.click("#sl-projb"); await A.waitForTimeout(300); await A.fill(".sl-pj-q", "dra"); await A.waitForTimeout(200); await A.keyboard.press("Enter"); await B.waitForTimeout(4500);
 check("lo que Bastián proyecta aparece en el TV de Juliana", await B.evaluate(() => /DRACULA/i.test(document.getElementById("sl-tv").textContent)));
 await B.close(); await A.waitForTimeout(4500);
 check("cuando Juliana se va, sale de la sala de Bastián", !(await vio(A, "juliana")));
