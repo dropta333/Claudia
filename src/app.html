@@ -11182,6 +11182,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       </details>`;
     }).join("")}</div>${sinAct ? `<p class="note ct-foot">${sinAct} cliente${sinAct !== 1 ? "s" : ""} sin proyectos activos<button type="button" class="ct-all" onclick="pxpCtAlc('todos')">Ver todos<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></p>` : ""}`;
   }
+  window.pxpClientTreeHtml = clientTreeHtml;   // v213 · el mapa de la Sala usa las mismas fichas de cliente
 
   const origClientes = window.renderClientes;
   window.renderClientes = function () {
@@ -24019,7 +24020,7 @@ button.pm-pxa{cursor:pointer}
   run();
 })();
 </script>
-<!-- ═════ v212 · Sala de juntas (prototipo) y perfil con foto más grande ═════ -->
+<!-- ═════ v212–v213 · Sala de juntas (presencia real, fichas de Proyectos y Clientes) y perfil con foto más grande ═════ -->
 <style id="sala-v212">/* ═════ v212 · Perfil: foto más grande (triángulos más llenos) y acciones debajo, sin tapar la foto ═════ */
 #pxp-person .ph-avw{display:flex;flex-direction:column;align-items:center;gap:8px}
 #pxp-person .ph-avw .av{--s:112px!important}
@@ -24184,6 +24185,22 @@ button.pm-pxa{cursor:pointer}
 .sl-mp-p{all:unset;cursor:pointer;border-radius:8px;background:var(--surface);padding:2px}
 .sl-mp-p img{width:28px;height:28px;image-rendering:pixelated;display:block}
 .sl-mp-p:hover,.sl-mp-p:focus-visible{box-shadow:0 0 0 2px var(--majorelle)}
+/* v213 · ficha proyectada, mapa con fichas de Clientes, conversación más alta */
+.sl-tvc{position:absolute;inset:0;overflow:hidden;background:radial-gradient(120% 90% at 50% 0%,#24203a,#121020)}
+.sl-tvc .sl-ficha{position:absolute;left:50%;top:50%;width:340px;transform-origin:50% 50%;pointer-events:none}
+.sl-tvc.big .sl-ficha{pointer-events:auto}
+.sl-tvc .pvc{cursor:default;box-shadow:0 20px 50px rgba(0,0,0,.45)}
+.sl-tvc.big .pvc{cursor:pointer}
+.sl-cv{padding:16px 20px 20px}
+.sl-cv .cnode.sl-focus{box-shadow:0 0 0 2px var(--cc),0 10px 30px rgba(0,0,0,.18)}
+@media (min-width:1101px){.sl-main{grid-template-columns:minmax(0,1fr) 320px;align-items:stretch}.sl-side{contain:size;overflow:hidden}}
+.sl-side section:first-child{flex:0 1 auto;max-height:44%;min-height:0}
+.sl-side section:last-child{flex:1 1 auto;min-height:0}
+.sl-ppl{max-height:none;flex:1 1 auto;min-height:0}
+.sl-log{max-height:none;flex:1 1 auto;min-height:0;gap:8px;font-size:13.5px;padding-right:4px}
+.sl-log li{padding:6px 8px;border-radius:8px;background:var(--surface2)}
+.sl-log li.sl-empty{background:none;padding:0}
+@media (max-width:1100px){.sl-side section:first-child{max-height:none}.sl-ppl{max-height:220px}.sl-log{max-height:320px}}
 </style>
 <script id="sala-js">/* ═════ v212 · Sala de juntas (prototipo): los avatares entran, caminan, se sientan, hablan en burbujas y proyectan en el TV ═════
    Todo lo que viaja entre personas pasa por un "transporte" con mensajes simples ({t:"hi"|"mv"|"say"|"st"|"proj"|"bye", …}).
@@ -24206,14 +24223,17 @@ button.pm-pxa{cursor:pointer}
   const reduce = () => window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   const isDark = () => { const r = document.documentElement; return r.dataset.theme ? r.dataset.theme === "dark" : !(window.matchMedia && matchMedia("(prefers-color-scheme: light)").matches); };
   const L = (es, en) => (window.pxpLang === "en" ? en : es);
+  /* los compañeros de demostración solo los ve Bastián (para probar); el resto ve únicamente a quien está de verdad */
+  const isDev = () => { const n = nn(me()); return n === nn("Bastián Torres") || (window.pxpHandleDe && pxpHandleDe(me()) === "bastian.ia"); };
 
   /* ---------- geometría: mesa grande casi cuadrada al centro, sala limpia (píxeles lógicos; los pies de cada avatar son su punto) ---------- */
   const TABLE = { x: 72, y: 88, w: 176, h: 52 };
   const SEATS = [];
   [100, 140, 180, 220].forEach(x => SEATS.push({ x, y: TABLE.y + 8, view: "front", ax: x, ay: 66, side: "back" }));
-  SEATS.push({ x: 56, y: 124, view: "front", ax: 42, ay: 126, side: "end" }, { x: 264, y: 124, view: "front", ax: 278, ay: 126, side: "end" });
+  [110, 138].forEach(y => SEATS.push({ x: 57, y, view: "front", ax: 44, ay: y, side: "end" }, { x: 263, y, view: "front", ax: 276, ay: y, side: "end" }));
   [100, 140, 180, 220].forEach(x => SEATS.push({ x, y: TABLE.y + TABLE.h + 22, view: "back", ax: x, ay: 178, side: "front" }));
-  const BLOCK = [{ x: 62, y: 78, w: 196, h: 94 }, { x: 0, y: 54, w: 22, h: 14 }];
+  [118, 148].forEach(y => SEATS.push({ x: 22, y, view: "front", ax: 46, ay: y + 2, side: "sofa" }, { x: 298, y, view: "front", ax: 274, ay: y + 2, side: "sofa" }));
+  const BLOCK = [{ x: 62, y: 78, w: 196, h: 94 }, { x: 0, y: 90, w: 38, h: 72 }, { x: 282, y: 90, w: 38, h: 72 }];
   const BOUNDS = { x0: 8, x1: 312, y0: 62, y1: 190 };
   const DOOR = { x: 160, y: 196 };
   const TV = { x: 120, y: 3, w: 80, h: 45 };   // 16:9 exacto
@@ -24233,11 +24253,11 @@ button.pm-pxa{cursor:pointer}
 
   /* ---------- paleta según la hora: mañana cálida, mediodía neutro, tarde dorada, atardecer, noche fría ---------- */
   const PAL = {
-    noche: { ol: "#0d0f1f", wallHi: "#39406a", wall: "#2c3256", wallLo: "#232847", trim: "#3b4370", trimLo: "#2a305a", floor: "#283052", floorMk: "#202744", rug: "#323b66", rugIn: "#2b3359", rugHi: "#3d477a", wood: "#4b4560", woodHi: "#5a5474", woodLo: "#3a354c", woodDk: "#2b2738", chair: "#23263d", chairHi: "#343854", plant: "#2f5a5a", plantHi: "#3d6f6c", pot: "#4a4050", metal: "#5a6080", paper: "#8a90b0", sky1: "#0b1030", sky2: "#141c48", sky3: "#1f2a60", curtain: "#3a4270", curtainLo: "#2c3358", frame: "#1a1d33", board: "#5a5f86", cork: "#4a4560" },
-    manana: { ol: "#3b2418", wallHi: "#fbe7c8", wall: "#f4d6a8", wallLo: "#e8c08a", trim: "#d9925a", trimLo: "#b8743f", floor: "#e3a466", floorMk: "#d08e52", rug: "#c9824a", rugIn: "#b9733f", rugHi: "#dc9a62", wood: "#a5643a", woodHi: "#c07c4c", woodLo: "#8a5030", woodDk: "#6b3b22", chair: "#6b4a3c", chairHi: "#85604e", plant: "#6f9a4a", plantHi: "#8bb35a", pot: "#b86e3e", metal: "#b8a48e", paper: "#fff4e0", sky1: "#f6c38a", sky2: "#fad9a8", sky3: "#fdebc8", curtain: "#f2b84a", curtainLo: "#d9973a", frame: "#8a5030", board: "#fffaf0", cork: "#d9a873" },
-    mediodia: { ol: "#22202e", wallHi: "#f2f0f5", wall: "#e6e3ec", wallLo: "#d6d2e0", trim: "#b9b3c9", trimLo: "#9d97b0", floor: "#d4d0dc", floorMk: "#c4bfd0", rug: "#b8b1cc", rugIn: "#aaa2c2", rugHi: "#c8c2da", wood: "#8c6a54", woodHi: "#a3806a", woodLo: "#725440", woodDk: "#574030", chair: "#3e3c4a", chairHi: "#55526a", plant: "#4f9a6a", plantHi: "#63b07c", pot: "#c4a888", metal: "#a0a0b0", paper: "#ffffff", sky1: "#8fbcef", sky2: "#aed0f4", sky3: "#cfe3f8", curtain: "#d9d4e6", curtainLo: "#bdb6d0", frame: "#4a4658", board: "#ffffff", cork: "#cdb69a" },
-    dorada: { ol: "#2e1608", wallHi: "#fcd59c", wall: "#f6c27e", wallLo: "#e8a660", trim: "#d4783c", trimLo: "#b35e2a", floor: "#e07a3a", floorMk: "#c9672c", rug: "#a85a2c", rugIn: "#96501f", rugHi: "#bd6a38", wood: "#a24e24", woodHi: "#c0643a", woodLo: "#84401c", woodDk: "#612c12", chair: "#5a3424", chairHi: "#774634", plant: "#7a8a38", plantHi: "#97a648", pot: "#b45a2a", metal: "#c49a70", paper: "#fff0d0", sky1: "#f08a3a", sky2: "#f6a54e", sky3: "#fbc676", curtain: "#f6b33a", curtainLo: "#d9902a", frame: "#6a3416", board: "#fff4dc", cork: "#d08a4a" },
-    atardecer: { ol: "#1c1028", wallHi: "#b78aa8", wall: "#9a7096", wallLo: "#7e5a80", trim: "#6e4f80", trimLo: "#573f6a", floor: "#7a5878", floorMk: "#684a68", rug: "#6a4c74", rugIn: "#5c4066", rugHi: "#7a5a86", wood: "#6a4450", woodHi: "#805464", woodLo: "#54363f", woodDk: "#3e2730", chair: "#3a2a44", chairHi: "#4e3a5a", plant: "#4a6a5a", plantHi: "#5a806a", pot: "#7a5060", metal: "#8a7a9a", paper: "#e8d8e8", sky1: "#3a2a6a", sky2: "#a05a8a", sky3: "#f08a6a", curtain: "#b07a9a", curtainLo: "#8a5a7c", frame: "#3a2440", board: "#d8cce0", cork: "#8a6a7a" },
+    noche: { sofa: "#36407a", sofaHi: "#45508f", sofaLo: "#2a3262", city: "#1a2040", ol: "#0d0f1f", wallHi: "#39406a", wall: "#2c3256", wallLo: "#232847", trim: "#3b4370", trimLo: "#2a305a", floor: "#283052", floorMk: "#202744", rug: "#323b66", rugIn: "#2b3359", rugHi: "#3d477a", wood: "#4b4560", woodHi: "#5a5474", woodLo: "#3a354c", woodDk: "#2b2738", chair: "#23263d", chairHi: "#343854", plant: "#2f5a5a", plantHi: "#3d6f6c", pot: "#4a4050", metal: "#5a6080", paper: "#8a90b0", sky1: "#0b1030", sky2: "#141c48", sky3: "#1f2a60", curtain: "#3a4270", curtainLo: "#2c3358", frame: "#1a1d33", board: "#5a5f86", cork: "#4a4560" },
+    manana: { sofa: "#c46a3e", sofaHi: "#d9824f", sofaLo: "#a3542e", city: "#c9a98a", ol: "#3b2418", wallHi: "#fbe7c8", wall: "#f4d6a8", wallLo: "#e8c08a", trim: "#d9925a", trimLo: "#b8743f", floor: "#e3a466", floorMk: "#d08e52", rug: "#c9824a", rugIn: "#b9733f", rugHi: "#dc9a62", wood: "#a5643a", woodHi: "#c07c4c", woodLo: "#8a5030", woodDk: "#6b3b22", chair: "#6b4a3c", chairHi: "#85604e", plant: "#6f9a4a", plantHi: "#8bb35a", pot: "#b86e3e", metal: "#b8a48e", paper: "#fff4e0", sky1: "#f6c38a", sky2: "#fad9a8", sky3: "#fdebc8", curtain: "#f2b84a", curtainLo: "#d9973a", frame: "#8a5030", board: "#fffaf0", cork: "#d9a873" },
+    mediodia: { sofa: "#6a5ad6", sofaHi: "#7d6ee0", sofaLo: "#5546b0", city: "#9aa6bd", ol: "#22202e", wallHi: "#f2f0f5", wall: "#e6e3ec", wallLo: "#d6d2e0", trim: "#b9b3c9", trimLo: "#9d97b0", floor: "#d4d0dc", floorMk: "#c4bfd0", rug: "#b8b1cc", rugIn: "#aaa2c2", rugHi: "#c8c2da", wood: "#8c6a54", woodHi: "#a3806a", woodLo: "#725440", woodDk: "#574030", chair: "#3e3c4a", chairHi: "#55526a", plant: "#4f9a6a", plantHi: "#63b07c", pot: "#c4a888", metal: "#a0a0b0", paper: "#ffffff", sky1: "#8fbcef", sky2: "#aed0f4", sky3: "#cfe3f8", curtain: "#d9d4e6", curtainLo: "#bdb6d0", frame: "#4a4658", board: "#ffffff", cork: "#cdb69a" },
+    dorada: { sofa: "#b0442a", sofaHi: "#c95a38", sofaLo: "#8e3420", city: "#b8784a", ol: "#2e1608", wallHi: "#fcd59c", wall: "#f6c27e", wallLo: "#e8a660", trim: "#d4783c", trimLo: "#b35e2a", floor: "#e07a3a", floorMk: "#c9672c", rug: "#a85a2c", rugIn: "#96501f", rugHi: "#bd6a38", wood: "#a24e24", woodHi: "#c0643a", woodLo: "#84401c", woodDk: "#612c12", chair: "#5a3424", chairHi: "#774634", plant: "#7a8a38", plantHi: "#97a648", pot: "#b45a2a", metal: "#c49a70", paper: "#fff0d0", sky1: "#f08a3a", sky2: "#f6a54e", sky3: "#fbc676", curtain: "#f6b33a", curtainLo: "#d9902a", frame: "#6a3416", board: "#fff4dc", cork: "#d08a4a" },
+    atardecer: { sofa: "#6a4a9a", sofaHi: "#7c5aae", sofaLo: "#553a80", city: "#5a4470", ol: "#1c1028", wallHi: "#b78aa8", wall: "#9a7096", wallLo: "#7e5a80", trim: "#6e4f80", trimLo: "#573f6a", floor: "#7a5878", floorMk: "#684a68", rug: "#6a4c74", rugIn: "#5c4066", rugHi: "#7a5a86", wood: "#6a4450", woodHi: "#805464", woodLo: "#54363f", woodDk: "#3e2730", chair: "#3a2a44", chairHi: "#4e3a5a", plant: "#4a6a5a", plantHi: "#5a806a", pot: "#7a5060", metal: "#8a7a9a", paper: "#e8d8e8", sky1: "#3a2a6a", sky2: "#a05a8a", sky3: "#f08a6a", curtain: "#b07a9a", curtainLo: "#8a5a7c", frame: "#3a2440", board: "#d8cce0", cork: "#8a6a7a" },
   };
   const KEYS = [[0, "noche"], [5.5, "noche"], [7, "manana"], [10, "manana"], [12, "mediodia"], [15, "mediodia"], [17, "dorada"], [18.6, "atardecer"], [19.8, "noche"], [24, "noche"]];
   const MOMENTO = { noche: ["Noche", "Night"], manana: ["Mañana", "Morning"], mediodia: ["Mediodía", "Midday"], dorada: ["Tarde dorada", "Golden hour"], atardecer: ["Atardecer", "Dusk"] };
@@ -24281,14 +24301,20 @@ button.pm-pxa{cursor:pointer}
     // alfombra
     rbox(48, 74, 224, 108, C.rug); R0(C.rugHi, 51, 77, 218, 1); R0(C.rugHi, 51, 178, 218, 1); R0(C.rugHi, 51, 77, 1, 102); R0(C.rugHi, 268, 77, 1, 102);
     for (let i = 56; i < 266; i += 10) { R0(C.rugIn, i, 80, 4, 2); R0(C.rugIn, i + 1, 79, 2, 1); R0(C.rugIn, i, 174, 4, 2); R0(C.rugIn, i + 1, 176, 2, 1); }
-    // ventana con cortinas (cielo y astro según la hora)
-    rbox(14, 6, 50, 34, C.sky2); R0(C.sky1, 14, 6, 50, 11); R0(C.sky3, 14, 28, 50, 12);
-    if (C.sol) { const p = Math.max(0, Math.min(1, (h - 6.5) / 12)); R0(C.paper, 20 + Math.round(p * 36), 30 - Math.round(Math.sin(p * Math.PI) * 18), 4, 4); }
-    else { R0(C.board, 50, 10, 4, 4); R0(C.sky1, 52, 9, 3, 3); [[20, 12], [30, 9], [40, 18], [58, 22]].forEach(([a, b]) => R0(C.board, a, b, 1, 1)); }
-    for (let i = 0; i < 50; i++) { const hh = Math.round(5 + 3 * Math.sin(i / 6) + 2 * Math.sin(i / 2.3)); R0(C.plant, 14 + i, 40 - hh, 1, hh); }
-    R0(C.ol, 38, 6, 1, 34); R0(C.ol, 14, 22, 50, 1);
-    [[9, 0], [57, 1]].forEach(([a]) => { rbox(a, 4, 10, 38, C.curtain); for (let j = 0; j < 3; j++) R0(C.curtainLo, a + 2 + j * 3, 6, 1, 35); });
-    rbox(10, 41, 58, 2, C.woodHi);
+    // terraza: puerta de vidrio, baranda, matera y la ciudad al fondo (cielo y luces según la hora)
+    const GX = 6, GY = 3, GW = 64, GH = 46;
+    R0(C.ol, GX - 1, GY - 1, GW + 2, GH + 2); R0(C.sky2, GX, GY, GW, GH); R0(C.sky1, GX, GY, GW, 13); R0(C.sky3, GX, GY + 26, GW, 20);
+    if (C.sol) { const p = Math.max(0, Math.min(1, (h - 6.5) / 12)); R0(C.paper, GX + 6 + Math.round(p * 48), GY + 24 - Math.round(Math.sin(p * Math.PI) * 18), 4, 4); }
+    else { R0(C.board, GX + 50, GY + 5, 4, 4); R0(C.sky1, GX + 52, GY + 4, 3, 3); [[8, 6], [20, 3], [34, 9], [44, 4]].forEach(([a2, b2]) => R0(C.board, GX + a2, GY + b2, 1, 1)); }
+    for (let i = 0; i < GW; i++) { const hh = Math.round(9 + 4 * Math.sin(i / 9) + 2 * Math.sin(i / 3.1)); R0(mix(C.sky3, C.plant, .45), GX + i, GY + 30 - hh, 1, hh); }
+    const BLD = [[0, 13, 9], [9, 18, 7], [16, 10, 8], [24, 24, 6], [30, 15, 9], [39, 20, 7], [46, 12, 8], [54, 17, 10]];
+    BLD.forEach(([bx, bh, bw], i) => { const top = GY + 36 - bh; R0(mix(C.city, C.ol, i % 2 ? .18 : 0), GX + bx, top, bw, bh);
+      for (let yy = top + 2; yy < GY + 34; yy += 3) for (let xx = GX + bx + 1; xx < GX + bx + bw - 1; xx += 2) if ((xx * 7 + yy * 3 + i) % 5 < (C.noche ? 2 : 1)) R0(C.noche ? "#ffd27a" : mix(C.city, C.paper, .45), xx, yy, 1, 1); });
+    R0(mix(C.city, C.ol, .3), GX + 26, GY + 6, 2, 6); R0(C.noche ? "#ff6b6b" : mix(C.city, C.ol, .3), GX + 26, GY + 5, 2, 1);   // torre con antena
+    R0(C.woodLo, GX, GY + 38, GW, 8); R0(C.woodHi, GX, GY + 38, GW, 1); for (let i = 4; i < GW; i += 8) R0(C.woodDk, GX + i, GY + 39, 1, 7);   // piso de la terraza
+    R0(C.ol, GX, GY + 30, GW, 1); for (let i = 2; i < GW; i += 6) R0(C.ol, GX + i, GY + 30, 1, 8); R0(C.metal, GX, GY + 29, GW, 1);   // baranda
+    R0(C.ol, GX + 48, GY + 32, 10, 8); R0(C.pot, GX + 49, GY + 33, 8, 6); R0(C.plant, GX + 47, GY + 25, 12, 8); R0(C.plantHi, GX + 49, GY + 24, 6, 3);
+    R0(C.ol, GX + 21, GY, 1, GH); R0(C.ol, GX + 43, GY, 1, GH); R0("rgba(255,255,255,.18)", GX + 3, GY + 2, 2, 20); R0("rgba(255,255,255,.12)", GX + 25, GY + 2, 2, 14);
     // repisa con premios
     rbox(74, 28, 34, 2, C.wood, C.woodHi);
     rbox(78, 19, 6, 8, "#e8b84a", "#ffe08a"); rbox(89, 21, 5, 6, "#c9c9d4", "#ffffff"); rbox(99, 18, 5, 9, "#e8b84a", "#ffe08a");
@@ -24305,8 +24331,11 @@ button.pm-pxa{cursor:pointer}
     R0(C.ol, hub[0] - 3, hub[1] - 3, 6, 6); R0("#F3FF57", hub[0] - 2, hub[1] - 2, 4, 4);
     M.forEach(m => { const [a, b] = m.slot; rbox(a - 6, b - 4, 12, 8, m.color); R0("rgba(0,0,0,.12)", a - 5, b + 3, 10, 1); R0(mix(m.color, C.ol, .35), a - 4, b - 1, 6, 1); R0(mix(m.color, C.ol, .35), a - 4, b + 1, 4, 1);
       m.proyectos.slice(0, 6).forEach((_, j) => { const px = a - 6 + j * 2 + (j > 2 ? 2 : 0); R0(C.ol, px, b - 6, 1, 1); R0("#d23b3b", px, b - 7, 1, 1); }); });
-    // planta (esquina superior izquierda, junto a la ventana)
-    rbox(4, 45, 14, 11, C.pot, C.trim, C.woodLo); [[0, 30, 10, 14], [9, 26, 9, 18], [4, 20, 8, 12]].forEach(([a, b, w, hh], i) => { R0(C.ol, a - 1, b - 1, w + 2, hh + 2); R0(i % 2 ? C.plant : C.plantHi, a, b, w, hh); R0(C.plant, a, b + hh - 2, w, 2); });
+    // sofás a los costados (respaldo contra la pared, cojines y brazos)
+    [[4, 1], [282, -1]].forEach(([sx, dir]) => { const bx = dir > 0 ? sx : sx + 28;
+      R0(C.ol, sx - 1, 91, 36, 72); R0(C.sofa, sx, 92, 34, 70); R0(C.sofaLo, bx, 92, 6, 70); R0(C.sofaHi, sx, 92, 34, 1);
+      R0(C.ol, sx - 1, 91, 36, 8); R0(C.sofaLo, sx, 92, 34, 6); R0(C.ol, sx - 1, 155, 36, 8); R0(C.sofaLo, sx, 156, 34, 6);
+      R0(C.sofaLo, dir > 0 ? sx + 6 : sx, 127, 28, 1); R0(C.sofaHi, dir > 0 ? sx + 7 : sx + 1, 100, 26, 1); });
     // respaldos detrás de la gente (fila de atrás y extremos)
     SEATS.filter(s => s.side === "back" || s.side === "end").forEach(s => { rbox(s.x - 8, s.y - 24, 16, 10, C.chair, C.chairHi); });
     // muro frontal con la puerta
@@ -24335,7 +24364,7 @@ button.pm-pxa{cursor:pointer}
     rbox(cx + 22, cy - 2, 3, 5, "#bfe3f2"); rbox(cx + 27, cy - 1, 3, 4, "#bfe3f2");
     // en cada puesto: portátil si está ocupado, libreta si está libre
     SEATS.forEach((s, i) => {
-      let px, py; if (s.side === "back") { px = s.x; py = T.y + 3; } else if (s.side === "front") { px = s.x; py = T.y + T.h - 9; } else { px = s.x < cx ? T.x + 10 : T.x + T.w - 10; py = cy - 3; }
+      if (s.side === "sofa") return; let px, py; if (s.side === "back") { px = s.x; py = T.y + 3; } else if (s.side === "front") { px = s.x; py = T.y + T.h - 9; } else { px = s.x < cx ? T.x + 10 : T.x + T.w - 10; py = s.y - 16; }
       if (used.has(i)) { if (s.side === "front") { rbox(px - 6, py, 12, 5, C.metal); R0(C.noche ? "#9fd0ff" : mix(C.metal, "#ffffff", .5), px - 5, py + 1, 10, 3); } else { rbox(px - 6, py, 12, 6, C.metal, mix(C.metal, "#ffffff", .3)); R0(C.paper, px - 1, py + 2, 2, 2); } }
       else { rbox(px - 4, py + 1, 8, 5, C.paper); R0(C.trimLo, px - 3, py + 3, 5, 1); }
       if (i % 3 === 1 && s.side !== "end") { rbox(px + 8, py + 1, 3, 4, C.paper); R0(C.woodLo, px + 8, py + 2, 3, 1); }
@@ -24399,7 +24428,7 @@ button.pm-pxa{cursor:pointer}
   }
 
   /* ---------- estado ---------- */
-  const S = { ents: new Map(), myId: "", proj: null, projBy: "", log: [], demo: true, raf: 0, last: 0, keys: new Set(), mounted: false, media: { mic: null, cam: null, screen: null } };
+  const S = { ents: new Map(), myId: "", proj: null, projBy: "", log: [], demo: false, raf: 0, last: 0, keys: new Set(), mounted: false, media: { mic: null, cam: null, screen: null } };
   let tr = null; // transporte activo
   const myEnt = () => S.ents.get(S.myId);
 
@@ -24423,7 +24452,50 @@ button.pm-pxa{cursor:pointer}
 
   /* ---------- transporte ---------- */
   const PROVIDER = { impl: null };
-  function send(m) { m.from = S.myId; try { if (PROVIDER.impl && PROVIDER.impl.send) PROVIDER.impl.send(m); else if (tr) tr.postMessage(m); } catch (e) { } }
+  function send(m) { m.from = S.myId; try { if (PROVIDER.impl && PROVIDER.impl.send) PROVIDER.impl.send(m); else if (NET.on) netQueue(m); else if (tr) tr.postMessage(m); } catch (e) { } }
+  /* presencia real (/api/sala): quién está de verdad, dónde, qué dijo y qué proyecta. Solo late mientras tienes la Sala abierta. */
+  const API_SALA = "/api/sala", NET = { on: false, t: 0, q: 0, busy: false, dirty: false, out: [], proj: undefined, seen: {}, projTs: 0, projId: "" };
+  function netQueue(m) {
+    if (m.t === "say") NET.out.push({ text: m.text }); else if (m.t === "proj") NET.proj = m.k ? { k: m.k } : null;
+    else if (m.t === "bye") { try { fetch(API_SALA, { method: "POST", keepalive: true, headers: { "content-type": "application/json" }, body: JSON.stringify({ id: S.myId, bye: true }) }); } catch (e) { } return; }
+    NET.dirty = true; clearTimeout(NET.q); NET.q = setTimeout(() => { if (!NET.busy) netTick(); }, 250);
+  }
+  async function netTick() {
+    clearTimeout(NET.t); if (!NET.on) return;
+    const v = $("view-sala"), activa = v && v.classList.contains("active") && !document.hidden, e = myEnt();
+    if (!activa || !e) { NET.t = setTimeout(netTick, 4000); return; }
+    const tgt = e.path.length ? e.path[e.path.length - 1] : [e.x, e.y];
+    const body = { id: S.myId, name: me(), x: Math.round(tgt[0]), y: Math.round(tgt[1]), seat: e.seat >= 0 ? e.seat : (e.goSeat >= 0 ? e.goSeat : -1), mic: !!e.mic, cam: !!e.cam, say: NET.out.splice(0) };
+    if (NET.proj !== undefined) { body.proj = NET.proj; NET.proj = undefined; }
+    NET.busy = true; NET.dirty = false;
+    try { const r = await fetch(API_SALA, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }); if (r.ok) netApply(await r.json()); else NET.out.unshift(...body.say); }
+    catch (er) { NET.out.unshift(...body.say); }
+    NET.busy = false;
+    NET.t = setTimeout(netTick, NET.dirty ? 250 : [...S.ents.values()].some(x => x.net) ? 2500 : 6000);
+  }
+  function logAdd(name, text, ts) { S.log.push({ ts, name, text }); S.log.sort((a, b) => a.ts - b.ts); if (S.log.length > 80) S.log.splice(0, S.log.length - 80); renderLog(); }
+  function netApply(j) {
+    const ids = new Set();
+    (j.people || []).forEach(p => {
+      if (!p || !p.id || p.id === S.myId) return; ids.add(p.id);
+      let e = S.ents.get(p.id); const nuevo = !e;
+      const says = (p.say || []).slice().sort((a, b) => a.ts - b.ts), last = says.length ? says[says.length - 1].ts : 0;
+      if (nuevo) {
+        e = mkEnt({ name: p.name }); e.net = true;
+        if (p.seat >= 0 && SEATS[p.seat]) { e.seat = p.seat; e.x = SEATS[p.seat].x; e.y = SEATS[p.seat].y; } else { e.x = p.x; e.y = p.y; }
+        says.forEach(m => logAdd(p.name, m.text, m.ts)); NET.seen[p.id] = last;
+      } else {
+        if (p.seat >= 0) { if (e.seat !== p.seat && e.goSeat !== p.seat) sitAt(e, p.seat); }
+        else { const t = e.path.length ? e.path[e.path.length - 1] : [e.x, e.y]; if (e.seat >= 0 || Math.hypot(t[0] - p.x, t[1] - p.y) > 2) walkTo(e, p.x, p.y); }
+        says.filter(m => m.ts > (NET.seen[p.id] || 0)).forEach(m => { say(e, m.text, m.ts); }); NET.seen[p.id] = Math.max(NET.seen[p.id] || 0, last);
+      }
+      e.mic = !!p.mic; e.camR = !!p.cam;
+      if (p.proj && p.proj.ts > NET.projTs) { NET.projTs = p.proj.ts; NET.projId = p.id; setProj(p.proj.k, p.name, true); }
+      else if (!p.proj && NET.projId === p.id && S.proj) { NET.projId = ""; setProj(null, "", true); }
+    });
+    [...S.ents.values()].filter(e => e.net && !ids.has(e.id)).forEach(e => { if (NET.projId === e.id && S.proj) { NET.projId = ""; setProj(null, "", true); } rmEnt(e.id); });
+    people_();
+  }
   function onMsg(m) {
     if (!m || m.from === S.myId) return;
     let e = S.ents.get(m.from);
@@ -24437,14 +24509,16 @@ button.pm-pxa{cursor:pointer}
   }
   const sendState = () => { const e = myEnt(); if (e) send({ t: "state", name: e.name, x: e.x, y: e.y, seat: e.seat, mic: e.mic, proj: S.projBy === e.name ? S.proj : null }); };
   function openTransport() {
-    if (PROVIDER.impl) return;
-    try { tr = new BroadcastChannel("pxp-sala-v1"); tr.onmessage = ev => onMsg(ev.data); } catch (e) { tr = null; }
+    if (PROVIDER.impl || NET.on || tr) return;
+    const local = () => { try { tr = new BroadcastChannel("pxp-sala-v1"); tr.onmessage = ev => onMsg(ev.data); tr.postMessage({ t: "hi", from: S.myId, name: me(), x: DOOR.x, y: DOOR.y, seat: -1, mic: false }); } catch (e) { tr = null; } };
+    if (!/^https?:/.test(location.protocol)) return local();
+    fetch(API_SALA, { cache: "no-store" }).then(r => { if (r.ok) { NET.on = true; netTick(); } else local(); }).catch(local);
   }
 
   /* ---------- burbujas, registro y proyección ---------- */
-  function say(e, text) {
+  function say(e, text, ts) {
     text = String(text || "").trim().slice(0, 140); if (!text) return;
-    S.log.push({ ts: Date.now(), name: e.name, text }); if (S.log.length > 60) S.log.shift(); renderLog();
+    logAdd(e.name, text, ts || Date.now());
     if (e.bub) e.bub.remove();
     const b = document.createElement("div"); b.className = "sl-bub pxb"; b.innerHTML = `<span class="pxb-o"><span class="pxb-i"></span></span>${PXA.TAIL}`; b.querySelector(".pxb-i").textContent = text;
     $("sl-ov").appendChild(b); e.bub = b; e.bubT = performance.now() + 4200 + text.length * 70;
@@ -24452,7 +24526,7 @@ button.pm-pxa{cursor:pointer}
   }
   function renderLog() {
     const l = $("sl-log"); if (!l) return;
-    l.innerHTML = S.log.slice(-40).map(m => `<li><b>${esc(tit(String(m.name).split(" ")[0]))}</b> ${esc(m.text)} <time>${new Date(m.ts).toLocaleTimeString("es-CO", { hour: "numeric", minute: "2-digit" })}</time></li>`).join("") || `<li class="sl-empty">${L("Aquí queda lo que se dice en la sala.", "What's said in the room stays here.")}</li>`;
+    l.innerHTML = S.log.slice(-80).map(m => `<li><b>${esc(tit(String(m.name).split(" ")[0]))}</b> ${esc(m.text)} <time>${new Date(m.ts).toLocaleTimeString("es-CO", { hour: "numeric", minute: "2-digit" })}</time></li>`).join("") || `<li class="sl-empty">${L("Aquí queda lo que se dice en la sala.", "What's said in the room stays here.")}</li>`;
     l.scrollTop = l.scrollHeight;
   }
   const ESTP = { cotizado: "Cotizado", preproduccion: "Preproducción", rodaje: "Rodaje", en_produccion: "Postproducción", postproduccion: "Postproducción", revision: "Revisión", entregado: "Entregado", aprobado: "Aprobado", standby: "Standby" };
@@ -24466,6 +24540,10 @@ button.pm-pxa{cursor:pointer}
       <div class="sl-pc-bar"><i style="width:${pct}%"></i></div><div class="sl-pc-n">${done}/${et.length} ${L("etapas listas", "stages done")}${fin ? ` · ${L("entrega", "delivery")} ${fD(fin)}` : ""}</div>
       <ul>${next.map(e => `<li><span>${esc(e.nombre || "")}</span><em>${e.fecha ? fD(e.fecha) : ""}</em></li>`).join("")}</ul></div>`;
   }
+  /* la misma ficha de la pestaña Proyectos, escalada para que quepa entera */
+  const fichaHTML = k => { try { if (window.pxpCardHtml) return `<div class="sl-ficha">${pxpCardHtml(k)}</div>`; } catch (e) { } return projHTML(k); };
+  function fit(box) { requestAnimationFrame(() => { const f = box.querySelector(".sl-ficha"); if (!f) return; f.style.transform = "none"; const w = f.offsetWidth, h = f.offsetHeight, bw = box.clientWidth, bh = box.clientHeight; if (!w || !h || !bw) return;
+    const k = Math.min((bw - 16) / w, (bh - 16) / h); f.style.transform = `translate(-50%,-50%) scale(${k})`; }); }
   function setProj(k, by, remote) {
     if (S.media.screen && k) stopScreen();
     S.proj = k || null; S.projBy = k ? by : ""; paintTV();
@@ -24475,7 +24553,8 @@ button.pm-pxa{cursor:pointer}
   function paintTV() {
     const tv = $("sl-tv"); if (!tv) return;
     if (S.media.screen) { if (!tv.querySelector("video")) { tv.innerHTML = ""; const v = document.createElement("video"); v.muted = true; v.autoplay = true; v.playsInline = true; v.srcObject = S.media.screen; tv.appendChild(v); v.play().catch(() => { }); } tv.dataset.mode = "screen"; return; }
-    if (S.proj) { tv.innerHTML = projHTML(S.proj); tv.dataset.mode = "proj"; return; }
+    if (S.proj) { if (tv.dataset.k !== S.proj || tv.dataset.mode !== "proj") { tv.innerHTML = `<div class="sl-tvc">${fichaHTML(S.proj)}</div>`; tv.dataset.k = S.proj; } tv.dataset.mode = "proj"; fit(tv); return; }
+    tv.dataset.k = "";
     const n = S.ents.size; tv.dataset.mode = "idle";
     tv.innerHTML = `<div class="sl-idle"><b>${L("Sala de juntas", "Meeting room")}</b><span>${n} ${n === 1 ? L("persona", "person") : L("personas", "people")} · ${new Date().toLocaleTimeString("es-CO", { hour: "numeric", minute: "2-digit" })}</span></div>`;
   }
@@ -24516,7 +24595,7 @@ button.pm-pxa{cursor:pointer}
   const LINES = ["¿Ya salió el render?", "Versión 7, la buena", "¿Quién tiene el EDL?", "Frame.io actualizado", "Le subo dos puntos al contraste", "El cliente pidió el logo más grande", "Hagamos un pase de color", "El audio quedó perfecto", "¿Cerramos la entrega hoy?", "Necesito el master en ProRes", "Ojo con los safe areas", "Me encanta ese corte", "¿Lo vemos en el TV?", "Subo la referencia al repo", "Mañana rodamos temprano", "Ese plano pide un respiro", "Cafecito y seguimos"];
   let demoT = [];
   function demoStart() {
-    demoStop(); if (!S.demo) return;
+    demoStop(); if (!S.demo || !isDev()) return;
     const mine = S.myId, pool = people().filter(p => nn(p.name) !== mine).sort(() => Math.random() - .5).sort((a, b) => (!!b.avatar) - (!!a.avatar)).slice(0, 6);
     pool.forEach((p, i) => demoT.push(setTimeout(() => {
       if (!S.demo || S.ents.has(nn(p.name))) return; const e = mkEnt({ name: p.name, demo: true }); e.x = DOOR.x + R(-6, 6); e.y = DOOR.y;
@@ -24616,22 +24695,29 @@ button.pm-pxa{cursor:pointer}
       + `<button type="button" class="sl-mn hub" style="left:50%;top:${pct(BOARD.y + 20, BOARD.y, BOARD.h)}" data-sl-tip="${L("Mapa de proyectos", "Project map")}" aria-label="${L("Abrir el mapa de proyectos", "Open project map")}"></button>`;
     box.onclick = ev => { const b = ev.target.closest(".sl-mn"); if (!b) return; ev.stopPropagation(); mapaBig(b.dataset.i != null ? +b.dataset.i : -1); };
   }
+  /* copia los estilos de las fichas de Clientes (que viven bajo #view-clientes) para usarlos en el mapa */
+  function cssClientes() {
+    if ($("sl-cli-css")) return; const out = [];
+    const walk = (rules, wrap) => { for (const r of rules) { try {
+      if (r.type === 1 && /#view-clientes|#cli-wrap/.test(r.selectorText)) { const t = r.cssText.replace(/#view-clientes/g, ".sl-cv").replace(/#cli-wrap/g, ".sl-cv"); out.push(wrap ? `@media ${wrap}{${t}}` : t); }
+      else if (r.type === 4) walk(r.cssRules, r.conditionText || r.media.mediaText); } catch (e) { } } };
+    for (const sh of document.styleSheets) { try { walk(sh.cssRules, null); } catch (e) { } }
+    const st = document.createElement("style"); st.id = "sl-cli-css"; st.textContent = out.join("\n"); document.head.appendChild(st);
+  }
   function mapaBig(focus) {
-    const P = typeof PROJECTS !== "undefined" ? PROJECTS : {}, by = {};
-    Object.keys(P).forEach(k => { const p = P[k]; if (!p || p.archivadoEn || p.estadoGeneral === "aprobado") return; const c = tit(p.cliente || L("Sin cliente", "No client")); (by[c] = by[c] || []).push(k); });
-    const cls = Object.keys(by).sort((a, b) => by[b].length - by[a].length), fc = focus >= 0 && S.mapa[focus] ? S.mapa[focus].cliente : null;
-    const colorOf = c => { const m = (S.mapa || []).find(x => x.cliente === c); return m ? m.color : "var(--border2)"; };
-    const card = c => { const team = new Set(); by[c].forEach(k => (P[k].etapas || []).forEach(e => [].concat(e.resp || []).forEach(r => r && team.add(r))));
-      const heads = [...team].slice(0, 8).map(n => { const p = find(n) || { name: n }; return `<button type="button" class="sl-mp-p" data-p="${esc(p.name)}" title="${esc(tit(p.name))}"><img src="${PXA.headURL(cfgFor(p), null, 36)}" alt=""></button>`; }).join("");
-      return `<section class="sl-mp-c${c === fc ? " on" : ""}" style="--nc:${colorOf(c)}"><h4>${esc(c)} <span>${by[c].length}</span></h4><ul>${by[c].map(k => { const e = (P[k].etapas || []).filter(x => x.estado !== "listo").sort((a, b) => (a.fecha || "9").localeCompare(b.fecha || "9"))[0];
-        return `<li><button type="button" data-k="${esc(k)}"><b>${esc(P[k].nombre || k)}</b><small>${esc(ESTP[P[k].estadoGeneral] || "")}${e && e.fecha ? ` · ${esc(e.nombre || "")} ${fD(e.fecha)}` : ""}</small></button></li>`; }).join("")}</ul>${heads ? `<div class="sl-mp-t">${heads}</div>` : ""}</section>`; };
+    let html = ""; try { html = window.pxpClientTreeHtml ? pxpClientTreeHtml() : ""; } catch (e) { }
+    const tmp = document.createElement("div"); tmp.innerHTML = html; const tree = tmp.querySelector(".ctree"); if (!tree) return;
+    cssClientes();
+    const fc = focus >= 0 && S.mapa && S.mapa[focus] ? nn(S.mapa[focus].cliente) : null;
+    const n = tree.querySelectorAll("details.cnode").length, foot = tmp.querySelector(".ct-foot");
     const ov = document.createElement("div"); ov.className = "sl-mp"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", L("Mapa de proyectos", "Project map"));
-    ov.innerHTML = `<div class="sl-mp-b"><header><h3>${L("Mapa de proyectos", "Project map")}</h3><p>${cls.length} ${L("clientes", "clients")} · ${Object.values(by).reduce((n, a) => n + a.length, 0)} ${L("proyectos activos", "active projects")}</p><button type="button" class="sl-mp-x" aria-label="${L("Cerrar", "Close")}">✕</button></header><div class="sl-mp-g">${(fc ? [fc].concat(cls.filter(c => c !== fc)) : cls).map(card).join("")}</div></div>`;
+    ov.innerHTML = `<div class="sl-mp-b"><header><h3>${L("Mapa de proyectos", "Project map")}</h3><p>${n} ${L("clientes con proyectos activos", "clients with active projects")}</p><button type="button" class="sl-mp-x" aria-label="${L("Cerrar", "Close")}">✕</button></header><div class="sl-cv"></div></div>`;
+    const host = ov.querySelector(".sl-cv"); host.appendChild(tree); if (foot) host.appendChild(foot);
     document.body.appendChild(ov);
     const close = () => { ov.remove(); document.removeEventListener("keydown", k); }; const k = ev => { if (ev.key === "Escape") close(); };
-    document.addEventListener("keydown", k); ov.querySelector(".sl-mp-x").onclick = close; ov.onclick = ev => { if (ev.target === ov) return close();
-      const pj = ev.target.closest("[data-k]"); if (pj) { close(); try { pxpOpenProject(pj.dataset.k); } catch (e) { } return; }
-      const pe = ev.target.closest("[data-p]"); if (pe) { close(); try { pxpOpenPerson(pe.dataset.p); } catch (e) { } } };
+    document.addEventListener("keydown", k); ov.querySelector(".sl-mp-x").onclick = close;
+    ov.addEventListener("click", ev => { if (ev.target === ov) return close(); if (ev.target.closest(".pchip, .cn-link, .cav, .ct-all, [data-k]")) setTimeout(close, 0); });
+    if (fc) { const d = [...tree.querySelectorAll("details.cnode")].find(x => nn(x.dataset.ck) === fc); if (d) { d.open = true; d.classList.add("sl-focus"); setTimeout(() => d.scrollIntoView({ block: "nearest" }), 60); } }
     setTimeout(() => ov.querySelector(".sl-mp-x").focus(), 30);
   }
   /* ---------- interfaz ---------- */
@@ -24659,7 +24745,7 @@ button.pm-pxa{cursor:pointer}
   function people_() {
     const ul = $("sl-ppl"); if (!ul) return; const list = [...S.ents.values()].sort((a, b) => (b.id === S.myId) - (a.id === S.myId) || a.name.localeCompare(b.name));
     $("sl-n").textContent = list.length;
-    ul.innerHTML = list.map(e => `<li data-id="${esc(e.id)}"><img src="${PXA.headURL(e.cfg, null, 44)}" alt=""><span><b>${esc(tit(e.name))}${e.id === S.myId ? ` <em>${L("tú", "you")}</em>` : ""}</b><small>${esc(e.role)}${e.demo ? ` · ${L("demo", "demo")}` : ""}</small></span><i class="${e.mic ? "on" : ""}" title="${e.mic ? L("Micrófono encendido", "Mic on") : L("Micrófono apagado", "Mic off")}">${svg(e.mic ? IC.mic : IC.micOff)}</i><i class="${e.cam ? "on" : ""}" title="${e.cam ? L("Cámara encendida", "Camera on") : L("Cámara apagada", "Camera off")}">${svg(e.cam ? IC.cam : IC.camOff)}</i></li>`).join("");
+    ul.innerHTML = list.map(e => `<li data-id="${esc(e.id)}"><img src="${PXA.headURL(e.cfg, null, 44)}" alt=""><span><b>${esc(tit(e.name))}${e.id === S.myId ? ` <em>${L("tú", "you")}</em>` : ""}</b><small>${esc(e.role)}${e.demo ? ` · ${L("demo", "demo")}` : ""}</small></span><i class="${e.mic ? "on" : ""}" title="${e.mic ? L("Micrófono encendido", "Mic on") : L("Micrófono apagado", "Mic off")}">${svg(e.mic ? IC.mic : IC.micOff)}</i><i class="${e.cam || e.camR ? "on" : ""}" title="${e.cam || e.camR ? L("Cámara encendida", "Camera on") : L("Cámara apagada", "Camera off")}">${svg(e.cam || e.camR ? IC.cam : IC.camOff)}</i></li>`).join("");
     paintTV();
   }
   function chatSend() { const i = $("sl-in"); const v = i.value.trim(); if (!v) { i.focus(); return; } i.value = ""; const e = myEnt(); if (!e) return; say(e, v); send({ t: "say", text: v }); }
@@ -24681,7 +24767,7 @@ button.pm-pxa{cursor:pointer}
     const ov = document.createElement("div"); ov.className = "sl-big"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", L("TV en grande", "TV enlarged"));
     ov.innerHTML = `<div class="sl-big-b"><button type="button" class="sl-big-x" aria-label="${L("Cerrar", "Close")}">✕</button><div class="sl-big-c"></div>${S.proj ? `<button type="button" class="sl-big-o">${L("Abrir proyecto", "Open project")}</button>` : ""}</div>`;
     document.body.appendChild(ov); const c = ov.querySelector(".sl-big-c");
-    if (S.media.screen) { const v = document.createElement("video"); v.muted = true; v.autoplay = true; v.playsInline = true; v.srcObject = S.media.screen; c.appendChild(v); v.play().catch(() => { }); } else c.innerHTML = projHTML(S.proj, true);
+    if (S.media.screen) { const v = document.createElement("video"); v.muted = true; v.autoplay = true; v.playsInline = true; v.srcObject = S.media.screen; c.appendChild(v); v.play().catch(() => { }); } else { c.innerHTML = `<div class="sl-tvc big">${fichaHTML(S.proj)}</div>`; fit(c.firstElementChild); c.addEventListener("click", ev => { if (ev.target.closest(".pvc")) setTimeout(close, 0); }); }
     const close = () => { ov.remove(); document.removeEventListener("keydown", k); }; const k = ev => { if (ev.key === "Escape") close(); };
     document.addEventListener("keydown", k); ov.querySelector(".sl-big-x").onclick = close; ov.onclick = ev => { if (ev.target === ov) close(); };
     const o = ov.querySelector(".sl-big-o"); if (o) o.onclick = () => { const kk = S.proj; close(); try { pxpOpenProject(kk); } catch (e) { } };
@@ -24718,7 +24804,7 @@ button.pm-pxa{cursor:pointer}
     const host = $("view-logros") || $("view-repositorio") || $("view-team"); if (!host) return;
     host.insertAdjacentHTML("afterend", `<div class="view" id="view-sala"><div class="proj-wrap sl-wrap">
       <div class="sl-head"><div><h2>${L("Sala de juntas", "Meeting room")}</h2><p>${L("Haz clic en el piso para caminar o en una silla para sentarte. También con las flechas.", "Click the floor to walk or a chair to sit. Arrow keys work too.")}</p></div>
-        <div class="sl-hr"><button type="button" class="sl-hora" id="sl-hora" title="${L("Ver la sala a otra hora", "See the room at another time")}"></button><span class="sl-badge">${L("Prototipo", "Prototype")}</span><label class="sl-demo"><input type="checkbox" id="sl-demo" checked> ${L("Compañeros de demostración", "Demo teammates")}</label></div></div>
+        <div class="sl-hr"><button type="button" class="sl-hora" id="sl-hora" title="${L("Ver la sala a otra hora", "See the room at another time")}"></button><span class="sl-badge">${L("Prototipo", "Prototype")}</span><label class="sl-demo" hidden><input type="checkbox" id="sl-demo"> ${L("Compañeros de demostración", "Demo teammates")}</label></div></div>
       <div class="sl-main">
         <div class="sl-stage" id="sl-stage" tabindex="0" role="application" aria-label="${L("Sala de juntas. Flechas para caminar.", "Meeting room. Arrow keys to walk.")}">
           <canvas id="sl-cv" width="${W}" height="${H}"></canvas>
@@ -24753,16 +24839,17 @@ button.pm-pxa{cursor:pointer}
     $("sl-stage").addEventListener("keydown", ev => { const k = KM[ev.key]; if (k) { ev.preventDefault(); S.keys.add(k); } else if (ev.key === "Enter") { $("sl-in").focus(); } });
     $("sl-stage").addEventListener("keyup", ev => { const k = KM[ev.key]; if (k) { S.keys.delete(k); if (!S.keys.size) sendState(); } });
     $("sl-stage").addEventListener("blur", () => S.keys.clear());
-    try { S.demo = localStorage.getItem("pxp_sala_demo") !== "0"; } catch (e) { } $("sl-demo").checked = S.demo;
+    try { S.demo = isDev() && localStorage.getItem("pxp_sala_demo") === "1"; } catch (e) { S.demo = false; } $("sl-demo").checked = S.demo;
     bar(); renderLog();
   }
   function enter() {
     mount(); if (!$("view-sala")) return;
     const id = nn(me()); if (!id) return;
     if (S.myId !== id) { [...S.ents.keys()].forEach(rmEnt); S.myId = id; }
+    const dl = document.querySelector(".sl-demo"); if (dl) dl.hidden = !isDev(); if (!isDev() && S.demo) { S.demo = false; demoStop(); }
     if (!myEnt()) { const e = mkEnt({ name: me() }); e.x = DOOR.x; e.y = DOOR.y; walkTo(e, DOOR.x + 18, 180); openTransport();
-      send({ t: "hi", name: me(), x: e.x, y: e.y, seat: -1, mic: false });
-      if (S.demo) demoStart(); }
+      if (S.demo && isDev()) demoStart(); }
+    else if (NET.on) netTick();
     else { const e = myEnt(), p = find(me()); if (p) { e.cfg = cfgFor(p); e.g = grp(p); } }
     people_(); bar(); paintTV(); run();
     const ed = !(find(me()) || {}).avatar; const hint = $("sl-noav");

@@ -180,6 +180,8 @@ El asistente del avatar funciona sin IA. Para conectarlo a la IA aprobada por Pu
 - **API compatible con OpenAI** (gateway interno): `AI_PROVIDER=compatible`, `AI_BASE_URL`, `AI_API_KEY`, `AI_MODEL`.
 Sin variables, `/api/ai` responde que no está configurada y el asistente sigue con sus reglas. El modelo solo elige acciones; los permisos, las confirmaciones y Deshacer son los mismos de siempre.
 
-## Sala de juntas (prototipo, v212)
-Funciona sin servidor adicional: caminar, sentarse, burbujas de chat, proyectar un proyecto en el TV y el mapa de clientes. Hoy se comparte entre pestañas del mismo navegador y con compañeros de demostración. Cámara, micrófono y pantalla se ven solo en tu equipo. Cuando TI apruebe el servicio de llamadas, se conecta con `PXP_SALA.setProvider({...})` (ver HANDOFF.md).
-
+## Sala de juntas (v213)
+Ya muestra a las personas que de verdad están en la Sala, sin servidor adicional: cada quien escribe su posición, su silla, lo que dice y lo que proyecta en `/api/sala` (Netlify Blobs, almacén `trafico-sala`). Solo late mientras la persona tiene la pestaña Sala abierta (cada 2,5 s si hay alguien más, cada 6 s si está sola); quien cierra la pestaña sale de la sala. Los mensajes duran 15 minutos.
+- Cálculo de uso: cada latido es una llamada a la función. 5 personas una hora al día ≈ 7.000 llamadas al día. Si el plan de Netlify se queda corto, basta con subir el intervalo en `netTick` (sala-js).
+- Cámara, micrófono y pantalla todavía se ven solo en el equipo de cada quien. Cuando TI apruebe el servicio de llamadas, se conecta con `PXP_SALA.setProvider({...})` (ver HANDOFF.md) y reemplaza a `/api/sala`.
+- Los compañeros de demostración solo los puede activar Bastián, y están apagados por defecto.

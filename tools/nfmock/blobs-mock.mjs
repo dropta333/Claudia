@@ -10,5 +10,6 @@ export function getStore({ name }) {
     async set(k, val, o = {}) { m.set(k, { buf: val, data: typeof val === "string" ? val : null, metadata: o.metadata }); },
     async setJSON(k, val) { m.set(k, { data: JSON.stringify(val) }); },
     async delete(k) { m.delete(k); },
+    async list(o = {}) { return { blobs: [...m.keys()].filter(k => !o.prefix || k.startsWith(o.prefix)).map(key => ({ key, etag: "" })), directories: [] }; },
   };
 }

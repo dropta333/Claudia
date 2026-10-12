@@ -1,4 +1,4 @@
-// Prueba v212: Sala de juntas (entrar, caminar, sentarse, burbujas, proyectar, cámara/mic/pantalla locales, demo, proveedor),
+// Prueba v212–v213: Sala de juntas (entrar, caminar, sentarse, burbujas, proyectar, cámara/mic/pantalla locales, demo, proveedor),
 // perfil con foto más grande y acciones debajo, asistente que lleva a la Sala y catálogo de herramientas para la IA.
 import { createRequire } from "node:module"; import { execSync } from "node:child_process"; import path from "node:path";
 const req = createRequire(import.meta.url); let pw; try { pw = req("playwright"); } catch { pw = req(execSync("npm root -g").toString().trim() + "/playwright"); }
@@ -8,7 +8,7 @@ async function abrir(w, h, quien) {
   const ctx = await b.newContext({ viewport: { width: w, height: h } }); await ctx.grantPermissions(["camera", "microphone"]).catch(() => { });
   const page = await ctx.newPage(); page.on("pageerror", e => errs.push(e.message)); page.on("console", m => { if (m.type() === "error" && !/Failed to load resource/.test(m.text())) errs.push(m.text()); });
   await page.goto("file://" + path.resolve("dist/preview.html")); await page.waitForTimeout(700);
-  await page.evaluate(n => { window.pxpSaveBase = function () { }; window.saveState = async function () { }; try { localStorage.setItem("pxp_lg_off", "1"); } catch (e) { } enterApp({ name: n }, "preview"); }, quien || "Bastián Torres");
+  await page.evaluate(n => { window.pxpSaveBase = function () { }; window.saveState = async function () { }; try { localStorage.setItem("pxp_lg_off", "1"); localStorage.setItem("pxp_sala_demo", "1"); } catch (e) { } enterApp({ name: n }, "preview"); }, quien || "Bastián Torres");
   await page.waitForTimeout(3600); await page.evaluate(() => { const c = () => { for (let i = 0; i < 8; i++) try { pxpLogroCerrar(); } catch (e) { } }; c(); setInterval(c, 300); }); return page;
 }
 const page = await abrir(1440, 950);
@@ -22,7 +22,7 @@ await page.evaluate(() => { try { pxpClosePerson(); } catch (e) { } document.que
 check("Sala: pestaña en el menú", await page.evaluate(() => !!document.querySelector('#tab-nav [data-view="sala"]')));
 await page.evaluate(() => switchView("sala")); await page.waitForTimeout(1500);
 check("Sala: entro por la puerta con mi avatar", await page.evaluate(() => PXP_SALA.state().people.some(p => p.name === "Bastián Torres")));
-check("Sala: 10 puestos alrededor de la mesa", await page.evaluate(() => PXP_SALA.seats === 10));
+check("Sala: 16 puestos (12 en la mesa, 2 por cabecera, y 4 en los sofás)", await page.evaluate(() => PXP_SALA.seats === 16));
 await page.waitForTimeout(8000);
 const demo = await page.evaluate(() => PXP_SALA.state().people.filter(p => p.demo));
 check(`Sala: compañeros de demostración entran y se sientan (${demo.length})`, demo.length >= 3 && demo.some(p => p.seat >= 0));
@@ -43,15 +43,15 @@ await page.fill("#sl-in", "Arrancamos la revisión"); await page.keyboard.press(
 check("Sala: el mensaje sale como burbuja sobre mi avatar", await page.evaluate(() => [...document.querySelectorAll(".sl-bub")].some(b => /Arrancamos la revisión/.test(b.textContent))));
 check("Sala: queda en la conversación", await page.evaluate(() => /Arrancamos la revisión/.test(document.getElementById("sl-log").textContent)));
 await page.click("#sl-projb"); await page.waitForTimeout(200); await page.fill(".sl-pick input", "dra"); await page.waitForTimeout(200); await page.click(".sl-pick li button"); await page.waitForTimeout(400);
-check("Sala: proyectar un proyecto lo muestra en el TV", await page.evaluate(() => document.getElementById("sl-tv").dataset.mode === "proj" && /DRACULA/i.test(document.getElementById("sl-tv").textContent)));
+check("Sala: proyectar muestra en el TV la misma ficha de Proyectos, entera", await page.evaluate(() => { const tv = document.getElementById("sl-tv"), c = tv.querySelector(".pvc"); if (!c || !/DRACULA/i.test(c.textContent)) return false; const a = tv.getBoundingClientRect(), b = c.getBoundingClientRect(); return b.left >= a.left - 1 && b.right <= a.right + 1 && b.top >= a.top - 1 && b.bottom <= a.bottom + 1; }));
 await page.click("#sl-tv"); await page.waitForTimeout(300);
-check("Sala: clic en el TV lo abre en grande", await page.evaluate(() => !!document.querySelector(".sl-big .sl-pc")));
+check("Sala: clic en el TV abre la ficha en grande", await page.evaluate(() => !!document.querySelector(".sl-big .pvc")));
 await page.keyboard.press("Escape"); await page.waitForTimeout(200);
 check("Sala: TV en formato 16:9", await page.evaluate(() => { const r = document.getElementById("sl-tv").getBoundingClientRect(); return Math.abs(r.width / r.height - 16 / 9) < .03; }));
 await page.hover(".sl-mn[data-i='0']"); await page.waitForTimeout(250);
 check("Sala: las notas del mapa muestran cliente, proyectos y equipo al pasar", await page.evaluate(() => { const b = document.querySelector(".sl-mn[data-i='0']"); return !!b && /proyecto/.test(b.dataset.slTip) && getComputedStyle(b, "::after").opacity === "1"; }));
 await page.click(".sl-mn[data-i='0']"); await page.waitForTimeout(300);
-check("Sala: clic en el mapa abre clientes con sus proyectos y su equipo", await page.evaluate(() => document.querySelectorAll(".sl-mp .sl-mp-c").length > 2 && !!document.querySelector(".sl-mp .sl-mp-c.on [data-k]") && !!document.querySelector(".sl-mp .sl-mp-p")));
+check("Sala: clic en el mapa abre las mismas fichas de Clientes (con el cliente elegido resaltado)", await page.evaluate(() => document.querySelectorAll(".sl-mp .sl-cv details.cnode").length > 2 && !!document.querySelector(".sl-mp .cnode.sl-focus .pchip") && getComputedStyle(document.querySelector(".sl-mp .cn-h")).display !== "list-item"));
 await page.keyboard.press("Escape"); await page.waitForTimeout(200);
 await page.click("#sl-mic"); await page.waitForTimeout(800);
 check("Sala: micrófono local (indicador encendido)", await page.evaluate(() => PXP_SALA.state().people.find(p => p.name === "Bastián Torres").mic && document.getElementById("sl-mic").classList.contains("on")));
@@ -66,9 +66,13 @@ check("Sala: con proveedor conectado, el chat viaja por el adaptador", prov.incl
 check("Asistente: «ve a la sala» navega", await page.evaluate(() => { switchView("home"); const r = PXA_AGENT.ask("ve a la sala"); return /Sala/.test(r.text) && document.getElementById("view-sala").classList.contains("active"); }));
 check("Asistente: catálogo de 12 herramientas listo para la IA", await page.evaluate(() => PXA_AGENT.tools().length === 12 && PXA_AGENT.tools().every(t => t.type === "function" && t.function.parameters)));
 check("Asistente: sin IA configurada en la vista previa", await page.evaluate(() => PXA_AGENT.ai() === false));
+// otra persona: sin compañeros de demostración ni la casilla
+const j = await abrir(1440, 950, "JULIANA CANAL"); await j.evaluate(() => switchView("sala")); await j.waitForTimeout(6000);
+check("Otra persona: no ve la casilla de demostración ni compañeros simulados", await j.evaluate(() => document.querySelector(".sl-demo").hidden && !PXP_SALA.state().people.some(p => p.demo)));
 // celular
 const m = await abrir(390, 844);
 await m.evaluate(() => switchView("sala")); await m.waitForTimeout(1500);
+check("Sala: la conversación ocupa el alto de la sala", await page.evaluate(() => { switchView("sala"); return document.getElementById("sl-log").getBoundingClientRect().height > 250; }));
 check("Celular: la sala cabe sin desbordar", await m.evaluate(() => { const s = document.getElementById("sl-stage").getBoundingClientRect(); return s.width > 300 && s.right <= innerWidth + 1 && document.documentElement.scrollWidth <= innerWidth + 1; }));
 check("sin errores: " + errs.slice(0, 3).join(" | "), errs.length === 0);
 console.log(ok.map(x => "✓ " + x).join("\n")); console.log(fail.map(x => "✗ " + x).join("\n")); await b.close(); process.exit(fail.length ? 1 : 0);

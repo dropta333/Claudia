@@ -12,7 +12,7 @@ const p0 = await ai0(new Request(BASE + "/api/ai", { method: "POST", headers: { 
 // 1 · modelo falso: si le piden horas, responde con la herramienta registrar_horas
 let visto = null;
 const fake = http.createServer(async (rq, rs) => { const c = []; for await (const d of rq) c.push(d); const j = JSON.parse(Buffer.concat(c).toString() || "{}"); visto = { auth: rq.headers.authorization, model: j.model, tools: (j.tools || []).map(t => t.function.name), sys: (j.messages || [])[0] };
-  const last = (j.messages || []).slice(-1)[0]?.content || ""; const msg = /horitas/.test(last) ? { role: "assistant", content: null, tool_calls: [{ id: "c1", type: "function", function: { name: "registrar_horas", arguments: JSON.stringify({ horas: 2, fecha: new Date().toISOString().slice(0, 10) }) } }] } : { role: "assistant", content: "Corte y queda. ¿Algo más?" };
+  const last = (j.messages || []).slice(-1)[0]?.content || ""; const msg = /horitas/.test(last) ? { role: "assistant", content: null, tool_calls: [{ id: "c1", type: "function", function: { name: "registrar_horas", arguments: JSON.stringify({ horas: 2, fecha: (d => new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10))(new Date()) }) } }] } : { role: "assistant", content: "Corte y queda. ¿Algo más?" };
   rs.writeHead(200, { "content-type": "application/json" }); rs.end(JSON.stringify({ choices: [{ message: msg }] })); });
 await new Promise(r => fake.listen(FAKE, r));
 Object.assign(process.env, { AI_PROVIDER: "compatible", AI_BASE_URL: `http://localhost:${FAKE}/v1`, AI_API_KEY: "clave-de-prueba", AI_MODEL: "modelo-x" });

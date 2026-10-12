@@ -1,6 +1,15 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v212** · 11 oct 2026 · Resumen general en `HANDOFF-COMPLETO.md` · Responsable: Bastián Torres
+Versión: **v213** · 11 oct 2026 · Resumen general en `HANDOFF-COMPLETO.md` · Responsable: Bastián Torres
+
+## v213 · Sala: personas reales, fichas de Proyectos y Clientes, terraza con ciudad, sofás y conversación más alta
+- **Presencia real** (`netlify/functions/sala.mjs`, `/api/sala`): cada persona guarda su propia ficha `p/<id>` en Blobs (`trafico-sala`): posición, silla, micrófono, cámara, últimos mensajes (15 min) y proyección. GET/POST devuelven a los demás vivos (latido en los últimos 20 s); los viejos se borran solos. En el tablero, `NET` (sala-js) late cada 2,5 s con gente / 6 s sola, solo con la pestaña Sala visible; al cerrar se despide con `keepalive`. Sin servidor (vista previa) sigue el canal entre pestañas.
+- **Demostración:** solo para Bastián (`isDev`), apagada por defecto (`pxp_sala_demo` = "1" para encenderla). Los demás no ven la casilla.
+- **Proyectar** muestra la ficha real de Proyectos (`window.pxpCardHtml`), escalada para caber entera en el TV 16:9; clic en el TV la abre en grande y clic en la ficha abre el proyecto.
+- **Mapa** abre las fichas reales de Clientes (`window.pxpClientTreeHtml`, expuesta en esta versión). Sus estilos viven bajo `#view-clientes`; `cssClientes()` los copia una vez con el alcance `.sl-cv`. El cliente elegido en el corcho queda resaltado.
+- **Escena:** la ventana es una terraza con baranda, matera y ciudad al fondo (luces encendidas de noche); sofás a los costados (2 puestos cada uno); 2 sillas por cabecera. 16 puestos en total.
+- **Conversación:** el panel derecho mide lo mismo que la sala y el registro crece hacia abajo (80 mensajes).
+- Pruebas: `node tools/test-v213.mjs` (28) y `python3 tools/netlify-e2e-prep.py && node tools/sala-e2e.mjs /tmp/nfmock` (9: dos personas se ven, mensaje, silla, proyección y salida). `tools/ai-e2e.mjs` usa la fecha local.
 
 ## v212 · Sala de juntas (prototipo), IA lista para conectar y perfil con foto más grande
 - **Sala** (`view-sala`, pestaña después de Team; capa `<style id="sala-v212">` + `<script id="sala-js">`): sala pixel en picado de 320×200 px lógicos.
