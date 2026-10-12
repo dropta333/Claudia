@@ -14399,12 +14399,13 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const shape = window.pxpShapeSvg, poly = window.pxpPoly;
     if (!items.length) return `<div class="empty-cta"><b>Sin proyectos activos</b>Cuando tenga proyectos asignados aparecerán aquí, conectados a su alrededor.</div>`;
     // v188 · Con muchos proyectos: lienzo más ancho y dos anillos alternados para que no quede todo diminuto
-    const n = items.length, two = n > 12, W = two ? 1040 : 640, H = two ? (n > 24 ? 660 : 580) : n > 8 ? 420 : 350, cx = W / 2, cy = H / 2 + 2, rx = W / 2 - (two ? 110 : 84), ry = H / 2 - (two ? 78 : 74);
+    // v217 · En celular el lienzo va vertical: el texto se lee a tamaño real y no empuja el resto de la ventana
+    const n = items.length, port = (window.innerWidth || 1200) < 640, two = n > 12, W = port ? 400 : two ? 1040 : 640, H = port ? (two ? (n > 24 ? 940 : 820) : n > 8 ? 660 : n > 4 ? 560 : 470) : two ? (n > 24 ? 660 : 580) : n > 8 ? 420 : 350, cx = W / 2, cy = H / 2 + 2, rx = W / 2 - (port ? 86 : two ? 110 : 84), ry = H / 2 - (port ? 84 : two ? 78 : 74);
     const uid = "nx" + Math.random().toString(36).slice(2, 7);
     const pos = items.map((_, i) => { const a = -Math.PI / 2 + (i / n) * Math.PI * 2 + (n % 2 ? 0 : Math.PI / n), f = two ? (i % 2 ? 0.6 : 1) : 1; return { a, x: cx + rx * f * Math.cos(a), y: cy + ry * f * Math.sin(a) }; });
     let mesh = "", dots = "", links = "", nodes = "";
     if (n > 2) pos.forEach((q, i) => { const m = pos[(i + 1) % n]; mesh += `<line x1="${q.x.toFixed(1)}" y1="${q.y.toFixed(1)}" x2="${m.x.toFixed(1)}" y2="${m.y.toFixed(1)}" class="mm-mesh"/>`; });
-    for (let i = 0; i < 24; i++) { const a = (i * 137.5) * Math.PI / 180, rr = 60 + ((i * 53) % 150); dots += `<circle cx="${(cx + rr * 1.7 * Math.cos(a)).toFixed(1)}" cy="${(cy + rr * .85 * Math.sin(a)).toFixed(1)}" r="${(1 + (i % 3) * .6).toFixed(1)}" class="mm-dot" style="animation-delay:${(i % 7) * .45}s"/>`; }
+    for (let i = 0; i < 24; i++) { const a = (i * 137.5) * Math.PI / 180, rr = 60 + ((i * 53) % 150); dots += `<circle cx="${(cx + rr * (port ? .9 : 1.7) * Math.cos(a)).toFixed(1)}" cy="${(cy + rr * (port ? 1.6 : .85) * Math.sin(a)).toFixed(1)}" r="${(1 + (i % 3) * .6).toFixed(1)}" class="mm-dot" style="animation-delay:${(i % 7) * .45}s"/>`; }
     const used = {};
     items.forEach((it, i) => {
       const { x, y, a } = pos[i], up = Math.sin(a) < -0.25, sh = TIPO_SHAPE[it.tipo] || "circle"; used[it.tipo] = sh;
@@ -14412,7 +14413,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       links += `<path id="${uid}p${i}" d="M${cx},${cy} Q${mx.toFixed(1)},${my.toFixed(1)} ${x.toFixed(1)},${y.toFixed(1)}" data-i="${i}" class="mm-l" style="stroke:url(#${uid}g${i});animation-delay:${(i * 0.08).toFixed(2)}s"/>
         <linearGradient id="${uid}g${i}" gradientUnits="userSpaceOnUse" x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}"><stop offset="0" stop-color="${center.color}" stop-opacity=".9"/><stop offset="1" stop-color="${it.color}" stop-opacity=".95"/></linearGradient>
         <circle r="3.2" class="mm-pulse" style="fill:${it.color}"><animateMotion dur="${(2.4 + (i % 3) * 0.5).toFixed(1)}s" begin="${(0.6 + i * 0.21).toFixed(2)}s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" calcMode="spline" keySplines=".4 0 .2 1"><mpath href="#${uid}p${i}"/></animateMotion></circle>`;
-      const ly = up ? y - 38 : y + 44, ly2 = up ? y - 54 : y + 59, mx2 = two ? 16 : n > 8 ? 14 : 18, lab = it.nombre.length > mx2 ? it.nombre.slice(0, mx2 - 1) + "…" : it.nombre;
+      const ly = up ? y - 38 : y + 44, ly2 = up ? y - 54 : y + 59, mx2 = port ? 13 : two ? 16 : n > 8 ? 14 : 18, lab = it.nombre.length > mx2 ? it.nombre.slice(0, mx2 - 1) + "…" : it.nombre;
       const inner = it.photo ? `<clipPath id="${uid}c${i}"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="15"/></clipPath><image href="${it.photo}" x="${(x - 15).toFixed(1)}" y="${(y - 15).toFixed(1)}" width="30" height="30" clip-path="url(#${uid}c${i})" preserveAspectRatio="xMidYMid slice"/>`
         : `<text x="${x.toFixed(1)}" y="${(y + 5).toFixed(1)}" text-anchor="middle" class="mm-i">${esc(initials(it.nombre))}</text>`;
       nodes += `<g class="mm-n clk${it.estado === "standby" ? " sb" : ""}" data-i="${i}" data-pkey="${esc(it.key)}" tabindex="0" role="button" aria-label="Abrir ${esc(it.nombre)}" style="--rc:${it.color};animation-delay:${(0.25 + i * 0.07).toFixed(2)}s"><g class="mm-f" style="animation-duration:${(3.6 + (i % 4) * 0.7).toFixed(1)}s;animation-delay:${(-(i * 1.1) % 4).toFixed(1)}s">
@@ -14431,7 +14432,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     const legT = Object.entries(used).map(([t, sh]) => `<li><svg viewBox="-16 -16 32 32" aria-hidden="true">${shape(sh, 0, 0, 9, "mm-lg", `stroke:var(--text);fill:color-mix(in srgb,var(--text) 14%,transparent)`)}</svg>${esc(t)}</li>`).join("");
     const legE = Object.entries(EST).filter(([k]) => items.some(x => x.estado === k)).map(([, [l, c]]) => `<li><span class="nx-dot" style="background:${c}"></span>${l}</li>`).join("");
     const legend = `<li class="nx-lh">Forma · tipo</li>${legT}<li class="nx-sep" aria-hidden="true"></li><li class="nx-lh">Punto · estado</li>${legE}<li class="nx-q"><button type="button" class="nx-info" data-tip="La forma de cada proyecto indica su tipo, el color es el del proyecto y el punto pequeño su estado. Toca un proyecto para abrirlo." aria-label="Cómo leer la red">?</button></li>`;
-    return `<div class="mm-wrap"><svg class="mm nx${two ? " big" : ""}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Red de proyectos de ${esc(center.nombre)}"><g class="mm-bg">${dots}${mesh}</g>${links}${core}${nodes}</svg></div>
+    return `<div class="mm-wrap"><svg class="mm nx${two ? " big" : ""}${port ? " port" : ""}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Red de proyectos de ${esc(center.nombre)}"><g class="mm-bg">${dots}${mesh}</g>${links}${core}${nodes}</svg></div>
       <ul class="mm-legend nx-leg">${legend}</ul>`;
   }
   function projItem(k, subFn) {
@@ -16943,12 +16944,13 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     if (enOrden && panels.length <= n) { panels.forEach((p, i) => C[i].appendChild(p)); return; }
     // se mide cada caja al ancho de una columna y se busca el reparto más parejo posible (pocas cajas: se prueban todas las combinaciones)
     const H = panels.map(p => { C[0].appendChild(p); const h = p.offsetHeight; return h; }), gap = 16;
-    let best = null, bestMax = Infinity;
+    // v217 · a igual altura máxima gana el reparto más parejo (antes una caja muy alta dejaba una columna entera vacía)
+    let best = null, bestMax = Infinity, bestSq = Infinity;
     if (Math.pow(n, panels.length) <= 200000) {
       const asg = new Array(panels.length).fill(0), tot = new Array(n).fill(0);
       const rec = (i, curMax) => {
-        if (curMax >= bestMax) return;
-        if (i === panels.length) { bestMax = curMax; best = asg.slice(); return; }
+        if (curMax > bestMax + 0.5) return;
+        if (i === panels.length) { const sq = tot.reduce((s, v) => s + v * v, 0) + (tot.some(v => v === 0) ? 1e15 : 0); if (curMax < bestMax - 0.5 || sq < bestSq) { bestMax = Math.min(bestMax, curMax); bestSq = sq; best = asg.slice(); } return; }
         for (let c = 0; c < n; c++) {
           if (c > 0 && tot.slice(0, c).every(v => v === 0) && tot[c] === 0) break;   // columnas vacías equivalentes
           const add = H[i] + (tot[c] ? gap : 0); tot[c] += add; asg[i] = c; rec(i + 1, Math.max(curMax, tot[c])); tot[c] -= add;
@@ -24053,7 +24055,7 @@ button.pm-pxa{cursor:pointer}
   run();
 })();
 </script>
-<!-- ═════ v212–v216 · Sala de juntas (presencia real, proyección de ventanas en 16:9, mapa de Clientes) y perfil con foto más grande ═════ -->
+<!-- ═════ v212–v217 · Sala de juntas (entrar y salir con confirmación, presencia real, proyección en 16:9, tablero con vista previa) y perfil ═════ -->
 <style id="sala-v212">/* ═════ v212 · Perfil: foto más grande (triángulos más llenos) y acciones debajo, sin tapar la foto ═════ */
 #pxp-person .ph-avw{display:flex;flex-direction:column;align-items:center;gap:8px}
 #pxp-person .ph-avw .av{--s:112px!important}
@@ -24313,6 +24315,94 @@ button.pm-pxa{cursor:pointer}
 .sl-tl-vw span{border-radius:3px;background:color-mix(in srgb,var(--majorelle) 45%,var(--surface))}
 .sl-tl-vw span:first-child{grid-column:1/3;background:var(--majorelle)}
 #mi-resumen.pxa-off,#mi-resumen.pxa-off *,#mi-resumen.pxa-off *::before,#mi-resumen.pxa-off *::after{animation-play-state:paused!important}
+
+/* v217 · Perfil y cliente en celular: una sola columna que nunca pasa del ancho de la pantalla */
+@media (max-width:760px){
+#pxp-person .pm-body,#pxp-client .pm-body{grid-template-columns:minmax(0,1fr)!important;column-count:auto!important}
+#pxp-person .pm-body>*,#pxp-client .pm-body>*,#pxp-person .pm-sec,#pxp-client .pm-sec{min-width:0!important;max-width:100%!important}
+#pxp-person .pxn-sec .mm-wrap,#pxp-client .pxn-sec .mm-wrap{max-width:100%}
+#pxp-person .pxn-sec svg.mm,#pxp-client .pxn-sec svg.mm{width:100%!important;max-width:100%!important;height:auto!important;max-height:none!important}
+#pxp-person .pxn-sec svg.mm:not(.port),#pxp-client .pxn-sec svg.mm:not(.port){max-height:70vh!important}
+#pxp-person .mm-legend.nx-leg,#pxp-client .mm-legend.nx-leg{flex-wrap:wrap;overflow:visible;row-gap:8px}
+#pxp-person .mm-legend.nx-leg .nx-sep,#pxp-client .mm-legend.nx-leg .nx-sep{flex-basis:100%;width:auto;height:0;margin:0}
+#pxp-person .pm-proj{grid-template-columns:minmax(0,1fr) auto auto!important;grid-auto-flow:row!important;align-items:center;row-gap:8px}
+#pxp-person .pm-proj>.pn{grid-column:1/-1!important;min-width:0;white-space:normal}
+#pxp-person .pm-proj>.status-pill{grid-column:1!important;justify-self:start;width:auto!important;max-width:100%!important;min-width:0}
+#pxp-person .pm-proj>.proj-pill{grid-column:2!important}
+#pxp-person .pm-proj>.xbtn{grid-column:3!important}
+}
+/* v217 · Entrar y salir de la sala con confirmación */
+.sl-lobby{position:absolute;inset:0;z-index:6;display:grid;place-items:center;padding:16px;background:color-mix(in srgb,#0b0a12 52%,transparent);backdrop-filter:blur(1.5px);-webkit-backdrop-filter:blur(1.5px);animation:slFade .25s ease}
+@keyframes slFade{from{opacity:0}}
+.sl-lb-c,.sl-ask-b{width:min(380px,100%);box-sizing:border-box;padding:22px 22px 18px;border-radius:16px;background:var(--surface);border:1px solid var(--border2);box-shadow:0 24px 60px rgba(0,0,0,.4);text-align:center;color:var(--text)}
+.sl-lb-c h3,.sl-ask-b h3{margin:0 0 12px;font:700 22px/1.05 var(--display);text-transform:uppercase;letter-spacing:.02em}
+.sl-lb-c p,.sl-ask-b p{margin:0 0 6px;font-size:14px;line-height:1.45}
+.sl-lb-c .sl-lb-s{color:var(--muted);font-size:12.5px;margin-bottom:0}
+.sl-lb-h{display:flex;justify-content:center;margin:0 0 10px}
+.sl-lb-h img,.sl-lb-h em{width:40px;height:40px;border-radius:50%;background:var(--surface2);border:2px solid var(--surface);margin-left:-8px;image-rendering:pixelated}
+.sl-lb-h img:first-child{margin-left:0}
+.sl-lb-h em{display:grid;place-items:center;font:600 12px/1 var(--sans);font-style:normal;color:var(--muted)}
+.sl-lb-a{display:flex;gap:8px;justify-content:center;margin-top:16px}
+.sl-lb-a button{all:unset;cursor:pointer;flex:1;max-width:160px;padding:11px 14px;border-radius:10px;font:600 14px/1 var(--sans);text-align:center;box-sizing:border-box}
+.sl-lb-a .sl-lb-no{border:1px solid var(--border2);background:var(--surface2)}
+.sl-lb-a .sl-lb-no:hover{border-color:var(--muted)}
+.sl-lb-a .sl-lb-si{background:#F3FF57;color:#111;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.sl-lb-a .sl-lb-si.danger{background:var(--red,#e5484d);color:#fff;box-shadow:none}
+.sl-lb-a button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.sl-ask{position:fixed;inset:0;z-index:1500;display:grid;place-items:center;padding:16px;background:rgba(10,8,18,.55);animation:slFade .18s ease}
+.sl-bar.out .sl-ctl .sl-b:not(.sl-exit),.sl-bar.out .sl-chat{opacity:.4;pointer-events:none}
+.sl-b[disabled]{cursor:not-allowed}
+.sl-b.sl-exit{background:#F3FF57;color:#111;border-color:transparent}
+.sl-b.sl-exit.in{background:var(--surface2);color:var(--red,#e5484d);border-color:color-mix(in srgb,var(--red,#e5484d) 45%,var(--border))}
+.sl-b.sl-exit.in:hover{background:color-mix(in srgb,var(--red,#e5484d) 12%,var(--surface2))}
+@media (max-width:760px){.sl-b.sl-exit span{display:inline}.sl-b.sl-exit{padding:10px 12px}}
+/* aviso flotante: estás en la sala mientras miras otra pestaña */
+.sl-pill{position:fixed;left:16px;bottom:16px;z-index:1200;display:flex;align-items:center;gap:4px;padding:5px;border-radius:14px;background:var(--surface);border:1px solid var(--border2);box-shadow:0 14px 40px rgba(0,0,0,.3);animation:slFade .2s ease;max-width:calc(100vw - 32px);box-sizing:border-box}
+.sl-pill[hidden]{display:none}
+.sl-pill button{all:unset;cursor:pointer;box-sizing:border-box;border-radius:10px}
+.sl-pill-v{display:flex;align-items:center;gap:9px;padding:4px 10px 4px 4px;min-width:0}
+.sl-pill-v:hover{background:var(--surface2)}
+.sl-pill-v img{width:34px;height:34px;border-radius:9px;background:color-mix(in srgb,var(--green) 22%,var(--surface2));image-rendering:pixelated;flex:none}
+.sl-pill-v span{display:flex;flex-direction:column;gap:3px;min-width:0}
+.sl-pill-v b{font:600 13px/1 var(--sans);white-space:nowrap}
+.sl-pill-v b::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green,#3dd68c);margin-right:6px;vertical-align:1px;box-shadow:0 0 0 3px color-mix(in srgb,var(--green,#3dd68c) 25%,transparent)}
+.sl-pill-v small{font-size:11.5px;color:var(--muted);white-space:nowrap}
+.sl-pill-v em{font:700 11px/1 var(--sans);font-style:normal;min-width:18px;height:18px;padding:0 5px;box-sizing:border-box;border-radius:9px;display:grid;place-items:center;background:#F3FF57;color:#111}
+.sl-pill-x{padding:9px 11px;font:600 12.5px/1 var(--sans);color:var(--red,#e5484d)}
+.sl-pill-x:hover{background:color-mix(in srgb,var(--red,#e5484d) 12%,transparent)}
+.sl-pill button:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
+/* vista previa desde las notas del tablero */
+.sl-np .sl-mp-b{width:min(1180px,100%);max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
+.sl-np .sl-mp-b header{flex-wrap:wrap;align-items:center}
+.sl-np-pj{all:unset;cursor:pointer;margin-left:auto;padding:8px 13px;border-radius:9px;background:#F3FF57;color:#111;font:600 13px/1 var(--sans)}
+.sl-np-pj~.sl-mp-go{margin-left:0}
+.sl-mp-b header .sl-mp-x{margin-left:0}
+.sl-mp-b header:not(:has(.sl-mp-go)) .sl-mp-x{margin-left:auto}
+.sl-np-prev{position:relative;aspect-ratio:16/9;width:100%;max-height:calc(90vh - 120px);overflow:hidden;background:var(--bg);flex:none}
+.sl-np-prev .sl-frame{transform-origin:0 0}
+.sl-np-h{margin:0;padding:10px 20px 14px;font-size:12.5px;color:var(--muted)}
+.sl-mp-b .sl-np-pj{margin-left:auto}
+@media (max-width:640px){.sl-mp-b header p{flex-basis:100%;order:5}.sl-np-pj,.sl-mp-go{padding:8px 10px}}
+/* v217 · Vista ampliada: la sala ocupa toda la pantalla; en celular vertical se gira a horizontal */
+.sl-sideb[hidden]{display:none}
+html.sl-full-on,html.sl-full-on body{overflow:hidden!important}
+.sl-wrap.sl-full{position:fixed;left:0;top:0;width:var(--fw,100vw);height:var(--fh,100vh);z-index:1050;box-sizing:border-box;margin:0!important;max-width:none!important;padding:12px;gap:10px;display:grid;grid-template-rows:minmax(0,1fr) auto;background:var(--bg);animation:slFade .2s ease}
+.sl-wrap.sl-full.sl-rot{transform-origin:0 0;transform:rotate(90deg) translateY(-100%)}
+.sl-full .sl-head,.sl-full .sl-note{display:none!important}
+.sl-full .sl-main{grid-template-columns:minmax(0,1fr) 280px;min-height:0;height:100%;align-items:stretch}
+.sl-full.side-off .sl-main{grid-template-columns:minmax(0,1fr)}
+.sl-full.side-off .sl-side{display:none!important}
+.sl-full .sl-stage{width:var(--sw,100%);max-width:none!important;min-width:0!important;align-self:center;justify-self:center}
+.sl-full .sl-side{height:100%;max-height:none;overflow:auto;box-sizing:border-box;display:flex!important;grid-template-columns:none}
+.sl-full .sl-bar{flex-wrap:nowrap;padding:8px}
+.sl-full .sl-ctl{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;min-width:0}
+.sl-full .sl-chat{flex:1 1 180px!important;min-width:140px;max-width:none}
+.sl-full .sl-exit{margin-left:0}
+@media (max-width:1100px){.sl-full .sl-b span{display:none}.sl-full .sl-b{padding:10px}}
+.sl-full.sl-rot .sl-b span,.sl-full.sl-rot .sl-b.sl-exit span{display:none}
+.sl-full.sl-rot .sl-b{padding:9px}
+
+.sl-full .sl-b.sl-vwb{margin-left:0}
 </style>
 <script id="sala-js">/* ═════ v212 · Sala de juntas (prototipo): los avatares entran, caminan, se sientan, hablan en burbujas y proyectan en el TV ═════
    Todo lo que viaja entre personas pasa por un "transporte" con mensajes simples ({t:"hi"|"mv"|"say"|"st"|"proj"|"bye", …}).
@@ -24391,7 +24481,7 @@ button.pm-pxa{cursor:pointer}
     const cnt = { projects: act.length, clientes: new Set(act.map(k => nn(P[k].cliente)).filter(Boolean)).size, team: people().length };
     const tip = { projects: n => `${n} ${L("proyectos activos", "active projects")}`, clientes: n => `${n} ${L("clientes activos · ver el mapa", "active clients · see the map")}`, team: n => `${n} ${L("personas", "people")}` };
     const ok = v => !nav || !!nav.querySelector(`[data-view="${v}"]`);
-    return NOTAS.filter(([v]) => ok(v)).slice(0, 8).map(([v, lab], i) => ({ v, label: L(...lab), n: cnt[v], tip: (tip[v] ? tip[v](cnt[v]) : L("Ir a ", "Go to ") + L(...lab)), color: NOTE_C[i], slot: [BOARD.x + 12 + (i % 4) * 22, BOARD.y + 12 + Math.floor(i / 4) * 19] }));
+    return NOTAS.filter(([v]) => ok(v)).slice(0, 8).map(([v, lab], i) => ({ v, label: L(...lab), n: cnt[v], tip: (tip[v] ? tip[v](cnt[v]) : L("Vista previa de ", "Preview of ") + L(...lab)), color: NOTE_C[i], slot: [BOARD.x + 12 + (i % 4) * 22, BOARD.y + 12 + Math.floor(i / 4) * 19] }));
   }
 
   /* ---------- dibujo: contorno parejo, esquinas redondeadas, paleta única ---------- */
@@ -24545,7 +24635,7 @@ button.pm-pxa{cursor:pointer}
   }
 
   /* ---------- estado ---------- */
-  const S = { ents: new Map(), myId: "", proj: null, projBy: "", log: [], raf: 0, last: 0, keys: new Set(), mounted: false, media: { mic: null, cam: null, screen: null } };
+  const S = { ents: new Map(), myId: "", proj: null, projBy: "", log: [], raf: 0, last: 0, keys: new Set(), mounted: false, inside: false, unread: 0, prevView: "", media: { mic: null, cam: null, screen: null } };
   let tr = null; // transporte activo
   const myEnt = () => S.ents.get(S.myId);
 
@@ -24579,8 +24669,9 @@ button.pm-pxa{cursor:pointer}
   }
   async function netTick() {
     clearTimeout(NET.t); if (!NET.on) return;
-    const v = $("view-sala"), activa = v && v.classList.contains("active") && !document.hidden, e = myEnt();
-    if (!activa || !e) { NET.t = setTimeout(netTick, 4000); return; }
+    const v = $("view-sala"), visible = v && v.classList.contains("active") && !document.hidden, e = myEnt();
+    /* afuera: solo se mira quién está (sin aparecer), y solo con la pestaña Sala a la vista */
+    if (!S.inside || !e) { if (visible && !NET.busy) { NET.busy = true; try { const r = await fetch(API_SALA, { cache: "no-store" }); if (r.ok) netApply(await r.json()); } catch (er) { } NET.busy = false; } NET.t = setTimeout(netTick, visible ? 5000 : 8000); return; }
     const tgt = e.path.length ? e.path[e.path.length - 1] : [e.x, e.y];
     const body = { id: S.myId, name: me(), x: Math.round(tgt[0]), y: Math.round(tgt[1]), seat: e.seat >= 0 ? e.seat : (e.goSeat >= 0 ? e.goSeat : -1), mic: !!e.mic, cam: !!e.cam, say: NET.out.splice(0) };
     if (NET.proj !== undefined) { body.proj = NET.proj; NET.proj = undefined; }
@@ -24615,6 +24706,7 @@ button.pm-pxa{cursor:pointer}
   }
   function onMsg(m) {
     if (!m || m.from === S.myId) return;
+    if (m.t === "who") { if (S.inside) sendState(); return; }
     let e = S.ents.get(m.from);
     if (m.t === "hi" || m.t === "state") { if (!e) e = mkEnt({ name: m.name, x: m.x, y: m.y }); if (m.seat >= 0) { e.seat = m.seat; const s = seatOf(m.seat); e.x = s.x; e.y = s.y; } else { e.x = m.x; e.y = m.y; } e.mic = !!m.mic; e.cam = false; if (m.t === "hi") sendState(); people_(); if (m.proj && !S.proj) setProj(m.proj, m.name, true); return; }
     if (!e) return;
@@ -24627,7 +24719,7 @@ button.pm-pxa{cursor:pointer}
   const sendState = () => { const e = myEnt(); if (e) send({ t: "state", name: e.name, x: e.x, y: e.y, seat: e.seat, mic: e.mic, proj: S.projBy === e.name ? S.proj : null }); };
   function openTransport() {
     if (PROVIDER.impl || NET.on || tr) return;
-    const local = () => { try { tr = new BroadcastChannel("pxp-sala-v1"); tr.onmessage = ev => onMsg(ev.data); tr.postMessage({ t: "hi", from: S.myId, name: me(), x: DOOR.x, y: DOOR.y, seat: -1, mic: false }); } catch (e) { tr = null; } };
+    const local = () => { try { tr = new BroadcastChannel("pxp-sala-v1"); tr.onmessage = ev => onMsg(ev.data); tr.postMessage({ t: "who", from: S.myId }); } catch (e) { tr = null; } };
     if (!/^https?:/.test(location.protocol)) return local();
     fetch(API_SALA, { cache: "no-store" }).then(r => { if (r.ok) { NET.on = true; netTick(); } else local(); }).catch(local);
   }
@@ -24639,6 +24731,7 @@ button.pm-pxa{cursor:pointer}
     if (e.bub) e.bub.remove();
     const b = document.createElement("div"); b.className = "sl-bub pxb"; b.innerHTML = `<span class="pxb-o"><span class="pxb-i"></span></span>${PXA.TAIL}`; b.querySelector(".pxb-i").textContent = text;
     $("sl-ov").appendChild(b); e.bub = b; e.bubT = performance.now() + 4200 + text.length * 70;
+    if (e.id !== S.myId && S.inside && !salaVisible()) { S.unread++; pill(); }
   }
   function renderLog() {
     const l = $("sl-log"); if (!l) return;
@@ -24764,7 +24857,7 @@ button.pm-pxa{cursor:pointer}
     const pct = (v, o, l) => ((v - o) / l * 100) + "%";
     box.innerHTML = S.mapa.map((m, i) => `<button type="button" class="sl-mn" data-v="${m.v}" style="left:${pct(m.slot[0], BOARD.x, BOARD.w)};top:${pct(m.slot[1] + (i % 3 === 1 ? 1 : 0), BOARD.y, BOARD.h)}" data-sl-tip="${esc(m.tip)}" aria-label="${esc(m.label)} · ${esc(m.tip)}"><b>${esc(m.label)}</b>${m.n != null ? `<small>${m.n}</small>` : ""}</button>`).join("");
     box.onclick = ev => { const b = ev.target.closest(".sl-mn"); if (!b) return; ev.stopPropagation(); const v = b.dataset.v;
-      if (v === "clientes") return mapaBig(-1); try { switchView(v); window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) { } };
+      if (v === "clientes") return mapaBig(-1); notaPreview(v); };
   }
   /* copia los estilos de las fichas de Clientes (que viven bajo #view-clientes) para usarlos en el mapa */
   function cssClientes() {
@@ -24782,12 +24875,13 @@ button.pm-pxa{cursor:pointer}
     const fc = null;
     const n = tree.querySelectorAll("details.cnode").length, foot = tmp.querySelector(".ct-foot");
     const ov = document.createElement("div"); ov.className = "sl-mp"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", L("Mapa de proyectos", "Project map"));
-    ov.innerHTML = `<div class="sl-mp-b"><header><h3>${L("Mapa de proyectos", "Project map")}</h3><p>${n} ${L("clientes con proyectos activos", "clients with active projects")}</p><button type="button" class="sl-mp-go">${L("Ir a Clientes", "Go to Clients")}</button><button type="button" class="sl-mp-x" aria-label="${L("Cerrar", "Close")}">✕</button></header><div class="sl-cv"></div></div>`;
+    ov.innerHTML = `<div class="sl-mp-b"><header><h3>${L("Mapa de proyectos", "Project map")}</h3><p>${n} ${L("clientes con proyectos activos", "clients with active projects")}</p>${S.inside ? `<button type="button" class="sl-np-pj">${L("Proyectar en el TV", "Show on the TV")}</button>` : ""}<button type="button" class="sl-mp-go">${L("Abrir Clientes", "Open Clients")}</button><button type="button" class="sl-mp-x" aria-label="${L("Cerrar", "Close")}">✕</button></header><div class="sl-cv"></div></div>`;
     const host = ov.querySelector(".sl-cv"); host.appendChild(tree); if (foot) host.appendChild(foot);
     document.body.appendChild(ov);
     const close = () => { ov.remove(); document.removeEventListener("keydown", k); }; const k = ev => { if (ev.key === "Escape") close(); };
     document.addEventListener("keydown", k); ov.querySelector(".sl-mp-x").onclick = close;
     ov.querySelector(".sl-mp-go").onclick = () => { close(); try { switchView("clientes"); window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) { } };
+    const pj = ov.querySelector(".sl-np-pj"); if (pj) pj.onclick = () => { close(); setProj("view:clientes", me()); const e = myEnt(); if (e) say(e, L("Les proyecto ", "Showing ") + refLabel("view:clientes")); };
     ov.addEventListener("click", ev => { if (ev.target === ov) return close(); if (ev.target.closest(".pchip, .cn-link, .cav, .ct-all, [data-k]")) setTimeout(close, 0); });
     if (fc) { const d = [...tree.querySelectorAll("details.cnode")].find(x => nn(x.dataset.ck) === fc); if (d) { d.open = true; d.classList.add("sl-focus"); setTimeout(() => d.scrollIntoView({ block: "nearest" }), 60); } }
     setTimeout(() => ov.querySelector(".sl-mp-x").focus(), 30);
@@ -24803,6 +24897,11 @@ button.pm-pxa{cursor:pointer}
     seat: '<path d="M6 4v10h12V4"/><path d="M5 14h14M7 14v6M17 14v6"/>',
     send: '<path d="M5 12h14M13 6l6 6l-6 6"/>',
     log: '<path d="M5 6h14M5 12h14M5 18h9"/>',
+    expand: '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
+    shrink: '<path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/>',
+    side: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/>',
+    enter: '<path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4"/><path d="M3 12h11M10 8l4 4l-4 4"/>',
+    exit: '<path d="M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4"/><path d="M21 12H10M17 8l4 4l-4 4"/>',
     room: '<rect x="5" y="9" width="14" height="6" rx="1"/><circle cx="8" cy="5.5" r="1.6"/><circle cx="12" cy="5.5" r="1.6"/><circle cx="16" cy="5.5" r="1.6"/><path d="M8 15v4M16 15v4"/>',
   };
   const svg = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
@@ -24813,11 +24912,16 @@ button.pm-pxa{cursor:pointer}
     set("sl-camb", e && e.cam, IC.cam, IC.camOff, L("Cámara encendida", "Camera on"), L("Cámara", "Camera"));
     set("sl-scr", !!S.media.screen, IC.screen, null, L("Dejar de compartir", "Stop sharing"), L("Pantalla", "Screen"));
     set("sl-seat", e && e.seat >= 0, IC.seat, null, L("Levantarme", "Stand up"), L("Sentarme", "Sit down"));
+    const out = !S.inside; ["sl-mic", "sl-camb", "sl-scr", "sl-projb", "sl-seat", "sl-in", "sl-send"].forEach(id => { const x = $(id); if (x) x.disabled = out; });
+    const vw = $("sl-vw"); if (vw) { vw.classList.toggle("on", !!S.full); vw.querySelector("i").innerHTML = svg(S.full ? IC.shrink : IC.expand); vw.querySelector("span").textContent = S.full ? L("Reducir", "Exit wide view") : L("Ampliar", "Wide view"); vw.setAttribute("aria-pressed", S.full ? "true" : "false"); }
+    const sd = $("sl-sidet"); if (sd) { sd.hidden = !S.full; sd.classList.toggle("on", S.full && !S.sideOff); }
+    b.classList.toggle("out", out); const x = $("sl-exit"); if (x) { x.classList.toggle("in", !out); x.querySelector("span").textContent = out ? L("Entrar a la sala", "Enter the room") : L("Salir de la sala", "Leave the room"); x.querySelector("i").innerHTML = svg(out ? IC.enter : IC.exit); }
   }
   function people_() {
     const ul = $("sl-ppl"); if (!ul) return; const list = [...S.ents.values()].sort((a, b) => (b.id === S.myId) - (a.id === S.myId) || a.name.localeCompare(b.name));
     $("sl-n").textContent = list.length;
     ul.innerHTML = list.map(e => `<li data-id="${esc(e.id)}"><img src="${PXA.headURL(e.cfg, null, 44)}" alt=""><span><b>${esc(tit(e.name))}${e.id === S.myId ? ` <em>${L("tú", "you")}</em>` : ""}</b><small>${esc(e.role)}</small></span><i class="${e.mic ? "on" : ""}" title="${e.mic ? L("Micrófono encendido", "Mic on") : L("Micrófono apagado", "Mic off")}">${svg(e.mic ? IC.mic : IC.micOff)}</i><i class="${e.cam || e.camR ? "on" : ""}" title="${e.cam || e.camR ? L("Cámara encendida", "Camera on") : L("Cámara apagada", "Camera off")}">${svg(e.cam || e.camR ? IC.cam : IC.camOff)}</i></li>`).join("");
+    if (!S.inside) lobby(); pill();
     paintTV();
   }
   function chatSend() { const i = $("sl-in"); const v = i.value.trim(); if (!v) { i.focus(); return; } i.value = ""; const e = myEnt(); if (!e) return; say(e, v); send({ t: "say", text: v }); }
@@ -24873,8 +24977,8 @@ button.pm-pxa{cursor:pointer}
     } else if (t === "view") {
       /* una pestaña completa: se dibuja un instante sin pintarse (todo en el mismo paso) y se vuelve a la Sala */
       const cur = (document.querySelector(".view.active") || { id: "view-sala" }).id.replace(/^view-/, ""), sy = scrollY;
-      try { switchView(id); const v = $("view-" + id); if (v) { html = snap(v, "sl-wview", ["view-" + id]); html = html.replace(/class="view active /, 'class="').replace(/class="view active"/, 'class=""'); } } catch (e) { }
-      try { switchView(cur); } catch (e) { } window.scrollTo(0, sy);
+      S.capturing = true; try { switchView(id); const v = $("view-" + id); if (v) { html = snap(v, "sl-wview", ["view-" + id]); html = html.replace(/class="view active /, 'class="').replace(/class="view active"/, 'class=""'); } } catch (e) { }
+      try { switchView(cur); } catch (e) { } S.capturing = false; window.scrollTo(0, sy);
     }
     capCache.set(base, { t: Date.now(), html }); return html;
   }
@@ -24960,7 +25064,8 @@ button.pm-pxa{cursor:pointer}
     setTimeout(() => document.addEventListener("pointerdown", function h(ev) { if (!c.contains(ev.target)) { c.remove(); document.removeEventListener("pointerdown", h); } }), 0);
   }
   function stageClick(ev) {
-    const st = $("sl-stage"), r = st.getBoundingClientRect(), x = (ev.clientX - r.left) / r.width * W, y = (ev.clientY - r.top) / r.height * H, e = myEnt(); if (!e) return;
+    const st = $("sl-stage"), r = st.getBoundingClientRect(), rot = S.full && S.rot, e = myEnt(); if (!e) return;
+    const x = rot ? (ev.clientY - r.top) / r.height * W : (ev.clientX - r.left) / r.width * W, y = rot ? (r.right - ev.clientX) / r.width * H : (ev.clientY - r.top) / r.height * H;
     if (ev.target.closest(".sl-card,.sl-pick,.sl-map")) return;
     if (x >= TV.x && x <= TV.x + TV.w && y >= TV.y && y <= TV.y + TV.h) { tvBig(); return; }
     // ¿clic sobre alguien?
@@ -25001,13 +25106,16 @@ button.pm-pxa{cursor:pointer}
           <button type="button" class="sl-b" id="sl-scr"><i></i><span></span></button>
           <button type="button" class="sl-b" id="sl-projb"><i>${svg(IC.proj)}</i><span>${L("Proyectar", "Show project")}</span></button>
           <button type="button" class="sl-b" id="sl-seat"><i></i><span></span></button>
+          <button type="button" class="sl-b sl-vwb" id="sl-vw"><i></i><span></span></button>
+          <button type="button" class="sl-b sl-sideb" id="sl-sidet"><i>${svg(IC.side)}</i><span>${L("Personas y chat", "People & chat")}</span></button>
+          <button type="button" class="sl-b sl-exit" id="sl-exit"><i></i><span></span></button>
         </div>
         <div class="sl-chat"><input id="sl-in" type="text" enterkeyhint="send" maxlength="140" autocomplete="off" placeholder="${L("Escribe a la sala…", "Write to the room…")}" aria-label="${L("Mensaje para la sala", "Message to the room")}"><button type="button" id="sl-send" aria-label="${L("Enviar", "Send")}">${svg(IC.send)}</button></div>
       </div>
       <p class="sl-note">${L("Voz, video y pantalla compartida llegan cuando TI apruebe el servicio de llamadas. Por ahora tu cámara, tu micrófono y tu pantalla solo se ven en tu equipo.", "Voice, video and screen sharing arrive once IT approves the calling service. For now your camera, mic and screen are only visible on your device.")}</p>
     </div></div>`);
     $("sl-stage").addEventListener("click", stageClick);
-    $("sl-mic").onclick = toggleMic; $("sl-camb").onclick = toggleCam; $("sl-scr").onclick = toggleScreen; $("sl-projb").onclick = projPicker;
+    $("sl-mic").onclick = toggleMic; $("sl-camb").onclick = toggleCam; $("sl-scr").onclick = toggleScreen; $("sl-projb").onclick = projPicker; $("sl-exit").onclick = () => S.inside ? leaveAsk() : lobby(true); $("sl-vw").onclick = () => S.full ? exitFull() : goFull(); $("sl-sidet").onclick = () => { const w = document.querySelector(".sl-wrap"); w.classList.toggle("side-off"); S.sideOff = w.classList.contains("side-off"); fitFull(); };
     $("sl-seat").onclick = () => { const e = myEnt(); if (!e) return; if (e.seat >= 0) { const s = seatOf(e.seat); e.seat = -1; e.x = s.ax; e.y = s.ay; walkTo(e, s.ax, s.side === "back" ? 63 : s.side === "front" ? 184 : s.ay); bar(); sendState(); return; }
       let best = -1, bd = 1e9; SEATS.forEach((s, i) => { if (seatTaken(i, e.id)) return; const d = Math.hypot(s.ax - e.x, s.ay - e.y); if (d < bd) { bd = d; best = i; } }); if (best >= 0) { sitAt(e, best); send({ t: "mv", seat: best }); } };
     $("sl-send").onclick = chatSend; $("sl-in").addEventListener("keydown", ev => { if (ev.key === "Enter" && !ev.isComposing) { ev.preventDefault(); chatSend(); } ev.stopPropagation(); });
@@ -25018,19 +25126,125 @@ button.pm-pxa{cursor:pointer}
     $("sl-stage").addEventListener("blur", () => S.keys.clear());
     bar(); renderLog();
   }
-  function enter() {
-    mount(); if (!$("view-sala")) return;
-    const id = nn(me()); if (!id) return;
-    if (S.myId !== id) { [...S.ents.keys()].forEach(rmEnt); S.myId = id; }
-    if (!myEnt()) { const e = mkEnt({ name: me() }); e.x = DOOR.x; e.y = DOOR.y; walkTo(e, DOOR.x + 18, 180); openTransport(); }
-    else if (NET.on) netTick();
-    else { const e = myEnt(), p = find(me()); if (p) { e.cfg = cfgFor(p); e.g = grp(p); } }
-    people_(); bar(); paintTV(); run();
-    const ed = !(find(me()) || {}).avatar; const hint = $("sl-noav");
+  const salaVisible = () => { const v = $("view-sala"); return !!(v && v.classList.contains("active")); };
+  /* ---------- entrar y salir: siempre con confirmación ---------- */
+  function lobby(show) {
+    const st = $("sl-stage"); if (!st) return; let lb = $("sl-lobby");
+    if (S.inside) { if (lb) lb.remove(); return; }
+    if (!lb) { lb = document.createElement("div"); lb.id = "sl-lobby"; lb.className = "sl-lobby"; lb.setAttribute("role", "dialog"); lb.setAttribute("aria-modal", "false"); lb.setAttribute("aria-labelledby", "sl-lb-t"); st.appendChild(lb); show = true; }
+    const ppl = [...S.ents.values()].filter(e => e.id !== S.myId), n = ppl.length;
+    const k = n + ppl.map(e => e.id).join(",") + (window.pxpLang || ""); if (!show && lb.dataset.k === k) return; lb.dataset.k = k;
+    const heads = ppl.slice(0, 6).map(e => `<img src="${PXA.headURL(e.cfg, null, 44)}" alt="" title="${esc(tit(e.name))}">`).join("") + (n > 6 ? `<em>+${n - 6}</em>` : "");
+    const quien = n ? (n === 1 ? `${esc(tit(ppl[0].name.split(" ")[0]))} ${L("está adentro", "is inside")}` : n <= 3 ? `${ppl.map(e => esc(tit(e.name.split(" ")[0]))).join(", ").replace(/, ([^,]*)$/, " " + L("y", "and") + " $1")} ${L("están adentro", "are inside")}` : `${n} ${L("personas adentro", "people inside")}`) : L("No hay nadie todavía. Puedes ser la primera persona.", "Nobody's here yet. You can be the first.");
+    lb.innerHTML = `<div class="sl-lb-c"><h3 id="sl-lb-t">${L("¿Entrar a la sala de juntas?", "Enter the meeting room?")}</h3>${n ? `<div class="sl-lb-h">${heads}</div>` : ""}<p>${quien}</p><p class="sl-lb-s">${L("Al entrar, las demás personas te ven en la sala hasta que salgas.", "Once inside, others see you in the room until you leave.")}</p><div class="sl-lb-a"><button type="button" class="sl-lb-no">${L("Ahora no", "Not now")}</button><button type="button" class="sl-lb-si">${L("Entrar", "Enter")}</button></div></div>`;
+    lb.querySelector(".sl-lb-si").onclick = join;
+    lb.querySelector(".sl-lb-no").onclick = () => { const p = S.prevView && S.prevView !== "sala" ? S.prevView : "home"; try { switchView(p); window.scrollTo({ top: 0 }); } catch (e) { } };
+    if (show) setTimeout(() => { const b = lb.querySelector(".sl-lb-si"); if (b && salaVisible()) b.focus({ preventScroll: true }); }, 60);
+  }
+  function join() {
+    if (S.inside || !S.myId) return; S.inside = true; S.unread = 0;
+    const e = mkEnt({ name: me() }); e.x = DOOR.x; e.y = DOOR.y; walkTo(e, DOOR.x + 18, 180);
+    if (NET.on) { NET.dirty = true; clearTimeout(NET.t); if (!NET.busy) netTick(); else NET.q = setTimeout(netTick, 400); }
+    else if (tr) tr.postMessage({ t: "hi", from: S.myId, name: me(), x: DOOR.x, y: DOOR.y, seat: -1, mic: false });
+    lobby(); people_(); bar(); pill(); paintTV(); avHint();
+    const st = $("sl-stage"); if (st) st.focus({ preventScroll: true });
+  }
+  function leave() {
+    if (!S.inside) return; const e = myEnt();
+    if (S.media.mic) toggleMic(); if (S.media.cam) toggleCam(); if (S.media.screen) stopScreen();
+    if (S.proj && S.projBy === me()) setProj(null, me());
+    send({ t: "bye" }); NET.out = []; NET.proj = undefined;
+    if (PROVIDER.impl && PROVIDER.impl.leave) try { PROVIDER.impl.leave(); } catch (er) { }
+    if (e) rmEnt(S.myId); S.inside = false; S.unread = 0; S.keys.clear();
+    document.querySelectorAll(".sl-card").forEach(x => x.remove());
+    people_(); bar(); pill(); if (salaVisible()) lobby(true);
+  }
+  function askBox(o) {
+    document.querySelectorAll(".sl-ask").forEach(x => x.remove());
+    const ov = document.createElement("div"); ov.className = "sl-ask"; ov.setAttribute("role", "alertdialog"); ov.setAttribute("aria-modal", "true"); ov.setAttribute("aria-labelledby", "sl-ask-t");
+    ov.innerHTML = `<div class="sl-ask-b"><h3 id="sl-ask-t">${o.title}</h3>${o.text ? `<p>${o.text}</p>` : ""}<div class="sl-lb-a"><button type="button" class="sl-lb-no">${o.no}</button><button type="button" class="sl-lb-si${o.danger ? " danger" : ""}">${o.yes}</button></div></div>`;
+    document.body.appendChild(ov); const back = document.activeElement;
+    const close = () => { ov.remove(); document.removeEventListener("keydown", k, true); try { if (back && back.isConnected) back.focus({ preventScroll: true }); } catch (e) { } };
+    const k = ev => { if (ev.key === "Escape") { ev.stopPropagation(); close(); } };
+    document.addEventListener("keydown", k, true); ov.querySelector(".sl-lb-no").onclick = close; ov.onclick = ev => { if (ev.target === ov) close(); };
+    ov.querySelector(".sl-lb-si").onclick = () => { close(); o.onYes(); };
+    setTimeout(() => ov.querySelector(".sl-lb-no").focus(), 30);
+  }
+  function leaveAsk() {
+    const yo = S.proj && S.projBy === me();
+    askBox({ title: L("¿Salir de la sala?", "Leave the room?"), text: yo ? L("Estás proyectando: al salir se apaga el TV para todos.", "You're showing something: leaving turns the TV off for everyone.") : L("Las demás personas dejarán de verte en la sala.", "Others will stop seeing you in the room."), yes: L("Salir", "Leave"), no: L("Quedarme", "Stay"), danger: true, onYes: leave });
+  }
+  /* mientras estás adentro y miras otra pestaña: un aviso flotante para volver o salir */
+  function pill() {
+    let p = $("sl-pill"); const show = S.inside && !salaVisible() && !!me();
+    if (!show) { if (p) p.hidden = true; return; }
+    if (!p) { p = document.createElement("div"); p.id = "sl-pill"; p.className = "sl-pill"; p.setAttribute("role", "status"); document.body.appendChild(p);
+      p.onclick = ev => { if (ev.target.closest(".sl-pill-x")) return leaveAsk(); if (ev.target.closest(".sl-pill-v")) { try { switchView("sala"); window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) { } } }; }
+    const e = myEnt(), n = S.ents.size;
+    p.innerHTML = `<button type="button" class="sl-pill-v" aria-label="${L("Volver a la sala", "Back to the room")}">${e ? `<img src="${PXA.headURL(e.cfg, null, 40)}" alt="">` : ""}<span><b>${L("Estás en la sala", "You're in the room")}</b><small>${n} ${n === 1 ? L("persona", "person") : L("personas", "people")}${S.proj ? " · " + L("TV encendido", "TV on") : ""}</small></span>${S.unread ? `<em>${S.unread}</em>` : ""}</button><button type="button" class="sl-pill-x">${L("Salir", "Leave")}</button>`;
+    p.hidden = false;
+  }
+  /* notas del tablero: vista previa en una ventana, sin sacarte de la sala */
+  function notaPreview(v) {
+    const m = (S.mapa || []).find(x => x.v === v) || { label: refLabel("view:" + v), tip: "" }; scopeCss();
+    const ov = document.createElement("div"); ov.className = "sl-mp sl-np"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", L("Vista previa de ", "Preview of ") + m.label);
+    ov.innerHTML = `<div class="sl-mp-b"><header><h3>${esc(m.label)}</h3><p>${esc(m.n != null ? m.tip : L("Vista previa", "Preview"))}</p>${S.inside ? `<button type="button" class="sl-np-pj">${L("Proyectar en el TV", "Show on the TV")}</button>` : ""}<button type="button" class="sl-mp-go">${L("Abrir ", "Open ")}${esc(m.label)}</button><button type="button" class="sl-mp-x" aria-label="${L("Cerrar", "Close")}">✕</button></header><div class="sl-np-prev"></div><p class="sl-np-h">${L("Desplázate para ver más. Al abrir la pestaña sigues en la sala.", "Scroll to see more. Opening the tab keeps you in the room.")}</p></div>`;
+    document.body.appendChild(ov); const prev = ov.querySelector(".sl-np-prev");
+    prev.innerHTML = frameHTML("view:" + v, true); blockClicks(prev); requestAnimationFrame(() => fit(prev, 0));
+    const ro = window.ResizeObserver ? new ResizeObserver(() => fit(prev)) : null; if (ro) ro.observe(prev);
+    const close = () => { if (ro) ro.disconnect(); ov.remove(); document.removeEventListener("keydown", k); }; const k = ev => { if (ev.key === "Escape") close(); };
+    document.addEventListener("keydown", k); ov.querySelector(".sl-mp-x").onclick = close; ov.onclick = ev => { if (ev.target === ov) close(); };
+    ov.querySelector(".sl-mp-go").onclick = () => { close(); try { switchView(v); window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) { } };
+    const pj = ov.querySelector(".sl-np-pj"); if (pj) pj.onclick = () => { const f = prev.querySelector(".sl-frame"), y = f ? Math.round(f.scrollTop) : 0; close(); setProj("view:" + v + (y > 0 ? "#y=" + y : ""), me()); const e = myEnt(); if (e) say(e, L("Les proyecto ", "Showing ") + m.label); };
+    setTimeout(() => ov.querySelector(".sl-mp-x").focus(), 30);
+  }
+  function avHint() {
+    const ed = S.inside && !(find(me()) || {}).avatar, hint = $("sl-noav");
     if (ed && !hint && window.pxpAvatarEditor) { const n = document.createElement("div"); n.id = "sl-noav"; n.className = "sl-noav"; n.innerHTML = `<span>${L("Entraste con un avatar provisional.", "You came in with a temporary avatar.")}</span><button type="button">${L("Crear mi avatar", "Create my avatar")}</button>`; document.querySelector(".sl-head > div").appendChild(n); n.querySelector("button").onclick = () => { pxpAvatarEditor(me()); }; }
     else if (!ed && hint) hint.remove();
   }
-  addEventListener("pagehide", () => send({ t: "bye" }));
+  /* ---------- vistas: normal o ampliada (pantalla completa; en celular, horizontal) ---------- */
+  const isPhone = () => Math.min(innerWidth, innerHeight) < 600 && matchMedia("(pointer:coarse)").matches;
+  function fitFull() {
+    const w = document.querySelector(".sl-wrap"); if (!w) return;
+    if (!S.full) { w.style.removeProperty("--sw"); return; }
+    S.rot = innerHeight > innerWidth && isPhone() && !(screen.orientation && /landscape/.test(screen.orientation.type || ""));
+    w.classList.toggle("sl-rot", S.rot);
+    const vw = S.rot ? innerHeight : innerWidth, vh = S.rot ? innerWidth : innerHeight; w.style.setProperty("--fw", vw + "px"); w.style.setProperty("--fh", vh + "px");
+    if (S.sideOff == null) { S.sideOff = vw < 900; w.classList.toggle("side-off", S.sideOff); }
+    requestAnimationFrame(() => { const m = w.querySelector(".sl-main"), sd = w.querySelector(".sl-side"); if (!m) return;
+      const aw = m.clientWidth - (S.sideOff || !sd ? 0 : sd.offsetWidth + 12), ah = m.clientHeight; const sw = Math.max(200, Math.min(aw, ah * W / H)); w.style.setProperty("--sw", Math.floor(sw) + "px"); const tv = $("sl-tv"); if (tv) fit(tv); });
+  }
+  function goFull() {
+    const w = document.querySelector(".sl-wrap"); if (!w || S.full) return; S.full = true; S.sideOff = null;
+    /* se lleva al cuerpo de la página mientras dura: así nada de la pestaña la recorta ni la desplaza */
+    S.home = { p: w.parentNode, n: w.nextSibling }; document.body.appendChild(w);
+    w.classList.add("sl-full"); document.documentElement.classList.add("sl-full-on");
+    const de = document.documentElement, rq = de.requestFullscreen || de.webkitRequestFullscreen;
+    const lock = () => { try { if (isPhone() && screen.orientation && screen.orientation.lock) screen.orientation.lock("landscape").then(fitFull).catch(() => { }); } catch (e) { } };
+    if (rq && !document.fullscreenElement) { try { const p = rq.call(de); S.fsUs = true; if (p && p.then) p.then(lock).catch(() => { S.fsUs = false; }); else lock(); } catch (e) { } } else lock();
+    fitFull(); bar(); setTimeout(() => { const st = $("sl-stage"); if (st) st.focus({ preventScroll: true }); }, 60);
+  }
+  function exitFull() {
+    const w = document.querySelector(".sl-wrap"); if (!S.full) return; S.full = false; S.rot = false;
+    if (w) { w.classList.remove("sl-full", "sl-rot", "side-off"); if (S.home && S.home.p && S.home.p.isConnected) S.home.p.insertBefore(w, S.home.n && S.home.n.parentNode === S.home.p ? S.home.n : null); } S.home = null; document.documentElement.classList.remove("sl-full-on");
+    try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) { }
+    if (S.fsUs && document.fullscreenElement) { try { (document.exitFullscreen || document.webkitExitFullscreen).call(document); } catch (e) { } } S.fsUs = false;
+    fitFull(); bar(); const tv = $("sl-tv"); if (tv) setTimeout(() => fit(tv), 50);
+  }
+  addEventListener("resize", () => { if (S.full) fitFull(); });
+  document.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement && S.full && S.fsUs) { S.fsUs = false; exitFull(); } });
+  document.addEventListener("keydown", ev => { if (ev.key === "Escape" && S.full && !document.querySelector(".sl-mp,.sl-pj,.sl-big,.sl-ask,.pxp-modal.open,.sl-card")) exitFull(); });
+  function enter() {
+    mount(); if (!$("view-sala")) return;
+    const id = nn(me()); if (!id) return;
+    if (S.myId !== id) { if (S.inside) leave(); [...S.ents.keys()].forEach(rmEnt); S.myId = id; S.inside = false; }
+    openTransport();
+    if (S.inside) { S.unread = 0; const e = myEnt(), p = find(me()); if (e && p) { e.cfg = cfgFor(p); e.g = grp(p); } if (NET.on && !NET.busy) netTick(); }
+    else if (NET.on && !NET.busy) netTick();
+    lobby(); people_(); bar(); pill(); paintTV(); run(); avHint();
+  }
+  addEventListener("pagehide", () => { if (S.inside) send({ t: "bye" }); });
 
   /* proveedor del servicio de llamadas: se conecta con estos mismos mensajes */
   window.PXP_SALA = {
@@ -25041,10 +25255,11 @@ button.pm-pxa{cursor:pointer}
     state: () => ({ me: S.myId, people: [...S.ents.values()].map(e => ({ id: e.id, name: e.name, x: Math.round(e.x), y: Math.round(e.y), seat: e.seat, mic: e.mic, cam: e.cam })), proj: S.proj, log: S.log.slice() }),
     say: t => { const e = myEnt(); if (e) { say(e, t); send({ t: "say", text: t }); } },
     seats: SEATS.length,
+    inside: () => S.inside, full: on => (on === false ? exitFull() : goFull()), join: () => { if (!S.inside) join(); }, leave: () => leave(),
   };
 
   const oSw = window.switchView;
-  if (typeof oSw === "function") window.switchView = function (name) { const r = oSw.apply(this, arguments); if (name === "sala") { try { enter(); } catch (e) { console.error(e); } } return r; };
+  if (typeof oSw === "function") window.switchView = function (name) { const cv = (document.querySelector(".view.active") || { id: "" }).id.replace(/^view-/, ""); if (name === "sala" && cv && cv !== "sala") S.prevView = cv; if (name !== "sala" && S.full && !S.capturing) exitFull(); const r = oSw.apply(this, arguments); if (name === "sala") { try { enter(); } catch (e) { console.error(e); } } try { pill(); } catch (e) { } return r; };
   const tryMount = () => { try { if (me()) mount(); } catch (e) { } };
   const oEnter = window.enterApp; if (typeof oEnter === "function") window.enterApp = function () { const r = oEnter.apply(this, arguments); setTimeout(tryMount, 1900); return r; };
   let rt = null; const oRender = window.render; if (typeof oRender === "function") window.render = function () { const r = oRender.apply(this, arguments); clearTimeout(rt); rt = setTimeout(tryMount, 950); return r; };

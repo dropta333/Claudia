@@ -21,6 +21,8 @@ await page.evaluate(() => { try { pxpClosePerson(); } catch (e) { } document.que
 // sala
 check("Sala: pestaña en el menú", await page.evaluate(() => !!document.querySelector('#tab-nav [data-view="sala"]')));
 await page.evaluate(() => switchView("sala")); await page.waitForTimeout(1500);
+check("Sala v217: al abrir la pestaña pregunta antes de entrar (y no apareces)", await page.evaluate(() => !!document.querySelector("#sl-lobby .sl-lb-si") && !PXP_SALA.inside() && PXP_SALA.state().people.length === 0 && document.getElementById("sl-mic").disabled));
+await page.click("#sl-lobby .sl-lb-si"); await page.waitForTimeout(800);
 check("Sala: entro por la puerta con mi avatar", await page.evaluate(() => PXP_SALA.state().people.some(p => p.name === "Bastián Torres")));
 check("Sala: 16 puestos (12 en la mesa, 2 por cabecera, y 4 en los sofás)", await page.evaluate(() => PXP_SALA.seats === 16));
 await page.waitForTimeout(2000);
@@ -73,6 +75,14 @@ check("Tablero: al pasar, la nota dice a dónde lleva y cuántos hay", await pag
 await page.click(".sl-mn[data-v='clientes']"); await page.waitForTimeout(300);
 check("Tablero: la nota Clientes abre el mapa con las fichas de Clientes", await page.evaluate(() => document.querySelectorAll(".sl-mp .sl-cv details.cnode").length > 2 && !!document.querySelector(".sl-mp .cnode .pchip") && getComputedStyle(document.querySelector(".sl-mp .cn-h")).display !== "list-item"));
 await page.keyboard.press("Escape"); await page.waitForTimeout(200);
+await page.click(".sl-mn[data-v='team']"); await page.waitForTimeout(1200);
+check("Tablero v217: la nota Team abre una vista previa en ventana, sin sacarte de la sala", await page.evaluate(() => !!document.querySelector(".sl-np .sl-np-prev .sl-frame") && document.querySelector(".sl-np .sl-frame").textContent.length > 500 && document.querySelector(".view.active").id === "view-sala" && PXP_SALA.inside()));
+check("Tablero v217: la vista previa trae Proyectar en el TV y Abrir la pestaña", await page.evaluate(() => !!document.querySelector(".sl-np .sl-np-pj") && !!document.querySelector(".sl-np .sl-mp-go")));
+await page.keyboard.press("Escape"); await page.waitForTimeout(200);
+await page.click("#sl-vw"); await page.waitForTimeout(600);
+check("Vista ampliada v217: la sala ocupa la pantalla y la escena crece", await page.evaluate(() => { const w = document.querySelector(".sl-wrap.sl-full"), s = document.getElementById("sl-stage").getBoundingClientRect(); return !!w && s.width > innerWidth * .6 && Math.abs(s.width / s.height - 1.6) < .03; }));
+await page.keyboard.press("Escape"); await page.waitForTimeout(400);
+check("Vista ampliada v217: Escape vuelve a la vista normal", await page.evaluate(() => !document.querySelector(".sl-full") && document.getElementById("view-sala").contains(document.getElementById("sl-stage"))));
 await page.click("#sl-mic"); await page.waitForTimeout(800);
 check("Sala: micrófono local (indicador encendido)", await page.evaluate(() => PXP_SALA.state().people.find(p => p.name === "Bastián Torres").mic && document.getElementById("sl-mic").classList.contains("on")));
 await page.click("#sl-camb"); await page.waitForTimeout(1200);
@@ -93,5 +103,9 @@ check("Sala: la conversación ocupa el alto de la sala", await page.evaluate(() 
 check("Celular: la sala cabe sin desbordar", await m.evaluate(() => { const s = document.getElementById("sl-stage").getBoundingClientRect(); return s.width > 300 && s.right <= innerWidth + 1 && document.documentElement.scrollWidth <= innerWidth + 1; }));
 for (const w of [1181, 1200, 1280, 1366]) { const h = await abrir(w, 900, "CARLOS QUINTERO"); await h.evaluate(() => { try { pxpHomeModo("personal"); } catch (e) { } switchView("home"); }); await h.waitForTimeout(1200);
   check(`Home ${w}px: las cifras de la tarjeta caben sin apretarse`, await h.evaluate(() => { const m = document.getElementById("mi-resumen"), st = [...m.querySelectorAll(".mr-stats > div")], r = m.getBoundingClientRect(); return st.length === 4 && st.every(d => d.getBoundingClientRect().width >= 150 && d.getBoundingClientRect().right <= r.right + 1); })); await h.context().close(); }
+for (const n of ["Juliana Canal", "Andres Brinez"]) { await m.evaluate(n => { document.querySelectorAll(".pxp-modal.open").forEach(x => x.classList.remove("open")); pxpOpenPerson(n); }, n); await m.waitForTimeout(1200);
+  check(`Celular v217: la ventana de ${n} no se sale de la pantalla (red de proyectos vertical)`, await m.evaluate(() => { const b = document.querySelector("#pxp-person .pm-box"), s = b.querySelector(".pxn-sec svg"); return b.scrollWidth <= b.clientWidth + 1 && (!s || s.classList.contains("port")) && [...b.querySelectorAll(".pm-proj")].every(p => p.getBoundingClientRect().right <= b.getBoundingClientRect().right + 1); })); }
+{ const g = await abrir(1800, 1000); await g.evaluate(() => { switchView("home"); const s = document.querySelector(".hm-more"); if (s && !s.classList.contains("open")) s.querySelector(".hm-more-b").click(); }); await g.waitForTimeout(800);
+  check("Home global v217: «Más gráficas» usa las tres columnas (ninguna queda vacía)", await g.evaluate(() => { const c = [...document.querySelectorAll(".hm-more .ht-col")]; return c.length === 3 && c.every(x => x.children.length > 0); })); }
 check("sin errores: " + errs.slice(0, 3).join(" | "), errs.length === 0);
 console.log(ok.map(x => "✓ " + x).join("\n")); console.log(fail.map(x => "✗ " + x).join("\n")); await b.close(); process.exit(fail.length ? 1 : 0);

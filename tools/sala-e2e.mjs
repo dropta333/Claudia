@@ -1,4 +1,4 @@
-// Prueba v213 · presencia real de la Sala (/api/sala) con dos personas en navegadores distintos.
+// Prueba v213/v217 · presencia real (con confirmación para entrar y salir) de la Sala (/api/sala) con dos personas en navegadores distintos.
 // Uso: python3 tools/netlify-e2e-prep.py && node tools/sala-e2e.mjs /tmp/nfmock
 import { createRequire } from "node:module"; import { execSync } from "node:child_process"; import path from "node:path"; import fs from "node:fs"; import http from "node:http";
 const req = createRequire(import.meta.url); let pw; try { pw = req("playwright"); } catch { pw = req(execSync("npm root -g").toString().trim() + "/playwright"); }
@@ -23,7 +23,12 @@ const abrir = async (n) => { const p = await (await b.newContext({ viewport: { w
   await p.goto(BASE + "/"); await p.waitForTimeout(800); await p.evaluate(n => { try { localStorage.setItem("pxp_lg_off", "1"); } catch (e) { } enterApp({ name: n }, "x"); }, n); await p.waitForTimeout(3500);
   await p.evaluate(() => { setInterval(() => { for (let i = 0; i < 8; i++) try { pxpLogroCerrar(); } catch (e) { } }, 300); switchView("sala"); }); return p; };
 const A = await abrir("Bastián Torres"), B = await abrir("Juliana Canal");
-await A.waitForTimeout(9000);
+await A.waitForTimeout(1500);
+check("al abrir la Sala nadie entra sin confirmar", await A.evaluate(() => !PXP_SALA.inside() && !!document.getElementById("sl-lobby")) && await B.evaluate(() => !PXP_SALA.inside()));
+await A.click("#sl-lobby .sl-lb-si"); await B.waitForTimeout(7000);
+check("Juliana, sin entrar, ve que Bastián está adentro (en la invitación)", await B.evaluate(() => /basti/i.test(document.getElementById("sl-lobby").textContent)));
+check("Bastián no ve a Juliana mientras ella no entra", await A.evaluate(() => PXP_SALA.state().people.length === 1));
+await B.click("#sl-lobby .sl-lb-si"); await A.waitForTimeout(8000);
 const vio = async (p, n) => p.evaluate(n => PXP_SALA.state().people.some(x => x.name.toLowerCase().includes(n)), n);
 check("solo personas reales en la sala (sin demostración)", await A.evaluate(() => !document.querySelector(".sl-demo") && PXP_SALA.state().people.length === 2));
 check("Bastián ve a Juliana en la sala", await vio(A, "juliana"));
@@ -38,7 +43,10 @@ await B.mouse.click(r.x + r.width * [100, 140, 180, 220][sx] / 320, r.y + r.heig
 check("Juliana se sienta y Bastián la ve sentada en el mismo puesto", await A.evaluate(i => { const j = PXP_SALA.state().people.find(x => /juliana/i.test(x.name)); return j && j.seat === i; }, sx));
 await A.click("#sl-projb"); await A.waitForTimeout(300); await A.fill(".sl-pj-q", "dra"); await A.waitForTimeout(200); await A.keyboard.press("Enter"); await B.waitForTimeout(4500);
 check("lo que Bastián proyecta aparece en el TV de Juliana", await B.evaluate(() => /DRACULA/i.test(document.getElementById("sl-tv").textContent)));
+await B.click("#sl-exit"); await B.waitForTimeout(300); await B.click(".sl-ask .sl-lb-si"); await A.waitForTimeout(4500);
+check("Juliana sale con confirmación y desaparece de la sala de Bastián", !(await vio(A, "juliana")) && await B.evaluate(() => !PXP_SALA.inside()));
+await B.click("#sl-lobby .sl-lb-si"); await A.waitForTimeout(8000); check("vuelve a entrar", await vio(A, "juliana"));
 await B.close(); await A.waitForTimeout(4500);
-check("cuando Juliana se va, sale de la sala de Bastián", !(await vio(A, "juliana")));
+check("si cierra la página, también sale", !(await vio(A, "juliana")));
 check("sin errores: " + errs.slice(0, 2).join(" | "), errs.length === 0);
 console.log(ok.map(x => "✓ " + x).join("\n")); console.log(fail.map(x => "✗ " + x).join("\n")); await b.close(); srv.close(); process.exit(fail.length ? 1 : 0);
