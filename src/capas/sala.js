@@ -676,7 +676,7 @@
   function frameLater(box, r, big, after) {
     const bw = box.clientWidth;
     /* TV muy pequeño (celular): una tarjeta clara con qué se proyecta; la ficha completa se ve al tocarlo */
-    if (box.id === "sl-tv" && bw && bw < 230) { box._tok = (box._tok || 0) + 1; const by = S.projBy ? tit(String(S.projBy).split(" ")[0]) : "";
+    if (box.id === "sl-tv" && bw && bw < 150) { box._tok = (box._tok || 0) + 1; const by = S.projBy ? tit(String(S.projBy).split(" ")[0]) : "";
       box.innerHTML = `<div class="sl-mini"><small>${by ? `${esc(by)} ${L("proyecta", "is showing")}` : L("En el TV", "On the TV")}</small><b>${esc(refLabel(r))}</b><span>${L("Toca para verlo en grande", "Tap to enlarge")}</span></div>`; if (after) after(); return; }
     box.innerHTML = cargando(); const tok = box._tok = (box._tok || 0) + 1;
     setTimeout(() => requestAnimationFrame(() => { if (box._tok !== tok || !box.isConnected) return; scopeCss(); box.innerHTML = frameHTML(r, big, box.clientWidth || bw); requestAnimationFrame(() => { fit(box); if (after) after(); }); }), 30); }

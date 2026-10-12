@@ -354,3 +354,4 @@ Versión: **v219** · 12 oct 2026 · Resumen general en `HANDOFF-COMPLETO.md` ·
 - Entrada/salida con puertas oscuras animadas; panel de personas y chat ocultable; burbujas más grandes y duraderas.
 - Reacciones (mano y emojis) sincronizadas por /api/sala (hand, rx).
 - Avatar: sin pin por defecto (Auto = forma del grupo), cadenitas (nk, kc) y efectos (fx, xc): brillo, aura, lluvia de ideas, confeti.
+- Arreglo v219: el TV en portátiles (~225 px) muestra la ficha (la tarjeta solo aplica bajo 150 px, celular); al iniciar sesión la pantalla de carga espera hasta que lleguen los datos del servidor (máx. 20 s).

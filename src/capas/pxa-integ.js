@@ -50,7 +50,8 @@
     const root = document.documentElement, loginVisible = () => !!ls && getComputedStyle(ls).display !== "none";
     let holding = false, released = 0;
     const ready = () => { if (loginVisible()) return true;
-      const st = document.getElementById("sync-status"); if (st && /^\s*Cargando/i.test(st.textContent)) return false;
+      const st = document.getElementById("sync-status"); if (st && /^\s*(Cargando|Sincronizando|Conectando)/i.test(st.textContent)) return false;
+      if (window.PXP_BACKEND === "netlify" && (typeof TEAM === "undefined" || !TEAM.length)) return false;   /* v219 · los datos del servidor aún no llegan */
       const v = document.querySelector(".view.active"); return !!(v && v.textContent.trim().length > 40); };
     const settle = max => new Promise(res => {
       const t0 = performance.now(); let last = t0;
@@ -64,10 +65,10 @@
         setTimeout(() => root.classList.remove("no-anim"), 900); }); };
     /* la plataforma quiere ocultar su pantalla de carga: la retenemos hasta que todo esté listo (primera visita o recarga) */
     new MutationObserver(() => { if (holding && sp.dataset.pxaHold && sp.classList.contains("hide")) { sp.classList.remove("hide"); return; }
-      if (sp.classList.contains("hide") && !holding && !released) hold(loginVisible() ? 2500 : 6000); })
+      if (sp.classList.contains("hide") && !holding && !released) hold(loginVisible() ? 2500 : 20000); })
       .observe(sp, { attributes: true, attributeFilter: ["class"] });
     /* inicio de sesión: al ocultarse el ingreso, la pantalla de carga se queda hasta que el Home esté completo */
-    if (ls) new MutationObserver(() => { if (!loginVisible() && !holding && performance.now() - released > 1500) { released = 0; hold(6000); } })
+    if (ls) new MutationObserver(() => { if (!loginVisible() && !holding && performance.now() - released > 1500) { released = 0; hold(20000); } })
       .observe(ls, { attributes: true, attributeFilter: ["style", "class"] });
   })();
 
