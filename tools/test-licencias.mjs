@@ -9,7 +9,7 @@ await page.evaluate(() => { window.pxpSaveBase = function () { }; enterApp({ nam
 await page.waitForTimeout(1500); await page.evaluate(() => { for (let i = 0; i < 4; i++) try { pxpLogroCerrar(); } catch (e) { } });
 const ok = [], fail = []; const check = (n, c) => (c ? ok : fail).push(n);
 await page.evaluate(() => {
-  const d = (n) => { const x = new Date(); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
+  const d = (n) => { const x = new Date(); x.setDate(x.getDate() + n); return new Date(x.getTime() - x.getTimezoneOffset() * 6e4).toISOString().slice(0, 10); };
   const base = { plataforma: "Higgsfield", usaCreditos: true, estado: "activa", tipo: "Ultra", ciclo: "mensual", fechaCompra: d(-20), marcas: [] };
   META.licencias = [
     Object.assign({}, base, { id: "t-act", operador: "PRUEBA ACTIVA", creditosPct: 70, fechaVence: d(10) }),

@@ -1,6 +1,13 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v215** · 11 oct 2026 · Resumen general en `HANDOFF-COMPLETO.md` · Responsable: Bastián Torres
+Versión: **v216** · 11 oct 2026 · Resumen general en `HANDOFF-COMPLETO.md` · Responsable: Bastián Torres
+
+## v216 · Sala sin compañeros de demostración, luz según la hora con transición suave, "hoy" en hora local y revisión de guardado
+- **Sala:** se eliminaron por completo los compañeros de demostración (código, casilla y textos); solo aparece quien está de verdad. El chip de la hora solo informa (la sala sigue sola la hora real; `PXP_SALA.hora(h)` queda para pruebas).
+- **Transición suave:** la paleta se recalcula cada minuto y el fondo nuevo se funde con el anterior en 1,6 s. La oscuridad de la noche (`dark`, de 18:54 a 20:18 y de 05:12 a 06:42), los rayos de sol de la mañana y de la tarde dorada (`sunAm`, `sunPm`) y la lámpara de la mesa (se enciende y apaga en ~0,7 s) son rampas continuas, no interruptores.
+- **Error corregido en toda la plataforma:** 13 lugares calculaban "hoy" con la fecha UTC (`new Date().toISOString().slice(0, 10)`). En Bogotá, después de las 7 p. m., eso ya era el día siguiente: fecha por defecto al registrar horas, cierre automático de proyectos, entregas "de hoy", licencias vencidas, nombre de las copias de seguridad. Ahora usan la fecha local.
+- **Guardado:** nueva prueba `tools/guardado-e2e.mjs` contra las funciones reales: dos personas guardan su avatar a la vez, una fija su estado, se crean tareas y una etapa con el asistente mientras otra persona se crea una tarea, y una tercera abre el tablero y encuentra todo. Estar en la Sala no genera guardados del tablero.
+- Todas las pruebas `tools/test-*.mjs` pasan, más netlify/guardado/sala/ai/extractor/migrate e2e y el recorrido completo de vistas.
 
 ## v215 · Home en laptops estrechos, tablero de notas como accesos, más cosas para proyectar (vistas completas, con desplazamiento), entrada limpia y rendimiento
 - **Home 1181–1440 px:** la identidad cede espacio (`minmax(220px,310px)`) y las cifras de la derecha nunca bajan de 158 px; logros a 44 px por debajo de 1280.

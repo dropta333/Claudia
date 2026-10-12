@@ -1,4 +1,4 @@
-// Prueba v212–v215: Sala de juntas (entrar, caminar, sentarse, burbujas, proyectar, cámara/mic/pantalla locales, demo, proveedor),
+// Prueba v212–v216: Sala de juntas (entrar, caminar, sentarse, burbujas, proyectar, cámara/mic/pantalla locales, proveedor),
 // perfil con foto más grande y acciones debajo, asistente que lleva a la Sala y catálogo de herramientas para la IA.
 import { createRequire } from "node:module"; import { execSync } from "node:child_process"; import path from "node:path";
 const req = createRequire(import.meta.url); let pw; try { pw = req("playwright"); } catch { pw = req(execSync("npm root -g").toString().trim() + "/playwright"); }
@@ -8,7 +8,7 @@ async function abrir(w, h, quien) {
   const ctx = await b.newContext({ viewport: { width: w, height: h } }); await ctx.grantPermissions(["camera", "microphone"]).catch(() => { });
   const page = await ctx.newPage(); page.on("pageerror", e => errs.push(e.message)); page.on("console", m => { if (m.type() === "error" && !/Failed to load resource/.test(m.text())) errs.push(m.text()); });
   await page.goto("file://" + path.resolve("dist/preview.html")); await page.waitForTimeout(700);
-  await page.evaluate(n => { window.pxpSaveBase = function () { }; window.saveState = async function () { }; try { localStorage.setItem("pxp_lg_off", "1"); localStorage.setItem("pxp_sala_demo", "1"); } catch (e) { } enterApp({ name: n }, "preview"); }, quien || "Bastián Torres");
+  await page.evaluate(n => { window.pxpSaveBase = function () { }; window.saveState = async function () { }; try { localStorage.setItem("pxp_lg_off", "1"); } catch (e) { } enterApp({ name: n }, "preview"); }, quien || "Bastián Torres");
   await page.waitForTimeout(3600); await page.evaluate(() => { const c = () => { for (let i = 0; i < 8; i++) try { pxpLogroCerrar(); } catch (e) { } }; c(); setInterval(c, 300); }); return page;
 }
 const page = await abrir(1440, 950);
@@ -23,11 +23,9 @@ check("Sala: pestaña en el menú", await page.evaluate(() => !!document.querySe
 await page.evaluate(() => switchView("sala")); await page.waitForTimeout(1500);
 check("Sala: entro por la puerta con mi avatar", await page.evaluate(() => PXP_SALA.state().people.some(p => p.name === "Bastián Torres")));
 check("Sala: 16 puestos (12 en la mesa, 2 por cabecera, y 4 en los sofás)", await page.evaluate(() => PXP_SALA.seats === 16));
-await page.waitForTimeout(8000);
-const demo = await page.evaluate(() => PXP_SALA.state().people.filter(p => p.demo));
-check(`Sala: compañeros de demostración entran y se sientan (${demo.length})`, demo.length >= 3 && demo.some(p => p.seat >= 0));
-await page.click("#sl-demo"); await page.waitForTimeout(300);
-check("Sala: apagar la demostración saca a los simulados", await page.evaluate(() => !PXP_SALA.state().people.some(p => p.demo)));
+await page.waitForTimeout(2000);
+check("Sala: sin compañeros de demostración (ni la casilla): solo personas reales", await page.evaluate(() => !document.querySelector(".sl-demo, #sl-demo") && PXP_SALA.state().people.length === 1));
+check("Sala: la hora es automática (el chip solo informa)", await page.evaluate(() => document.getElementById("sl-hora").tagName === "SPAN"));
 await page.evaluate(() => document.getElementById("sl-stage").scrollIntoView({ block: "center" })); await page.waitForTimeout(200);
 const r = await page.evaluate(() => document.getElementById("sl-stage").getBoundingClientRect().toJSON());
 const libre = await page.evaluate(() => { const used = new Set(PXP_SALA.state().people.map(p => p.seat)); return [0, 1, 2, 3].find(i => !used.has(i)); });
@@ -88,9 +86,6 @@ check("Sala: con proveedor conectado, el chat viaja por el adaptador", prov.incl
 check("Asistente: «ve a la sala» navega", await page.evaluate(() => { switchView("home"); const r = PXA_AGENT.ask("ve a la sala"); return /Sala/.test(r.text) && document.getElementById("view-sala").classList.contains("active"); }));
 check("Asistente: catálogo de 12 herramientas listo para la IA", await page.evaluate(() => PXA_AGENT.tools().length === 12 && PXA_AGENT.tools().every(t => t.type === "function" && t.function.parameters)));
 check("Asistente: sin IA configurada en la vista previa", await page.evaluate(() => PXA_AGENT.ai() === false));
-// otra persona: sin compañeros de demostración ni la casilla
-const j = await abrir(1440, 950, "JULIANA CANAL"); await j.evaluate(() => switchView("sala")); await j.waitForTimeout(6000);
-check("Otra persona: no ve la casilla de demostración ni compañeros simulados", await j.evaluate(() => document.querySelector(".sl-demo").hidden && !PXP_SALA.state().people.some(p => p.demo)));
 // celular
 const m = await abrir(390, 844);
 await m.evaluate(() => switchView("sala")); await m.waitForTimeout(1500);

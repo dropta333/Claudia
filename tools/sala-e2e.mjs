@@ -25,7 +25,7 @@ const abrir = async (n) => { const p = await (await b.newContext({ viewport: { w
 const A = await abrir("Bastián Torres"), B = await abrir("Juliana Canal");
 await A.waitForTimeout(9000);
 const vio = async (p, n) => p.evaluate(n => PXP_SALA.state().people.some(x => x.name.toLowerCase().includes(n)), n);
-check("por defecto no hay compañeros de demostración, solo personas reales", await A.evaluate(() => !PXP_SALA.state().people.some(p => p.demo)));
+check("solo personas reales en la sala (sin demostración)", await A.evaluate(() => !document.querySelector(".sl-demo") && PXP_SALA.state().people.length === 2));
 check("Bastián ve a Juliana en la sala", await vio(A, "juliana"));
 check("Juliana ve a Bastián en la sala", await vio(B, "bastián") || await vio(B, "bastian"));
 await A.evaluate(() => PXP_SALA.say("¿Arrancamos la revisión?")); await B.waitForTimeout(4500);

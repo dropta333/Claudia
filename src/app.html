@@ -7461,7 +7461,7 @@ async function downloadBackup() {
     meta: { exportadoPor: currentUser, exportadoEl: new Date().toISOString(), clientColors: (META && META.clientColors) || {}, clientPhotos: (META && META.clientPhotos) || {}, clientInfo: (META && META.clientInfo) || {}, clientesExtra: (META && META.clientesExtra) || [], exEquipo: (META && META.exEquipo) || [], gruposRen: (META && META.gruposRen) || {}, gruposColor: (META && META.gruposColor) || {}, casasAudio: (META && META.casasAudio) || [] }
   };
   const json = JSON.stringify(state, null, 2);
-  const fecha = new Date().toISOString().slice(0,10);
+  const fecha = (d => new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10))(new Date());
   const filename = `tablero_trafico_pxp_backup_${fecha}.json`;
   const statusEl = document.getElementById("sync-status");
   await ensureCapabilities();
@@ -7841,7 +7841,7 @@ function pxpPuntosCarga(person, w) {
 window.pxpEstadosIco = function (person, w, aus, ausObj, ausKey) {
   try {
     const sv = (d) => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`, esc = (x) => String(x == null ? "" : x).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-    const cp = pxpPuntosCarga(person, w), disp = pxpDisponibilidad(person, w), hoy = new Date().toISOString().slice(0, 10);
+    const cp = pxpPuntosCarga(person, w), disp = pxpDisponibilidad(person, w), hoy = (d => new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10))(new Date());
     let venc = 0; (cp.keys || []).forEach(k => { const q = PROJECTS[k]; if (!q || !window.pxpPlanEtapas) return; pxpPlanEtapas(q).forEach(x => { if (x.fin && x.fin < hoy && x.e.estado !== "listo" && pxpEsResp(x.e, person.name)) venc++; }); });
     const DI = { si: ["Sí", "var(--green)", "<circle cx='12' cy='12' r='8.5'/><path d='m8 12.3 2.8 2.8 5.2-5.6'/>"], parcial: ["Parcial", "#C99400", "<circle cx='12' cy='12' r='8.5'/><path d='M12 3.5a8.5 8.5 0 0 1 0 17z' fill='currentColor' stroke='none'/>"], no: ["No", "var(--red)", "<circle cx='12' cy='12' r='8.5'/><path d='m6 6 12 12'/>"] }[disp.k] || ["—", "var(--muted)", "<circle cx='12' cy='12' r='8.5'/>"];
     const tile = (cls, ic, val, lbl, tip, extra) => `<span class="ei ${cls}" data-tip="${tip}"${extra || ""}>${sv(ic)}<b>${val}</b><small>${lbl}</small></span>`;
@@ -7869,7 +7869,7 @@ function pxpLatente(person, w) {
 }
 // Disponible / Apoyo parcial / No disponible = carga activa + latente (y si se le suma un proyecto medio)
 function pxpDisponibilidad(person, w) {
-  const hoy = new Date().toISOString().slice(0, 10);
+  const hoy = (d => new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10))(new Date());
   const aus = typeof getAusencia === "function" ? getAusencia(person, w) : null;
   if (aus && aus.tipo) return { k: "no", l: "No disponible", why: "Tiene una ausencia esta semana" };
   if (person.vinculo === "freelance" && person.hasta && person.hasta < hoy) return { k: "no", l: "No disponible", why: "Terminó su contrato de freelance" };
@@ -8329,7 +8329,7 @@ function quitarProyectoDeTrafico(key) {
 function aplicarEstadoGeneral(key, value, before) {
   const proj = PROJECTS[key];
   proj.estadoGeneral = value;
-  if (value === "entregado" && before !== "entregado" && !proj.fechaFin) proj.fechaFin = new Date().toISOString().slice(0, 10);   // v163 · fecha de cierre automática
+  if (value === "entregado" && before !== "entregado" && !proj.fechaFin) proj.fechaFin = (d => new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10))(new Date());   // v163 · fecha de cierre automática
   if (value === "aprobado" && before !== "aprobado") {
     quitarProyectoDeTrafico(key);
     proj.archivadoEn = new Date().toISOString();
@@ -8357,7 +8357,7 @@ function pxpEstadoCalc(p) {
   const ent = P.filter(x => pxpClaseEtapa(x.e) === "entrega" && x.fin).sort((a, b) => (a.fin + a.i).localeCompare(b.fin + b.i)).pop();
   if (ent && ent.e.estado === "listo") return { v: "entregado", por: nom(ent) };
   const vivos = P.filter(x => x.e.estado !== "listo"); if (!vivos.length) return null;
-  const t = new Date().toISOString().slice(0, 10);
+  const t = (d => new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10))(new Date());
   let base = vivos.filter(x => ["en_curso", "ajustes", "revision", "bloqueada"].includes(x.e.estado));
   if (!base.length) base = vivos.filter(x => x.ini && x.fin && x.ini <= t && x.fin >= t);
   if (!base.length) base = [vivos.slice().sort((a, b) => (a.ini || "9999").localeCompare(b.ini || "9999"))[0]];
@@ -10095,7 +10095,7 @@ function renderFicha() {
       <div class="ficha-section-title">Horas trabajadas — ${horasReg}h registradas${proj.horasEstimadas ? ` de ${proj.horasEstimadas}h estimadas` : ""}</div>
       <div class="ficha-historial" style="margin-bottom:10px">${horasLogHtml}</div>
       <div class="ficha-row" style="align-items:flex-end">
-        <div class="ficha-field" style="max-width:150px"><label>Día trabajado</label><input type="date" id="ficha-nuevas-horas-fecha" value="${new Date().toISOString().slice(0,10)}"></div>
+        <div class="ficha-field" style="max-width:150px"><label>Día trabajado</label><input type="date" id="ficha-nuevas-horas-fecha" value="${(d => new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10))(new Date())}"></div>
         <div class="ficha-field" style="max-width:110px"><label>Horas</label><input type="number" min="0" step="0.5" id="ficha-nuevas-horas" placeholder="Ej: 3"></div>
         <div class="ficha-field"><label>Nota (opcional)</label><input type="text" id="ficha-nuevas-horas-nota" placeholder="En qué trabajaste"></div>
         <button class="ficha-nota-btn" onclick="addHoras()">Registrar</button>
@@ -10285,7 +10285,7 @@ async function addHoras() {
   const horas = parseFloat(horasInput.value);
   if (!horas || horas <= 0) { horasInput.focus(); return; }
   const nota = notaInput.value.trim();
-  const fecha = fechaInput.value || new Date().toISOString().slice(0,10);
+  const fecha = fechaInput.value || (d => new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10))(new Date());
   const proj = PROJECTS[fichaCurrentKey];
   proj.horasLog = proj.horasLog || [];
   // ts guarda la fecha del día TRABAJADO (no el momento del click), para poder sumar por día de la semana
@@ -10611,7 +10611,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   const trafWeeks = () => { const m = {}; [...TEAM, ...AUDIO].forEach(p => (p.weeks || []).forEach((tags, w) => (tags || []).forEach(t => { if (!t || String(t).startsWith("_")) return; const k = projectKey(t); (m[k] = m[k] || new Set()).add(w); }))); return m; };
   const ovl = (a, b, c, d) => a <= d && b >= c;
   window.pxpEnMes = (k, mi, tw) => {
-    const p = PROJECTS[k] || {}, ini = `2026-${pad2(mi + 1)}-01`, fin = `2026-${pad2(mi + 1)}-${pad2(new Date(2026, mi + 1, 0).getDate())}`, hoy = new Date().toISOString().slice(0, 10);
+    const p = PROJECTS[k] || {}, ini = `2026-${pad2(mi + 1)}-01`, fin = `2026-${pad2(mi + 1)}-${pad2(new Date(2026, mi + 1, 0).getDate())}`, hoy = (d => new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10))(new Date());
     const ws = (tw || trafWeeks())[k]; if (ws) for (const w of ws) { if (weekDates(w).some(d => d >= ini && d <= fin)) return true; }
     const a = p.fechaInicio, end = (window.pxpEntregaFinal && window.pxpEntregaFinal(p)) || p.fechaFin || (p.archivadoEn || "").slice(0, 10), abierto = !["entregado", "aprobado"].includes(p.estadoGeneral || "en_produccion");
     if (a) return ovl(a, end || (abierto ? (hoy > a ? hoy : a) : a), ini, fin);
@@ -11612,7 +11612,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = `tablero_trafico_pxp_backup_${new Date().toISOString().slice(0, 10)}.json`;
+      a.download = `tablero_trafico_pxp_backup_${(d => new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10))(new Date())}.json`;
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(a.href), 2000);
     };
@@ -12035,7 +12035,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
     if (isRoleBased(f)) return proyectosActivosDe(f.p.name).map(x => ({ key: x.key, nombre: x.nombre || x.key }));
     return pxpKeysDe(f).map(k => ({ key: k, nombre: (PROJECTS[k] && PROJECTS[k].nombre) || cleanTag(k) }));
   }
-  const today = () => new Date().toISOString().slice(0, 10);
+  const today = () => (d => new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10))(new Date());
 
   // ═════════ Etapas de la persona (reemplaza a "Tareas"): ver las suyas y asignarle una nueva en tres toques ═════════
   let asig = null;
@@ -13921,7 +13921,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       months += `<div class="tl-mo" style="left:${l}%;width:${wdt}%"><span>${m.toLocaleDateString("es-CO", { month: "long" })}${m.getMonth() === 0 || iso(m) === S ? " " + m.getFullYear() : ""}</span></div>`;
       m = n;
     }
-    const today = new Date().toISOString().slice(0, 10), tp = pct(today);
+    const today = (d => new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10))(new Date()), tp = pct(today);
     const row = (x, i) => {
       const l = pct(x.point ? x.fin : x.ini), w = x.point ? 0 : Math.max(0.6, pct(addD(x.fin, 1)) - l);
       const dias = x.point ? null : Math.round((new Date(x.fin) - new Date(x.ini)) / 86400000) + 1;
@@ -16209,7 +16209,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   const ea = (s) => esc(String(s).replace(/\\/g, "\\\\").replace(/'/g, "\\'"));
   const can = () => (window.pxpPuedeEditar ? window.pxpPuedeEditar() : true);
   const toast = (m) => (window.pxpToast ? window.pxpToast(m) : null);
-  const hoy = () => new Date().toISOString().slice(0, 10);
+  const hoy = () => (d => new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10))(new Date());
   const fD = (s) => s ? new Date(s + "T00:00:00").toLocaleDateString("es-CO", { day: "numeric", month: "short" }).replace(".", "") : "";
   const n1 = (x) => String(Math.round(x * 10) / 10).replace(".", ",");
   const DISP_IC = { si: "<path d='m6 12.5 4 4L18 8'/>", parcial: "<path d='M12 4a8 8 0 1 0 0 16z' fill='currentColor' stroke='none'/><circle cx='12' cy='12' r='8'/>", no: "<circle cx='12' cy='12' r='8'/><path d='M8 16 16 8'/>" };
@@ -19023,7 +19023,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
   window.downloadBackup = async function () {
     const state = { team: TEAM, rodajes: RODAJES, freelance: FREELANCE, pendientes: PENDIENTES, audio: AUDIO, projects: PROJECTS, capacidadHistorico: CAPACIDAD_HISTORICO, meta: Object.assign({}, META || {}, { exportadoPor: currentUser, exportadoEl: new Date().toISOString() }), completa: true, adjuntos: window.pxpAdjuntosDe(PROJECTS).length };
     const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
-    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `tablero_trafico_pxp_backup_${new Date().toISOString().slice(0, 10)}.json`;
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `tablero_trafico_pxp_backup_${(d => new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10))(new Date())}.json`;
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
     estado("Copia completa descargada (incluye licencias, logros y todos los ajustes).");
   };
@@ -24053,7 +24053,7 @@ button.pm-pxa{cursor:pointer}
   run();
 })();
 </script>
-<!-- ═════ v212–v215 · Sala de juntas (presencia real, proyección de ventanas en 16:9, mapa de Clientes) y perfil con foto más grande ═════ -->
+<!-- ═════ v212–v216 · Sala de juntas (presencia real, proyección de ventanas en 16:9, mapa de Clientes) y perfil con foto más grande ═════ -->
 <style id="sala-v212">/* ═════ v212 · Perfil: foto más grande (triángulos más llenos) y acciones debajo, sin tapar la foto ═════ */
 #pxp-person .ph-avw{display:flex;flex-direction:column;align-items:center;gap:8px}
 #pxp-person .ph-avw .av{--s:112px!important}
@@ -24316,7 +24316,7 @@ button.pm-pxa{cursor:pointer}
 </style>
 <script id="sala-js">/* ═════ v212 · Sala de juntas (prototipo): los avatares entran, caminan, se sientan, hablan en burbujas y proyectan en el TV ═════
    Todo lo que viaja entre personas pasa por un "transporte" con mensajes simples ({t:"hi"|"mv"|"say"|"st"|"proj"|"bye", …}).
-   Hoy: entre pestañas del mismo navegador (BroadcastChannel) y compañeros simulados (modo demostración).
+   Hoy: presencia real en /api/sala (en la vista previa, entre pestañas del mismo navegador).
    Cuando TI apruebe el servicio de llamadas: PXP_SALA.setProvider({...}) entrega presencia, chat, voz, video y pantalla con los mismos mensajes.
    Cámara, micrófono y pantalla funcionan ya, pero solo en tu equipo (no se transmiten). */
 (function () {
@@ -24335,8 +24335,6 @@ button.pm-pxa{cursor:pointer}
   const reduce = () => window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   const isDark = () => { const r = document.documentElement; return r.dataset.theme ? r.dataset.theme === "dark" : !(window.matchMedia && matchMedia("(prefers-color-scheme: light)").matches); };
   const L = (es, en) => (window.pxpLang === "en" ? en : es);
-  /* los compañeros de demostración solo los ve Bastián (para probar); el resto ve únicamente a quien está de verdad */
-  const isDev = () => { const n = nn(me()); return n === nn("Bastián Torres") || (window.pxpHandleDe && pxpHandleDe(me()) === "bastian.ia"); };
 
   /* ---------- geometría: mesa grande casi cuadrada al centro, sala limpia (píxeles lógicos; los pies de cada avatar son su punto) ---------- */
   const TABLE = { x: 72, y: 88, w: 176, h: 52 };
@@ -24378,7 +24376,10 @@ button.pm-pxa{cursor:pointer}
     let i = 0; while (i < KEYS.length - 2 && h >= KEYS[i + 1][0]) i++;
     const [h0, a] = KEYS[i], [h1, b] = KEYS[i + 1], t = h1 > h0 ? Math.max(0, Math.min(1, (h - h0) / (h1 - h0))) : 0, A = PAL[a], B = PAL[b], out = {};
     Object.keys(A).forEach(k => { out[k] = t <= 0 ? A[k] : t >= 1 ? B[k] : mix(A[k], B[k], t); });
-    out.momento = t < .5 ? a : b; out.noche = h >= 19.8 || h < 6; out.sol = h >= 6.5 && h < 18.4; return out;
+    const ss = (e0, e1, v) => { const k = Math.max(0, Math.min(1, (v - e0) / (e1 - e0))); return k * k * (3 - 2 * k); };   /* rampa suave */
+    out.dark = Math.max(ss(18.9, 20.3, h), 1 - ss(5.2, 6.7, h));                         /* 0 de día · 1 de noche, con transición */
+    out.sunAm = ss(6.4, 7.4, h) * (1 - ss(9.6, 10.8, h)); out.sunPm = ss(15.8, 17, h) * (1 - ss(18, 18.8, h));
+    out.momento = t < .5 ? a : b; out.noche = out.dark > .5; out.sol = h >= 6.5 && h < 18.4; return out;
   }
 
   /* ---------- tablero de notas: accesos a las secciones de la plataforma (solo las que la persona puede ver) ---------- */
@@ -24396,8 +24397,8 @@ button.pm-pxa{cursor:pointer}
   /* ---------- dibujo: contorno parejo, esquinas redondeadas, paleta única ---------- */
   let bg = null, bgKey = "";
   function drawBg() {
-    const h = hora(), M = tableroData(), key = Math.round(h * 12) + "|" + (window.pxpLang || "es") + "|" + M.map(m => m.v + m.n).join(",");
-    if (bg && bgKey === key) return bg; bgKey = key; S.mapa = M;
+    const h = hora(), M = tableroData(), key = Math.round(h * 60) + "|" + (window.pxpLang || "es") + "|" + M.map(m => m.v + m.n).join(",");
+    if (bg && bgKey === key) return bg; bgKey = key; S.mapa = M; if (bg) { S.bgPrev = bg; S.fade0 = performance.now(); }
     const C = paleta(h); S.pal = C;
     bg = document.createElement("canvas"); bg.width = W; bg.height = H; const x = bg.getContext("2d");
     const R0 = (c, a, b, w, hh) => { x.fillStyle = c; x.fillRect(a, b, w, hh); };
@@ -24495,19 +24496,21 @@ button.pm-pxa{cursor:pointer}
   /* luces: de noche todo oscuro; si hay gente en la mesa se prende la luz sobre ella; el TV siempre brilla */
   function drawLight(x) {
     const C = S.pal; if (!C) return;
-    const enMesa = [...S.ents.values()].some(e => e.seat >= 0);
-    if (C.sol && (C.momento === "manana" || C.momento === "dorada")) {
-      x.save(); x.globalCompositeOperation = "soft-light"; x.fillStyle = C.momento === "manana" ? "rgba(255,230,170,.55)" : "rgba(255,180,90,.55)";
-      x.beginPath(); x.moveTo(14, 57); x.lineTo(64, 57); x.lineTo(122, 130); x.lineTo(58, 130); x.closePath(); x.fill(); x.restore();
-    }
-    if (!C.noche) return;
-    x.save(); x.globalCompositeOperation = "multiply"; x.fillStyle = enMesa ? "rgba(70,80,140,.55)" : "rgba(40,46,96,.8)"; x.fillRect(0, 0, W, H); x.restore();
+    const enMesa = [...S.ents.values()].some(e => e.seat >= 0), now = performance.now(), dt = Math.min(100, now - (S.lt || now)); S.lt = now;
+    S.lamp = (S.lamp || 0) + ((enMesa ? 1 : 0) - (S.lamp || 0)) * Math.min(1, dt / 700);   /* la lámpara se enciende y apaga despacio */
+    const ray = (a, col) => { if (a < .01) return; x.save(); x.globalCompositeOperation = "soft-light"; x.globalAlpha = a; x.fillStyle = col;
+      x.beginPath(); x.moveTo(14, 57); x.lineTo(64, 57); x.lineTo(122, 130); x.lineTo(58, 130); x.closePath(); x.fill(); x.restore(); };
+    ray(C.sunAm, "rgba(255,230,170,.55)"); ray(C.sunPm, "rgba(255,180,90,.55)");
+    const d = C.dark || 0; if (d < .01) return;
+    const a = d * (.8 - .25 * S.lamp);
+    x.save(); x.globalCompositeOperation = "multiply"; x.fillStyle = `rgba(${Math.round(40 + 30 * S.lamp)},${Math.round(46 + 34 * S.lamp)},${Math.round(96 + 44 * S.lamp)},${a.toFixed(3)})`; x.fillRect(0, 0, W, H); x.restore();
     x.save(); x.globalCompositeOperation = "screen";
     const glow = (cx, cy, r, c) => { const g = x.createRadialGradient(cx, cy, 0, cx, cy, r); g.addColorStop(0, c); g.addColorStop(1, "rgba(0,0,0,0)"); x.fillStyle = g; x.fillRect(cx - r, cy - r, r * 2, r * 2); };
-    glow(TV.x + TV.w / 2, TV.y + TV.h + 6, 64, "rgba(120,140,255,.3)");
-    if (enMesa) glow(160, 114, 118, "rgba(255,205,140,.42)");
+    glow(TV.x + TV.w / 2, TV.y + TV.h + 6, 64, `rgba(120,140,255,${(.3 * d).toFixed(3)})`);
+    if (S.lamp > .01) glow(160, 114, 118, `rgba(255,205,140,${(.42 * d * S.lamp).toFixed(3)})`);
     x.restore();
   }
+
 
   /* ---------- sprites: frente (del núcleo) y espalda (cabeza cubierta con pelo, nuca en piel) ---------- */
   const hex2 = h => [1, 3, 5].map(i => parseInt(h.substr(i, 2), 16));
@@ -24542,13 +24545,13 @@ button.pm-pxa{cursor:pointer}
   }
 
   /* ---------- estado ---------- */
-  const S = { ents: new Map(), myId: "", proj: null, projBy: "", log: [], demo: false, raf: 0, last: 0, keys: new Set(), mounted: false, media: { mic: null, cam: null, screen: null } };
+  const S = { ents: new Map(), myId: "", proj: null, projBy: "", log: [], raf: 0, last: 0, keys: new Set(), mounted: false, media: { mic: null, cam: null, screen: null } };
   let tr = null; // transporte activo
   const myEnt = () => S.ents.get(S.myId);
 
   function mkEnt(o) {
     const p = find(o.name) || { name: o.name };
-    const e = Object.assign({ id: nn(o.name), name: o.name, cfg: cfgFor(p), g: grp(p), role: p.alias || p.role || "", x: DOOR.x, y: DOOR.y, path: [], seat: -1, walkT: 0, step: 1, br: 0, brT: R(800, 2400), blink: 0, blinkT: R(1200, 4000), dx: 0, dxT: R(3000, 8000), mic: false, cam: false, speaking: 0, demo: false, back: false }, o);
+    const e = Object.assign({ id: nn(o.name), name: o.name, cfg: cfgFor(p), g: grp(p), role: p.alias || p.role || "", x: DOOR.x, y: DOOR.y, path: [], seat: -1, walkT: 0, step: 1, br: 0, brT: R(800, 2400), blink: 0, blinkT: R(1200, 4000), dx: 0, dxT: R(3000, 8000), mic: false, cam: false, speaking: 0, back: false }, o);
     e.el = document.createElement("div"); e.el.className = "sl-e"; e.el.innerHTML = `<span class="sl-spk"></span><span class="sl-cam"></span><span class="sl-tag"><i class="sl-mic" hidden></i><b></b></span>`;
     e.el.querySelector("b").textContent = tit(String(o.name).split(" ")[0]) + (o.id === S.myId || nn(o.name) === S.myId ? " · " + L("tú", "you") : "");
     e.el.style.setProperty("--c", e.g.color || "#F3FF57"); $("sl-ov").appendChild(e.el); S.ents.set(e.id, e); return e;
@@ -24636,7 +24639,6 @@ button.pm-pxa{cursor:pointer}
     if (e.bub) e.bub.remove();
     const b = document.createElement("div"); b.className = "sl-bub pxb"; b.innerHTML = `<span class="pxb-o"><span class="pxb-i"></span></span>${PXA.TAIL}`; b.querySelector(".pxb-i").textContent = text;
     $("sl-ov").appendChild(b); e.bub = b; e.bubT = performance.now() + 4200 + text.length * 70;
-    if (e.demo) { e.speaking = 1; setTimeout(() => { e.speaking = 0; }, 900 + text.length * 40); }
   }
   function renderLog() {
     const l = $("sl-log"); if (!l) return;
@@ -24679,25 +24681,6 @@ button.pm-pxa{cursor:pointer}
     paintTV(); bar(); note(L("Tu pantalla se ve en el TV. Por ahora solo en tu equipo.", "Your screen is on the TV. Only on your device for now."));
   }
 
-  /* ---------- compañeros simulados (modo demostración) ---------- */
-  const LINES = ["¿Ya salió el render?", "Versión 7, la buena", "¿Quién tiene el EDL?", "Frame.io actualizado", "Le subo dos puntos al contraste", "El cliente pidió el logo más grande", "Hagamos un pase de color", "El audio quedó perfecto", "¿Cerramos la entrega hoy?", "Necesito el master en ProRes", "Ojo con los safe areas", "Me encanta ese corte", "¿Lo vemos en el TV?", "Subo la referencia al repo", "Mañana rodamos temprano", "Ese plano pide un respiro", "Cafecito y seguimos"];
-  let demoT = [];
-  function demoStart() {
-    demoStop(); if (!S.demo || !isDev()) return;
-    const mine = S.myId, pool = people().filter(p => nn(p.name) !== mine).sort(() => Math.random() - .5).sort((a, b) => (!!b.avatar) - (!!a.avatar)).slice(0, 6);
-    pool.forEach((p, i) => demoT.push(setTimeout(() => {
-      if (!S.demo || S.ents.has(nn(p.name))) return; const e = mkEnt({ name: p.name, demo: true }); e.x = DOOR.x + R(-6, 6); e.y = DOOR.y;
-      const free = SEATS.map((s, j) => j).filter(j => !seatTaken(j)); const j = pick(free.filter(j => SEATS[j].side !== "sofa").length && Math.random() < .85 ? free.filter(j => SEATS[j].side !== "sofa") : free);
-      if (j != null) sitAt(e, j); people_(); paintTV();
-    }, 900 + i * R(1400, 2600))));
-    const chat = () => { if (!S.demo) return; const d = [...S.ents.values()].filter(e => e.demo && !e.path.length); if (d.length) say(pick(d), pick(LINES)); demoT.push(setTimeout(chat, R(5500, 11000))); };
-    demoT.push(setTimeout(chat, 7000));
-    const wander = () => { if (!S.demo) return; const d = [...S.ents.values()].filter(e => e.demo && !e.path.length); if (d.length) { const e = pick(d);
-        if (e.seat >= 0) { walkTo(e, R(26, 50), R(72, 80)); demoT.push(setTimeout(() => { const f = SEATS.map((s, j) => j).filter(j => !seatTaken(j)); if (f.length && S.ents.has(e.id)) sitAt(e, pick(f)); }, R(7000, 12000))); } }
-      demoT.push(setTimeout(wander, R(16000, 26000))); };
-    demoT.push(setTimeout(wander, 18000));
-  }
-  function demoStop() { demoT.forEach(clearTimeout); demoT = []; [...S.ents.values()].filter(e => e.demo).forEach(e => rmEnt(e.id)); }
 
   /* ---------- bucle ---------- */
   function update(dt) {
@@ -24715,7 +24698,7 @@ button.pm-pxa{cursor:pointer}
       if (e.path.length) {
         const [tx, ty] = e.path[0], dx = tx - e.x, dy = ty - e.y, d = Math.hypot(dx, dy), sp = 46 * dt / 1000;
         e.back = dy < -0.5 && Math.abs(dy) > Math.abs(dx) * .8;
-        if (d <= sp) { e.x = tx; e.y = ty; e.path.shift(); if (!e.path.length && e.goSeat >= 0) { if (!seatTaken(e.goSeat, e.id)) { e.seat = e.goSeat; const s = seatOf(e.seat); e.x = s.x; e.y = s.y; e.goSeat = -1; } else if (e.demo) { const f = SEATS.map((s, j) => j).filter(j => !seatTaken(j, e.id)); e.goSeat = -1; if (f.length) { f.sort((a, b) => Math.hypot(SEATS[a].ax - e.x, SEATS[a].ay - e.y) - Math.hypot(SEATS[b].ax - e.x, SEATS[b].ay - e.y)); sitAt(e, f[0]); } } else { e.goSeat = -1; say(e, L("Uy, alguien se sentó primero", "Oops, someone took that seat")); } if (e.id === S.myId) { bar(); sendState(); } } }
+        if (d <= sp) { e.x = tx; e.y = ty; e.path.shift(); if (!e.path.length && e.goSeat >= 0) { if (!seatTaken(e.goSeat, e.id)) { e.seat = e.goSeat; const s = seatOf(e.seat); e.x = s.x; e.y = s.y; e.goSeat = -1; } else { e.goSeat = -1; if (e.id === S.myId) say(e, L("Uy, alguien se sentó primero", "Oops, someone took that seat")); } if (e.id === S.myId) { bar(); sendState(); } } }
         else { e.x += dx / d * sp; e.y += dy / d * sp; }
         e.moving = true;
       } else if (!(e.id === S.myId && S.keys.size)) e.moving = false;
@@ -24733,7 +24716,7 @@ button.pm-pxa{cursor:pointer}
     if (me_ && me_.moving && (!me_._sent || now - me_._sent > 400)) { me_._sent = now; send({ t: "mv", x: Math.round(me_.path.length ? me_.path[me_.path.length - 1][0] : me_.x), y: Math.round(me_.path.length ? me_.path[me_.path.length - 1][1] : me_.y), seat: me_.goSeat >= 0 ? me_.goSeat : -1 }); }
   }
   function frame(x) {
-    x.imageSmoothingEnabled = false; x.clearRect(0, 0, W, H); x.drawImage(drawBg(), 0, 0); drawClock(x); horaChip(); mapaHot();
+    x.imageSmoothingEnabled = false; x.clearRect(0, 0, W, H); x.drawImage(drawBg(), 0, 0); if (S.bgPrev) { const f = (performance.now() - S.fade0) / 1600; if (f >= 1) S.bgPrev = null; else { x.globalAlpha = 1 - f * f * (3 - 2 * f); x.drawImage(S.bgPrev, 0, 0); x.globalAlpha = 1; } } drawClock(x); horaChip(); mapaHot();
     const ents = [...S.ents.values()];
     const items = ents.map(e => {
       const s = e.seat >= 0 ? seatOf(e.seat) : null, back = s ? s.view === "back" : e.back;
@@ -24834,7 +24817,7 @@ button.pm-pxa{cursor:pointer}
   function people_() {
     const ul = $("sl-ppl"); if (!ul) return; const list = [...S.ents.values()].sort((a, b) => (b.id === S.myId) - (a.id === S.myId) || a.name.localeCompare(b.name));
     $("sl-n").textContent = list.length;
-    ul.innerHTML = list.map(e => `<li data-id="${esc(e.id)}"><img src="${PXA.headURL(e.cfg, null, 44)}" alt=""><span><b>${esc(tit(e.name))}${e.id === S.myId ? ` <em>${L("tú", "you")}</em>` : ""}</b><small>${esc(e.role)}${e.demo ? ` · ${L("demo", "demo")}` : ""}</small></span><i class="${e.mic ? "on" : ""}" title="${e.mic ? L("Micrófono encendido", "Mic on") : L("Micrófono apagado", "Mic off")}">${svg(e.mic ? IC.mic : IC.micOff)}</i><i class="${e.cam || e.camR ? "on" : ""}" title="${e.cam || e.camR ? L("Cámara encendida", "Camera on") : L("Cámara apagada", "Camera off")}">${svg(e.cam || e.camR ? IC.cam : IC.camOff)}</i></li>`).join("");
+    ul.innerHTML = list.map(e => `<li data-id="${esc(e.id)}"><img src="${PXA.headURL(e.cfg, null, 44)}" alt=""><span><b>${esc(tit(e.name))}${e.id === S.myId ? ` <em>${L("tú", "you")}</em>` : ""}</b><small>${esc(e.role)}</small></span><i class="${e.mic ? "on" : ""}" title="${e.mic ? L("Micrófono encendido", "Mic on") : L("Micrófono apagado", "Mic off")}">${svg(e.mic ? IC.mic : IC.micOff)}</i><i class="${e.cam || e.camR ? "on" : ""}" title="${e.cam || e.camR ? L("Cámara encendida", "Camera on") : L("Cámara apagada", "Camera off")}">${svg(e.cam || e.camR ? IC.cam : IC.camOff)}</i></li>`).join("");
     paintTV();
   }
   function chatSend() { const i = $("sl-in"); const v = i.value.trim(); if (!v) { i.focus(); return; } i.value = ""; const e = myEnt(); if (!e) return; say(e, v); send({ t: "say", text: v }); }
@@ -24971,7 +24954,7 @@ button.pm-pxa{cursor:pointer}
   }
   function personCard(e, cx, cy) {
     document.querySelectorAll(".sl-card").forEach(x => x.remove());
-    const c = document.createElement("div"); c.className = "sl-card"; c.innerHTML = `<img src="${PXA.headURL(e.cfg, null, 56)}" alt=""><b>${esc(tit(e.name))}</b><small>${esc(e.role)}</small>${e.demo ? `<em>${L("Simulado", "Simulated")}</em>` : ""}<button type="button">${L("Ver ficha", "View profile")}</button>`;
+    const c = document.createElement("div"); c.className = "sl-card"; c.innerHTML = `<img src="${PXA.headURL(e.cfg, null, 56)}" alt=""><b>${esc(tit(e.name))}</b><small>${esc(e.role)}</small><button type="button">${L("Ver ficha", "View profile")}</button>`;
     $("sl-stage").appendChild(c); c.style.left = (cx / W * 100) + "%"; c.style.top = (cy / H * 100) + "%";
     c.querySelector("button").onclick = () => { c.remove(); try { pxpOpenPerson(e.name); } catch (er) { } };
     setTimeout(() => document.addEventListener("pointerdown", function h(ev) { if (!c.contains(ev.target)) { c.remove(); document.removeEventListener("pointerdown", h); } }), 0);
@@ -25001,7 +24984,7 @@ button.pm-pxa{cursor:pointer}
     const host = $("view-logros") || $("view-repositorio") || $("view-team"); if (!host) return;
     host.insertAdjacentHTML("afterend", `<div class="view" id="view-sala"><div class="proj-wrap sl-wrap">
       <div class="sl-head"><div><h2>${L("Sala de juntas", "Meeting room")}</h2><p>${L("Haz clic en el piso para caminar o en una silla para sentarte. También con las flechas.", "Click the floor to walk or a chair to sit. Arrow keys work too.")}</p></div>
-        <div class="sl-hr"><button type="button" class="sl-hora" id="sl-hora" title="${L("Ver la sala a otra hora", "See the room at another time")}"></button><span class="sl-badge">${L("Prototipo", "Prototype")}</span><label class="sl-demo" hidden><input type="checkbox" id="sl-demo"> ${L("Compañeros de demostración", "Demo teammates")}</label></div></div>
+        <div class="sl-hr"><span class="sl-hora" id="sl-hora" title="${L("La sala sigue la hora del día", "The room follows the time of day")}"></span><span class="sl-badge">${L("Prototipo", "Prototype")}</span></div></div>
       <div class="sl-main">
         <div class="sl-stage" id="sl-stage" tabindex="0" role="application" aria-label="${L("Sala de juntas. Flechas para caminar.", "Meeting room. Arrow keys to walk.")}">
           <canvas id="sl-cv" width="${W}" height="${H}"></canvas>
@@ -25024,28 +25007,22 @@ button.pm-pxa{cursor:pointer}
       <p class="sl-note">${L("Voz, video y pantalla compartida llegan cuando TI apruebe el servicio de llamadas. Por ahora tu cámara, tu micrófono y tu pantalla solo se ven en tu equipo.", "Voice, video and screen sharing arrive once IT approves the calling service. For now your camera, mic and screen are only visible on your device.")}</p>
     </div></div>`);
     $("sl-stage").addEventListener("click", stageClick);
-    const PRE = [null, 8, 12.5, 17.2, 18.9, 22];
-    $("sl-hora").onclick = () => { const i = PRE.indexOf(S.hora == null ? null : S.hora); S.hora = PRE[(i + 1) % PRE.length]; bgKey = ""; horaChip(true); };
     $("sl-mic").onclick = toggleMic; $("sl-camb").onclick = toggleCam; $("sl-scr").onclick = toggleScreen; $("sl-projb").onclick = projPicker;
     $("sl-seat").onclick = () => { const e = myEnt(); if (!e) return; if (e.seat >= 0) { const s = seatOf(e.seat); e.seat = -1; e.x = s.ax; e.y = s.ay; walkTo(e, s.ax, s.side === "back" ? 63 : s.side === "front" ? 184 : s.ay); bar(); sendState(); return; }
       let best = -1, bd = 1e9; SEATS.forEach((s, i) => { if (seatTaken(i, e.id)) return; const d = Math.hypot(s.ax - e.x, s.ay - e.y); if (d < bd) { bd = d; best = i; } }); if (best >= 0) { sitAt(e, best); send({ t: "mv", seat: best }); } };
     $("sl-send").onclick = chatSend; $("sl-in").addEventListener("keydown", ev => { if (ev.key === "Enter" && !ev.isComposing) { ev.preventDefault(); chatSend(); } ev.stopPropagation(); });
-    $("sl-demo").onchange = ev => { S.demo = ev.target.checked; try { localStorage.setItem("pxp_sala_demo", S.demo ? "1" : "0"); } catch (e) { } if (S.demo) demoStart(); else demoStop(); people_(); };
     $("sl-ppl").onclick = ev => { const li = ev.target.closest("li[data-id]"); if (!li) return; const e = S.ents.get(li.dataset.id); if (e && e.id !== S.myId) personCard(e, e._cx, e._top); };
     const KM = { ArrowLeft: "l", ArrowRight: "r", ArrowUp: "u", ArrowDown: "d", a: "l", d: "r", w: "u", s: "d", A: "l", D: "r", W: "u", S: "d" };
     $("sl-stage").addEventListener("keydown", ev => { const k = KM[ev.key]; if (k) { ev.preventDefault(); S.keys.add(k); } else if (ev.key === "Enter") { $("sl-in").focus(); } });
     $("sl-stage").addEventListener("keyup", ev => { const k = KM[ev.key]; if (k) { S.keys.delete(k); if (!S.keys.size) sendState(); } });
     $("sl-stage").addEventListener("blur", () => S.keys.clear());
-    try { S.demo = isDev() && localStorage.getItem("pxp_sala_demo") === "1"; } catch (e) { S.demo = false; } $("sl-demo").checked = S.demo;
     bar(); renderLog();
   }
   function enter() {
     mount(); if (!$("view-sala")) return;
     const id = nn(me()); if (!id) return;
     if (S.myId !== id) { [...S.ents.keys()].forEach(rmEnt); S.myId = id; }
-    const dl = document.querySelector(".sl-demo"); if (dl) dl.hidden = !isDev(); if (!isDev() && S.demo) { S.demo = false; demoStop(); }
-    if (!myEnt()) { const e = mkEnt({ name: me() }); e.x = DOOR.x; e.y = DOOR.y; walkTo(e, DOOR.x + 18, 180); openTransport();
-      if (S.demo && isDev()) demoStart(); }
+    if (!myEnt()) { const e = mkEnt({ name: me() }); e.x = DOOR.x; e.y = DOOR.y; walkTo(e, DOOR.x + 18, 180); openTransport(); }
     else if (NET.on) netTick();
     else { const e = myEnt(), p = find(me()); if (p) { e.cfg = cfgFor(p); e.g = grp(p); } }
     people_(); bar(); paintTV(); run();
@@ -25061,7 +25038,7 @@ button.pm-pxa{cursor:pointer}
     /* impl: { connect({me, onMessage}) → Promise, send(msg), setMic(on, stream), setCam(on, stream), setScreen(on, stream), leave() } */
     hora: h => { S.hora = h == null ? null : +h; bgKey = ""; },
     setProvider(impl) { PROVIDER.impl = impl; if (tr) { try { tr.close(); } catch (e) { } tr = null; } if (impl && impl.connect) return impl.connect({ me: me(), onMessage: onMsg }); },
-    state: () => ({ me: S.myId, people: [...S.ents.values()].map(e => ({ id: e.id, name: e.name, x: Math.round(e.x), y: Math.round(e.y), seat: e.seat, mic: e.mic, cam: e.cam, demo: e.demo })), proj: S.proj, log: S.log.slice() }),
+    state: () => ({ me: S.myId, people: [...S.ents.values()].map(e => ({ id: e.id, name: e.name, x: Math.round(e.x), y: Math.round(e.y), seat: e.seat, mic: e.mic, cam: e.cam })), proj: S.proj, log: S.log.slice() }),
     say: t => { const e = myEnt(); if (e) { say(e, t); send({ t: "say", text: t }); } },
     seats: SEATS.length,
   };
