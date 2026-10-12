@@ -6943,7 +6943,7 @@ body[data-view="dashboard"] .legend-d,body[data-view="dashboard"] .legend-row{di
       <path d="M484.43,121.87c-4.7,12.69-17.69,16.28-24,27.29,3.55.12,22.41-4.17,29.4-16,6.7-11.43.13-44.74,21.76-52.86,22.59-8.55,46.25-21.1,19.54-48.37,41,10.38,18,54.13,13.09,60.54-4.69,5.95-19.79,17.95-19.79,37.13,0,14.23-12.77,30.45-22.73,32.43,10.51,4.26,26.23-19.79,26.23-19.79l51.09-66.1-29.39,15.17s8.06-6.95,8.06-30c0-32.6-35-38.43-34.67-28.31.27,6.72,11.9,11.49,12.28,22.57s-15.2,17.36-27.33,20.88l-5.44-18.19v20.49c-19.86,10.25-13.19,29.78-18.12,43.12"/>
     </g>
   </g>
-</svg><span>Cargando…</span></div></div><script>try{if(sessionStorage.getItem("pxp_ui")){document.getElementById("pxp-splash").classList.add("soft");document.documentElement.classList.add("no-anim");}}catch(e){}
+</svg><span>Cargando…</span></div></div><script>document.documentElement.classList.add("no-anim");/* v215 · el tablero aparece completo, sin animaciones de entrada escalonadas */try{if(sessionStorage.getItem("pxp_ui")){document.getElementById("pxp-splash").classList.add("soft");}}catch(e){}
 </script>
 
 <!-- LOGIN -->
@@ -23146,6 +23146,24 @@ button.pm-pxa{cursor:pointer}
 .pxa-mic.on{color:#fff;background:#d23b3b;animation:pxaRec 1s steps(2) infinite}
 .pxa-mic[disabled]{opacity:.35;cursor:not-allowed}
 @keyframes pxaRec{50%{background:#a82626}}
+/* v215 · laptops estrechos (1181–1440 px): la identidad cede espacio y las cifras nunca se aprietan */
+@media (min-width:1181px) and (max-width:1440px){
+  #mi-resumen.has-pxa{grid-template-columns:minmax(220px,310px) minmax(126px,1fr) auto}
+  #mi-resumen.has-pxa .mr-stats{grid-template-columns:repeat(2,minmax(158px,1fr))}
+  #mi-resumen.has-pxa .mr-stats > div{min-width:0}
+}
+@media (min-width:1181px) and (max-width:1279px){
+  #mi-resumen.has-pxa .mr-lg-g{grid-template-columns:repeat(3,44px)}
+  #mi-resumen.has-pxa .mr-lg-g .lg-h-i{width:44px;height:44px}
+  #mi-resumen.has-pxa .mr-lg{grid-template-columns:26px auto}
+}
+/* v215 · rendimiento: el barrido de la tarjeta del Home se mueve con transform (antes movía "top" y obligaba a recalcular el diseño 25 veces por segundo) */
+.mr-bg::after{top:0!important;transform:translateY(-100%);animation:mrScanT 6s ease-in-out infinite!important;will-change:transform}
+@keyframes mrScanT{from{transform:translateY(-100%)}to{transform:translateY(250%)}}
+#pxp-splash.hide .pxp-pulse,#pxp-splash.hide *{animation:none!important}
+/* v215 · rendimiento: las animaciones decorativas (logros, brillos, barrido) quedan aisladas para no recalcular toda la página */
+#mi-resumen .mr-lgw,#mi-resumen .mr-lg,#mi-resumen .mr-bg,#mi-resumen .mr-av{contain:layout paint style}
+#mi-resumen .lg-h-i{contain:layout paint}
 </style>
 <script id="pxa-core">/* ═════ PXA · avatares pixel 32×32 · núcleo (datos, render, editor) ═════ */
 (function () {
@@ -23211,12 +23229,13 @@ button.pm-pxa{cursor:pointer}
   const reduce = () => window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   function live(cv, getCfg, g) {
     const a = { br: 0, blink: false, dx: 0 }, off = document.createElement("canvas");
-    const draw = () => { if (!cv.isConnected) return false; blit(cv, render(getCfg(), a, g, off)); return true; };
+    const draw = () => { if (!cv.isConnected) return false; if (document.hidden || !cv.getClientRects().length) return true; blit(cv, render(getCfg(), a, g, off)); return true; };   /* oculto: no se redibuja */
     const R = (m, n) => m + Math.random() * (n - m);
     const loop = (fn, min, max) => setTimeout(() => { if (cv.isConnected) fn(); }, R(min, max));
     const breathe = () => { if (reduce()) return; a.br = 1; draw(); setTimeout(() => { a.br = 0; if (draw()) loop(breathe, 2400, 4600); }, R(700, 1000)); };
     const glance = () => { if (reduce()) return; a.dx = Math.random() < .5 ? -1 : 1; draw(); setTimeout(() => { a.dx = 0; if (draw()) loop(glance, 5000, 11000); }, R(700, 1400)); };
     const blink = () => { a.blink = true; draw(); setTimeout(() => { a.blink = false; if (!draw()) return; if (Math.random() < .18) setTimeout(() => { a.blink = true; draw(); setTimeout(() => { a.blink = false; draw(); }, 110); }, 170); loop(blink, 2600, 5600); }, 120); };
+    try { const io = new IntersectionObserver(es => { if (!cv.isConnected) return io.disconnect(); if (es.some(e => e.isIntersecting)) draw(); }); io.observe(cv); } catch (e) { }
     draw(); loop(breathe, 1200, 3000); loop(glance, 4000, 8000); loop(blink, 1500, 4000);
     return { redraw: draw, a };
   }
@@ -23817,22 +23836,30 @@ button.pm-pxa{cursor:pointer}
 
   /* entrada limpia: la pantalla de carga se queda hasta que el tablero termina de armarse y aparece completo */
   (function cleanEntry() {
+    /* entrada limpia: la pantalla de carga se queda hasta que hay datos, fuentes y el tablero dejó de moverse; luego todo aparece de una vez
+       (sin animaciones de entrada escalonadas). Aplica a la primera visita (pantalla de ingreso), al recargar con sesión y al iniciar sesión. */
     const sp = document.getElementById("pxp-splash"), ls = document.getElementById("login-screen"); if (!sp) return;
+    const root = document.documentElement, loginVisible = () => !!ls && getComputedStyle(ls).display !== "none";
     let holding = false, released = 0;
-    const settle = () => new Promise(res => {
+    const ready = () => { if (loginVisible()) return true;
+      const st = document.getElementById("sync-status"); if (st && /^\s*Cargando/i.test(st.textContent)) return false;
+      const v = document.querySelector(".view.active"); return !!(v && v.textContent.trim().length > 40); };
+    const settle = max => new Promise(res => {
       const t0 = performance.now(); let last = t0;
       const mo = new MutationObserver(() => { last = performance.now(); });
       mo.observe(document.body, { childList: true, subtree: true, characterData: true });
-      const tick = () => { const n = performance.now(); if ((n - last > 320 && n - t0 > 500) || n - t0 > 2200) { mo.disconnect(); res(); } else setTimeout(tick, 60); };
-      Promise.race([document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve(), new Promise(r => setTimeout(r, 1200))]).then(() => setTimeout(tick, 60));
+      const tick = () => { const n = performance.now(); if ((n - last > 350 && n - t0 > 450 && ready()) || n - t0 > max) { mo.disconnect(); res(); } else setTimeout(tick, 60); };
+      Promise.race([document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve(), new Promise(r => setTimeout(r, 1500))]).then(() => setTimeout(tick, 40));
     });
-    const hold = () => { if (holding) return; holding = true; sp.dataset.pxaHold = "1"; sp.style.transition = "none"; sp.classList.remove("hide", "soft"); void sp.offsetWidth; sp.style.transition = "";
-      Promise.race([settle(), new Promise(r => setTimeout(r, 3000))]).then(() => { if (!holding) return; released = performance.now(); delete sp.dataset.pxaHold; sp.classList.add("hide"); holding = false; }); };
-    /* recarga con sesión: cuando la plataforma quiere ocultar su pantalla de carga, la retenemos hasta que todo esté listo */
-    new MutationObserver(() => { if (holding && sp.dataset.pxaHold && sp.classList.contains("hide")) { sp.classList.remove("hide"); return; } if (sp.classList.contains("hide") && !holding && !released && !(ls && getComputedStyle(ls).display !== "none")) hold(); })
+    const hold = max => { if (holding) return; holding = true; root.classList.add("no-anim"); sp.dataset.pxaHold = "1"; sp.style.transition = "none"; sp.classList.remove("hide"); void sp.offsetWidth; sp.style.transition = "";
+      Promise.race([settle(max), new Promise(r => setTimeout(r, max + 400))]).then(() => { if (!holding) return; released = performance.now(); delete sp.dataset.pxaHold; root.classList.add("no-anim"); sp.classList.add("hide"); holding = false;
+        setTimeout(() => root.classList.remove("no-anim"), 900); }); };
+    /* la plataforma quiere ocultar su pantalla de carga: la retenemos hasta que todo esté listo (primera visita o recarga) */
+    new MutationObserver(() => { if (holding && sp.dataset.pxaHold && sp.classList.contains("hide")) { sp.classList.remove("hide"); return; }
+      if (sp.classList.contains("hide") && !holding && !released) hold(loginVisible() ? 2500 : 6000); })
       .observe(sp, { attributes: true, attributeFilter: ["class"] });
-    /* inicio de sesión: al ocultarse el login, mostramos la carga hasta que el Home esté completo */
-    if (ls) new MutationObserver(() => { if (getComputedStyle(ls).display === "none" && !holding && performance.now() - released > 1500) { released = 0; hold(); } })
+    /* inicio de sesión: al ocultarse el ingreso, la pantalla de carga se queda hasta que el Home esté completo */
+    if (ls) new MutationObserver(() => { if (!loginVisible() && !holding && performance.now() - released > 1500) { released = 0; hold(6000); } })
       .observe(ls, { attributes: true, attributeFilter: ["style", "class"] });
   })();
 
@@ -23900,11 +23927,12 @@ button.pm-pxa{cursor:pointer}
     let x = 0, target = 0, final = 0, walking = false, last = 0, stepT = 0, step = 1;
     const lookAround = done => { if (!L) return done(); const seq = [[-1, 520], [1, 620], [0, 380]]; let i = 0;
       const nx = () => { if (i >= seq.length) return done(); L.a.dx = seq[i][0]; L.redraw(); setTimeout(nx, seq[i++][1]); }; nx(); };
-    const go = (to, pause) => { final = to; target = pause ? Math.round(x + (to - x) * R(.4, .62)) : to; walking = true; };
+    let rafOn = false; const kick = () => { if (!rafOn) { rafOn = true; last = 0; requestAnimationFrame(frame); } };
+    const go = (to, pause) => { final = to; target = pause ? Math.round(x + (to - x) * R(.4, .62)) : to; walking = true; kick(); };
     const range = () => Math.max(0, track.clientWidth - wk.offsetWidth);
     const canWalk = () => innerWidth > 1180 && !reduceMo() && !document.hidden && !(bub && bub.el.isConnected) && range() > 24;
     const frame = ts => {
-      if (!track.isConnected) return;
+      if (!track.isConnected || !walking) { rafOn = false; return; }   /* solo se anima mientras camina */
       const dt = Math.min(64, ts - (last || ts)); last = ts;
       if (walking) {
         const dir = Math.sign(target - x), v = 26 * dt / 1000;
@@ -23918,7 +23946,7 @@ button.pm-pxa{cursor:pointer}
           else schedule();
         }
       }
-      requestAnimationFrame(frame);
+      if (walking) requestAnimationFrame(frame); else rafOn = false;
     };
     const schedule = (first) => setTimeout(() => {
       if (!track.isConnected) return;
@@ -23927,8 +23955,10 @@ button.pm-pxa{cursor:pointer}
       const r = range(), to = -Math.round(R(.5, .95) * r);
       if (Math.abs(to - x) > 6) go(to, true); else schedule();
     }, first ? R(45000, 60000) : R(45000, 90000));
-    requestAnimationFrame(frame); schedule(true);
-    addEventListener("resize", () => { const r = range(); if (-x > r) { x = -r; wk.style.transform = `translateX(${x}px)`; } });
+    schedule(true);
+    if (window.__pxaResize) removeEventListener("resize", window.__pxaResize);   /* un solo oyente aunque la tarjeta se vuelva a dibujar */
+    window.__pxaResize = () => { if (!track.isConnected) return; const r = range(); if (-x > r) { x = -r; wk.style.transform = `translateX(${x}px)`; } };
+    addEventListener("resize", window.__pxaResize);
 
     /* frases cortas que aparecen y se desvanecen */
     let tip = null, tipT = 0, ti = Math.floor(Math.random() * TIPS.length), turn = 0; const shown = new Set();
@@ -24015,12 +24045,15 @@ button.pm-pxa{cursor:pointer}
     try { if (window.renderHome) renderHome(); } catch (e) { }
     run();
   }
-  let q = 0; const run = () => { q = 0; homeCard(); homeState(); personHead(); teamCards(); };
+  /* rendimiento: las animaciones de la tarjeta del Home se pausan cuando no está en pantalla */
+  let mrObs = null, mrEl = null; const watchMr = () => { const m = document.getElementById("mi-resumen"); if (!m || m === mrEl || !window.IntersectionObserver) return; mrEl = m;
+    if (!mrObs) mrObs = new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle("pxa-off", !e.isIntersecting))); mrObs.disconnect(); mrObs.observe(m); };
+  let q = 0; const run = () => { q = 0; homeCard(); homeState(); personHead(); teamCards(); watchMr(); };
   new MutationObserver(() => { if (!q) q = requestAnimationFrame(run); }).observe(document.body, { childList: true, subtree: true });
   run();
 })();
 </script>
-<!-- ═════ v212–v214 · Sala de juntas (presencia real, proyección de ventanas en 16:9, mapa de Clientes) y perfil con foto más grande ═════ -->
+<!-- ═════ v212–v215 · Sala de juntas (presencia real, proyección de ventanas en 16:9, mapa de Clientes) y perfil con foto más grande ═════ -->
 <style id="sala-v212">/* ═════ v212 · Perfil: foto más grande (triángulos más llenos) y acciones debajo, sin tapar la foto ═════ */
 #pxp-person .ph-avw{display:flex;flex-direction:column;align-items:center;gap:8px}
 #pxp-person .ph-avw .av{--s:112px!important}
@@ -24204,8 +24237,8 @@ button.pm-pxa{cursor:pointer}
 /* v214 · ventanas proyectadas en 16:9 y selector visual */
 .sl-cap .pxp-modal.open{opacity:0!important;pointer-events:none!important;transition:none!important}
 .sl-cap body{overflow:auto!important}
-.sl-frame{position:absolute;left:0;top:0;width:1280px;height:720px;overflow:hidden;background:var(--bg);color:var(--text);font:400 14.5px/1.5 var(--sans);pointer-events:none;text-align:left}
-.sl-frame.big{position:relative;height:auto;min-height:720px;pointer-events:auto}
+.sl-frame{position:absolute;left:0;top:0;width:1280px;height:720px;overflow:hidden auto;scrollbar-width:thin;background:var(--bg);color:var(--text);font:400 14.5px/1.5 var(--sans);pointer-events:none;text-align:left}
+.sl-frame.big{pointer-events:auto}
 .sl-frame.empty{display:grid;place-items:center;color:var(--muted)}
 .sl-frame .sl-wwin.sl-pxm{position:static!important;inset:auto!important;display:block!important;background:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;padding:24px 50px!important;opacity:1!important;visibility:visible!important;z-index:auto!important;animation:none!important}
 .sl-frame .sl-wwin .pm-box{position:static!important;width:1180px!important;max-width:none!important;max-height:none!important;height:auto!important;overflow:visible!important;margin:0 auto!important;transform:none!important;animation:none!important;box-shadow:0 20px 60px rgba(0,0,0,.18)}
@@ -24260,6 +24293,26 @@ button.pm-pxa{cursor:pointer}
 .sl-pj-a button:focus-visible{outline:2px solid var(--majorelle);outline-offset:2px}
 @media (max-width:860px){.sl-pj-m{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)}.sl-pj-r{order:-1;border-bottom:1px solid var(--border)}.sl-pj-l{border-right:0}.sl-pj-b{height:94vh}.sl-pj-g{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}}
 .sl-pj-h{margin:0;color:var(--muted);font-size:12.5px}
+/* v215 · notas del tablero como accesos */
+.sl-mn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*.6);width:calc(var(--u)*19);height:calc(var(--u)*15);border-radius:calc(var(--u)*.8);color:#1d1a24;text-align:center;transition:transform .12s}
+.sl-mn b{font:700 clamp(7px,calc(var(--u)*2.45),11px)/1 var(--display);letter-spacing:.04em;text-transform:uppercase;max-width:95%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sl-mn small{font:700 clamp(8px,calc(var(--u)*3.4),15px)/1 var(--display);opacity:.78}
+.sl-mn:hover,.sl-mn:focus-visible{transform:translateY(calc(var(--u)*-.8)) rotate(-2deg);box-shadow:0 0 0 2px #F3FF57,0 calc(var(--u)*1.5) calc(var(--u)*3) rgba(0,0,0,.35)}
+.sl-mp-go{all:unset;cursor:pointer;margin-left:auto;padding:8px 13px;border-radius:9px;background:var(--surface2);border:1px solid var(--border2);font:600 13px/1 var(--sans)}
+.sl-mp-go:hover{border-color:var(--muted)}
+.sl-mp-go + .sl-mp-x{margin-left:4px}
+/* v215 · vista previa y TV en grande con desplazamiento; pestañas completas */
+.sl-pj-prev .sl-frame{pointer-events:auto;cursor:ns-resize}
+.sl-tv .sl-frame{scrollbar-width:none}
+.sl-tv .sl-frame::-webkit-scrollbar{display:none}
+.sl-big-c{overflow:hidden}
+.sl-big-c .sl-frame{position:absolute}
+.sl-frame .sl-wview{padding:24px 40px}
+.sl-frame .sl-wview > div{display:block!important}
+.sl-tl-vw{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:8px 14px;gap:3px;width:42px;height:28px;margin-bottom:4px}
+.sl-tl-vw span{border-radius:3px;background:color-mix(in srgb,var(--majorelle) 45%,var(--surface))}
+.sl-tl-vw span:first-child{grid-column:1/3;background:var(--majorelle)}
+#mi-resumen.pxa-off,#mi-resumen.pxa-off *,#mi-resumen.pxa-off *::before,#mi-resumen.pxa-off *::after{animation-play-state:paused!important}
 </style>
 <script id="sala-js">/* ═════ v212 · Sala de juntas (prototipo): los avatares entran, caminan, se sientan, hablan en burbujas y proyectan en el TV ═════
    Todo lo que viaja entre personas pasa por un "transporte" con mensajes simples ({t:"hi"|"mv"|"say"|"st"|"proj"|"bye", …}).
@@ -24328,22 +24381,22 @@ button.pm-pxa{cursor:pointer}
     out.momento = t < .5 ? a : b; out.noche = h >= 19.8 || h < 6; out.sol = h >= 6.5 && h < 18.4; return out;
   }
 
-  /* ---------- mapa del tablero (clientes → proyectos → equipo) ---------- */
-  const NOTE_C = ["#F3FF57", "#ff8fb8", "#7fd0ff", "#b7a8ff", "#ffb36b"];
-  const SLOTS = [[229, 9], [295, 9], [229, 33], [295, 33], [262, 37]];
-  function mapaData() {
-    const P = typeof PROJECTS !== "undefined" ? PROJECTS : {}, by = {};
-    Object.keys(P).forEach(k => { const p = P[k]; if (!p || p.archivadoEn || p.estadoGeneral === "aprobado") return; const c = tit(p.cliente || L("Sin cliente", "No client")); (by[c] = by[c] || []).push(k); });
-    return Object.keys(by).sort((a, b) => by[b].length - by[a].length).slice(0, 5).map((c, i) => {
-      const team = new Set(); by[c].forEach(k => (P[k].etapas || []).forEach(e => [].concat(e.resp || []).forEach(r => r && team.add(nn(r)))));
-      return { cliente: c, proyectos: by[c], team: [...team], color: NOTE_C[i], slot: SLOTS[i] };
-    });
+  /* ---------- tablero de notas: accesos a las secciones de la plataforma (solo las que la persona puede ver) ---------- */
+  const NOTE_C = ["#F3FF57", "#ff8fb8", "#7fd0ff", "#b7a8ff", "#ffb36b", "#8ff0b4", "#ffd36b", "#f5f1e6"];
+  const NOTAS = [["projects", ["Proyectos", "Projects"]], ["clientes", ["Clientes", "Clients"]], ["team", ["Team", "Team"]], ["licencias", ["Licencias", "Licenses"]], ["traffic", ["Tráfico", "Traffic"]],
+    ["capacidad", ["Capacidad", "Capacity"]], ["reportes", ["Reportes", "Reports"]], ["mishoras", ["Mis horas", "My hours"]], ["horas", ["Horas", "Hours"]], ["repositorio", ["Repositorio", "Repository"]], ["logros", ["Logros", "Achievements"]], ["dashboard", ["Dashboard", "Dashboard"]]];
+  function tableroData() {
+    const nav = $("tab-nav"), P = typeof PROJECTS !== "undefined" ? PROJECTS : {}, act = Object.keys(P).filter(k => P[k] && !P[k].archivadoEn && P[k].estadoGeneral !== "aprobado" && P[k].estadoGeneral !== "entregado");
+    const cnt = { projects: act.length, clientes: new Set(act.map(k => nn(P[k].cliente)).filter(Boolean)).size, team: people().length };
+    const tip = { projects: n => `${n} ${L("proyectos activos", "active projects")}`, clientes: n => `${n} ${L("clientes activos · ver el mapa", "active clients · see the map")}`, team: n => `${n} ${L("personas", "people")}` };
+    const ok = v => !nav || !!nav.querySelector(`[data-view="${v}"]`);
+    return NOTAS.filter(([v]) => ok(v)).slice(0, 8).map(([v, lab], i) => ({ v, label: L(...lab), n: cnt[v], tip: (tip[v] ? tip[v](cnt[v]) : L("Ir a ", "Go to ") + L(...lab)), color: NOTE_C[i], slot: [BOARD.x + 12 + (i % 4) * 22, BOARD.y + 12 + Math.floor(i / 4) * 19] }));
   }
 
   /* ---------- dibujo: contorno parejo, esquinas redondeadas, paleta única ---------- */
   let bg = null, bgKey = "";
   function drawBg() {
-    const h = hora(), M = mapaData(), key = Math.round(h * 12) + "|" + (window.pxpLang || "es") + "|" + M.map(m => m.cliente + m.proyectos.length).join(",");
+    const h = hora(), M = tableroData(), key = Math.round(h * 12) + "|" + (window.pxpLang || "es") + "|" + M.map(m => m.v + m.n).join(",");
     if (bg && bgKey === key) return bg; bgKey = key; S.mapa = M;
     const C = paleta(h); S.pal = C;
     bg = document.createElement("canvas"); bg.width = W; bg.height = H; const x = bg.getContext("2d");
@@ -24382,14 +24435,12 @@ button.pm-pxa{cursor:pointer}
     R0(C.ol, TV.x - 2, TV.y - 2, TV.w + 4, TV.h + 4); R0("#141220", TV.x, TV.y, TV.w, TV.h); R0("#F3FF57", TV.x + TV.w - 3, TV.y + TV.h + 1, 2, 1);
     // reloj
     rbox(206, 12, 10, 10, C.paper);
-    // mapa: corcho con notas por cliente, hilos al centro y un pin por proyecto
+    // tablero de corcho con notas adhesivas (accesos a las secciones)
     const B = BOARD; rbox(B.x, B.y, B.w, B.h, C.cork); R0(C.frame, B.x, B.y + B.h - 1, B.w, 1);
     for (let i = 0; i < 26; i++) R0(mix(C.cork, C.ol, .12), B.x + 2 + rnd(B.w - 4), B.y + 2 + rnd(B.h - 4), 1, 1);
-    const hub = [B.x + B.w / 2, B.y + 20];
-    x.globalAlpha = .55; M.forEach(m => { const [a, b] = m.slot, n = Math.max(Math.abs(hub[0] - a), Math.abs(hub[1] - b)); for (let i = 0; i <= n; i++) R0(C.ol, Math.round(a + (hub[0] - a) * i / n), Math.round(b + (hub[1] - b) * i / n), 1, 1); }); x.globalAlpha = 1;
-    R0(C.ol, hub[0] - 3, hub[1] - 3, 6, 6); R0("#F3FF57", hub[0] - 2, hub[1] - 2, 4, 4);
-    M.forEach(m => { const [a, b] = m.slot; rbox(a - 6, b - 4, 12, 8, m.color); R0("rgba(0,0,0,.12)", a - 5, b + 3, 10, 1); R0(mix(m.color, C.ol, .35), a - 4, b - 1, 6, 1); R0(mix(m.color, C.ol, .35), a - 4, b + 1, 4, 1);
-      m.proyectos.slice(0, 6).forEach((_, j) => { const px = a - 6 + j * 2 + (j > 2 ? 2 : 0); R0(C.ol, px, b - 6, 1, 1); R0("#d23b3b", px, b - 7, 1, 1); }); });
+    M.forEach((m, i) => { const [cx, cy] = m.slot, nx = cx - 9, ny = cy - 7, tilt = i % 3 === 1 ? 1 : 0;
+      R0("rgba(0,0,0,.14)", nx + 1, ny + 2, 19, 15); rbox(nx, ny + tilt, 19, 15, m.color); R0(mix(m.color, C.ol, .22), nx + 15, ny + tilt + 12, 4, 3); R0(mix(m.color, "#ffffff", .35), nx + 1, ny + tilt, 17, 1);
+      R0(C.ol, cx - 1, ny + tilt - 2, 2, 2); R0(i % 2 ? "#d23b3b" : "#624AFF", cx - 1, ny + tilt - 2, 1, 1); });
     // sofás compactos a los costados: respaldo contra la pared, brazos redondeados, dos cojines, cojín de color y patas
     [[5, 1], [293, -1]].forEach(([sx, dir]) => { const W2 = 22, top = 106, H2 = 48, f = mix(C.sofa, C.wall, .25), hi = mix(C.sofaHi, C.wall, .2), lo = mix(C.sofaLo, C.wall, .15);
       const back = dir > 0 ? sx : sx + W2 - 5, seat = dir > 0 ? sx + 5 : sx;
@@ -24726,11 +24777,11 @@ button.pm-pxa{cursor:pointer}
   /* mapa: notas del corcho con detalle al pasar y vista grande al hacer clic */
   let mapK = "";
   function mapaHot() {
-    const box = $("sl-map"); if (!box || !S.mapa) return; const k = S.mapa.map(m => m.cliente + m.proyectos.length).join("|"); if (k === mapK) return; mapK = k;
+    const box = $("sl-map"); if (!box || !S.mapa) return; const k = S.mapa.map(m => m.v + m.n + m.label).join("|"); if (k === mapK) return; mapK = k;
     const pct = (v, o, l) => ((v - o) / l * 100) + "%";
-    box.innerHTML = S.mapa.map((m, i) => `<button type="button" class="sl-mn" data-i="${i}" style="left:${pct(m.slot[0], BOARD.x, BOARD.w)};top:${pct(m.slot[1], BOARD.y, BOARD.h)}" data-sl-tip="${esc(m.cliente)} · ${m.proyectos.length} ${m.proyectos.length === 1 ? L("proyecto", "project") : L("proyectos", "projects")} · ${m.team.length} ${m.team.length === 1 ? L("persona", "person") : L("personas", "people")}" aria-label="${esc(m.cliente)}"></button>`).join("")
-      + `<button type="button" class="sl-mn hub" style="left:50%;top:${pct(BOARD.y + 20, BOARD.y, BOARD.h)}" data-sl-tip="${L("Mapa de proyectos", "Project map")}" aria-label="${L("Abrir el mapa de proyectos", "Open project map")}"></button>`;
-    box.onclick = ev => { const b = ev.target.closest(".sl-mn"); if (!b) return; ev.stopPropagation(); mapaBig(b.dataset.i != null ? +b.dataset.i : -1); };
+    box.innerHTML = S.mapa.map((m, i) => `<button type="button" class="sl-mn" data-v="${m.v}" style="left:${pct(m.slot[0], BOARD.x, BOARD.w)};top:${pct(m.slot[1] + (i % 3 === 1 ? 1 : 0), BOARD.y, BOARD.h)}" data-sl-tip="${esc(m.tip)}" aria-label="${esc(m.label)} · ${esc(m.tip)}"><b>${esc(m.label)}</b>${m.n != null ? `<small>${m.n}</small>` : ""}</button>`).join("");
+    box.onclick = ev => { const b = ev.target.closest(".sl-mn"); if (!b) return; ev.stopPropagation(); const v = b.dataset.v;
+      if (v === "clientes") return mapaBig(-1); try { switchView(v); window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) { } };
   }
   /* copia los estilos de las fichas de Clientes (que viven bajo #view-clientes) para usarlos en el mapa */
   function cssClientes() {
@@ -24745,14 +24796,15 @@ button.pm-pxa{cursor:pointer}
     let html = ""; try { html = window.pxpClientTreeHtml ? pxpClientTreeHtml() : ""; } catch (e) { }
     const tmp = document.createElement("div"); tmp.innerHTML = html; const tree = tmp.querySelector(".ctree"); if (!tree) return;
     cssClientes();
-    const fc = focus >= 0 && S.mapa && S.mapa[focus] ? nn(S.mapa[focus].cliente) : null;
+    const fc = null;
     const n = tree.querySelectorAll("details.cnode").length, foot = tmp.querySelector(".ct-foot");
     const ov = document.createElement("div"); ov.className = "sl-mp"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", L("Mapa de proyectos", "Project map"));
-    ov.innerHTML = `<div class="sl-mp-b"><header><h3>${L("Mapa de proyectos", "Project map")}</h3><p>${n} ${L("clientes con proyectos activos", "clients with active projects")}</p><button type="button" class="sl-mp-x" aria-label="${L("Cerrar", "Close")}">✕</button></header><div class="sl-cv"></div></div>`;
+    ov.innerHTML = `<div class="sl-mp-b"><header><h3>${L("Mapa de proyectos", "Project map")}</h3><p>${n} ${L("clientes con proyectos activos", "clients with active projects")}</p><button type="button" class="sl-mp-go">${L("Ir a Clientes", "Go to Clients")}</button><button type="button" class="sl-mp-x" aria-label="${L("Cerrar", "Close")}">✕</button></header><div class="sl-cv"></div></div>`;
     const host = ov.querySelector(".sl-cv"); host.appendChild(tree); if (foot) host.appendChild(foot);
     document.body.appendChild(ov);
     const close = () => { ov.remove(); document.removeEventListener("keydown", k); }; const k = ev => { if (ev.key === "Escape") close(); };
     document.addEventListener("keydown", k); ov.querySelector(".sl-mp-x").onclick = close;
+    ov.querySelector(".sl-mp-go").onclick = () => { close(); try { switchView("clientes"); window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) { } };
     ov.addEventListener("click", ev => { if (ev.target === ov) return close(); if (ev.target.closest(".pchip, .cn-link, .cav, .ct-all, [data-k]")) setTimeout(close, 0); });
     if (fc) { const d = [...tree.querySelectorAll("details.cnode")].find(x => nn(x.dataset.ck) === fc); if (d) { d.open = true; d.classList.add("sl-focus"); setTimeout(() => d.scrollIntoView({ block: "nearest" }), 60); } }
     setTimeout(() => ov.querySelector(".sl-mp-x").focus(), 30);
@@ -24789,11 +24841,12 @@ button.pm-pxa{cursor:pointer}
   /* ---------- proyección: ventanas reales de la plataforma (proyecto, cliente, persona) y gráficas del equipo, en un cuadro 16:9 ----------
      ref = "proj:CLAVE" | "cli:Nombre" | "per:Nombre" | "chart:disp" | "chart:carga"  (una clave sin prefijo = proyecto) */
   const FW = 1280, FH = 720;
-  const parseRef = r => { r = String(r || ""); const i = r.indexOf(":"); return i < 0 ? { t: "proj", id: r } : { t: r.slice(0, i), id: r.slice(i + 1) }; };
+  const parseRef = r => { r = String(r || ""); let y = 0; const m = r.match(/#y=(\d+)$/); if (m) { y = +m[1]; r = r.slice(0, m.index); } const i = r.indexOf(":"); return i < 0 ? { t: "proj", id: r, y, base: "proj:" + r } : { t: r.slice(0, i), id: r.slice(i + 1), y, base: r }; };
+  const VIEWS_PJ = [["dashboard", ["Dashboard", "Dashboard"], "Disponibilidad, entregas y cargas"], ["traffic", ["Tráfico", "Traffic"], "La semana de todo el equipo"], ["projects", ["Proyectos", "Projects"], "Todas las fichas de proyecto"], ["team", ["Team", "Team"], "Grupos y personas"], ["clientes", ["Clientes", "Clients"], "Clientes, marcas y gráficas"], ["capacidad", ["Capacidad", "Capacity"], "Quién tiene cupo"], ["horas", ["Horas", "Hours"], "Horas registradas por persona"], ["mishoras", ["Mis horas", "My hours"], "Tus horas de la semana"], ["reportes", ["Reportes", "Reports"], "Reportes y time tables"], ["licencias", ["Licencias", "Licenses"], "Licencias de herramientas"], ["logros", ["Logros", "Achievements"], "Logros del equipo"], ["repositorio", ["Repositorio", "Repository"], "Proyectos aprobados"]];
   const CHARTS = { disp: { label: L("Disponibilidad del equipo", "Team availability"), sel: "#dash-wrap .lb-panel", sub: L("Libres, ocupados y en sobrecarga esta semana", "Free, busy and overloaded this week") },
     carga: { label: L("Carga por persona", "Load by person"), title: "Carga por persona", sub: L("Proyectos activos de cada persona esta semana", "Active projects per person this week") } };
   const WIN = { proj: { m: "pxp-proj", open: id => openProjectFicha(id), close: () => pxpCloseProject() }, cli: { m: "pxp-client", open: id => pxpOpenClient(id), close: () => pxpCloseClient() }, per: { m: "pxp-person", open: id => pxpOpenPerson(id), close: () => pxpClosePerson() } };
-  function refLabel(r) { const { t, id } = parseRef(r); if (t === "proj") return ((typeof PROJECTS !== "undefined" && PROJECTS[id]) || {}).nombre || id; if (t === "chart") return (CHARTS[id] || {}).label || id; return tit(id); }
+  function refLabel(r) { const { t, id } = parseRef(r); if (t === "view") { const v = VIEWS_PJ.find(x => x[0] === id); return v ? L(...v[1]) : id; } if (t === "proj") return ((typeof PROJECTS !== "undefined" && PROJECTS[id]) || {}).nombre || id; if (t === "chart") return (CHARTS[id] || {}).label || id; return tit(id); }
   /* copia una vez los estilos que dependen de un id (#pxp-proj, #dash-wrap…) a una clase, para que la copia se vea igual */
   function scopeCss() {
     if ($("sl-win-css")) return; const MAP = [[".pxp-modal", ".sl-pxm"], ["#pxp-proj", ".sl-w-pxp-proj"], ["#pxp-client", ".sl-w-pxp-client"], ["#pxp-person", ".sl-w-pxp-person"], ["#dash-wrap", ".sl-w-dash"], ["#view-dashboard", ".sl-w-dash"]], out = [];
@@ -24802,26 +24855,50 @@ button.pm-pxa{cursor:pointer}
     for (const sh of document.styleSheets) { try { walk(sh.cssRules, null); } catch (e) { } }
     const st = document.createElement("style"); st.id = "sl-win-css"; st.textContent = out.join("\n"); document.head.appendChild(st);
   }
+  /* ids → clases: la copia no repite ids en la página y conserva los estilos que dependían de ellos */
+  const SLID = new Set(); let slidCss = null;
+  function scopeIds(root, extra) {
+    const ids = (extra || []).slice();
+    root.querySelectorAll("[id]").forEach(e => { if (e.closest("svg")) return; const id = e.id; e.removeAttribute("id"); if (/^[\w-]+$/.test(id)) { e.classList.add("slid-" + id); ids.push(id); } });
+    const nuevos = [...new Set(ids)].filter(i => /^[\w-]+$/.test(i) && !SLID.has(i)); if (!nuevos.length) return;
+    nuevos.forEach(i => SLID.add(i)); const re = new RegExp("#(" + nuevos.join("|") + ")(?![\\w-])", "g"), out = [];
+    const walk = (rules, wrap) => { for (const r of rules) { try { if (r.type === 1 && r.selectorText && (re.lastIndex = 0, re.test(r.selectorText))) { re.lastIndex = 0; const t = r.cssText.replace(re, ".slid-$1"); out.push(wrap ? `@media ${wrap}{${t}}` : t); } else if (r.type === 4) walk(r.cssRules, r.conditionText || r.media.mediaText); } catch (e) { } } };
+    for (const sh of document.styleSheets) { if (sh.ownerNode && sh.ownerNode.id === "sl-slid-css") continue; try { walk(sh.cssRules, null); } catch (e) { } }
+    if (!slidCss) { slidCss = document.createElement("style"); slidCss.id = "sl-slid-css"; document.head.appendChild(slidCss); } slidCss.textContent += "\n" + out.join("\n");
+  }
+  /* copia un pedazo de la página: los lienzos (gráficas) pasan como imagen */
+  function snap(src, wrapCls, wrapIds, header) {
+    const cl = src.cloneNode(true), sc = [...src.querySelectorAll("canvas")], cc = [...cl.querySelectorAll("canvas")];
+    cc.forEach((c, i) => { const o = sc[i]; if (!o) return; try { const img = document.createElement("img"); img.src = o.toDataURL(); img.className = c.className; img.style.cssText = c.style.cssText; img.style.width = (o.clientWidth || o.width) + "px"; img.style.height = (o.clientHeight || o.height) + "px"; c.replaceWith(img); } catch (e) { } });
+    cl.querySelectorAll("video, iframe, script").forEach(x => x.remove());
+    const w = document.createElement("div"); w.className = wrapCls; if (header) w.insertAdjacentHTML("afterbegin", header); w.appendChild(cl); scopeIds(w, wrapIds); return w.outerHTML;
+  }
   const capCache = new Map();
   function capture(r) {
-    const hit = capCache.get(r); if (hit && Date.now() - hit.t < 15000) return hit.html;
-    const { t, id } = parseRef(r); let html = "";
+    const { t, id, base } = parseRef(r); const hit = capCache.get(base); if (hit && Date.now() - hit.t < 15000) return hit.html;
+    let html = "";
     if (WIN[t]) {
       const w = WIN[t], m0 = $(w.m), wasOpen = m0 && m0.classList.contains("open"); if (wasOpen) return hit ? hit.html : "";
       document.documentElement.classList.add("sl-cap");
-      try { w.open(id); const m = $(w.m), box = m && m.querySelector(".pm-box"); if (box) html = `<div class="sl-wwin sl-pxm open sl-w-${w.m}">${box.outerHTML}</div>`; } catch (e) { }
+      try { w.open(id); const m = $(w.m), box = m && m.querySelector(".pm-box"); if (box) html = snap(box, `sl-wwin sl-pxm open sl-w-${w.m} slid-${w.m}`, [w.m]); } catch (e) { }
       try { w.close(); } catch (e) { } setTimeout(() => document.documentElement.classList.remove("sl-cap"), 60);
     } else if (t === "chart") {
       const c = CHARTS[id]; if (!c) return "";
-      let el = null; const find_ = () => c.sel ? document.querySelector(c.sel) : [...document.querySelectorAll("#dash-wrap .home-panel, #dash-wrap section")].find(x => (x.querySelector(".hp-title") || {}).textContent && x.querySelector(".hp-title").textContent.includes(c.title));
-      el = find_(); if (!el) { try { renderDashboard(); } catch (e) { } el = find_(); }
-      if (el) html = `<div class="sl-wchart sl-w-dash"><header><b>${esc(c.label)}</b><span>${esc(c.sub)}</span></header>${el.outerHTML}</div>`;
+      const find_ = () => c.sel ? document.querySelector(c.sel) : [...document.querySelectorAll("#dash-wrap .home-panel, #dash-wrap section")].find(x => (x.querySelector(".hp-title") || {}).textContent && x.querySelector(".hp-title").textContent.includes(c.title));
+      let el = find_(); if (!el) { try { renderDashboard(); } catch (e) { } el = find_(); }
+      if (el) html = snap(el, "sl-wchart sl-w-dash slid-dash-wrap", ["dash-wrap"], `<header><b>${esc(c.label)}</b><span>${esc(c.sub)}</span></header>`);
+    } else if (t === "view") {
+      /* una pestaña completa: se dibuja un instante sin pintarse (todo en el mismo paso) y se vuelve a la Sala */
+      const cur = (document.querySelector(".view.active") || { id: "view-sala" }).id.replace(/^view-/, ""), sy = scrollY;
+      try { switchView(id); const v = $("view-" + id); if (v) { html = snap(v, "sl-wview", ["view-" + id]); html = html.replace(/class="view active /, 'class="').replace(/class="view active"/, 'class=""'); } } catch (e) { }
+      try { switchView(cur); } catch (e) { } window.scrollTo(0, sy);
     }
-    html = html.replace(/\sid="[^"]*"/g, "");   // sin ids repetidos en la página
-    capCache.set(r, { t: Date.now(), html }); return html;
+    capCache.set(base, { t: Date.now(), html }); return html;
   }
   function frameHTML(r, big) { const h = capture(r); return h ? `<div class="sl-frame${big ? " big" : ""}">${h}</div>` : `<div class="sl-frame empty"><p>${L("No pude abrir esa ventana.", "Couldn't open that window.")}</p></div>`; }
-  function fit(box) { const f = box.querySelector(".sl-frame"); if (!f) return; const k = box.clientWidth / FW; if (k > 0) f.style.zoom = k; }
+  function fit(box, y) { const f = box.querySelector(".sl-frame"); if (!f) return; const k = box.clientWidth / FW; if (k > 0) f.style.zoom = k; if (y != null) f.scrollTop = y; }
+  /* clics dentro de una copia: no abren nada (solo se desplaza) */
+  const blockClicks = box => box.addEventListener("click", ev => { if (ev.target.closest(".sl-frame")) { ev.preventDefault(); ev.stopPropagation(); } }, true);
   const projHTML = (k) => frameHTML("proj:" + k);
   function setProj(r, by, remote) {
     if (S.media.screen && r) stopScreen();
@@ -24832,7 +24909,7 @@ button.pm-pxa{cursor:pointer}
   function paintTV() {
     const tv = $("sl-tv"); if (!tv) return;
     if (S.media.screen) { if (!tv.querySelector("video")) { tv.innerHTML = ""; const v = document.createElement("video"); v.muted = true; v.autoplay = true; v.playsInline = true; v.srcObject = S.media.screen; tv.appendChild(v); v.play().catch(() => { }); } tv.dataset.mode = "screen"; return; }
-    if (S.proj) { if (tv.dataset.k !== S.proj || tv.dataset.mode !== "proj") { scopeCss(); tv.innerHTML = frameHTML(S.proj); tv.dataset.k = S.proj; } tv.dataset.mode = "proj"; fit(tv); return; }
+    if (S.proj) { const R = parseRef(S.proj); if (tv.dataset.k !== R.base || tv.dataset.mode !== "proj") { scopeCss(); tv.innerHTML = frameHTML(S.proj); tv.dataset.k = R.base; } tv.dataset.mode = "proj"; fit(tv); const f = tv.querySelector(".sl-frame"); if (f) f.scrollTo({ top: R.y, behavior: "smooth" }); return; }
     tv.dataset.k = "";
     const n = S.ents.size; tv.dataset.mode = "idle";
     tv.innerHTML = `<div class="sl-idle"><b>${L("Sala de juntas", "Meeting room")}</b><span>${n} ${n === 1 ? L("persona", "person") : L("personas", "people")} · ${new Date().toLocaleTimeString("es-CO", { hour: "numeric", minute: "2-digit" })}</span></div>`;
@@ -24846,7 +24923,7 @@ button.pm-pxa{cursor:pointer}
     const ESTC = { cotizado: "var(--muted)", preproduccion: "var(--cyan)", rodaje: "var(--yellow)", en_produccion: "var(--majorelle)", postproduccion: "var(--majorelle)", revision: "var(--cyan)", entregado: "var(--green)", standby: "var(--pink)" };
     const clientes = () => { const by = {}; Object.keys(P).filter(act).forEach(k => { const c = String(P[k].cliente || "").trim(); if (c) (by[c] = by[c] || []).push(k); }); return Object.keys(by).sort((a, b) => by[b].length - by[a].length).map(c => ({ c, n: by[c].length })); };
     const av = (kind, n) => { try { return window.pxpAvatar ? pxpAvatar(kind, n, 34) : ""; } catch (e) { return ""; } };
-    const TABS = [["proj", L("Proyectos", "Projects")], ["cli", L("Clientes", "Clients")], ["per", L("Personas", "People")], ["chart", L("Gráficas", "Charts")]];
+    const TABS = [["proj", L("Proyectos", "Projects")], ["cli", L("Clientes", "Clients")], ["per", L("Personas", "People")], ["chart", L("Gráficas", "Charts")], ["view", L("Vistas", "Views")]];
     let tab = S.proj ? parseRef(S.proj).t : "proj", sel = S.proj || "";
     const ov = document.createElement("div"); ov.className = "sl-pj"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", L("Proyectar en el TV", "Show on the TV"));
     ov.innerHTML = `<div class="sl-pj-b"><header><h3>${L("Proyectar en el TV", "Show on the TV")}</h3><div class="seg sl-pj-tabs" role="tablist">${TABS.map(([k, l]) => `<button type="button" role="tab" data-t="${k}">${l}</button>`).join("")}</div><button type="button" class="sl-mp-x" aria-label="${L("Cerrar", "Close")}">✕</button></header>
@@ -24860,12 +24937,14 @@ button.pm-pxa{cursor:pointer}
         .map(k => `<button type="button" role="option" class="sl-tl" data-r="proj:${esc(k)}" style="--tc:${window.pxpProjectColor ? pxpProjectColor(k) : "var(--majorelle)"}"><i class="sl-tl-c"></i><b>${esc(P[k].nombre || k)}</b><small>${esc(tit(P[k].cliente || ""))}</small><em style="--ec:${ESTC[P[k].estadoGeneral] || "var(--muted)"}">${esc(ESTP[P[k].estadoGeneral] || "")}</em></button>`);
       if (tab === "cli") return clientes().filter(x => !nq || nn(x.c).includes(nq)).map(x => `<button type="button" role="option" class="sl-tl av" data-r="cli:${esc(x.c)}">${av("client", x.c)}<b>${esc(tit(x.c))}</b><small>${x.n} ${x.n === 1 ? L("proyecto activo", "active project") : L("proyectos activos", "active projects")}</small></button>`);
       if (tab === "per") return people().filter(p => !nq || nn(p.name).includes(nq) || nn(p.alias || p.role).includes(nq)).sort((a, b) => a.name.localeCompare(b.name)).map(p => `<button type="button" role="option" class="sl-tl av" data-r="per:${esc(p.name)}">${av("person", p.name)}<b>${esc(tit(p.name))}</b><small>${esc(p.alias || p.role || "")}</small></button>`);
+      if (tab === "view") { const nav = $("tab-nav"); return VIEWS_PJ.filter(([v]) => (!nav || nav.querySelector(`[data-view="${v}"]`)) && (!nq || nn(L(...VIEWS_PJ.find(x => x[0] === v)[1])).includes(nq))).map(([v, lab, sub]) => `<button type="button" role="option" class="sl-tl vw" data-r="view:${v}"><i class="sl-tl-vw"><span></span><span></span><span></span></i><b>${esc(L(...lab))}</b><small>${esc(sub)}</small></button>`); }
       return Object.keys(CHARTS).filter(k => !nq || nn(CHARTS[k].label).includes(nq)).map(k => `<button type="button" role="option" class="sl-tl ch" data-r="chart:${k}"><i class="sl-tl-ch">${k === "disp" ? "<span></span><span></span><span></span>" : "<span></span><span></span><span></span><span></span>"}</i><b>${esc(CHARTS[k].label)}</b><small>${esc(CHARTS[k].sub)}</small></button>`); };
-    const PH = { proj: L("Busca un proyecto o cliente", "Search a project or client"), cli: L("Busca un cliente", "Search a client"), per: L("Busca a alguien del equipo", "Search a teammate"), chart: L("Busca una gráfica", "Search a chart") };
+    const PH = { proj: L("Busca un proyecto o cliente", "Search a project or client"), cli: L("Busca un cliente", "Search a client"), per: L("Busca a alguien del equipo", "Search a teammate"), chart: L("Busca una gráfica", "Search a chart"), view: L("Busca una pestaña de la plataforma", "Search a platform tab") };
     const draw = () => { ov.querySelectorAll(".sl-pj-tabs button").forEach(b => { b.classList.toggle("on", b.dataset.t === tab); b.setAttribute("aria-selected", b.dataset.t === tab); }); q.placeholder = PH[tab];
       const list = tiles(); g.innerHTML = list.join("") || `<p class="sl-pj-e">${L("Nada con ese nombre.", "Nothing by that name.")}</p>`; g.querySelectorAll(".sl-tl").forEach(b => b.setAttribute("aria-selected", b.dataset.r === sel)); };
-    const pick = r => { sel = r; g.querySelectorAll(".sl-tl").forEach(b => b.setAttribute("aria-selected", b.dataset.r === sel)); prev.innerHTML = frameHTML(r); requestAnimationFrame(() => fit(prev)); $o(".sl-pj-n").textContent = refLabel(r); go.disabled = false; };
-    const doGo = () => { if (!sel) return; setProj(sel, me()); close(); const e = myEnt(); if (e) say(e, L("Les proyecto ", "Showing ") + refLabel(sel)); };
+    const pick = r => { const R = parseRef(r); sel = R.base; g.querySelectorAll(".sl-tl").forEach(b => b.setAttribute("aria-selected", b.dataset.r === sel)); prev.innerHTML = frameHTML(sel); requestAnimationFrame(() => fit(prev, R.y)); $o(".sl-pj-n").textContent = refLabel(sel); go.disabled = false; };
+    blockClicks(prev);
+    const doGo = () => { if (!sel) return; const f = prev.querySelector(".sl-frame"), y = f ? Math.round(f.scrollTop) : 0; setProj(sel + (y > 0 ? "#y=" + y : ""), me()); close(); const e = myEnt(); if (e) say(e, L("Les proyecto ", "Showing ") + refLabel(sel)); };
     ov.querySelector(".sl-pj-tabs").onclick = ev => { const b = ev.target.closest("[data-t]"); if (!b) return; tab = b.dataset.t; q.value = ""; draw(); q.focus(); };
     g.onclick = ev => { const b = ev.target.closest(".sl-tl"); if (b) pick(b.dataset.r); };
     g.ondblclick = ev => { const b = ev.target.closest(".sl-tl"); if (b) { pick(b.dataset.r); doGo(); } };
@@ -24885,7 +24964,8 @@ button.pm-pxa{cursor:pointer}
     document.body.appendChild(ov); const c = ov.querySelector(".sl-big-c");
     const close = () => { ov.remove(); document.removeEventListener("keydown", k); }; const k = ev => { if (ev.key === "Escape") close(); };
     if (S.media.screen) { const v = document.createElement("video"); v.muted = true; v.autoplay = true; v.playsInline = true; v.srcObject = S.media.screen; c.appendChild(v); v.play().catch(() => { }); }
-    else { scopeCss(); c.innerHTML = frameHTML(S.proj, true); requestAnimationFrame(() => fit(c)); }
+    else { scopeCss(); const R = parseRef(S.proj); c.innerHTML = frameHTML(S.proj, true); blockClicks(c); requestAnimationFrame(() => { fit(c, R.y); const f = c.querySelector(".sl-frame"); let tm = 0;
+        if (f && S.projBy === me()) f.addEventListener("scroll", () => { clearTimeout(tm); tm = setTimeout(() => { if (!S.proj) return; const y = Math.round(f.scrollTop); setProj(parseRef(S.proj).base + (y > 0 ? "#y=" + y : ""), me()); }, 220); }); }); }
     document.addEventListener("keydown", k); ov.querySelector(".sl-big-x").onclick = close; ov.onclick = ev => { if (ev.target === ov) close(); };
     const o = ov.querySelector(".sl-big-o"); if (o) o.onclick = () => { close(); try { WIN[t].open(id); } catch (e) { } };
   }

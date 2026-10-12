@@ -1,4 +1,4 @@
-// Prueba v212–v214: Sala de juntas (entrar, caminar, sentarse, burbujas, proyectar, cámara/mic/pantalla locales, demo, proveedor),
+// Prueba v212–v215: Sala de juntas (entrar, caminar, sentarse, burbujas, proyectar, cámara/mic/pantalla locales, demo, proveedor),
 // perfil con foto más grande y acciones debajo, asistente que lleva a la Sala y catálogo de herramientas para la IA.
 import { createRequire } from "node:module"; import { execSync } from "node:child_process"; import path from "node:path";
 const req = createRequire(import.meta.url); let pw; try { pw = req("playwright"); } catch { pw = req(execSync("npm root -g").toString().trim() + "/playwright"); }
@@ -43,7 +43,7 @@ await page.fill("#sl-in", "Arrancamos la revisión"); await page.keyboard.press(
 check("Sala: el mensaje sale como burbuja sobre mi avatar", await page.evaluate(() => [...document.querySelectorAll(".sl-bub")].some(b => /Arrancamos la revisión/.test(b.textContent))));
 check("Sala: queda en la conversación", await page.evaluate(() => /Arrancamos la revisión/.test(document.getElementById("sl-log").textContent)));
 await page.click("#sl-projb"); await page.waitForTimeout(300);
-check("Proyectar: selector con pestañas Proyectos, Clientes, Personas y Gráficas", await page.evaluate(() => document.querySelectorAll(".sl-pj-tabs [data-t]").length === 4 && document.querySelectorAll(".sl-pj-g .sl-tl").length > 5));
+check("Proyectar: selector con pestañas Proyectos, Clientes, Personas, Gráficas y Vistas", await page.evaluate(() => document.querySelectorAll(".sl-pj-tabs [data-t]").length === 5 && document.querySelectorAll(".sl-pj-g .sl-tl").length > 5));
 await page.fill(".sl-pj-q", "dra"); await page.waitForTimeout(200); await page.click(".sl-pj-g .sl-tl"); await page.waitForTimeout(600);
 check("Proyectar: vista previa 16:9 con la ventana real del proyecto", await page.evaluate(() => { const p = document.querySelector(".sl-pj-prev"), r = p.getBoundingClientRect(); return !!p.querySelector(".sl-frame .pm-box .pj-head") && Math.abs(r.width / r.height - 16 / 9) < .04; }));
 await page.click(".sl-pj-tabs [data-t=per]"); await page.waitForTimeout(200); await page.click(".sl-pj-g .sl-tl"); await page.waitForTimeout(600);
@@ -52,6 +52,16 @@ await page.click(".sl-pj-tabs [data-t=chart]"); await page.waitForTimeout(200); 
 check("Proyectar: y la gráfica de disponibilidad del equipo", await page.evaluate(() => !!document.querySelector(".sl-pj-prev .sl-frame .lb-panel")));
 await page.click(".sl-pj-tabs [data-t=cli]"); await page.waitForTimeout(200); await page.click(".sl-pj-g .sl-tl"); await page.waitForTimeout(600);
 check("Proyectar: y la ventana de un cliente", await page.evaluate(() => !!document.querySelector(".sl-pj-prev .sl-frame .pm-box")));
+await page.click(".sl-pj-tabs [data-t=view]"); await page.waitForTimeout(200);
+check("Proyectar: pestaña Vistas con las pestañas de la plataforma", await page.evaluate(() => document.querySelectorAll(".sl-pj-g .sl-tl.vw").length >= 8));
+await page.click('.sl-tl[data-r="view:traffic"]'); await page.waitForTimeout(900);
+check("Proyectar: una vista completa (Tráfico) se ve en la vista previa sin salir de la Sala", await page.evaluate(() => document.querySelector(".view.active").id === "view-sala" && document.querySelector(".sl-pj-prev .sl-frame").textContent.length > 2000));
+await page.hover(".sl-pj-prev"); await page.mouse.wheel(0, 600); await page.waitForTimeout(400);
+const yPrev = await page.evaluate(() => Math.round(document.querySelector(".sl-pj-prev .sl-frame").scrollTop));
+check(`Proyectar: la vista previa se desplaza (${yPrev}px)`, yPrev > 100);
+await page.click(".sl-pj-go"); await page.waitForTimeout(900);
+check("Proyectar: el TV queda en el mismo punto del desplazamiento", await page.evaluate(y => { const f = document.querySelector("#sl-tv .sl-frame"); return /#y=\d+/.test(PXP_SALA.state().proj) && f && Math.abs(f.scrollTop - y) < 30; }, yPrev));
+await page.click("#sl-projb"); await page.waitForTimeout(300);
 await page.click(".sl-pj-tabs [data-t=proj]"); await page.waitForTimeout(200); await page.fill(".sl-pj-q", "dra"); await page.waitForTimeout(200); await page.keyboard.press("Enter"); await page.waitForTimeout(700);
 check("Proyectar: Enter proyecta y el TV muestra la ventana llenando el 16:9", await page.evaluate(() => { const tv = document.getElementById("sl-tv"), f = tv.querySelector(".sl-frame"); if (!f || !/DRACULA/i.test(f.textContent)) return false; const a = tv.getBoundingClientRect(), b = f.getBoundingClientRect(); return Math.abs(a.width - b.width) < 2 && Math.abs(a.height - b.height) < 2; }));
 check("Proyectar: ninguna ventana quedó abierta por detrás", await page.evaluate(() => !document.querySelector(".pxp-modal.open") && !document.documentElement.classList.contains("sl-cap")));
@@ -59,10 +69,11 @@ await page.click("#sl-tv"); await page.waitForTimeout(400);
 check("Sala: clic en el TV abre la ventana en grande", await page.evaluate(() => !!document.querySelector(".sl-big .sl-frame .pm-box")));
 await page.keyboard.press("Escape"); await page.waitForTimeout(200);
 check("Sala: TV en formato 16:9", await page.evaluate(() => { const r = document.getElementById("sl-tv").getBoundingClientRect(); return Math.abs(r.width / r.height - 16 / 9) < .03; }));
-await page.hover(".sl-mn[data-i='0']"); await page.waitForTimeout(250);
-check("Sala: las notas del mapa muestran cliente, proyectos y equipo al pasar", await page.evaluate(() => { const b = document.querySelector(".sl-mn[data-i='0']"); return !!b && /proyecto/.test(b.dataset.slTip) && getComputedStyle(b, "::after").opacity === "1"; }));
-await page.click(".sl-mn[data-i='0']"); await page.waitForTimeout(300);
-check("Sala: clic en el mapa abre las mismas fichas de Clientes (con el cliente elegido resaltado)", await page.evaluate(() => document.querySelectorAll(".sl-mp .sl-cv details.cnode").length > 2 && !!document.querySelector(".sl-mp .cnode.sl-focus .pchip") && getComputedStyle(document.querySelector(".sl-mp .cn-h")).display !== "list-item"));
+check("Tablero: notas para ir a Proyectos, Clientes, Team, Licencias y más (solo las pestañas visibles)", await page.evaluate(() => { const v = [...document.querySelectorAll(".sl-mn")].map(b => b.dataset.v); return v.length >= 6 && ["projects", "clientes", "team", "licencias"].every(x => v.includes(x)) && v.every(x => document.querySelector(`#tab-nav [data-view="${x}"]`)); }));
+await page.hover(".sl-mn[data-v='projects']"); await page.waitForTimeout(250);
+check("Tablero: al pasar, la nota dice a dónde lleva y cuántos hay", await page.evaluate(() => { const b = document.querySelector(".sl-mn[data-v='projects']"); return !!b && /proyectos activos/.test(b.dataset.slTip) && /\d/.test(b.textContent) && getComputedStyle(b, "::after").opacity === "1"; }));
+await page.click(".sl-mn[data-v='clientes']"); await page.waitForTimeout(300);
+check("Tablero: la nota Clientes abre el mapa con las fichas de Clientes", await page.evaluate(() => document.querySelectorAll(".sl-mp .sl-cv details.cnode").length > 2 && !!document.querySelector(".sl-mp .cnode .pchip") && getComputedStyle(document.querySelector(".sl-mp .cn-h")).display !== "list-item"));
 await page.keyboard.press("Escape"); await page.waitForTimeout(200);
 await page.click("#sl-mic"); await page.waitForTimeout(800);
 check("Sala: micrófono local (indicador encendido)", await page.evaluate(() => PXP_SALA.state().people.find(p => p.name === "Bastián Torres").mic && document.getElementById("sl-mic").classList.contains("on")));
@@ -85,5 +96,7 @@ const m = await abrir(390, 844);
 await m.evaluate(() => switchView("sala")); await m.waitForTimeout(1500);
 check("Sala: la conversación ocupa el alto de la sala", await page.evaluate(() => { switchView("sala"); return document.getElementById("sl-log").getBoundingClientRect().height > 250; }));
 check("Celular: la sala cabe sin desbordar", await m.evaluate(() => { const s = document.getElementById("sl-stage").getBoundingClientRect(); return s.width > 300 && s.right <= innerWidth + 1 && document.documentElement.scrollWidth <= innerWidth + 1; }));
+for (const w of [1181, 1200, 1280, 1366]) { const h = await abrir(w, 900, "CARLOS QUINTERO"); await h.evaluate(() => { try { pxpHomeModo("personal"); } catch (e) { } switchView("home"); }); await h.waitForTimeout(1200);
+  check(`Home ${w}px: las cifras de la tarjeta caben sin apretarse`, await h.evaluate(() => { const m = document.getElementById("mi-resumen"), st = [...m.querySelectorAll(".mr-stats > div")], r = m.getBoundingClientRect(); return st.length === 4 && st.every(d => d.getBoundingClientRect().width >= 150 && d.getBoundingClientRect().right <= r.right + 1); })); await h.context().close(); }
 check("sin errores: " + errs.slice(0, 3).join(" | "), errs.length === 0);
 console.log(ok.map(x => "✓ " + x).join("\n")); console.log(fail.map(x => "✗ " + x).join("\n")); await b.close(); process.exit(fail.length ? 1 : 0);

@@ -1,6 +1,19 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v214** · 11 oct 2026 · Resumen general en `HANDOFF-COMPLETO.md` · Responsable: Bastián Torres
+Versión: **v215** · 11 oct 2026 · Resumen general en `HANDOFF-COMPLETO.md` · Responsable: Bastián Torres
+
+## v215 · Home en laptops estrechos, tablero de notas como accesos, más cosas para proyectar (vistas completas, con desplazamiento), entrada limpia y rendimiento
+- **Home 1181–1440 px:** la identidad cede espacio (`minmax(220px,310px)`) y las cifras de la derecha nunca bajan de 158 px; logros a 44 px por debajo de 1280.
+- **Tablero de notas de la Sala:** cada nota lleva a una sección (Proyectos, Clientes, Team, Licencias, Tráfico, Capacidad, Reportes, Mis horas, Horas, Repositorio, Logros, Dashboard), solo las que la persona ve en su menú, hasta 8. Muestran conteos (proyectos activos, clientes activos, personas). Clientes abre el mapa (con "Ir a Clientes").
+- **Proyectar:** nueva pestaña **Vistas** (cualquier pestaña de la plataforma). La vista se dibuja un instante sin pintarse y se vuelve a la Sala en el mismo paso. Las copias (`snap`) pasan los lienzos como imagen y cambian los ids por clases `slid-<id>` con sus estilos (`scopeIds`), así no se repiten ids en la página.
+- **Desplazamiento:** la vista previa se puede bajar; al proyectar, el TV queda en el mismo punto (`ref#y=N`). En el TV en grande, quien proyecta puede bajar y el TV de todos lo sigue. Los clics dentro de las copias no abren nada.
+- **Entrada limpia:** la pantalla de carga se queda hasta que hay datos, fuentes y el tablero dejó de moverse, también en la primera visita (pantalla de ingreso) y al iniciar sesión. Las animaciones de entrada escalonadas se desactivan siempre al entrar (`no-anim` desde el primer instante), así todo aparece de una vez.
+- **Rendimiento:**
+  - El barrido de la tarjeta del Home animaba `top` (≈25 recálculos de diseño por segundo); ahora usa `transform`.
+  - Las animaciones decorativas de la tarjeta quedan aisladas con `contain` y se pausan cuando la tarjeta no está en pantalla.
+  - El avatar del Home solo pide cuadros mientras camina (antes, 60 por segundo siempre) y tiene un solo oyente de `resize`.
+  - Los avatares de Team no se redibujan cuando están ocultos (se redibujan al volver a verse). Medido con la vista Team abierta y quieta: de 1,1 s a 0,35 s de trabajo cada 10 s.
+- Prueba: `node tools/test-v215.mjs` (44, incluye Home a 1181/1200/1280/1366 px).
 
 ## v214 · Sala: proyectar ventanas reales en 16:9 (proyecto, cliente, persona y gráficas) con un selector visual; sofás compactos
 - **Proyectar** abre un selector con pestañas Proyectos · Clientes · Personas · Gráficas, buscador, fichas visuales (color del proyecto y estado, avatar del cliente o la persona) y vista previa 16:9. Clic = vista previa; doble clic o Enter = proyectar; flechas para moverse. "Apagar el TV" cuando hay algo proyectado.
