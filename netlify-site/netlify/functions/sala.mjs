@@ -30,7 +30,7 @@ export default async (req) => {
       const say = (prev.say || []).filter(m => now - m.ts < MSG_VIDA);
       (Array.isArray(b.say) ? b.say : []).slice(0, 5).forEach(m => { const t = limpio(m && m.text, 140).trim(); if (t) say.push({ ts: now, text: t }); });
       const proj = b.proj === undefined ? prev.proj || null : (b.proj && b.proj.k ? { k: limpio(b.proj.k, 120), ts: now } : null);
-      await store.setJSON(key, { id, name: limpio(b.name, 80), x: num(b.x, 0, 320), y: num(b.y, 0, 200), seat: num(b.seat, -1, 40), mic: !!b.mic, cam: !!b.cam, t: now, say: say.slice(-12), proj });
+      await store.setJSON(key, { id, name: limpio(b.name, 80), x: num(b.x, 0, 320), y: num(b.y, 0, 200), seat: num(b.seat, -1, 40), mic: !!b.mic, cam: !!b.cam, cup: b.cup === "cafe" || b.cup === "agua" ? b.cup : "", t: now, say: say.slice(-12), proj });
     }
   } else if (req.method !== "GET") return json({ error: "Método no permitido" }, 405);
   const { blobs } = await store.list({ prefix: "p/" });

@@ -24508,21 +24508,6 @@ button.pm-pxa{cursor:pointer}
 .sl-b.sl-exit.in{background:var(--surface2);color:var(--red,#e5484d);border-color:color-mix(in srgb,var(--red,#e5484d) 45%,var(--border))}
 .sl-b.sl-exit.in:hover{background:color-mix(in srgb,var(--red,#e5484d) 12%,var(--surface2))}
 @media (max-width:760px){.sl-b.sl-exit span{display:inline}.sl-b.sl-exit{padding:10px 12px}}
-/* aviso flotante: estás en la sala mientras miras otra pestaña */
-.sl-pill{position:fixed;left:16px;bottom:16px;z-index:1200;display:flex;align-items:center;gap:4px;padding:5px;border-radius:14px;background:var(--surface);border:1px solid var(--border2);box-shadow:0 14px 40px rgba(0,0,0,.3);animation:slFade .2s ease;max-width:calc(100vw - 32px);box-sizing:border-box}
-.sl-pill[hidden]{display:none}
-.sl-pill button{all:unset;cursor:pointer;box-sizing:border-box;border-radius:10px}
-.sl-pill-v{display:flex;align-items:center;gap:9px;padding:4px 10px 4px 4px;min-width:0}
-.sl-pill-v:hover{background:var(--surface2)}
-.sl-pill-v img{width:34px;height:34px;border-radius:9px;background:color-mix(in srgb,var(--green) 22%,var(--surface2));image-rendering:pixelated;flex:none}
-.sl-pill-v span{display:flex;flex-direction:column;gap:3px;min-width:0}
-.sl-pill-v b{font:600 13px/1 var(--sans);white-space:nowrap}
-.sl-pill-v b::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green,#3dd68c);margin-right:6px;vertical-align:1px;box-shadow:0 0 0 3px color-mix(in srgb,var(--green,#3dd68c) 25%,transparent)}
-.sl-pill-v small{font-size:11.5px;color:var(--muted);white-space:nowrap}
-.sl-pill-v em{font:700 11px/1 var(--sans);font-style:normal;min-width:18px;height:18px;padding:0 5px;box-sizing:border-box;border-radius:9px;display:grid;place-items:center;background:#F3FF57;color:#111}
-.sl-pill-x{padding:9px 11px;font:600 12.5px/1 var(--sans);color:var(--red,#e5484d)}
-.sl-pill-x:hover{background:color-mix(in srgb,var(--red,#e5484d) 12%,transparent)}
-.sl-pill button:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
 /* vista previa desde las notas del tablero */
 .sl-np .sl-mp-b{width:min(1180px,100%);max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
 .sl-np .sl-mp-b header{flex-wrap:wrap;align-items:center}
@@ -24565,6 +24550,58 @@ html.sl-full-on,html.sl-full-on body{overflow:hidden!important}
 .sl-big-a button:focus-visible{outline:2px solid #F3FF57;outline-offset:2px}
 .sl-big-b:fullscreen{width:100vw!important;height:100vh!important;max-width:none!important;border-radius:0!important;background:#000}
 .sl-big-b:fullscreen .sl-big-c video{object-fit:contain}
+
+/* v218 · aviso flotante de la sala: tarjeta con estado en vivo, vista previa de la conversación y Salir integrado */
+.sl-pill{position:fixed;left:16px;bottom:16px;z-index:1200;display:flex;align-items:stretch;max-width:min(400px,calc(100vw - 32px));box-sizing:border-box;padding:4px;border-radius:18px;
+  background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(14px) saturate(1.3);-webkit-backdrop-filter:blur(14px) saturate(1.3);
+  border:1px solid color-mix(in srgb,var(--text) 10%,transparent);box-shadow:0 1px 0 color-mix(in srgb,#fff 10%,transparent) inset,0 18px 44px -12px rgba(0,0,0,.45),0 2px 8px rgba(0,0,0,.12);
+  transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s}
+.sl-pill[hidden]{display:none}
+.sl-pill:hover{transform:translateY(-2px);box-shadow:0 1px 0 color-mix(in srgb,#fff 10%,transparent) inset,0 24px 52px -14px rgba(0,0,0,.5),0 2px 8px rgba(0,0,0,.12)}
+.sl-pill.in{animation:slPillIn .5s cubic-bezier(.16,1,.3,1) both}
+.sl-pill.out{animation:slPillOut .26s ease-in both}
+@keyframes slPillIn{from{opacity:0;transform:translateY(14px) scale(.96);filter:blur(3px)}to{opacity:1;transform:none;filter:none}}
+@keyframes slPillOut{to{opacity:0;transform:translateY(10px) scale(.97)}}
+.sl-pill :where(button){all:unset;cursor:pointer;box-sizing:border-box}
+.sl-pill button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.sl-pill-v{display:flex;align-items:center;gap:10px;padding:6px 8px 6px 6px;border-radius:14px;min-width:0;flex:1 1 auto;transition:background .2s}
+.sl-pill-v:hover{background:color-mix(in srgb,var(--text) 6%,transparent)}
+.sl-pill-av{position:relative;flex:none;width:38px;height:38px;border-radius:12px;background:color-mix(in srgb,var(--green) 18%,var(--surface2));display:grid;place-items:center;overflow:visible}
+.sl-pill-av img{width:34px;height:34px;image-rendering:pixelated;border-radius:10px}
+.sl-pill-av .live{position:absolute;right:-3px;bottom:-3px;width:11px;height:11px;border-radius:50%;background:var(--green,#3dd68c);box-shadow:0 0 0 2.5px var(--surface)}
+.sl-pill-av .live::after{content:"";position:absolute;inset:0;border-radius:50%;background:var(--green,#3dd68c);animation:slLive 2.4s ease-out infinite}
+@keyframes slLive{0%{transform:scale(1);opacity:.55}70%,100%{transform:scale(2.6);opacity:0}}
+.sl-pill-t{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1 1 auto}
+.sl-pill-h{display:flex;align-items:baseline;gap:7px;min-width:0}
+.sl-pill-h b{font:700 13.5px/1.1 var(--sans);white-space:nowrap;letter-spacing:.01em}
+.sl-pill-h small{font:500 11.5px/1 var(--sans);color:var(--muted);white-space:nowrap}
+.sl-pill-n{font:700 10.5px/1 var(--sans);font-style:normal;min-width:17px;height:17px;padding:0 5px;box-sizing:border-box;border-radius:9px;display:inline-grid;place-items:center;background:#F3FF57;color:#111;align-self:center;animation:slPop .35s cubic-bezier(.2,1.6,.4,1)}
+.sl-pill-m{font:400 12.5px/1.3 var(--sans);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:230px}
+.sl-pill-m b{font-weight:600;color:var(--text)}
+.sl-pill-m .ic{font-style:normal;font-size:9px;margin-right:5px;color:var(--green)}
+.sl-pill-m.fresh{color:var(--text)}
+.sl-pill-m.pop{animation:slMsg .45s cubic-bezier(.16,1,.3,1)}
+@keyframes slMsg{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@keyframes slPop{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+.sl-pill-ppl{display:flex;flex:none;align-items:center;padding-left:2px}
+.sl-pill-ppl img,.sl-pill-ppl em{width:24px;height:24px;border-radius:8px;margin-left:-7px;box-shadow:0 0 0 2px var(--surface);background:var(--surface2);image-rendering:pixelated}
+.sl-pill-ppl img:first-child{margin-left:0}
+.sl-pill-ppl em{display:grid;place-items:center;font:700 10px/1 var(--sans);font-style:normal;color:var(--muted)}
+.sl-pill-go{flex:none;width:26px;height:26px;display:grid;place-items:center;border-radius:8px;color:var(--muted);transition:transform .25s cubic-bezier(.2,.8,.2,1),color .2s,background .2s}
+.sl-pill-go svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sl-pill-v:hover .sl-pill-go{color:var(--text);background:color-mix(in srgb,var(--text) 8%,transparent);transform:translate(1px,-1px)}
+.sl-pill-sep{width:1px;margin:8px 2px;background:color-mix(in srgb,var(--text) 10%,transparent);flex:none}
+.sl-pill-x{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:0 10px;min-width:48px;border-radius:14px;color:var(--muted);font:600 10.5px/1 var(--sans);letter-spacing:.04em;transition:color .2s,background .2s}
+.sl-pill-x svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+.sl-pill-x:hover{color:var(--red,#e5484d);background:color-mix(in srgb,var(--red,#e5484d) 10%,transparent)}
+.sl-pill-x:hover svg{transform:translateX(2px)}
+@media (max-width:520px){.sl-pill-ppl{display:none}.sl-pill-m{max-width:150px}}
+@media (prefers-reduced-motion:reduce){.sl-pill,.sl-pill.in,.sl-pill.out,.sl-pill-m.pop,.sl-pill-av .live::after,.sl-pill-n{animation:none!important;transition:none!important}}
+/* rincón del café: zonas para tocar la cafetera y la jarra */
+.sl-hot{all:unset;position:absolute;z-index:4;cursor:pointer;border-radius:4px;box-sizing:border-box;transition:box-shadow .15s,background .15s}
+.sl-hot:hover,.sl-hot:focus-visible{background:rgba(243,255,87,.12);box-shadow:0 0 0 1.5px rgba(243,255,87,.75)}
+.sl-hot::after{content:attr(data-sl-tip);position:absolute;left:50%;bottom:calc(100% + 6px);transform:translate(-50%,4px);white-space:nowrap;padding:5px 9px;border-radius:8px;background:#16141f;color:#fff;font:600 12px/1 var(--sans);opacity:0;pointer-events:none;transition:opacity .15s,transform .15s;box-shadow:0 6px 18px rgba(0,0,0,.3)}
+.sl-hot:hover::after,.sl-hot:focus-visible::after{opacity:1;transform:translate(-50%,0)}
 /* v217 · Grupos plegables (Dashboard · Carga por persona, Tráfico) con el mismo control que Team */
 .pl-ch{all:unset;cursor:pointer;margin-left:auto;display:grid;place-items:center;width:30px;height:30px;border-radius:9px;flex:none;transition:background .15s}
 .pl-ch:hover{background:var(--surface2)}
@@ -24663,6 +24700,7 @@ html.sl-full-on,html.sl-full-on body{overflow:hidden!important}
   const BOUNDS = { x0: 8, x1: 312, y0: 62, y1: 190 };
   const DOOR = { x: 160, y: 196 };
   const TV = { x: 120, y: 3, w: 80, h: 45 };   // 16:9 exacto
+  const CAFE = { x: 74, w: 40, top: 36, mx: 77, jx: 93, spot: { cafe: [84, 64], agua: [104, 64] } };   // v218 · rincón del café entre la terraza y el TV
   const BOARD = { x: 222, y: 5, w: 90, h: 42 };
   const inBlock = (x, y, m) => BLOCK.some(b => x > b.x - (m || 0) && x < b.x + b.w + (m || 0) && y > b.y - (m || 0) && y < b.y + b.h + (m || 0));
   const clampP = (x, y) => [Math.max(BOUNDS.x0, Math.min(BOUNDS.x1, x)), Math.max(BOUNDS.y0, Math.min(BOUNDS.y1, y))];
@@ -24744,10 +24782,24 @@ html.sl-full-on,html.sl-full-on body{overflow:hidden!important}
     R0(C.ol, GX, GY + 30, GW, 1); for (let i = 2; i < GW; i += 6) R0(C.ol, GX + i, GY + 30, 1, 8); R0(C.metal, GX, GY + 29, GW, 1);   // baranda
     R0(C.ol, GX + 48, GY + 32, 10, 8); R0(C.pot, GX + 49, GY + 33, 8, 6); R0(C.plant, GX + 47, GY + 25, 12, 8); R0(C.plantHi, GX + 49, GY + 24, 6, 3);
     R0(C.ol, GX + 21, GY, 1, GH); R0(C.ol, GX + 43, GY, 1, GH); R0("rgba(255,255,255,.18)", GX + 3, GY + 2, 2, 20); R0("rgba(255,255,255,.12)", GX + 25, GY + 2, 2, 14);
-    // repisa con premios
-    rbox(74, 28, 34, 2, C.wood, C.woodHi);
-    rbox(78, 19, 6, 8, "#e8b84a", "#ffe08a"); rbox(89, 21, 5, 6, "#c9c9d4", "#ffffff"); rbox(99, 18, 5, 9, "#e8b84a", "#ffe08a");
-    rbox(80, 7, 22, 7, C.paper); R0(C.trimLo, 83, 9, 15, 1); R0(C.trimLo, 83, 11, 10, 1);
+    // repisa con premios (más arriba) y, debajo, el rincón del café: mueble bajo con cafetera, jarra de agua y vasos
+    rbox(76, 15, 32, 2, C.wood, C.woodHi);
+    rbox(80, 7, 6, 7, "#e8b84a", "#ffe08a"); rbox(90, 9, 5, 5, "#c9c9d4", "#ffffff"); rbox(100, 6, 5, 8, "#e8b84a", "#ffe08a");
+    const CF = CAFE;
+    R0("rgba(0,0,0,.14)", CF.x + 2, 57, CF.w - 2, 2);   // sombra en el piso
+    rbox(CF.x, CF.top, CF.w, 50 - CF.top + 5, mix(C.wood, C.woodLo, .35), C.woodHi, C.woodDk);   // mueble
+    R0(C.woodDk, CF.x + Math.round(CF.w / 2), CF.top + 4, 1, 50 - CF.top); R0(C.woodHi, CF.x + 4, CF.top + 8, 6, 1); R0(C.woodHi, CF.x + CF.w - 10, CF.top + 8, 6, 1);   // puertas y tiradores
+    R0(mix(C.wood, "#ffffff", .25), CF.x - 1, CF.top - 2, CF.w + 2, 2); R0(C.ol, CF.x - 1, CF.top - 3, CF.w + 2, 1);   // cubierta
+    // cafetera: cuerpo oscuro, tanque, botones y una taza bajo el pico
+    const mx = CF.mx; rbox(mx, CF.top - 15, 11, 13, "#2a2833", "#4a4656", "#1c1a22");
+    R0("#3b3846", mx + 1, CF.top - 14, 9, 4); R0("#7fd0ff", mx + 2, CF.top - 13, 3, 2); R0("#e05656", mx + 7, CF.top - 13, 1, 1); R0("#64d861", mx + 8, CF.top - 11, 1, 1);
+    R0("#15131a", mx + 3, CF.top - 9, 5, 1); R0("#9a96a6", mx + 5, CF.top - 8, 1, 2);   // pico
+    rbox(mx + 3, CF.top - 5, 5, 3, C.paper); R0("#6b4226", mx + 4, CF.top - 5, 3, 1);   // taza servida
+    // jarra de vidrio con agua, rodaja de limón y vasos apilados
+    const jx = CF.jx; R0(C.ol, jx - 1, CF.top - 12, 9, 10); R0(C.ol, jx, CF.top - 13, 7, 1);
+    R0("#e7f6fd", jx, CF.top - 12, 7, 10); R0("#9fd8f3", jx, CF.top - 8, 7, 6); R0("#c8ecfb", jx + 1, CF.top - 8, 5, 1); R0("rgba(255,255,255,.7)", jx + 1, CF.top - 11, 1, 6);
+    R0("#e8d84a", jx + 4, CF.top - 7, 2, 2); R0(C.ol, jx + 7, CF.top - 10, 2, 1); R0(C.ol, jx + 8, CF.top - 10, 1, 5); R0(C.ol, jx + 7, CF.top - 6, 2, 1);   // limón y asa
+    rbox(jx + 11, CF.top - 7, 4, 5, "#d9f0fa", "#ffffff"); R0("#b5dcef", jx + 11, CF.top - 4, 4, 1); rbox(jx + 11, CF.top - 10, 4, 2, "#d9f0fa", "#ffffff");
     // TV 16:9
     R0(C.ol, TV.x - 2, TV.y - 2, TV.w + 4, TV.h + 4); R0("#141220", TV.x, TV.y, TV.w, TV.h); R0("#F3FF57", TV.x + TV.w - 3, TV.y + TV.h + 1, 2, 1);
     // reloj
@@ -24899,7 +24951,7 @@ html.sl-full-on,html.sl-full-on body{overflow:hidden!important}
     /* afuera: solo se mira quién está (sin aparecer), y solo con la pestaña Sala a la vista */
     if (!S.inside || !e) { if (visible && !NET.busy) { NET.busy = true; try { const r = await fetch(API_SALA, { cache: "no-store" }); if (r.ok) netApply(await r.json()); } catch (er) { } NET.busy = false; } NET.t = setTimeout(netTick, visible ? 5000 : 8000); return; }
     const tgt = e.path.length ? e.path[e.path.length - 1] : [e.x, e.y];
-    const body = { id: S.myId, name: me(), x: Math.round(tgt[0]), y: Math.round(tgt[1]), seat: e.seat >= 0 ? e.seat : (e.goSeat >= 0 ? e.goSeat : -1), mic: !!e.mic, cam: !!e.cam, say: NET.out.splice(0) };
+    const body = { id: S.myId, name: me(), x: Math.round(tgt[0]), y: Math.round(tgt[1]), seat: e.seat >= 0 ? e.seat : (e.goSeat >= 0 ? e.goSeat : -1), mic: !!e.mic, cam: !!e.cam, cup: e.cup || "", say: NET.out.splice(0) };
     if (NET.proj !== undefined) { body.proj = NET.proj; NET.proj = undefined; }
     NET.busy = true; NET.dirty = false;
     try { const r = await fetch(API_SALA, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }); if (r.ok) netApply(await r.json()); else NET.out.unshift(...body.say); }
@@ -24923,7 +24975,7 @@ html.sl-full-on,html.sl-full-on body{overflow:hidden!important}
         else { const t = e.path.length ? e.path[e.path.length - 1] : [e.x, e.y]; if (e.seat >= 0 || Math.hypot(t[0] - p.x, t[1] - p.y) > 2) walkTo(e, p.x, p.y); }
         says.filter(m => m.ts > (NET.seen[p.id] || 0)).forEach(m => { say(e, m.text, m.ts); }); NET.seen[p.id] = Math.max(NET.seen[p.id] || 0, last);
       }
-      if (!DL.call) { e.mic = !!p.mic; } e.camR = !!p.cam;
+      if (!DL.call) { e.mic = !!p.mic; } e.camR = !!p.cam; { const nc = p.cup === "cafe" || p.cup === "agua" ? p.cup : ""; if (nc && nc !== e.cup) e.back = false; e.cup = nc; }
       if (p.proj && p.proj.ts > NET.projTs) { NET.projTs = p.proj.ts; NET.projId = p.id; setProj(p.proj.k, p.name, true); }
       else if (!p.proj && NET.projId === p.id && S.proj) { NET.projId = ""; setProj(null, "", true); }
     });
@@ -24934,15 +24986,16 @@ html.sl-full-on,html.sl-full-on body{overflow:hidden!important}
     if (!m || m.from === S.myId) return;
     if (m.t === "who") { if (S.inside) sendState(); return; }
     let e = S.ents.get(m.from);
-    if (m.t === "hi" || m.t === "state") { if (!e) e = mkEnt({ name: m.name, x: m.x, y: m.y }); if (m.seat >= 0) { e.seat = m.seat; const s = seatOf(m.seat); e.x = s.x; e.y = s.y; } else { e.x = m.x; e.y = m.y; } e.mic = !!m.mic; e.cam = false; if (m.t === "hi") sendState(); people_(); if (m.proj && !S.proj) setProj(m.proj, m.name, true); return; }
+    if (m.t === "hi" || m.t === "state") { if (!e) e = mkEnt({ name: m.name, x: m.x, y: m.y }); if (m.seat >= 0) { e.seat = m.seat; const s = seatOf(m.seat); e.x = s.x; e.y = s.y; } else { e.x = m.x; e.y = m.y; } e.mic = !!m.mic; e.cam = false; e.cup = m.cup === "cafe" || m.cup === "agua" ? m.cup : ""; if (m.t === "hi") sendState(); people_(); if (m.proj && !S.proj) setProj(m.proj, m.name, true); return; }
     if (!e) return;
     if (m.t === "mv") { if (m.seat >= 0) sitAt(e, m.seat); else walkTo(e, m.x, m.y); }
     else if (m.t === "say") say(e, m.text);
     else if (m.t === "st") { e.mic = !!m.mic; e.speaking = m.spk ? 1 : 0; people_(); }
+    else if (m.t === "cup") { e.cup = m.cup === "cafe" || m.cup === "agua" ? m.cup : ""; if (e.cup) e.back = false; }
     else if (m.t === "proj") setProj(m.k, e.name, true);
     else if (m.t === "bye") { rmEnt(m.from); people_(); }
   }
-  const sendState = () => { const e = myEnt(); if (e) send({ t: "state", name: e.name, x: e.x, y: e.y, seat: e.seat, mic: e.mic, proj: S.projBy === e.name ? S.proj : null }); };
+  const sendState = () => { const e = myEnt(); if (e) send({ t: "state", name: e.name, x: e.x, y: e.y, seat: e.seat, mic: e.mic, cup: e.cup || "", proj: S.projBy === e.name ? S.proj : null }); };
   function openTransport() {
     if (PROVIDER.impl || NET.on || tr) return;
     const local = () => { try { tr = new BroadcastChannel("pxp-sala-v1"); tr.onmessage = ev => onMsg(ev.data); tr.postMessage({ t: "who", from: S.myId }); } catch (e) { tr = null; } };
@@ -25025,6 +25078,7 @@ html.sl-full-on,html.sl-full-on body{overflow:hidden!important}
         e.moving = true;
       } else if (!(e.id === S.myId && S.keys.size)) e.moving = false;
       if (e.moving) { e.walkT += dt; if (e.walkT > 170) { e.walkT = 0; e.step = e.step === 1 ? 2 : 1; } }
+      if (e.wantCup && !e.path.length && e.id === S.myId) { if (Math.hypot(e.x - CAFE.spot[e.wantCup][0], e.y - CAFE.spot[e.wantCup][1]) < 3) { e.cup = e.wantCup; e.back = false; e.sip = 0; e.sipT = R(3000, 6000); say(e, e.cup === "cafe" ? pick([L("Un tintico y seguimos", "Coffee break, then back to it"), L("Café listo ☕", "Coffee ready ☕"), L("Cafecito para la revisión", "A little coffee for the review")]) : pick([L("Agüita y seguimos", "Some water and on we go"), L("A hidratarse 💧", "Stay hydrated 💧")])); sendCup(); } e.wantCup = null; }
       if (!reduce()) {
         e.brT -= dt; if (e.brT <= 0) { e.br = e.br ? 0 : 1; e.brT = e.br ? R(700, 1000) : R(2400, 4600); }
         e.blinkT -= dt; if (e.blinkT <= 0) { e.blink = e.blink ? 0 : 1; e.blinkT = e.blink ? 120 : R(2600, 5600); }
@@ -25051,8 +25105,39 @@ html.sl-full-on,html.sl-full-on body{overflow:hidden!important}
     items.push({ z: TABLE.y + TABLE.h + 2, draw: () => drawTable(x) });
     SEATS.forEach(s => { if (s.side === "front") items.push({ z: s.y + .5, draw: () => drawFrontChair(x, s) }); });
         items.sort((a, b) => a.z - b.z).forEach(i => i.draw());
+    drawCups(x);
     drawLight(x);
   }
+  /* v218 · café y agua: vapor de la cafetera, taza o vaso en la mano y un sorbo cada tanto */
+  function cupSprite(x, kind, px, py) { const R0 = (c, a, b, w, hh) => { x.fillStyle = c; x.fillRect(a, b, w, hh); }, ol = (S.pal || {}).ol || "#241f38";
+    if (kind === "cafe") { R0(ol, px - 1, py - 1, 6, 6); R0("#ffffff", px, py, 4, 4); R0("#6b4226", px, py, 4, 1); R0(ol, px + 4, py + 1, 2, 1); R0(ol, px + 5, py + 1, 1, 2); R0("#d9d4e4", px, py + 3, 4, 1); }
+    else { R0(ol, px - 1, py - 1, 5, 7); R0("#e7f6fd", px, py, 3, 5); R0("#8fd0ef", px, py + 2, 3, 3); R0("rgba(255,255,255,.8)", px, py, 1, 3); } }
+  function drawCups(x) {
+    const now = performance.now(), t = now / 1000;
+    // vapor de la cafetera (y del café recién servido)
+    if (!reduce()) { x.fillStyle = "rgba(255,255,255,.55)"; for (let i = 0; i < 3; i++) { const p = ((t * .6 + i / 3) % 1); x.globalAlpha = .6 * (1 - p); x.fillRect(Math.round(CAFE.mx + 5 + Math.sin(t * 2 + i * 2) * 1.5), Math.round(CAFE.top - 7 - p * 9), 1, 2); } x.globalAlpha = 1; }
+    S.ents.forEach(e => {
+      if (!e.cup || e._cx == null) return;
+      const s = e.seat >= 0 ? seatOf(e.seat) : null, back = s ? s.view === "back" : e.back;
+      if (!reduce()) { e.sipT = (e.sipT == null ? R(4000, 9000) : e.sipT) - 16; if (e.sipT <= 0 && !e.moving && !back) { e.sip = 1400; e.sipT = R(9000, 22000); } }
+      if (e.sip > 0) e.sip -= 16;
+      const sip = e.sip > 0 && !back && !e.moving, up = sip ? Math.sin(Math.min(1, (1400 - e.sip) / 1400) * Math.PI) : 0;
+      let px, py;
+      if (s && s.side === "back") { px = s.x + 7; py = TABLE.y + 4; }
+      else if (s && s.side === "front") { px = s.x + 8; py = TABLE.y + TABLE.h - 7; }
+      else { px = e._cx + (back ? 5 : 7); py = e._top + 21; }
+      if (up > 0) { px = Math.round(px + (e._cx + 2 - px) * up); py = Math.round(py + (e._top + 15 - py) * up); }
+      if (back && !s) { px = e._cx + 8; }
+      cupSprite(x, e.cup, Math.round(px), Math.round(py));
+      if (e.cup === "cafe" && !reduce() && !sip) { const p = (t * .7 + e._cx * .01) % 1; x.globalAlpha = .5 * (1 - p); x.fillStyle = "#ffffff"; x.fillRect(Math.round(px + 1 + Math.sin(t * 3) ), Math.round(py - 2 - p * 5), 1, 1); x.globalAlpha = 1; }
+    });
+  }
+  function servir(kind) {
+    const e = myEnt(); if (!e) return;
+    if (e.cup === kind && !e.wantCup) { e.cup = ""; say(e, kind === "cafe" ? L("Dejé la taza", "Put the cup down") : L("Dejé el vaso", "Put the glass down")); sendCup(); return; }
+    const sp = CAFE.spot[kind]; e.wantCup = kind; if (walkTo(e, sp[0], sp[1])) send({ t: "mv", x: sp[0], y: sp[1], seat: -1 });
+  }
+  const sendCup = () => { const e = myEnt(); if (e) send({ t: "cup", cup: e.cup || "" }); };
   function overlays() {
     const st = $("sl-stage"); if (!st) return;
     S.ents.forEach(e => {
@@ -25300,7 +25385,7 @@ html.sl-full-on,html.sl-full-on body{overflow:hidden!important}
   function stageClick(ev) {
     const st = $("sl-stage"), r = st.getBoundingClientRect(), rot = S.full && S.rot, e = myEnt(); if (!e) return;
     const x = rot ? (ev.clientY - r.top) / r.height * W : (ev.clientX - r.left) / r.width * W, y = rot ? (r.right - ev.clientX) / r.width * H : (ev.clientY - r.top) / r.height * H;
-    if (ev.target.closest(".sl-card,.sl-pick,.sl-map")) return;
+    if (ev.target.closest(".sl-card,.sl-pick,.sl-map,.sl-hot")) return;
     if (x >= TV.x && x <= TV.x + TV.w && y >= TV.y && y <= TV.y + TV.h) { tvBig(); return; }
     // ¿clic sobre alguien?
     const who = [...S.ents.values()].find(o => o.id !== S.myId && o._cx != null && Math.abs(x - o._cx) < 9 && y > o._top + 3 && y < o._top + 30);
@@ -25328,6 +25413,7 @@ html.sl-full-on,html.sl-full-on body{overflow:hidden!important}
         <div class="sl-stage" id="sl-stage" tabindex="0" role="application" aria-label="${L("Sala de juntas. Flechas para caminar.", "Meeting room. Arrow keys to walk.")}">
           <canvas id="sl-cv" width="${W}" height="${H}"></canvas>
           <div class="sl-tv" id="sl-tv" style="left:${TV.x / W * 100}%;top:${TV.y / H * 100}%;width:${TV.w / W * 100}%;height:${TV.h / H * 100}%" title="${L("Clic para ver en grande", "Click to enlarge")}"></div>
+          <button type="button" class="sl-hot" id="sl-cafe" style="left:${(CAFE.mx - 2) / W * 100}%;top:${(CAFE.top - 17) / H * 100}%;width:${15 / W * 100}%;height:${17 / H * 100}%" aria-label="${L("Tomar un café", "Get a coffee")}" data-sl-tip="${L("Tomar un café", "Get a coffee")}"></button><button type="button" class="sl-hot" id="sl-agua" style="left:${(CAFE.jx - 2) / W * 100}%;top:${(CAFE.top - 15) / H * 100}%;width:${19 / W * 100}%;height:${15 / H * 100}%" aria-label="${L("Servirme agua", "Get some water")}" data-sl-tip="${L("Servirme agua", "Get some water")}"></button>
           <div class="sl-map" id="sl-map" style="left:${BOARD.x / W * 100}%;top:${BOARD.y / H * 100}%;width:${BOARD.w / W * 100}%;height:${BOARD.h / H * 100}%"></div><div class="sl-ov" id="sl-ov"></div><div class="sl-toast" id="sl-toast" role="status" hidden></div>
         </div>
         <aside class="sl-side"><section><h3>${L("En la sala", "In the room")} <b id="sl-n">0</b></h3><ul class="sl-ppl" id="sl-ppl"></ul><p class="sl-projs" id="sl-projs"></p></section>
@@ -25349,6 +25435,8 @@ html.sl-full-on,html.sl-full-on body{overflow:hidden!important}
       <p class="sl-note">${L("Voz, video y pantalla compartida llegan cuando TI apruebe el servicio de llamadas. Por ahora tu cámara, tu micrófono y tu pantalla solo se ven en tu equipo.", "Voice, video and screen sharing arrive once IT approves the calling service. For now your camera, mic and screen are only visible on your device.")}</p>
     </div></div>`);
     $("sl-stage").addEventListener("click", stageClick);
+    $("sl-cafe").onclick = ev => { ev.stopPropagation(); if (S.inside) servir("cafe"); };
+    $("sl-agua").onclick = ev => { ev.stopPropagation(); if (S.inside) servir("agua"); };
     $("sl-mic").onclick = toggleMic; $("sl-camb").onclick = toggleCam; $("sl-scr").onclick = toggleScreen; $("sl-projb").onclick = projPicker; $("sl-exit").onclick = () => S.inside ? leaveAsk() : lobby(true); $("sl-vw").onclick = () => S.full ? exitFull() : goFull(); $("sl-sidet").onclick = () => { const w = document.querySelector(".sl-wrap"); w.classList.toggle("side-off"); S.sideOff = w.classList.contains("side-off"); fitFull(); };
     $("sl-seat").onclick = () => { const e = myEnt(); if (!e) return; if (e.seat >= 0) { const s = seatOf(e.seat); e.seat = -1; e.x = s.ax; e.y = s.ay; walkTo(e, s.ax, s.side === "back" ? 63 : s.side === "front" ? 184 : s.ay); bar(); sendState(); return; }
       let best = -1, bd = 1e9; SEATS.forEach((s, i) => { if (seatTaken(i, e.id)) return; const d = Math.hypot(s.ax - e.x, s.ay - e.y); if (d < bd) { bd = d; best = i; } }); if (best >= 0) { sitAt(e, best); send({ t: "mv", seat: best }); } };
@@ -25493,12 +25581,21 @@ html.sl-full-on,html.sl-full-on body{overflow:hidden!important}
   /* mientras estás adentro y miras otra pestaña: un aviso flotante para volver o salir */
   function pill() {
     let p = $("sl-pill"); const show = S.inside && !salaVisible() && !!me();
-    if (!show) { if (p) p.hidden = true; return; }
-    if (!p) { p = document.createElement("div"); p.id = "sl-pill"; p.className = "sl-pill"; p.setAttribute("role", "status"); document.body.appendChild(p);
+    if (!show) { if (p && !p.hidden) { p.classList.add("out"); clearTimeout(p._t); p._t = setTimeout(() => { p.hidden = true; p.classList.remove("out"); }, 260); } return; }
+    if (!p) { p = document.createElement("div"); p.id = "sl-pill"; p.className = "sl-pill"; p.setAttribute("role", "status"); p.hidden = true; document.body.appendChild(p);
       p.onclick = ev => { if (ev.target.closest(".sl-pill-x")) return leaveAsk(); if (ev.target.closest(".sl-pill-v")) { try { switchView("sala"); window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) { } } }; }
-    const e = myEnt(), n = S.ents.size;
-    p.innerHTML = `<button type="button" class="sl-pill-v" aria-label="${L("Volver a la sala", "Back to the room")}">${e ? `<img src="${PXA.headURL(e.cfg, null, 40)}" alt="">` : ""}<span><b>${L("Estás en la sala", "You're in the room")}</b><small>${n} ${n === 1 ? L("persona", "person") : L("personas", "people")}${S.proj ? " · " + L("TV encendido", "TV on") : ""}</small></span>${S.unread ? `<em>${S.unread}</em>` : ""}</button><button type="button" class="sl-pill-x">${L("Salir", "Leave")}</button>`;
-    p.hidden = false;
+    const e = myEnt(), otros = [...S.ents.values()].filter(x => x.id !== S.myId), n = otros.length + 1;
+    const ult = S.log.length ? S.log[S.log.length - 1] : null, ultOtro = ult && nn(ult.name) !== S.myId ? ult : null;
+    const pre = DL.rScr ? `<i class="ic">▶</i>${esc(tit(String(DL.rScr.by).split(" ")[0]))} ${L("comparte pantalla", "is sharing")}` : S.proj ? `<i class="ic">▶</i>${esc(tit(String(S.projBy).split(" ")[0]))} ${L("proyecta", "is showing")} ${esc(refLabel(S.proj))}`
+      : ult ? `<b>${esc(tit(String(ult.name).split(" ")[0]))}:</b> ${esc(ult.text)}` : (otros.length ? L("Tranquilo por aquí. Escribe algo cuando quieras.", "Quiet in here. Say something anytime.") : L("Por ahora estás solo en la sala.", "You're alone in the room for now."));
+    const k = [n, S.unread, pre, e && e.cup].join("|"), nuevo = p.dataset.k && p.dataset.k.split("|")[2] !== pre; if (p.dataset.k === k && !p.hidden) return; p.dataset.k = k;
+    const heads = otros.slice(0, 3).map(o => `<img src="${PXA.headURL(o.cfg, null, 28)}" alt="" title="${esc(tit(o.name))}">`).join("") + (otros.length > 3 ? `<em>+${otros.length - 3}</em>` : "");
+    p.innerHTML = `<button type="button" class="sl-pill-v" aria-label="${L("Volver a la sala", "Back to the room")}"><span class="sl-pill-av">${e ? `<img src="${PXA.headURL(e.cfg, null, 40)}" alt="">` : ""}<i class="live"></i></span>
+      <span class="sl-pill-t"><span class="sl-pill-h"><b>${L("En la sala", "In the room")}</b><small>${n} ${n === 1 ? L("persona", "person") : L("personas", "people")}</small>${S.unread ? `<em class="sl-pill-n">${S.unread}</em>` : ""}</span><span class="sl-pill-m${ultOtro && S.unread ? " fresh" : ""}">${pre}</span></span>
+      ${heads ? `<span class="sl-pill-ppl">${heads}</span>` : ""}<span class="sl-pill-go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></span></button>
+      <span class="sl-pill-sep" aria-hidden="true"></span><button type="button" class="sl-pill-x" aria-label="${L("Salir de la sala", "Leave the room")}" title="${L("Salir de la sala", "Leave the room")}"><svg viewBox="0 0 24 24"><path d="M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4"/><path d="M21 12H10M17 8l4 4l-4 4"/></svg><span>${L("Salir", "Leave")}</span></button>`;
+    if (p.hidden) { p.hidden = false; p.classList.remove("in"); void p.offsetWidth; p.classList.add("in"); }
+    else if (nuevo) { const m = p.querySelector(".sl-pill-m"); if (m) { m.classList.remove("pop"); void m.offsetWidth; m.classList.add("pop"); } }
   }
   /* notas del tablero: vista previa en una ventana, sin sacarte de la sala */
   function notaPreview(v) {
@@ -25572,6 +25669,7 @@ html.sl-full-on,html.sl-full-on body{overflow:hidden!important}
     say: t => { const e = myEnt(); if (e) { say(e, t); send({ t: "say", text: t }); } },
     seats: SEATS.length,
     llamada: () => ({ enabled: DL.enabled, state: DL.st, remotos: DL.call ? Object.values(DL.call.participants()).filter(p => !p.local).length : 0, pantalla: !!DL.rScr }),
+    taza: () => { const e = myEnt(); return e ? e.cup || "" : ""; }, servir: k => servir(k),
     inside: () => S.inside, full: on => (on === false ? exitFull() : goFull()), join: () => { if (!S.inside) join(); }, leave: () => leave(),
   };
 
