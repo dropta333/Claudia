@@ -24602,6 +24602,21 @@ html.sl-full-on,html.sl-full-on body{overflow:hidden!important}
 .sl-hot:hover,.sl-hot:focus-visible{background:rgba(243,255,87,.12);box-shadow:0 0 0 1.5px rgba(243,255,87,.75)}
 .sl-hot::after{content:attr(data-sl-tip);position:absolute;left:50%;bottom:calc(100% + 6px);transform:translate(-50%,4px);white-space:nowrap;padding:5px 9px;border-radius:8px;background:#16141f;color:#fff;font:600 12px/1 var(--sans);opacity:0;pointer-events:none;transition:opacity .15s,transform .15s;box-shadow:0 6px 18px rgba(0,0,0,.3)}
 .sl-hot:hover::after,.sl-hot:focus-visible::after{opacity:1;transform:translate(-50%,0)}
+/* v218 · Encabezado de persona en celular: el cargo como una sola tarjeta (cargo en una línea, grupo debajo, lápiz adentro) */
+@media (max-width:600px){
+  #pxp-person .pm-head.ph2 .pm-id > p[data-al]{display:inline-flex!important;flex-wrap:wrap;align-items:center;justify-content:flex-start!important;gap:12px!important;margin-left:auto;margin-right:auto;
+    max-width:100%;box-sizing:border-box;padding:9px 9px 9px 16px;border-radius:16px;border:1px solid color-mix(in srgb,var(--gc,var(--brand)) 45%,var(--border));
+    background:linear-gradient(110deg,color-mix(in srgb,var(--gc,var(--brand)) 18%,var(--surface)),color-mix(in srgb,var(--gc,var(--brand)) 6%,var(--surface)))}
+  #pxp-person .pm-head.ph2 .ph-role{border:0!important;background:none!important;padding:0!important;box-shadow:none!important;width:auto!important;max-width:none!important;min-width:0;flex:1 1 auto!important;align-items:flex-start!important;text-align:left;gap:6px!important}
+  #pxp-person .pm-head.ph2 .ph-role-t{font-size:16px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  #pxp-person .pm-head.ph2 .ph-grp{font-size:10.5px;padding:4px 8px}
+  #pxp-person .pm-head.ph2 .ph-role.same .ph-grp{display:none}
+  #pxp-person .pm-head.ph2 .ph-role.same .ph-role-t::after{content:"";display:inline-block;width:8px;height:8px;border-radius:3px;background:var(--gc,var(--brand));margin-left:9px;vertical-align:2px}
+  #pxp-person .pm-head.ph2 .ph-pen{flex:none;width:34px;height:34px;border-radius:11px;border-color:color-mix(in srgb,var(--gc,var(--brand)) 35%,var(--border));background:color-mix(in srgb,var(--surface) 70%,transparent)}
+  #pxp-person .pm-head.ph2 .pm-role-ed:not([hidden]){flex-basis:100%;display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-start}
+  #pxp-person .pm-head.ph2 .pm-role-ed small{text-align:left}
+  #pxp-person .pm-head.ph2 .pm-links{margin-top:2px}
+}
 /* v217 · Grupos plegables (Dashboard · Carga por persona, Tráfico) con el mismo control que Team */
 .pl-ch{all:unset;cursor:pointer;margin-left:auto;display:grid;place-items:center;width:30px;height:30px;border-radius:9px;flex:none;transition:background .15s}
 .pl-ch:hover{background:var(--surface2)}
@@ -25763,7 +25778,10 @@ html.sl-full-on,html.sl-full-on body{overflow:hidden!important}
     const bar = $("trf-sort"); if (bar && any) foldCtl(bar, "trf", "pl-trf");
     return true;
   }
-  const run = () => { try { dash(); } catch (e) { console.error(e); } try { traffic(); } catch (e) { console.error(e); } };
+  /* encabezado de persona: si el cargo y el grupo dicen lo mismo, en celular se muestra una sola vez */
+  const planoT = s => String(s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim();
+  function cargo() { const r = document.querySelector("#pxp-person .ph-role"); if (!r) return; const s = planoT(txt(r.querySelector(".ph-role-t"))) === planoT(txt(r.querySelector(".ph-grp"))); if (r.classList.contains("same") !== s) r.classList.toggle("same", s); }
+  const run = () => { try { dash(); } catch (e) { console.error(e); } try { traffic(); } catch (e) { console.error(e); } try { cargo(); } catch (e) { } };
 
   document.addEventListener("click", e => {
     const b = e.target.closest && e.target.closest(".pl-ch, .pl-fold [data-pl], #main-grid > .section-label.pl-h, #main-grid > .trf-grp.pl-h, #trf-table tr.pv-g.pl-h, #dash-wrap .pl-box > .hp-title");

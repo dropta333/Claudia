@@ -79,7 +79,10 @@
     const bar = $("trf-sort"); if (bar && any) foldCtl(bar, "trf", "pl-trf");
     return true;
   }
-  const run = () => { try { dash(); } catch (e) { console.error(e); } try { traffic(); } catch (e) { console.error(e); } };
+  /* encabezado de persona: si el cargo y el grupo dicen lo mismo, en celular se muestra una sola vez */
+  const planoT = s => String(s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim();
+  function cargo() { const r = document.querySelector("#pxp-person .ph-role"); if (!r) return; const s = planoT(txt(r.querySelector(".ph-role-t"))) === planoT(txt(r.querySelector(".ph-grp"))); if (r.classList.contains("same") !== s) r.classList.toggle("same", s); }
+  const run = () => { try { dash(); } catch (e) { console.error(e); } try { traffic(); } catch (e) { console.error(e); } try { cargo(); } catch (e) { } };
 
   document.addEventListener("click", e => {
     const b = e.target.closest && e.target.closest(".pl-ch, .pl-fold [data-pl], #main-grid > .section-label.pl-h, #main-grid > .trf-grp.pl-h, #trf-table tr.pv-g.pl-h, #dash-wrap .pl-box > .hp-title");
