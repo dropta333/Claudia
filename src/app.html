@@ -23256,7 +23256,7 @@ button.pm-pxa{cursor:pointer}
     const col = c.xc || (g && g.color) || "#F3FF57", px = (cc, i, j, w, h) => { x.fillStyle = cc; x.fillRect(ox + i, oy + j, w || 1, h || 1); };
     const rgb = hex2(col), rgba = al => `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${al.toFixed(3)})`;
     if (c.fx === "aura" && layer !== "front") {   /* tornasol psicodélico: el arcoíris gira y ondula */
-      for (let j = -2; j < 30; j++) for (let i = 1; i < 31; i++) { const dx = (i - 15.5) / 13, dy = (j - 13) / 16, d = Math.sqrt(dx * dx + dy * dy); if (d >= 1.06) continue;
+      for (let j = 0; j < 32; j++) for (let i = 1; i < 31; i++) { const dx = (i - 15.5) / 13.5, dy = (j - 15.5) / 14.6, d = Math.sqrt(dx * dx + dy * dy); if (d >= 1.06) continue;   /* cabe entero en el lienzo (no se corta arriba) */
         const ang = Math.atan2(dy, dx) * 57.3, w = Math.sin(t * 2.4 + d * 9 + ang / 40), hue = (ang * 1.5 + t * 140 + d * 260 + w * 50) % 360, ring = d > .86;
         const al = ring ? .42 + .2 * Math.sin(t * 3 + ang / 30) : .1 + .07 * w; x.fillStyle = `hsla(${hue.toFixed(0)},95%,${ring ? 62 : 66}%,${Math.max(.05, al).toFixed(2)})`; x.fillRect(ox + i, oy + j, 1, 1); }
       return;
