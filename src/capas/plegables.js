@@ -22,25 +22,14 @@
     host.insertAdjacentHTML("beforeend", `<span class="fold pl-fold ${cls || ""}" role="group" aria-label="${T("Grupos", "Groups")}" data-scope="${scope}"><button type="button" data-pl="close">${FOLD}${T("Esconder todos", "Hide all")}</button><button type="button" data-pl="open">${UNFOLD}${T("Mostrar todos", "Show all")}</button></span>`);
   };
 
-  /* ---------- Dashboard · Carga por persona ---------- */
-  function rebalance(lg) {
-    const cols = [...lg.querySelectorAll(":scope > .lgc")]; if (cols.length < 2) return;
-    const grupos = [...lg.querySelectorAll(".lg")]; grupos.forEach(g => cols[0].appendChild(g));
-    const H = grupos.map(g => g.offsetHeight + 14), tot = new Array(cols.length).fill(0), asig = [];
-    grupos.map((g, i) => i).sort((a, b) => H[b] - H[a]).forEach(i => { const c = tot.indexOf(Math.min(...tot)); asig[i] = c; tot[c] += H[i]; });
-    /* mantiene el orden original dentro de cada columna */
-    grupos.forEach((g, i) => cols[asig[i]].appendChild(g));
-  }
+  /* ---------- Dashboard · Carga por persona: la caja completa se pliega (los grupos por cargo se ven como antes) ---------- */
   function dash() {
     const lg = document.querySelector("#dash-wrap .load-groups"); if (!lg) return false;
-    const st = cerr(); let cambio = false;
-    lg.querySelectorAll(".lg").forEach(g => {
-      const t = g.querySelector(".lg-t"); if (!t) return; const name = txt(t.firstChild) || txt(t).replace(/\d+$/, "").trim(), k = "dash:" + name, c = st.has(k);
-      if (g.classList.contains("pl-closed") !== c) { g.classList.toggle("pl-closed", c); cambio = true; }
-      chev(t, k, c, name);
-    });
-    const panel = lg.closest(".home-panel"), ht = panel && panel.querySelector(".hp-title"); foldCtl(ht, "dash", "pl-hp");
-    return cambio;
+    const panel = lg.closest(".home-panel"), ht = panel && panel.querySelector(".hp-title"); if (!ht) return false;
+    const k = "dashbox:carga", c = cerr().has(k);
+    panel.classList.add("pl-box"); if (panel.classList.contains("pl-closed") !== c) panel.classList.toggle("pl-closed", c);
+    chev(ht, k, c, T("Carga por persona", "Load by person"));
+    return false;
   }
 
   /* ---------- Tráfico: secciones (Equipo, Audio…), grupos por cargo y la vista en tabla ---------- */
@@ -76,24 +65,30 @@
       const isCard = el.classList.contains("card") && !!el.querySelector(".ch-top");
       const hid = secC || (isCard && grpC); if (el.classList.contains("pl-hid") !== hid) el.classList.toggle("pl-hid", hid);
     });
-    /* tabla: las filas de grupo pliegan sus personas */
+    /* tabla: las filas de grupo llevan la misma barra (avatares, cuántos y cómo están) y pliegan sus personas */
     const tb = $("trf-table");
-    if (tb) { let c = false; tb.querySelectorAll("tbody tr").forEach(tr => {
-      if (tr.classList.contains("pv-g")) { const b = tr.querySelector("b"), name = txt(b), k = "trfgrp:" + name; c = st.has(k); tr.classList.add("pl-h"); tr.classList.toggle("pl-closed", c); const td = tr.querySelector("td"); if (td) chev(td, k, c, name); return; }
+    if (tb) { const trs = [...tb.querySelectorAll("tbody tr")];
+      trs.forEach((tr, i) => { if (!tr.classList.contains("pv-g") || tr.classList.contains("tg2")) return; const td = tr.querySelector("td"); if (!td) return;
+        const ns = []; for (let j = i + 1; j < trs.length && !trs[j].classList.contains("pv-g"); j++) { const n = trs[j].querySelector(".tt-n"); if (n) ns.push(n.dataset.pname || txt(n.querySelector("b"))); }
+        const name = txt(td.querySelector("b")); const h = document.createElement("div"); h.innerHTML = "<b></b>"; h.querySelector("b").textContent = name;
+        barra(h, ns.map(n => { const d = document.createElement("div"); d.innerHTML = '<span class="ch-name"></span>'; d.firstChild.dataset.pname = n; return d; }));
+        tr.classList.add("tg2"); tr.style.setProperty("--gc", h.style.getPropertyValue("--gc")); td.innerHTML = `<div class="tg-row">${h.innerHTML}</div>`; });
+      let c = false; trs.forEach(tr => {
+      if (tr.classList.contains("pv-g")) { const name = txt(tr.querySelector(".gh-n") || tr.querySelector("b")), k = "trfgrp:" + name; c = st.has(k); tr.classList.add("pl-h"); tr.classList.toggle("pl-closed", c); const row = tr.querySelector(".tg-row") || tr.querySelector("td"); if (row) chev(row, k, c, name); return; }
       if (tr.classList.contains("pl-hid") !== c) tr.classList.toggle("pl-hid", c); }); }
     const bar = $("trf-sort"); if (bar && any) foldCtl(bar, "trf", "pl-trf");
     return true;
   }
-  const run = () => { try { if (dash()) { const lg = document.querySelector("#dash-wrap .load-groups"); if (lg) rebalance(lg); } } catch (e) { console.error(e); } try { traffic(); } catch (e) { console.error(e); } };   /* solo se reacomoda si algo cambió */
+  const run = () => { try { dash(); } catch (e) { console.error(e); } try { traffic(); } catch (e) { console.error(e); } };
 
   document.addEventListener("click", e => {
-    const b = e.target.closest && e.target.closest(".pl-ch, .pl-fold [data-pl], #main-grid > .section-label.pl-h, #main-grid > .trf-grp.pl-h, #trf-table tr.pv-g.pl-h, #dash-wrap .lg-t");
+    const b = e.target.closest && e.target.closest(".pl-ch, .pl-fold [data-pl], #main-grid > .section-label.pl-h, #main-grid > .trf-grp.pl-h, #trf-table tr.pv-g.pl-h, #dash-wrap .pl-box > .hp-title");
     if (!b) return; if (!b.dataset.pl && !b.classList.contains("pl-ch") && e.target.closest("button, a, input, select, label, [onclick]")) return;
     e.preventDefault(); e.stopPropagation();
     const st = cerr();
     if (b.dataset.pl) {
-      const scope = b.closest(".pl-fold").dataset.scope, keys = [...document.querySelectorAll(scope === "dash" ? "#dash-wrap .lg .pl-ch" : "#main-grid .pl-ch, #trf-table .pl-ch")].map(x => x.dataset.k);
-      const grp = keys.filter(k => k.startsWith("trfgrp:")), use = scope === "trf" && grp.length ? grp : keys;
+      const keys = [...document.querySelectorAll("#main-grid .pl-ch, #trf-table .pl-ch")].map(x => x.dataset.k);
+      const grp = keys.filter(k => k.startsWith("trfgrp:")), use = grp.length ? grp : keys;
       use.forEach(k => b.dataset.pl === "close" ? st.add(k) : st.delete(k));
     } else { const ch = b.classList.contains("pl-ch") ? b : b.querySelector(".pl-ch"); if (!ch) return; const k = ch.dataset.k; if (st.has(k)) st.delete(k); else st.add(k); }
     guardar(st); run(); try { if (document.getElementById("main-grid") && window.pxpTraficoMosaico) pxpTraficoMosaico(); } catch (er) { }

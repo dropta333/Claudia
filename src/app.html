@@ -8707,7 +8707,7 @@ function render(w) {
   // Audio section
   const audioLbl = document.createElement("div");
   audioLbl.className = "section-label";
-  audioLbl.textContent = "Audio · cabezas: " + AUDIO_HEADS;
+  audioLbl.textContent = "Audio";   // v218 · antes decía "cabezas: …" con nombres fijos del tablero original
   grid.appendChild(audioLbl);
   AUDIO.forEach((house, idx) => {
     const hProjs = house.weeks[w] || [];
@@ -12742,6 +12742,13 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       if (isP) { if (!cur) { cur = []; runs.push(cur); } cur.push(k); } else cur = null;
     });
     if (!runs.length) return;
+    // v218 · agrupado por cargo: Audio (que se guarda en otra lista) entra al mismo mosaico que el resto del equipo
+    grid.querySelectorAll(".section-label.trf-vacia").forEach(x => x.classList.remove("trf-vacia"));
+    if (ts.mode === "cargo" && runs.length > 1) {
+      const a0 = runs[0][runs[0].length - 1].nextSibling, todas = [].concat(...runs);
+      runs.slice(1).forEach(r => { const lab = r[0].previousElementSibling; if (lab && lab.classList.contains("section-label")) lab.classList.add("trf-vacia"); });
+      runs.length = 0; todas.__anchor = a0; runs.push(todas);
+    }
     runs.forEach(run => run.forEach((c, i) => { if (c.dataset.o === undefined) c.dataset.o = i; }));
     let bar = $("trf-sort");
     if (!bar) {
@@ -12767,7 +12774,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
         cargo: (a, b) => CARGO.indexOf(a.cargo) - CARGO.indexOf(b.cargo) || a.load - b.load || byName(a, b),
       }[ts.mode] || ((a, b) => a.c.dataset.o - b.c.dataset.o);
       info.sort(cmp);
-      const anchor = run[run.length - 1].nextSibling;
+      const anchor = run.__anchor || run[run.length - 1].nextSibling;
       let last = null, shown = 0;
       info.forEach(o => {
         if (ts.mode === "cargo" && o.cargo !== last) {
@@ -12782,7 +12789,7 @@ document.getElementById("login-pass").addEventListener("keydown", (e) => {
       if (q && !shown) { const e = document.createElement("div"); e.className = "trf-empty home-empty"; e.textContent = "Nadie coincide con la búsqueda."; grid.insertBefore(e, anchor); }
     });
   }
-  window.pxpTrfSort = function (m) { ts.mode = m; try { localStorage.setItem(TS_KEY, JSON.stringify({ mode: m })); } catch (e) { } sortTraffic(); };
+  window.pxpTrfSort = function (m) { const antes = ts.mode; ts.mode = m; try { localStorage.setItem(TS_KEY, JSON.stringify({ mode: m })); } catch (e) { } if (antes === "cargo" && m !== "cargo" && typeof render === "function") { render(currentWeek); return; } sortTraffic(); };   // v218 · al salir de "Por cargo" se repinta: Audio vuelve a su sección
   window.pxpTrfQ = function (v) { ts.q = v; sortTraffic(); };
 
 
@@ -24599,6 +24606,29 @@ html.sl-full-on,html.sl-full-on body{overflow:hidden!important}
 #main-grid > .trf-grp.tg2 .gh-m em.ok{color:var(--green)}
 #main-grid > .trf-grp.tg2 .pl-ch{order:4;margin-left:auto}
 #main-grid > .trf-grp.tg2.pl-closed{opacity:1}
+/* v218 · Dashboard: la caja de Carga por persona completa se pliega */
+#dash-wrap .pl-box > .hp-title{cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#dash-wrap .pl-box > .hp-title > .pl-ch{margin-left:auto}
+#dash-wrap .pl-box.pl-closed > :not(.hp-title){display:none!important}
+#dash-wrap .pl-box.pl-closed > .hp-title{margin-bottom:0;border-bottom:0;padding-bottom:0}
+#dash-wrap .pl-box.pl-closed{padding-bottom:16px}
+/* Tráfico: Audio entra al mosaico por cargo (sin sección aparte) */
+#main-grid > .section-label.trf-vacia{display:none!important}
+/* Tráfico en tabla: filas de grupo con la misma barra que las fichas */
+#trf-table tr.pv-g.tg2 td{padding:8px 10px!important;border-left:4px solid var(--gc);background:linear-gradient(100deg,color-mix(in srgb,var(--gc) 14%,var(--surface)),var(--surface) 60%)!important}
+#trf-table .tg-row{display:flex;align-items:center;gap:12px;min-width:0}
+#trf-table .tg-row .gh-av{order:0;display:flex;flex:none}
+#trf-table .tg-row .gh-av > *{margin-left:-7px;box-shadow:0 0 0 2px var(--surface)}
+#trf-table .tg-row .gh-av > *:first-child{margin-left:0}
+#trf-table .tg-row .gh-n{order:1;font:600 15px/1.1 var(--display);letter-spacing:.06em;text-transform:uppercase;color:var(--text);white-space:nowrap}
+#trf-table .tg-row .tg-c{order:2;font:700 13px/1 var(--display);padding:3px 8px;border-radius:99px;background:var(--surface2);color:var(--muted)}
+#trf-table .tg-row .gh-m{order:3;font:400 13px/1.3 var(--sans);color:var(--muted);flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#trf-table .tg-row .gh-m em{font-style:normal;font-weight:600}
+#trf-table .tg-row .gh-m em.sc{color:var(--red)}
+#trf-table .tg-row .gh-m em.al{color:var(--yellow)}
+#trf-table .tg-row .gh-m em.ok{color:var(--green)}
+#trf-table .tg-row .pl-ch{order:4;float:none;margin:0 0 0 auto}
+#dash-wrap .pl-box.pl-closed > .hp-title > .pl-ch::before{transform:rotate(45deg) translate(-2px,-2px)}
 </style>
 <script id="sala-js">/* ═════ v212 · Sala de juntas (prototipo): los avatares entran, caminan, se sientan, hablan en burbujas y proyectan en el TV ═════
    Todo lo que viaja entre personas pasa por un "transporte" con mensajes simples ({t:"hi"|"mv"|"say"|"st"|"proj"|"bye", …}).
@@ -25578,25 +25608,14 @@ html.sl-full-on,html.sl-full-on body{overflow:hidden!important}
     host.insertAdjacentHTML("beforeend", `<span class="fold pl-fold ${cls || ""}" role="group" aria-label="${T("Grupos", "Groups")}" data-scope="${scope}"><button type="button" data-pl="close">${FOLD}${T("Esconder todos", "Hide all")}</button><button type="button" data-pl="open">${UNFOLD}${T("Mostrar todos", "Show all")}</button></span>`);
   };
 
-  /* ---------- Dashboard · Carga por persona ---------- */
-  function rebalance(lg) {
-    const cols = [...lg.querySelectorAll(":scope > .lgc")]; if (cols.length < 2) return;
-    const grupos = [...lg.querySelectorAll(".lg")]; grupos.forEach(g => cols[0].appendChild(g));
-    const H = grupos.map(g => g.offsetHeight + 14), tot = new Array(cols.length).fill(0), asig = [];
-    grupos.map((g, i) => i).sort((a, b) => H[b] - H[a]).forEach(i => { const c = tot.indexOf(Math.min(...tot)); asig[i] = c; tot[c] += H[i]; });
-    /* mantiene el orden original dentro de cada columna */
-    grupos.forEach((g, i) => cols[asig[i]].appendChild(g));
-  }
+  /* ---------- Dashboard · Carga por persona: la caja completa se pliega (los grupos por cargo se ven como antes) ---------- */
   function dash() {
     const lg = document.querySelector("#dash-wrap .load-groups"); if (!lg) return false;
-    const st = cerr(); let cambio = false;
-    lg.querySelectorAll(".lg").forEach(g => {
-      const t = g.querySelector(".lg-t"); if (!t) return; const name = txt(t.firstChild) || txt(t).replace(/\d+$/, "").trim(), k = "dash:" + name, c = st.has(k);
-      if (g.classList.contains("pl-closed") !== c) { g.classList.toggle("pl-closed", c); cambio = true; }
-      chev(t, k, c, name);
-    });
-    const panel = lg.closest(".home-panel"), ht = panel && panel.querySelector(".hp-title"); foldCtl(ht, "dash", "pl-hp");
-    return cambio;
+    const panel = lg.closest(".home-panel"), ht = panel && panel.querySelector(".hp-title"); if (!ht) return false;
+    const k = "dashbox:carga", c = cerr().has(k);
+    panel.classList.add("pl-box"); if (panel.classList.contains("pl-closed") !== c) panel.classList.toggle("pl-closed", c);
+    chev(ht, k, c, T("Carga por persona", "Load by person"));
+    return false;
   }
 
   /* ---------- Tráfico: secciones (Equipo, Audio…), grupos por cargo y la vista en tabla ---------- */
@@ -25632,24 +25651,30 @@ html.sl-full-on,html.sl-full-on body{overflow:hidden!important}
       const isCard = el.classList.contains("card") && !!el.querySelector(".ch-top");
       const hid = secC || (isCard && grpC); if (el.classList.contains("pl-hid") !== hid) el.classList.toggle("pl-hid", hid);
     });
-    /* tabla: las filas de grupo pliegan sus personas */
+    /* tabla: las filas de grupo llevan la misma barra (avatares, cuántos y cómo están) y pliegan sus personas */
     const tb = $("trf-table");
-    if (tb) { let c = false; tb.querySelectorAll("tbody tr").forEach(tr => {
-      if (tr.classList.contains("pv-g")) { const b = tr.querySelector("b"), name = txt(b), k = "trfgrp:" + name; c = st.has(k); tr.classList.add("pl-h"); tr.classList.toggle("pl-closed", c); const td = tr.querySelector("td"); if (td) chev(td, k, c, name); return; }
+    if (tb) { const trs = [...tb.querySelectorAll("tbody tr")];
+      trs.forEach((tr, i) => { if (!tr.classList.contains("pv-g") || tr.classList.contains("tg2")) return; const td = tr.querySelector("td"); if (!td) return;
+        const ns = []; for (let j = i + 1; j < trs.length && !trs[j].classList.contains("pv-g"); j++) { const n = trs[j].querySelector(".tt-n"); if (n) ns.push(n.dataset.pname || txt(n.querySelector("b"))); }
+        const name = txt(td.querySelector("b")); const h = document.createElement("div"); h.innerHTML = "<b></b>"; h.querySelector("b").textContent = name;
+        barra(h, ns.map(n => { const d = document.createElement("div"); d.innerHTML = '<span class="ch-name"></span>'; d.firstChild.dataset.pname = n; return d; }));
+        tr.classList.add("tg2"); tr.style.setProperty("--gc", h.style.getPropertyValue("--gc")); td.innerHTML = `<div class="tg-row">${h.innerHTML}</div>`; });
+      let c = false; trs.forEach(tr => {
+      if (tr.classList.contains("pv-g")) { const name = txt(tr.querySelector(".gh-n") || tr.querySelector("b")), k = "trfgrp:" + name; c = st.has(k); tr.classList.add("pl-h"); tr.classList.toggle("pl-closed", c); const row = tr.querySelector(".tg-row") || tr.querySelector("td"); if (row) chev(row, k, c, name); return; }
       if (tr.classList.contains("pl-hid") !== c) tr.classList.toggle("pl-hid", c); }); }
     const bar = $("trf-sort"); if (bar && any) foldCtl(bar, "trf", "pl-trf");
     return true;
   }
-  const run = () => { try { if (dash()) { const lg = document.querySelector("#dash-wrap .load-groups"); if (lg) rebalance(lg); } } catch (e) { console.error(e); } try { traffic(); } catch (e) { console.error(e); } };   /* solo se reacomoda si algo cambió */
+  const run = () => { try { dash(); } catch (e) { console.error(e); } try { traffic(); } catch (e) { console.error(e); } };
 
   document.addEventListener("click", e => {
-    const b = e.target.closest && e.target.closest(".pl-ch, .pl-fold [data-pl], #main-grid > .section-label.pl-h, #main-grid > .trf-grp.pl-h, #trf-table tr.pv-g.pl-h, #dash-wrap .lg-t");
+    const b = e.target.closest && e.target.closest(".pl-ch, .pl-fold [data-pl], #main-grid > .section-label.pl-h, #main-grid > .trf-grp.pl-h, #trf-table tr.pv-g.pl-h, #dash-wrap .pl-box > .hp-title");
     if (!b) return; if (!b.dataset.pl && !b.classList.contains("pl-ch") && e.target.closest("button, a, input, select, label, [onclick]")) return;
     e.preventDefault(); e.stopPropagation();
     const st = cerr();
     if (b.dataset.pl) {
-      const scope = b.closest(".pl-fold").dataset.scope, keys = [...document.querySelectorAll(scope === "dash" ? "#dash-wrap .lg .pl-ch" : "#main-grid .pl-ch, #trf-table .pl-ch")].map(x => x.dataset.k);
-      const grp = keys.filter(k => k.startsWith("trfgrp:")), use = scope === "trf" && grp.length ? grp : keys;
+      const keys = [...document.querySelectorAll("#main-grid .pl-ch, #trf-table .pl-ch")].map(x => x.dataset.k);
+      const grp = keys.filter(k => k.startsWith("trfgrp:")), use = grp.length ? grp : keys;
       use.forEach(k => b.dataset.pl === "close" ? st.add(k) : st.delete(k));
     } else { const ch = b.classList.contains("pl-ch") ? b : b.querySelector(".pl-ch"); if (!ch) return; const k = ch.dataset.k; if (st.has(k)) st.delete(k); else st.add(k); }
     guardar(st); run(); try { if (document.getElementById("main-grid") && window.pxpTraficoMosaico) pxpTraficoMosaico(); } catch (er) { }

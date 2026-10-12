@@ -344,3 +344,4 @@ Versión: **v218** · 12 oct 2026 · Resumen general en `HANDOFF-COMPLETO.md` ·
 - `src/vendor-daily.js` (daily-js 0.92.2, BSD-2) se empaqueta como `public/daily.js` y se carga solo al entrar a la Sala.
 - En `src/capas/sala.js` (bloque DL): al confirmar la entrada se conecta la llamada; micrófono, cámara y pantalla usan las mismas pistas locales; el audio de los demás suena, su cámara va en la cara del avatar y su pantalla en el TV (con TV en grande y pantalla completa). Al salir se cuelga. La presencia y el chat siguen por `/api/sala`.
 - Prueba: `tools/daily-e2e.mjs` (función con Daily simulado + dos personas con un Daily falso), 17 revisiones.
+- Ajustes v218: en Dashboard se pliega la caja completa de «Carga por persona» (sin plegables por cargo); en Tráfico «Por cargo» Audio entra al mismo mosaico y la sección ya no dice «cabezas: …» (texto fijo heredado); en la tabla, cada grupo trae la barra con avatares y resumen.

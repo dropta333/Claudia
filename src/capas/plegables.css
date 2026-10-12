@@ -39,3 +39,26 @@
 #main-grid > .trf-grp.tg2 .gh-m em.ok{color:var(--green)}
 #main-grid > .trf-grp.tg2 .pl-ch{order:4;margin-left:auto}
 #main-grid > .trf-grp.tg2.pl-closed{opacity:1}
+/* v218 · Dashboard: la caja de Carga por persona completa se pliega */
+#dash-wrap .pl-box > .hp-title{cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#dash-wrap .pl-box > .hp-title > .pl-ch{margin-left:auto}
+#dash-wrap .pl-box.pl-closed > :not(.hp-title){display:none!important}
+#dash-wrap .pl-box.pl-closed > .hp-title{margin-bottom:0;border-bottom:0;padding-bottom:0}
+#dash-wrap .pl-box.pl-closed{padding-bottom:16px}
+/* Tráfico: Audio entra al mosaico por cargo (sin sección aparte) */
+#main-grid > .section-label.trf-vacia{display:none!important}
+/* Tráfico en tabla: filas de grupo con la misma barra que las fichas */
+#trf-table tr.pv-g.tg2 td{padding:8px 10px!important;border-left:4px solid var(--gc);background:linear-gradient(100deg,color-mix(in srgb,var(--gc) 14%,var(--surface)),var(--surface) 60%)!important}
+#trf-table .tg-row{display:flex;align-items:center;gap:12px;min-width:0}
+#trf-table .tg-row .gh-av{order:0;display:flex;flex:none}
+#trf-table .tg-row .gh-av > *{margin-left:-7px;box-shadow:0 0 0 2px var(--surface)}
+#trf-table .tg-row .gh-av > *:first-child{margin-left:0}
+#trf-table .tg-row .gh-n{order:1;font:600 15px/1.1 var(--display);letter-spacing:.06em;text-transform:uppercase;color:var(--text);white-space:nowrap}
+#trf-table .tg-row .tg-c{order:2;font:700 13px/1 var(--display);padding:3px 8px;border-radius:99px;background:var(--surface2);color:var(--muted)}
+#trf-table .tg-row .gh-m{order:3;font:400 13px/1.3 var(--sans);color:var(--muted);flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#trf-table .tg-row .gh-m em{font-style:normal;font-weight:600}
+#trf-table .tg-row .gh-m em.sc{color:var(--red)}
+#trf-table .tg-row .gh-m em.al{color:var(--yellow)}
+#trf-table .tg-row .gh-m em.ok{color:var(--green)}
+#trf-table .tg-row .pl-ch{order:4;float:none;margin:0 0 0 auto}
+#dash-wrap .pl-box.pl-closed > .hp-title > .pl-ch::before{transform:rotate(45deg) translate(-2px,-2px)}
