@@ -345,3 +345,13 @@ html.sl-full-on,html.sl-full-on body{overflow:hidden!important}
 .sl-full.sl-rot .sl-b{padding:9px}
 
 .sl-full .sl-b.sl-vwb{margin-left:0}
+/* v218 · llamada conectada y TV en grande con pantalla completa */
+.sl-note.on{color:var(--green)}
+.sl-note.on::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:7px;vertical-align:1px;box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 25%,transparent)}
+.sl-big-a{position:absolute;right:16px;bottom:16px;display:flex;gap:8px;z-index:3}
+.sl-big-a button{all:unset;cursor:pointer;padding:9px 14px;border-radius:9px;font:600 13.5px/1 var(--sans)}
+.sl-big-a .sl-big-o{position:static;background:#F3FF57;color:#111}
+.sl-big-a .sl-big-f{background:rgba(20,18,30,.75);color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
+.sl-big-a button:focus-visible{outline:2px solid #F3FF57;outline-offset:2px}
+.sl-big-b:fullscreen{width:100vw!important;height:100vh!important;max-width:none!important;border-radius:0!important;background:#000}
+.sl-big-b:fullscreen .sl-big-c video{object-fit:contain}

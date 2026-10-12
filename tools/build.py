@@ -37,6 +37,8 @@ D = R / "dist"; D.mkdir(exist_ok=True)
 def zipit(path, full):
     with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
         z.writestr("public/index.html", net); z.writestr("public/pdf.js", pdfjs)
+        dj = R / "src/vendor-daily.js"   # v218 · librería de llamadas de Daily (0.92.2, licencia BSD-2), se carga solo al entrar a la Sala
+        if dj.exists(): z.write(dj, "public/daily.js")
         ext = R / "tools/extractor/extractor.html"
         if ext.exists(): z.write(ext, "public/extractor.html")   # v185 · extractor de datos (botón de favoritos)
         if full:

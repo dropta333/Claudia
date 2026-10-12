@@ -291,12 +291,12 @@
         else { const t = e.path.length ? e.path[e.path.length - 1] : [e.x, e.y]; if (e.seat >= 0 || Math.hypot(t[0] - p.x, t[1] - p.y) > 2) walkTo(e, p.x, p.y); }
         says.filter(m => m.ts > (NET.seen[p.id] || 0)).forEach(m => { say(e, m.text, m.ts); }); NET.seen[p.id] = Math.max(NET.seen[p.id] || 0, last);
       }
-      e.mic = !!p.mic; e.camR = !!p.cam;
+      if (!DL.call) { e.mic = !!p.mic; } e.camR = !!p.cam;
       if (p.proj && p.proj.ts > NET.projTs) { NET.projTs = p.proj.ts; NET.projId = p.id; setProj(p.proj.k, p.name, true); }
       else if (!p.proj && NET.projId === p.id && S.proj) { NET.projId = ""; setProj(null, "", true); }
     });
     [...S.ents.values()].filter(e => e.net && !ids.has(e.id)).forEach(e => { if (NET.projId === e.id && S.proj) { NET.projId = ""; setProj(null, "", true); } rmEnt(e.id); });
-    people_();
+    if (DL.call) dailySync(); else people_();
   }
   function onMsg(m) {
     if (!m || m.from === S.myId) return;
@@ -342,30 +342,33 @@
   let actx = null, anal = null, buf = null;
   async function toggleMic() {
     const e = myEnt(); if (!e) return;
-    if (S.media.mic) { S.media.mic.getTracks().forEach(t => t.stop()); S.media.mic = null; e.mic = false; e.speaking = 0; anal = null; }
+    if (S.media.mic) { dlMic(false); S.media.mic.getTracks().forEach(t => t.stop()); S.media.mic = null; e.mic = false; e.speaking = 0; anal = null; }
     else { try { S.media.mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); e.mic = true;
         try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); const src = actx.createMediaStreamSource(S.media.mic); anal = actx.createAnalyser(); anal.fftSize = 512; buf = new Uint8Array(anal.fftSize); src.connect(anal); } catch (er) { anal = null; }
       } catch (er) { mErr(er, L("el micrófono", "the microphone")); return; } }
     if (PROVIDER.impl && PROVIDER.impl.setMic) try { PROVIDER.impl.setMic(e.mic, S.media.mic); } catch (er) { }
+    if (e.mic) dlMic(true);
     send({ t: "st", mic: e.mic }); bar(); people_();
   }
   async function toggleCam() {
     const e = myEnt(); if (!e) return;
-    if (S.media.cam) { S.media.cam.getTracks().forEach(t => t.stop()); S.media.cam = null; e.cam = false; const c = e.el.querySelector(".sl-cam"); c.innerHTML = ""; }
+    if (S.media.cam) { dlCam(false); S.media.cam.getTracks().forEach(t => t.stop()); S.media.cam = null; e.cam = false; const c = e.el.querySelector(".sl-cam"); c.innerHTML = ""; }
     else { try { S.media.cam = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 320 }, height: { ideal: 320 }, facingMode: "user" } }); e.cam = true;
         const v = document.createElement("video"); v.muted = true; v.autoplay = true; v.playsInline = true; v.srcObject = S.media.cam; const c = e.el.querySelector(".sl-cam"); c.innerHTML = ""; c.appendChild(v); v.play().catch(() => { });
       } catch (er) { mErr(er, L("la cámara", "the camera")); return; } }
     if (PROVIDER.impl && PROVIDER.impl.setCam) try { PROVIDER.impl.setCam(e.cam, S.media.cam); } catch (er) { }
+    if (e.cam) dlCam(true);
     bar(); people_();
   }
-  function stopScreen() { if (S.media.screen) S.media.screen.getTracks().forEach(t => t.stop()); S.media.screen = null; const tv = $("sl-tv"); if (tv) tv.innerHTML = ""; if (PROVIDER.impl && PROVIDER.impl.setScreen) try { PROVIDER.impl.setScreen(false, null); } catch (er) { } paintTV(); bar(); }
+  function stopScreen() { if (S.media.screen) { dlScreen(false); S.media.screen.getTracks().forEach(t => t.stop()); } S.media.screen = null; const tv = $("sl-tv"); if (tv) tv.innerHTML = ""; if (PROVIDER.impl && PROVIDER.impl.setScreen) try { PROVIDER.impl.setScreen(false, null); } catch (er) { } paintTV(); bar(); }
   async function toggleScreen() {
     if (S.media.screen) { stopScreen(); return; }
     if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) { note(L("Este navegador no permite compartir pantalla.", "This browser can't share the screen.")); return; }
     try { S.media.screen = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false }); } catch (er) { if (er && er.name !== "NotAllowedError") mErr(er, L("la pantalla", "the screen")); return; }
     S.media.screen.getVideoTracks()[0].onended = stopScreen; S.proj = null; const tv = $("sl-tv"); if (tv) tv.innerHTML = "";
     if (PROVIDER.impl && PROVIDER.impl.setScreen) try { PROVIDER.impl.setScreen(true, S.media.screen); } catch (er) { }
-    paintTV(); bar(); note(L("Tu pantalla se ve en el TV. Por ahora solo en tu equipo.", "Your screen is on the TV. Only on your device for now."));
+    if (S.proj && S.projBy === me()) setProj(null, me());
+    dlScreen(true); paintTV(); bar(); note(DL.st === "on" ? L("Todos en la sala ven tu pantalla en el TV.", "Everyone in the room sees your screen on the TV.") : L("Tu pantalla se ve en el TV. Por ahora solo en tu equipo.", "Your screen is on the TV. Only on your device for now."));
   }
 
 
@@ -589,7 +592,8 @@
   }
   function paintTV() {
     const tv = $("sl-tv"); if (!tv) return;
-    if (S.media.screen) { if (!tv.querySelector("video")) { tv.innerHTML = ""; const v = document.createElement("video"); v.muted = true; v.autoplay = true; v.playsInline = true; v.srcObject = S.media.screen; tv.appendChild(v); v.play().catch(() => { }); } tv.dataset.mode = "screen"; return; }
+    const scr = pantalla();
+    if (scr) { const v0 = tv.querySelector("video"); if (!v0 || v0.srcObject !== scr) { tv.innerHTML = ""; const v = document.createElement("video"); v.muted = true; v.autoplay = true; v.playsInline = true; v.srcObject = scr; tv.appendChild(v); v.play().catch(() => { }); } tv.dataset.mode = "screen"; return; }
     if (S.proj) { const R = parseRef(S.proj); if (tv.dataset.k !== R.base || tv.dataset.mode !== "proj") { scopeCss(); tv.innerHTML = frameHTML(S.proj); tv.dataset.k = R.base; } tv.dataset.mode = "proj"; fit(tv); const f = tv.querySelector(".sl-frame"); if (f) f.scrollTo({ top: R.y, behavior: "smooth" }); return; }
     tv.dataset.k = "";
     const n = S.ents.size; tv.dataset.mode = "idle";
@@ -638,17 +642,21 @@
     draw(); if (sel) pick(sel); setTimeout(() => q.focus(), 40);
   }
   function tvBig() {
-    if (!S.proj && !S.media.screen) return;
+    if (!S.proj && !pantalla()) return;
     const { t, id } = parseRef(S.proj || "");
     const ov = document.createElement("div"); ov.className = "sl-big"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", L("TV en grande", "TV enlarged"));
-    ov.innerHTML = `<div class="sl-big-b"><button type="button" class="sl-big-x" aria-label="${L("Cerrar", "Close")}">✕</button><div class="sl-big-c"></div>${S.proj && WIN[t] ? `<button type="button" class="sl-big-o">${L("Abrir en la plataforma", "Open in the platform")}</button>` : ""}</div>`;
+    ov.innerHTML = `<div class="sl-big-b"><button type="button" class="sl-big-x" aria-label="${L("Cerrar", "Close")}">✕</button><div class="sl-big-c"></div><div class="sl-big-a"><button type="button" class="sl-big-f">${L("Pantalla completa", "Full screen")}</button>${S.proj && WIN[t] && !pantalla() ? `<button type="button" class="sl-big-o">${L("Abrir en la plataforma", "Open in the platform")}</button>` : ""}</div></div>`;
     document.body.appendChild(ov); const c = ov.querySelector(".sl-big-c");
     const close = () => { ov.remove(); document.removeEventListener("keydown", k); }; const k = ev => { if (ev.key === "Escape") close(); };
-    if (S.media.screen) { const v = document.createElement("video"); v.muted = true; v.autoplay = true; v.playsInline = true; v.srcObject = S.media.screen; c.appendChild(v); v.play().catch(() => { }); }
+    if (pantalla()) { const v = document.createElement("video"); v.muted = true; v.autoplay = true; v.playsInline = true; v.srcObject = pantalla(); c.appendChild(v); v.play().catch(() => { }); }
     else { scopeCss(); const R = parseRef(S.proj); c.innerHTML = frameHTML(S.proj, true); blockClicks(c); requestAnimationFrame(() => { fit(c, R.y); const f = c.querySelector(".sl-frame"); let tm = 0;
         if (f && S.projBy === me()) f.addEventListener("scroll", () => { clearTimeout(tm); tm = setTimeout(() => { if (!S.proj) return; const y = Math.round(f.scrollTop); setProj(parseRef(S.proj).base + (y > 0 ? "#y=" + y : ""), me()); }, 220); }); }); }
     document.addEventListener("keydown", k); ov.querySelector(".sl-big-x").onclick = close; ov.onclick = ev => { if (ev.target === ov) close(); };
     const o = ov.querySelector(".sl-big-o"); if (o) o.onclick = () => { close(); try { WIN[t].open(id); } catch (e) { } };
+    const fb = ov.querySelector(".sl-big-f"), bx = ov.querySelector(".sl-big-b");
+    fb.onclick = () => { try { if (document.fullscreenElement) document.exitFullscreen(); else (bx.requestFullscreen || bx.webkitRequestFullscreen).call(bx); } catch (e) { } };
+    const fsc = () => { fb.textContent = document.fullscreenElement ? L("Salir de pantalla completa", "Exit full screen") : L("Pantalla completa", "Full screen"); if (!ov.isConnected) document.removeEventListener("fullscreenchange", fsc); };
+    document.addEventListener("fullscreenchange", fsc);
   }
   function personCard(e, cx, cy) {
     document.querySelectorAll(".sl-card").forEach(x => x.remove());
@@ -721,6 +729,87 @@
     bar(); renderLog();
   }
   const salaVisible = () => { const v = $("view-sala"); return !!(v && v.classList.contains("active")); };
+  /* ---------- v218 · llamadas reales con Daily: voz, cámara y pantalla para todos los que están en la sala ----------
+     La presencia (dónde está cada quien, el chat, lo proyectado) sigue por /api/sala; Daily solo lleva audio y video.
+     El permiso de entrada lo da /api/daily (la clave de Daily vive en Netlify, nunca aquí). Sin configurar, todo sigue local. */
+  const DL = { st: "off", call: null, enabled: null, aud: new Map(), rScr: null, err: "" };
+  async function dailyCheck() {
+    if (DL.enabled != null) return DL.enabled;
+    if (!/^https?:/.test(location.protocol)) return (DL.enabled = false);
+    try { const r = await fetch("/api/daily", { cache: "no-store" }); const j = r.ok ? await r.json() : {}; DL.enabled = !!j.enabled; } catch (e) { DL.enabled = false; }
+    callNote(); return DL.enabled;
+  }
+  const loadDaily = () => window.Daily ? Promise.resolve(window.Daily) : new Promise((ok, ko) => { const s = document.createElement("script"); s.src = "daily.js"; s.async = true; s.onload = () => window.Daily ? ok(window.Daily) : ko(new Error("lib")); s.onerror = () => ko(new Error("lib")); document.head.appendChild(s); });
+  function callNote() {
+    const n = document.querySelector(".sl-note"); if (!n) return;
+    n.textContent = DL.enabled
+      ? (DL.st === "on" ? L("Llamada conectada: tu micrófono, tu cámara y tu pantalla los ven y escuchan todos los que están en la sala.", "Call connected: everyone in the room sees and hears your mic, camera and screen.")
+        : DL.st === "joining" ? L("Conectando la llamada…", "Connecting the call…")
+        : DL.st === "err" ? L("No se pudo conectar la llamada. ", "Couldn't connect the call. ") + (DL.err || "")
+        : L("Al entrar a la sala se conecta la llamada: micrófono, cámara y pantalla para todos.", "Entering the room connects the call: mic, camera and screen for everyone."))
+      : L("Voz, video y pantalla compartida llegan cuando se configure el servicio de llamadas. Por ahora tu cámara, tu micrófono y tu pantalla solo se ven en tu equipo.", "Voice, video and screen sharing arrive once the calling service is set up. For now your camera, mic and screen are only visible on your device.");
+    n.classList.toggle("on", DL.st === "on");
+  }
+  async function dailyJoin() {
+    if (!S.inside || DL.call || DL.st === "joining") return;
+    if (!(await dailyCheck()) || !S.inside) return;
+    DL.st = "joining"; DL.err = ""; callNote();
+    try {
+      const r = await fetch("/api/daily", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ id: S.myId, name: me() }) });
+      const j = await r.json().catch(() => ({})); if (!r.ok || !j.token) throw new Error(j.error || L("Sin permiso de entrada.", "No entry token."));
+      const D = await loadDaily(); if (!S.inside) { DL.st = "off"; callNote(); return; }
+      const call = D.createCallObject({ subscribeToTracksAutomatically: true, audioSource: false, videoSource: false });
+      DL.call = call;
+      ["participant-joined", "participant-updated", "participant-left", "track-started", "track-stopped"].forEach(ev => call.on(ev, dailySync));
+      call.on("active-speaker-change", ev => { const sid = ev && ev.activeSpeaker && ev.activeSpeaker.peerId, ps = call.participants();
+        Object.values(ps).forEach(p => { if (p.local) return; const e = S.ents.get(p.user_id); if (e) e.speaking = p.session_id === sid && p.audio ? 1 : 0; }); clearTimeout(DL.spkT); DL.spkT = setTimeout(() => S.ents.forEach(e => { if (e.id !== S.myId) e.speaking = 0; }), 2500); });
+      call.on("error", ev => { DL.err = (ev && ev.errorMsg) || ""; dailyLeave(true); DL.st = "err"; callNote(); });
+      call.on("left-meeting", () => { if (DL.call === call) dailyLeave(true); });
+      await call.join({ url: j.url, token: j.token, userName: me(), startVideoOff: true, startAudioOff: true });
+      if (!S.inside) { dailyLeave(); return; }
+      DL.st = "on"; callNote();
+      if (S.media.mic) dlMic(true); if (S.media.cam) dlCam(true); if (S.media.screen) dlScreen(true);
+      dailySync();
+    } catch (e) { DL.err = (e && e.message) || ""; if (DL.call) { try { DL.call.destroy(); } catch (er) { } } DL.call = null; DL.st = "err"; callNote(); note(L("No pude conectar la llamada. ", "Couldn't connect the call. ") + DL.err); }
+  }
+  function dailyLeave(soft) {
+    const c = DL.call; DL.call = null; DL.st = "off";
+    if (c && !soft) { try { c.leave().finally(() => { try { c.destroy(); } catch (e) { } }); } catch (e) { } } else if (c) { try { c.destroy(); } catch (e) { } }
+    DL.aud.forEach(x => { try { x.srcObject = null; x.remove(); } catch (e) { } }); DL.aud.clear();
+    S.ents.forEach(e => { if (e.id === S.myId) return; if (e.dlV) { e.dlV = null; e.cam = false; const v = e.el.querySelector(".sl-cam"); if (v) v.innerHTML = ""; } e.speaking = 0; });
+    if (DL.rScr) { DL.rScr = null; paintTV(); } callNote(); people_();
+  }
+  const track = (p, k) => p && p.tracks && p.tracks[k] && p.tracks[k].state === "playable" ? p.tracks[k].persistentTrack : null;
+  function dailySync() {
+    const c = DL.call; if (!c) return; let ps = {}; try { ps = c.participants(); } catch (e) { return; }
+    const vivos = new Set(); let scr = null;
+    Object.values(ps).forEach(p => {
+      if (p.local) return; vivos.add(p.session_id);
+      const a = track(p, "audio");
+      let el = DL.aud.get(p.session_id);
+      if (a) { if (!el) { el = document.createElement("audio"); el.autoplay = true; el.playsInline = true; el.dataset.dl = p.session_id; el.style.display = "none"; document.body.appendChild(el); DL.aud.set(p.session_id, el); }
+        if (!el.srcObject || el.srcObject.getAudioTracks()[0] !== a) { el.srcObject = new MediaStream([a]); el.play().catch(() => { }); } }
+      else if (el) { el.srcObject = null; el.remove(); DL.aud.delete(p.session_id); }
+      const e = S.ents.get(p.user_id);
+      if (e) {
+        const v = track(p, "video");
+        if (v && e.dlV !== v) { e.dlV = v; e.cam = true; const box = e.el.querySelector(".sl-cam"); const ve = document.createElement("video"); ve.muted = true; ve.autoplay = true; ve.playsInline = true; ve.srcObject = new MediaStream([v]); box.innerHTML = ""; box.appendChild(ve); ve.play().catch(() => { }); }
+        else if (!v && e.dlV) { e.dlV = null; e.cam = false; const box = e.el.querySelector(".sl-cam"); if (box) box.innerHTML = ""; }
+        e.mic = !!p.audio;
+      }
+      const sv = track(p, "screenVideo"); if (sv && !scr) scr = { t: sv, by: p.user_name || "", sid: p.session_id };
+    });
+    DL.aud.forEach((el, sid) => { if (!vivos.has(sid)) { el.srcObject = null; el.remove(); DL.aud.delete(sid); } });
+    const prev = DL.rScr;
+    if (scr && (!prev || prev.t !== scr.t)) { DL.rScr = { t: scr.t, stream: new MediaStream([scr.t]), by: scr.by }; if (S.proj) { S.proj = null; S.projBy = ""; } const tv = $("sl-tv"); if (tv) tv.innerHTML = ""; paintTV(); const s = $("sl-projs"); if (s) s.textContent = `${tit(String(scr.by).split(" ")[0])} ${L("comparte su pantalla", "is sharing their screen")}`; }
+    else if (!scr && prev) { DL.rScr = null; const tv = $("sl-tv"); if (tv) tv.innerHTML = ""; paintTV(); const s = $("sl-projs"); if (s && !S.proj) s.textContent = ""; }
+    people_();
+  }
+  async function dlMic(on) { const c = DL.call; if (!c || DL.st !== "on") return; try { if (on && S.media.mic) { await c.setInputDevicesAsync({ audioSource: S.media.mic.getAudioTracks()[0] }); c.setLocalAudio(true); } else c.setLocalAudio(false); } catch (e) { console.warn(e); } }
+  async function dlCam(on) { const c = DL.call; if (!c || DL.st !== "on") return; try { if (on && S.media.cam) { await c.setInputDevicesAsync({ videoSource: S.media.cam.getVideoTracks()[0] }); c.setLocalVideo(true); } else c.setLocalVideo(false); } catch (e) { console.warn(e); } }
+  async function dlScreen(on) { const c = DL.call; if (!c || DL.st !== "on") return; try { if (on && S.media.screen) c.startScreenShare({ mediaStream: S.media.screen }); else c.stopScreenShare(); } catch (e) { console.warn(e); } }
+  const pantalla = () => S.media.screen || (DL.rScr && DL.rScr.stream) || null;
+
   /* ---------- entrar y salir: siempre con confirmación ---------- */
   function lobby(show) {
     const st = $("sl-stage"); if (!st) return; let lb = $("sl-lobby");
@@ -740,7 +829,7 @@
     const e = mkEnt({ name: me() }); e.x = DOOR.x; e.y = DOOR.y; walkTo(e, DOOR.x + 18, 180);
     if (NET.on) { NET.dirty = true; clearTimeout(NET.t); if (!NET.busy) netTick(); else NET.q = setTimeout(netTick, 400); }
     else if (tr) tr.postMessage({ t: "hi", from: S.myId, name: me(), x: DOOR.x, y: DOOR.y, seat: -1, mic: false });
-    lobby(); people_(); bar(); pill(); paintTV(); avHint();
+    lobby(); people_(); bar(); pill(); paintTV(); avHint(); dailyJoin();
     const st = $("sl-stage"); if (st) st.focus({ preventScroll: true });
   }
   function leave() {
@@ -749,6 +838,7 @@
     if (S.proj && S.projBy === me()) setProj(null, me());
     send({ t: "bye" }); NET.out = []; NET.proj = undefined;
     if (PROVIDER.impl && PROVIDER.impl.leave) try { PROVIDER.impl.leave(); } catch (er) { }
+    dailyLeave();
     if (e) rmEnt(S.myId); S.inside = false; S.unread = 0; S.keys.clear();
     document.querySelectorAll(".sl-card").forEach(x => x.remove());
     people_(); bar(); pill(); if (salaVisible()) lobby(true);
@@ -836,9 +926,9 @@
     openTransport();
     if (S.inside) { S.unread = 0; const e = myEnt(), p = find(me()); if (e && p) { e.cfg = cfgFor(p); e.g = grp(p); } if (NET.on && !NET.busy) netTick(); }
     else if (NET.on && !NET.busy) netTick();
-    lobby(); people_(); bar(); pill(); paintTV(); run(); avHint();
+    lobby(); people_(); bar(); pill(); paintTV(); run(); avHint(); dailyCheck().then(callNote);
   }
-  addEventListener("pagehide", () => { if (S.inside) send({ t: "bye" }); });
+  addEventListener("pagehide", () => { if (S.inside) send({ t: "bye" }); if (DL.call) dailyLeave(); });
 
   /* proveedor del servicio de llamadas: se conecta con estos mismos mensajes */
   window.PXP_SALA = {
@@ -849,6 +939,7 @@
     state: () => ({ me: S.myId, people: [...S.ents.values()].map(e => ({ id: e.id, name: e.name, x: Math.round(e.x), y: Math.round(e.y), seat: e.seat, mic: e.mic, cam: e.cam })), proj: S.proj, log: S.log.slice() }),
     say: t => { const e = myEnt(); if (e) { say(e, t); send({ t: "say", text: t }); } },
     seats: SEATS.length,
+    llamada: () => ({ enabled: DL.enabled, state: DL.st, remotos: DL.call ? Object.values(DL.call.participants()).filter(p => !p.local).length : 0, pantalla: !!DL.rScr }),
     inside: () => S.inside, full: on => (on === false ? exitFull() : goFull()), join: () => { if (!S.inside) join(); }, leave: () => leave(),
   };
 

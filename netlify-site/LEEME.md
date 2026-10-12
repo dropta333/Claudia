@@ -185,3 +185,12 @@ Ya muestra a las personas que de verdad están en la Sala, sin servidor adiciona
 - Cálculo de uso: cada latido es una llamada a la función. 5 personas una hora al día ≈ 7.000 llamadas al día. Si el plan de Netlify se queda corto, basta con subir el intervalo en `netTick` (sala-js).
 - Cámara, micrófono y pantalla todavía se ven solo en el equipo de cada quien. Cuando TI apruebe el servicio de llamadas, se conecta con `PXP_SALA.setProvider({...})` (ver HANDOFF.md) y reemplaza a `/api/sala`.
 - Los compañeros de demostración solo los puede activar Bastián, y están apagados por defecto.
+
+## Llamadas de la Sala con Daily (v218)
+Micrófono, cámara y pantalla compartida para todos los que entran a la Sala. Se activan solas cuando el sitio tiene estas dos variables
+(Netlify → Site configuration → Environment variables), y luego se vuelve a desplegar:
+- `DAILY_API_KEY` = la clave de API de Daily (dashboard.daily.co → Developers).
+- `DAILY_ROOM_URL` = la dirección de la sala, por ejemplo `https://trafficpostproduction.daily.co/salapxp`.
+La clave queda solo en el servidor: `/api/daily` le da a cada persona un permiso de entrada de 4 horas a nombre suyo.
+Recomendado: en Daily, dejar la sala como **privada** (así nadie entra con solo el enlace). Plan gratis: 10.000 minutos por participante al mes.
+Sin variables, la Sala sigue como antes (cámara, micrófono y pantalla solo en el equipo de cada uno). La librería va en `public/daily.js` y solo se carga al entrar a la Sala.

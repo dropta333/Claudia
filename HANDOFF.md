@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v217** · 12 oct 2026 · Resumen general en `HANDOFF-COMPLETO.md` · Responsable: Bastián Torres
+Versión: **v218** · 12 oct 2026 · Resumen general en `HANDOFF-COMPLETO.md` · Responsable: Bastián Torres
 
 ## v216 · Sala sin compañeros de demostración, luz según la hora con transición suave, "hoy" en hora local y revisión de guardado
 - **Sala:** se eliminaron por completo los compañeros de demostración (código, casilla y textos); solo aparece quien está de verdad. El chip de la hora solo informa (la sala sigue sola la hora real; `PXP_SALA.hora(h)` queda para pruebas).
@@ -338,3 +338,9 @@ Versión: **v217** · 12 oct 2026 · Resumen general en `HANDOFF-COMPLETO.md` ·
 - Asistente: ayudas por rol (Administración: planear, asignar, seguimiento, reportes; creativos: mi día, registrar, organizarme, buscar) y nuevas consultas (resumen del equipo, sobrecarga, vencidas, entregas de la semana, standby, mi semana, mis horas, mis tareas).
 - Frases del avatar: ~90, amables y con humor de post, sin repetirse hasta agotarse; según hora, día y rol.
 - Pruebas: tools/test-v217.mjs (57), tools/sala-e2e.mjs actualizado.
+
+## v218 · Llamadas reales en la Sala con Daily
+- `netlify/functions/daily.mjs` (`/api/daily`): GET dice si está configurado; POST entrega un permiso (meeting token, 4 h) a nombre de la persona. Variables: `DAILY_API_KEY`, `DAILY_ROOM_URL`. La clave nunca va al navegador ni al repositorio.
+- `src/vendor-daily.js` (daily-js 0.92.2, BSD-2) se empaqueta como `public/daily.js` y se carga solo al entrar a la Sala.
+- En `src/capas/sala.js` (bloque DL): al confirmar la entrada se conecta la llamada; micrófono, cámara y pantalla usan las mismas pistas locales; el audio de los demás suena, su cámara va en la cara del avatar y su pantalla en el TV (con TV en grande y pantalla completa). Al salir se cuelga. La presencia y el chat siguen por `/api/sala`.
+- Prueba: `tools/daily-e2e.mjs` (función con Daily simulado + dos personas con un Daily falso), 17 revisiones.
