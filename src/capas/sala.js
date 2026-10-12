@@ -437,12 +437,12 @@
         let ox = 0, oy = 0; const now = performance.now();
         if (e.rxA) { const p = (now - e.rxA.t0) / 1300; if (p >= 1 || reduce()) e.rxA = null; else {
           const k = e.rxA.k; if (k === "jump") oy = -Math.round(Math.abs(Math.sin(p * Math.PI * 2)) * 5); else if (k === "hop") oy = -Math.round(Math.abs(Math.sin(p * Math.PI * 3)) * 2);
-          else if (k === "shake") ox = Math.round(Math.sin(p * 46)) ; else if (k === "nod") oy = (Math.floor(p * 6) % 2); else if (k === "clap") oy = -(Math.floor(p * 8) % 2); } }
+          else if (k === "shake") ox = Math.round(Math.sin(p * 46)) ; else if (k === "nod") oy = (Math.floor(p * 6) % 2); else if (k === "clap") oy = -(Math.floor(p * 8) % 2); else if (k === "dance") { ox = Math.round(Math.sin(p * Math.PI * 6) * 2); oy = -(Math.floor(p * 12) % 2); } } }
         const sx = Math.round((s ? s.x : e.x) - 16 + ox), sy = Math.round(top + oy), t = now / 1000;
         if (window.PXA && PXA.fx && e.cfg && e.cfg.fx && e.cfg.fx !== "ninguno" && !reduce()) PXA.fx(x, e.cfg, sx, sy, t, e.g, "back");
         x.drawImage(spr, sx, sy); e._top = Math.round(top); e._cx = Math.round(s ? s.x : e.x);
-        if (e.hand && !back) { const sk = (PXA.norm ? PXA.norm(e.cfg).skin : "#e2aa80"), ol = (S.pal || {}).ol || "#241f38", hx = sx + 24, hy = sy + 9 + (Math.floor(now / 500) % 2);
-          x.fillStyle = ol; x.fillRect(hx - 1, hy - 1, 5, 5); x.fillRect(hx, hy + 3, 3, 9); x.fillStyle = sk; x.fillRect(hx, hy, 3, 3); x.fillRect(hx + 1, hy + 3, 1, 8); x.fillStyle = "rgba(255,255,255,.35)"; x.fillRect(hx, hy, 1, 1); }
+        if (e.hand && !back) { const sk = (PXA.norm ? PXA.norm(e.cfg).skin : "#e2aa80"), ol = (S.pal || {}).ol || "#241f38", hx = sx + 22, hy = sy + 9 + (Math.floor(now / 500) % 2), al = sy + 23 - (hy + 3);   /* el brazo sale del hombro */
+          x.fillStyle = ol; x.fillRect(hx - 1, hy - 1, 5, 5); x.fillRect(hx, hy + 3, 3, al); x.fillStyle = sk; x.fillRect(hx, hy, 3, 3); x.fillRect(hx + 1, hy + 3, 1, al - 1); x.fillStyle = "rgba(255,255,255,.35)"; x.fillRect(hx, hy, 1, 1); }
         if (window.PXA && PXA.fx && e.cfg && e.cfg.fx && e.cfg.fx !== "ninguno" && !reduce()) PXA.fx(x, e.cfg, sx, sy, t, e.g, "front"); } };
     });
     items.push({ z: TABLE.y + TABLE.h + 2, draw: () => drawTable(x) });
@@ -452,7 +452,7 @@
     drawLight(x);
   }
   /* v219 · reacciones: levantar la mano y emojis que suben sobre el avatar; el avatar también reacciona */
-  const RX = [["👍", "nod", L("De acuerdo", "Agree")], ["👏", "clap", L("Aplausos", "Applause")], ["😂", "shake", L("Jajaja", "Haha")], ["❤️", "hop", L("Me encanta", "Love it")], ["🎉", "jump", L("¡Celebremos!", "Celebrate!")], ["🔥", "jump", L("¡Fuego!", "On fire!")], ["🤯", "shake", L("¡Wow!", "Mind blown!")]];
+  const RX = [["👍", "nod", L("De acuerdo", "Agree")], ["👏", "clap", L("Aplausos", "Applause")], ["😂", "shake", L("Jajaja", "Haha")], ["❤️", "hop", L("Me encanta", "Love it")], ["🎉", "jump", L("¡Celebremos!", "Celebrate!")], ["🔥", "jump", L("¡Fuego!", "On fire!")], ["🤯", "shake", L("¡Wow!", "Mind blown!")], ["💃", "dance", L("¡A bailar!", "Let's dance!")]];
   const RXOK = new Set(RX.map(r => r[0]));
   function reaccion(e, emo, remote) {
     if (!e || !RXOK.has(emo)) return; const def = RX.find(r => r[0] === emo);

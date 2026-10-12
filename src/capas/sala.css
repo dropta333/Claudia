@@ -538,3 +538,16 @@ html.sl-full-on,html.sl-full-on body{overflow:hidden!important}
 .sl-bar{position:relative}
 @media (max-width:520px){.sl-rxe button{width:34px;height:34px;font-size:20px}}
 @media (prefers-reduced-motion:reduce){.sl-rx{animation-duration:1.6s}}
+
+/* v219 · barra de la sala más limpia: grupos (medios · sala · vista · salir), botones parejos con la estética de la plataforma */
+.sl-bar{gap:10px!important;padding:12px!important;border-radius:18px!important}
+.sl-bar .sl-ctl{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.sl-bar .sl-b{height:40px;padding:0 14px;border-radius:12px;background:var(--surface2);border:1px solid var(--border);font:600 12px/1 var(--display);letter-spacing:.08em;text-transform:uppercase;transition:background .15s,border-color .15s,transform .15s,color .15s}
+.sl-bar .sl-b:hover{border-color:color-mix(in srgb,var(--text) 30%,var(--border));transform:translateY(-1px)}
+.sl-bar .sl-b svg{width:16px;height:16px}
+.sl-bar .sl-b.on{background:color-mix(in srgb,#F3FF57 18%,var(--surface2));border-color:color-mix(in srgb,#c9d23f 70%,var(--border));color:var(--text)}
+.sl-bar #sl-mic.on,.sl-bar #sl-camb.on,.sl-bar #sl-scr.on{background:color-mix(in srgb,var(--green) 18%,var(--surface2));border-color:color-mix(in srgb,var(--green) 60%,var(--border))}
+.sl-bar #sl-projb,.sl-bar #sl-vw{margin-left:10px}
+.sl-bar #sl-exit{margin-left:auto}
+.sl-bar .sl-chat{flex:1 1 100%;max-width:none!important;min-height:44px;border-radius:14px}
+@media (max-width:760px){.sl-bar #sl-projb,.sl-bar #sl-vw{margin-left:0}.sl-bar .sl-b{padding:0 11px}.sl-bar #sl-exit{margin-left:0}}

@@ -23276,6 +23276,9 @@ button.pm-pxa{cursor:pointer}
       const M = cat ? ["K.....K.", "KoK..KoK", "KOOOOOOK", "KOEOOEOK", "KOOooOOK", ".KOOOOK.", "..K..K.."] : ["KK....KK", "KoK..KoK", "KOOOOOOK", "KOEOOEOK", "KOOKKOOK", ".KOOOOK.", "..K..K.."];
       const bx = 23, by = 24 + b; M.forEach((r, jj) => { for (let ii = 0; ii < 8; ii++) { const ch = r[ii]; if (ch === ".") continue; px(ch === "K" || ch === "E" ? K : ch === "o" ? F1 : F0, bx + ii - 1, by + jj); } });
       if (cat) { px(F1, bx + 7, by + 3 - wag); px(F1, bx + 8, by + 2 - wag); px(F1, bx + 8, by + 1 - wag); } else { px(F1, bx + 7, by + 4); px(F1, bx + 8, by + 3 + wag); }
+    } else if (c.fx === "nubes") {   /* nubecitas que pasan alrededor */
+      [[1, 0], [19, 1.6], [4, 3.1], [24, 4.4]].forEach(([y0, ph], n) => { const xx = Math.round(((t * 3 + ph * 9) % 40) - 6), yy = [1, 4, 17, 21][n] + Math.round(Math.sin(t + ph));
+        x.globalAlpha = .92; px("#ffffff", xx + 1, yy, 3, 1); px("#ffffff", xx, yy + 1, 6, 1); px("#dfe6f0", xx, yy + 2, 6, 1); px("#ffffff", xx + 3, yy - 1, 2, 1); x.globalAlpha = 1; });
     } else if (c.fx === "confeti") {
       const C = ["#F3FF57", "#ff8fb8", "#7fd0ff", "#b7a8ff", "#8ff0b4", "#ffb36b", col];
       for (let n = 0; n < 11; n++) { const p = ((t * .35 + n * .137) % 1), i = Math.round((n * 7.3) % 30 + Math.sin(t * 2 + n) * 1.5), j = Math.round(-3 + p * 33); if (j > 30) continue;
@@ -23353,9 +23356,9 @@ button.pm-pxa{cursor:pointer}
     acc: { ninguno: "Ninguno", gorra: "Gorra", boina: "Boina", "audífonos": "Audífonos", diadema: "Diadema", lazo: "Lazo", pinzas: "Pinzas", flor: "Flor" },
     ears: { ninguno: "Sin aretes", aretes: "Aretes", argollas: "Argollas" },
     nk: { ninguno: "Ninguna", cadena: "Cadena", gruesa: "Gruesa", perlas: "Perlas", dije: "Con dije" },
-    fx: { ninguno: "Ninguno", brillo: "Brillo", aura: "Aura tornasol", ideas: "Lluvia de ideas", confeti: "Confeti", perro: "Perrito", gato: "Gatito" },
+    fx: { ninguno: "Ninguno", brillo: "Brillo", aura: "Aura tornasol", ideas: "Lluvia de ideas", confeti: "Confeti", perro: "Perrito", gato: "Gatito", nubes: "Nubes" },
   };
-  const NK = ["ninguno", "cadena", "gruesa", "perlas", "dije"], FX = ["ninguno", "brillo", "aura", "ideas", "confeti", "perro", "gato"];
+  const NK = ["ninguno", "cadena", "gruesa", "perlas", "dije"], FX = ["ninguno", "brillo", "aura", "ideas", "confeti", "nubes", "perro", "gato"];
   const GOLD = [["#e8c14a", "#f3d98a", "#c9a45a", "#a9adb6", "#e9e4dc", "#d98a6a", "#2a1a22", "#7fd0ff", "#e8a0b8", "#8ff0b4"]];
   const ICON = {
     cara: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 10h.01M15 10h.01M9.5 15a3.5 3.5 0 0 0 5 0"/></svg>',
@@ -24833,6 +24836,19 @@ html.sl-full-on,html.sl-full-on body{overflow:hidden!important}
 .sl-bar{position:relative}
 @media (max-width:520px){.sl-rxe button{width:34px;height:34px;font-size:20px}}
 @media (prefers-reduced-motion:reduce){.sl-rx{animation-duration:1.6s}}
+
+/* v219 · barra de la sala más limpia: grupos (medios · sala · vista · salir), botones parejos con la estética de la plataforma */
+.sl-bar{gap:10px!important;padding:12px!important;border-radius:18px!important}
+.sl-bar .sl-ctl{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.sl-bar .sl-b{height:40px;padding:0 14px;border-radius:12px;background:var(--surface2);border:1px solid var(--border);font:600 12px/1 var(--display);letter-spacing:.08em;text-transform:uppercase;transition:background .15s,border-color .15s,transform .15s,color .15s}
+.sl-bar .sl-b:hover{border-color:color-mix(in srgb,var(--text) 30%,var(--border));transform:translateY(-1px)}
+.sl-bar .sl-b svg{width:16px;height:16px}
+.sl-bar .sl-b.on{background:color-mix(in srgb,#F3FF57 18%,var(--surface2));border-color:color-mix(in srgb,#c9d23f 70%,var(--border));color:var(--text)}
+.sl-bar #sl-mic.on,.sl-bar #sl-camb.on,.sl-bar #sl-scr.on{background:color-mix(in srgb,var(--green) 18%,var(--surface2));border-color:color-mix(in srgb,var(--green) 60%,var(--border))}
+.sl-bar #sl-projb,.sl-bar #sl-vw{margin-left:10px}
+.sl-bar #sl-exit{margin-left:auto}
+.sl-bar .sl-chat{flex:1 1 100%;max-width:none!important;min-height:44px;border-radius:14px}
+@media (max-width:760px){.sl-bar #sl-projb,.sl-bar #sl-vw{margin-left:0}.sl-bar .sl-b{padding:0 11px}.sl-bar #sl-exit{margin-left:0}}
 /* v217 · Grupos plegables (Dashboard · Carga por persona, Tráfico) con el mismo control que Team */
 .pl-ch{all:unset;cursor:pointer;margin-left:auto;display:grid;place-items:center;width:30px;height:30px;border-radius:9px;flex:none;transition:background .15s}
 .pl-ch:hover{background:var(--surface2)}
@@ -25337,12 +25353,12 @@ html.sl-full-on,html.sl-full-on body{overflow:hidden!important}
         let ox = 0, oy = 0; const now = performance.now();
         if (e.rxA) { const p = (now - e.rxA.t0) / 1300; if (p >= 1 || reduce()) e.rxA = null; else {
           const k = e.rxA.k; if (k === "jump") oy = -Math.round(Math.abs(Math.sin(p * Math.PI * 2)) * 5); else if (k === "hop") oy = -Math.round(Math.abs(Math.sin(p * Math.PI * 3)) * 2);
-          else if (k === "shake") ox = Math.round(Math.sin(p * 46)) ; else if (k === "nod") oy = (Math.floor(p * 6) % 2); else if (k === "clap") oy = -(Math.floor(p * 8) % 2); } }
+          else if (k === "shake") ox = Math.round(Math.sin(p * 46)) ; else if (k === "nod") oy = (Math.floor(p * 6) % 2); else if (k === "clap") oy = -(Math.floor(p * 8) % 2); else if (k === "dance") { ox = Math.round(Math.sin(p * Math.PI * 6) * 2); oy = -(Math.floor(p * 12) % 2); } } }
         const sx = Math.round((s ? s.x : e.x) - 16 + ox), sy = Math.round(top + oy), t = now / 1000;
         if (window.PXA && PXA.fx && e.cfg && e.cfg.fx && e.cfg.fx !== "ninguno" && !reduce()) PXA.fx(x, e.cfg, sx, sy, t, e.g, "back");
         x.drawImage(spr, sx, sy); e._top = Math.round(top); e._cx = Math.round(s ? s.x : e.x);
-        if (e.hand && !back) { const sk = (PXA.norm ? PXA.norm(e.cfg).skin : "#e2aa80"), ol = (S.pal || {}).ol || "#241f38", hx = sx + 24, hy = sy + 9 + (Math.floor(now / 500) % 2);
-          x.fillStyle = ol; x.fillRect(hx - 1, hy - 1, 5, 5); x.fillRect(hx, hy + 3, 3, 9); x.fillStyle = sk; x.fillRect(hx, hy, 3, 3); x.fillRect(hx + 1, hy + 3, 1, 8); x.fillStyle = "rgba(255,255,255,.35)"; x.fillRect(hx, hy, 1, 1); }
+        if (e.hand && !back) { const sk = (PXA.norm ? PXA.norm(e.cfg).skin : "#e2aa80"), ol = (S.pal || {}).ol || "#241f38", hx = sx + 22, hy = sy + 9 + (Math.floor(now / 500) % 2), al = sy + 23 - (hy + 3);   /* el brazo sale del hombro */
+          x.fillStyle = ol; x.fillRect(hx - 1, hy - 1, 5, 5); x.fillRect(hx, hy + 3, 3, al); x.fillStyle = sk; x.fillRect(hx, hy, 3, 3); x.fillRect(hx + 1, hy + 3, 1, al - 1); x.fillStyle = "rgba(255,255,255,.35)"; x.fillRect(hx, hy, 1, 1); }
         if (window.PXA && PXA.fx && e.cfg && e.cfg.fx && e.cfg.fx !== "ninguno" && !reduce()) PXA.fx(x, e.cfg, sx, sy, t, e.g, "front"); } };
     });
     items.push({ z: TABLE.y + TABLE.h + 2, draw: () => drawTable(x) });
@@ -25352,7 +25368,7 @@ html.sl-full-on,html.sl-full-on body{overflow:hidden!important}
     drawLight(x);
   }
   /* v219 · reacciones: levantar la mano y emojis que suben sobre el avatar; el avatar también reacciona */
-  const RX = [["👍", "nod", L("De acuerdo", "Agree")], ["👏", "clap", L("Aplausos", "Applause")], ["😂", "shake", L("Jajaja", "Haha")], ["❤️", "hop", L("Me encanta", "Love it")], ["🎉", "jump", L("¡Celebremos!", "Celebrate!")], ["🔥", "jump", L("¡Fuego!", "On fire!")], ["🤯", "shake", L("¡Wow!", "Mind blown!")]];
+  const RX = [["👍", "nod", L("De acuerdo", "Agree")], ["👏", "clap", L("Aplausos", "Applause")], ["😂", "shake", L("Jajaja", "Haha")], ["❤️", "hop", L("Me encanta", "Love it")], ["🎉", "jump", L("¡Celebremos!", "Celebrate!")], ["🔥", "jump", L("¡Fuego!", "On fire!")], ["🤯", "shake", L("¡Wow!", "Mind blown!")], ["💃", "dance", L("¡A bailar!", "Let's dance!")]];
   const RXOK = new Set(RX.map(r => r[0]));
   function reaccion(e, emo, remote) {
     if (!e || !RXOK.has(emo)) return; const def = RX.find(r => r[0] === emo);

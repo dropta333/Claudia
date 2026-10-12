@@ -52,6 +52,9 @@
       const M = cat ? ["K.....K.", "KoK..KoK", "KOOOOOOK", "KOEOOEOK", "KOOooOOK", ".KOOOOK.", "..K..K.."] : ["KK....KK", "KoK..KoK", "KOOOOOOK", "KOEOOEOK", "KOOKKOOK", ".KOOOOK.", "..K..K.."];
       const bx = 23, by = 24 + b; M.forEach((r, jj) => { for (let ii = 0; ii < 8; ii++) { const ch = r[ii]; if (ch === ".") continue; px(ch === "K" || ch === "E" ? K : ch === "o" ? F1 : F0, bx + ii - 1, by + jj); } });
       if (cat) { px(F1, bx + 7, by + 3 - wag); px(F1, bx + 8, by + 2 - wag); px(F1, bx + 8, by + 1 - wag); } else { px(F1, bx + 7, by + 4); px(F1, bx + 8, by + 3 + wag); }
+    } else if (c.fx === "nubes") {   /* nubecitas que pasan alrededor */
+      [[1, 0], [19, 1.6], [4, 3.1], [24, 4.4]].forEach(([y0, ph], n) => { const xx = Math.round(((t * 3 + ph * 9) % 40) - 6), yy = [1, 4, 17, 21][n] + Math.round(Math.sin(t + ph));
+        x.globalAlpha = .92; px("#ffffff", xx + 1, yy, 3, 1); px("#ffffff", xx, yy + 1, 6, 1); px("#dfe6f0", xx, yy + 2, 6, 1); px("#ffffff", xx + 3, yy - 1, 2, 1); x.globalAlpha = 1; });
     } else if (c.fx === "confeti") {
       const C = ["#F3FF57", "#ff8fb8", "#7fd0ff", "#b7a8ff", "#8ff0b4", "#ffb36b", col];
       for (let n = 0; n < 11; n++) { const p = ((t * .35 + n * .137) % 1), i = Math.round((n * 7.3) % 30 + Math.sin(t * 2 + n) * 1.5), j = Math.round(-3 + p * 33); if (j > 30) continue;
@@ -129,9 +132,9 @@
     acc: { ninguno: "Ninguno", gorra: "Gorra", boina: "Boina", "audífonos": "Audífonos", diadema: "Diadema", lazo: "Lazo", pinzas: "Pinzas", flor: "Flor" },
     ears: { ninguno: "Sin aretes", aretes: "Aretes", argollas: "Argollas" },
     nk: { ninguno: "Ninguna", cadena: "Cadena", gruesa: "Gruesa", perlas: "Perlas", dije: "Con dije" },
-    fx: { ninguno: "Ninguno", brillo: "Brillo", aura: "Aura tornasol", ideas: "Lluvia de ideas", confeti: "Confeti", perro: "Perrito", gato: "Gatito" },
+    fx: { ninguno: "Ninguno", brillo: "Brillo", aura: "Aura tornasol", ideas: "Lluvia de ideas", confeti: "Confeti", perro: "Perrito", gato: "Gatito", nubes: "Nubes" },
   };
-  const NK = ["ninguno", "cadena", "gruesa", "perlas", "dije"], FX = ["ninguno", "brillo", "aura", "ideas", "confeti", "perro", "gato"];
+  const NK = ["ninguno", "cadena", "gruesa", "perlas", "dije"], FX = ["ninguno", "brillo", "aura", "ideas", "confeti", "nubes", "perro", "gato"];
   const GOLD = [["#e8c14a", "#f3d98a", "#c9a45a", "#a9adb6", "#e9e4dc", "#d98a6a", "#2a1a22", "#7fd0ff", "#e8a0b8", "#8ff0b4"]];
   const ICON = {
     cara: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 10h.01M15 10h.01M9.5 15a3.5 3.5 0 0 0 5 0"/></svg>',
