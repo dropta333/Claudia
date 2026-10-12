@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v218** · 12 oct 2026 · Resumen general en `HANDOFF-COMPLETO.md` · Responsable: Bastián Torres
+Versión: **v219** · 12 oct 2026 · Resumen general en `HANDOFF-COMPLETO.md` · Responsable: Bastián Torres
 
 ## v216 · Sala sin compañeros de demostración, luz según la hora con transición suave, "hoy" en hora local y revisión de guardado
 - **Sala:** se eliminaron por completo los compañeros de demostración (código, casilla y textos); solo aparece quien está de verdad. El chip de la hora solo informa (la sala sigue sola la hora real; `PXP_SALA.hora(h)` queda para pruebas).
@@ -348,3 +348,9 @@ Versión: **v218** · 12 oct 2026 · Resumen general en `HANDOFF-COMPLETO.md` ·
 - Aviso flotante de la sala rediseñado (estado en vivo, vista previa de la conversación o de lo proyectado, avatares, Salir integrado, animaciones suaves y respeto a "reducir movimiento").
 - Rincón del café entre la terraza y el TV: mueble con cafetera y jarra de agua (zonas `#sl-cafe` / `#sl-agua`). Al tocarlas, el avatar camina, recibe taza o vaso (`cup` viaja en la presencia de `/api/sala`) y da sorbos de vez en cuando; tocar de nuevo la deja.
 - Encabezado de persona en celular: el cargo es una sola tarjeta (cargo en una línea, grupo debajo, lápiz adentro); si cargo y grupo son iguales se muestra una vez con el punto de color del grupo.
+
+## v219 · Sala: entrada con puertas, proyección sin trabas, reacciones; avatar con cadenitas y efectos
+- Proyección: se corrigió el bucle que trababa al proyectar pestañas; se arma después del clic; ventanas en 960×540; en celular tarjeta en el TV pequeño y vista grande legible.
+- Entrada/salida con puertas oscuras animadas; panel de personas y chat ocultable; burbujas más grandes y duraderas.
+- Reacciones (mano y emojis) sincronizadas por /api/sala (hand, rx).
+- Avatar: sin pin por defecto (Auto = forma del grupo), cadenitas (nk, kc) y efectos (fx, xc): brillo, aura, lluvia de ideas, confeti.

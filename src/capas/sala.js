@@ -220,7 +220,7 @@
     const key = JSON.stringify([cfg, g && g.color, g && g.shape, pose]); if (sprites.has(key)) return sprites.get(key);
     if (sprites.size > 600) sprites.clear();
     const back = pose.back, c = PXA.norm(cfg);
-    const cv = PXA.render(back ? Object.assign({}, c, { gl: "ninguna", fh: "ninguno" }) : c, { br: pose.br, blink: pose.blink, dx: pose.dx, walk: pose.walk }, back ? Object.assign({}, g, { nopin: true }) : g);
+    const cv = PXA.render(back ? Object.assign({}, c, { gl: "ninguna", fh: "ninguno", nk: "ninguno" }) : c, { br: pose.br, blink: pose.blink, dx: pose.dx, walk: pose.walk }, back ? Object.assign({}, g, { nopin: true }) : g);
     if (back) {
       const x = cv.getContext("2d"), im = x.getImageData(0, 0, 32, 23), d = im.data, P = PXA.data.P, s = c.skin;
       const face = [s, mix(s, "#000000", .14), mix(s, "#ffffff", .4), mix(s, "#e0707a", .35), P.E, P.e, P.W, P.r, P.l].filter(Boolean).map(h => hex2(String(h).slice(0, 7)).join(","));
@@ -272,7 +272,7 @@
   /* presencia real (/api/sala): quién está de verdad, dónde, qué dijo y qué proyecta. Solo late mientras tienes la Sala abierta. */
   const API_SALA = "/api/sala", NET = { on: false, t: 0, q: 0, busy: false, dirty: false, out: [], proj: undefined, seen: {}, projTs: 0, projId: "" };
   function netQueue(m) {
-    if (m.t === "say") NET.out.push({ text: m.text }); else if (m.t === "proj") NET.proj = m.k ? { k: m.k } : null;
+    if (m.t === "say") NET.out.push({ text: m.text }); else if (m.t === "proj") NET.proj = m.k ? { k: m.k } : null; else if (m.t === "rx") NET.rx = { e: m.e };
     else if (m.t === "bye") { try { fetch(API_SALA, { method: "POST", keepalive: true, headers: { "content-type": "application/json" }, body: JSON.stringify({ id: S.myId, bye: true }) }); } catch (e) { } return; }
     NET.dirty = true; clearTimeout(NET.q); NET.q = setTimeout(() => { if (!NET.busy) netTick(); }, 250);
   }
@@ -282,7 +282,8 @@
     /* afuera: solo se mira quién está (sin aparecer), y solo con la pestaña Sala a la vista */
     if (!S.inside || !e) { if (visible && !NET.busy) { NET.busy = true; try { const r = await fetch(API_SALA, { cache: "no-store" }); if (r.ok) netApply(await r.json()); } catch (er) { } NET.busy = false; } NET.t = setTimeout(netTick, visible ? 5000 : 8000); return; }
     const tgt = e.path.length ? e.path[e.path.length - 1] : [e.x, e.y];
-    const body = { id: S.myId, name: me(), x: Math.round(tgt[0]), y: Math.round(tgt[1]), seat: e.seat >= 0 ? e.seat : (e.goSeat >= 0 ? e.goSeat : -1), mic: !!e.mic, cam: !!e.cam, cup: e.cup || "", say: NET.out.splice(0) };
+    const body = { id: S.myId, name: me(), x: Math.round(tgt[0]), y: Math.round(tgt[1]), seat: e.seat >= 0 ? e.seat : (e.goSeat >= 0 ? e.goSeat : -1), mic: !!e.mic, cam: !!e.cam, cup: e.cup || "", hand: !!e.hand, say: NET.out.splice(0) };
+    if (NET.rx) { body.rx = NET.rx; NET.rx = null; }
     if (NET.proj !== undefined) { body.proj = NET.proj; NET.proj = undefined; }
     NET.busy = true; NET.dirty = false;
     try { const r = await fetch(API_SALA, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }); if (r.ok) netApply(await r.json()); else NET.out.unshift(...body.say); }
@@ -307,6 +308,7 @@
         says.filter(m => m.ts > (NET.seen[p.id] || 0)).forEach(m => { say(e, m.text, m.ts); }); NET.seen[p.id] = Math.max(NET.seen[p.id] || 0, last);
       }
       if (!DL.call) { e.mic = !!p.mic; } e.camR = !!p.cam; { const nc = p.cup === "cafe" || p.cup === "agua" ? p.cup : ""; if (nc && nc !== e.cup) e.back = false; e.cup = nc; }
+      e.hand = !!p.hand; if (p.rx && p.rx.ts && p.rx.ts > (e.rxTs || 0)) { const fresh = !nuevo && Date.now() - p.rx.ts < 15000; e.rxTs = p.rx.ts; if (fresh || (nuevo && j.now && j.now - p.rx.ts < 5000)) reaccion(e, p.rx.e, true); }
       if (p.proj && p.proj.ts > NET.projTs) { NET.projTs = p.proj.ts; NET.projId = p.id; setProj(p.proj.k, p.name, true); }
       else if (!p.proj && NET.projId === p.id && S.proj) { NET.projId = ""; setProj(null, "", true); }
     });
@@ -317,16 +319,18 @@
     if (!m || m.from === S.myId) return;
     if (m.t === "who") { if (S.inside) sendState(); return; }
     let e = S.ents.get(m.from);
-    if (m.t === "hi" || m.t === "state") { if (!e) e = mkEnt({ name: m.name, x: m.x, y: m.y }); if (m.seat >= 0) { e.seat = m.seat; const s = seatOf(m.seat); e.x = s.x; e.y = s.y; } else { e.x = m.x; e.y = m.y; } e.mic = !!m.mic; e.cam = false; e.cup = m.cup === "cafe" || m.cup === "agua" ? m.cup : ""; if (m.t === "hi") sendState(); people_(); if (m.proj && !S.proj) setProj(m.proj, m.name, true); return; }
+    if (m.t === "hi" || m.t === "state") { if (!e) e = mkEnt({ name: m.name, x: m.x, y: m.y }); if (m.seat >= 0) { e.seat = m.seat; const s = seatOf(m.seat); e.x = s.x; e.y = s.y; } else { e.x = m.x; e.y = m.y; } e.mic = !!m.mic; e.cam = false; e.cup = m.cup === "cafe" || m.cup === "agua" ? m.cup : ""; e.hand = !!m.hand; if (m.t === "hi") sendState(); people_(); if (m.proj && !S.proj) setProj(m.proj, m.name, true); return; }
     if (!e) return;
     if (m.t === "mv") { if (m.seat >= 0) sitAt(e, m.seat); else walkTo(e, m.x, m.y); }
     else if (m.t === "say") say(e, m.text);
     else if (m.t === "st") { e.mic = !!m.mic; e.speaking = m.spk ? 1 : 0; people_(); }
+    else if (m.t === "rx") reaccion(e, m.e, true);
+    else if (m.t === "hand") { e.hand = !!m.on; people_(); }
     else if (m.t === "cup") { e.cup = m.cup === "cafe" || m.cup === "agua" ? m.cup : ""; if (e.cup) e.back = false; }
     else if (m.t === "proj") setProj(m.k, e.name, true);
     else if (m.t === "bye") { rmEnt(m.from); people_(); }
   }
-  const sendState = () => { const e = myEnt(); if (e) send({ t: "state", name: e.name, x: e.x, y: e.y, seat: e.seat, mic: e.mic, cup: e.cup || "", proj: S.projBy === e.name ? S.proj : null }); };
+  const sendState = () => { const e = myEnt(); if (e) send({ t: "state", name: e.name, x: e.x, y: e.y, seat: e.seat, mic: e.mic, cup: e.cup || "", hand: !!e.hand, proj: S.projBy === e.name ? S.proj : null }); };
   function openTransport() {
     if (PROVIDER.impl || NET.on || tr) return;
     const local = () => { try { tr = new BroadcastChannel("pxp-sala-v1"); tr.onmessage = ev => onMsg(ev.data); tr.postMessage({ t: "who", from: S.myId }); } catch (e) { tr = null; } };
@@ -340,7 +344,7 @@
     logAdd(e.name, text, ts || Date.now());
     if (e.bub) e.bub.remove();
     const b = document.createElement("div"); b.className = "sl-bub pxb"; b.innerHTML = `<span class="pxb-o"><span class="pxb-i"></span></span>${PXA.TAIL}`; b.querySelector(".pxb-i").textContent = text;
-    $("sl-ov").appendChild(b); e.bub = b; e.bubT = performance.now() + 4200 + text.length * 70;
+    $("sl-ov").appendChild(b); e.bub = b; e.bubT = performance.now() + Math.min(20000, 7500 + text.length * 120);   // v219 · más tiempo para leer
     if (e.id !== S.myId && S.inside && !salaVisible()) { S.unread++; pill(); }
   }
   function renderLog() {
@@ -430,14 +434,44 @@
       const z = s ? (s.side === "back" ? TABLE.y - 1 : s.side === "front" ? s.y + .2 : s.y + .2) : e.y;
       return { z, draw: () => { const top = s && s.side === "sofa" ? s.y - 30 : (s ? s.y - 30 : e.y - 30);
         const spr = sprite(e.cfg, e.g, { back, br: e.moving ? 0 : e.br, blink: back ? 0 : e.blink, dx: back ? 0 : e.dx, walk: e.moving ? e.step : 0 });
-        if (!s) { x.fillStyle = "rgba(0,0,0,.0)"; }
-        x.drawImage(spr, Math.round((s ? s.x : e.x) - 16), Math.round(top)); e._top = Math.round(top); e._cx = Math.round(s ? s.x : e.x); } };
+        let ox = 0, oy = 0; const now = performance.now();
+        if (e.rxA) { const p = (now - e.rxA.t0) / 1300; if (p >= 1 || reduce()) e.rxA = null; else {
+          const k = e.rxA.k; if (k === "jump") oy = -Math.round(Math.abs(Math.sin(p * Math.PI * 2)) * 5); else if (k === "hop") oy = -Math.round(Math.abs(Math.sin(p * Math.PI * 3)) * 2);
+          else if (k === "shake") ox = Math.round(Math.sin(p * 46)) ; else if (k === "nod") oy = (Math.floor(p * 6) % 2); else if (k === "clap") oy = -(Math.floor(p * 8) % 2); } }
+        const sx = Math.round((s ? s.x : e.x) - 16 + ox), sy = Math.round(top + oy), t = now / 1000;
+        if (window.PXA && PXA.fx && e.cfg && e.cfg.fx && e.cfg.fx !== "ninguno" && !reduce()) PXA.fx(x, e.cfg, sx, sy, t, e.g, "back");
+        x.drawImage(spr, sx, sy); e._top = Math.round(top); e._cx = Math.round(s ? s.x : e.x);
+        if (e.hand && !back) { const sk = (PXA.norm ? PXA.norm(e.cfg).skin : "#e2aa80"), ol = (S.pal || {}).ol || "#241f38", hx = sx + 24, hy = sy + 9 + (Math.floor(now / 500) % 2);
+          x.fillStyle = ol; x.fillRect(hx - 1, hy - 1, 5, 5); x.fillRect(hx, hy + 3, 3, 9); x.fillStyle = sk; x.fillRect(hx, hy, 3, 3); x.fillRect(hx + 1, hy + 3, 1, 8); x.fillStyle = "rgba(255,255,255,.35)"; x.fillRect(hx, hy, 1, 1); }
+        if (window.PXA && PXA.fx && e.cfg && e.cfg.fx && e.cfg.fx !== "ninguno" && !reduce()) PXA.fx(x, e.cfg, sx, sy, t, e.g, "front"); } };
     });
     items.push({ z: TABLE.y + TABLE.h + 2, draw: () => drawTable(x) });
     SEATS.forEach(s => { if (s.side === "front") items.push({ z: s.y + .5, draw: () => drawFrontChair(x, s) }); });
         items.sort((a, b) => a.z - b.z).forEach(i => i.draw());
     drawCups(x);
     drawLight(x);
+  }
+  /* v219 · reacciones: levantar la mano y emojis que suben sobre el avatar; el avatar también reacciona */
+  const RX = [["👍", "nod", L("De acuerdo", "Agree")], ["👏", "clap", L("Aplausos", "Applause")], ["😂", "shake", L("Jajaja", "Haha")], ["❤️", "hop", L("Me encanta", "Love it")], ["🎉", "jump", L("¡Celebremos!", "Celebrate!")], ["🔥", "jump", L("¡Fuego!", "On fire!")], ["🤯", "shake", L("¡Wow!", "Mind blown!")]];
+  const RXOK = new Set(RX.map(r => r[0]));
+  function reaccion(e, emo, remote) {
+    if (!e || !RXOK.has(emo)) return; const def = RX.find(r => r[0] === emo);
+    e.rxA = { k: def[1], t0: performance.now() };
+    const el = document.createElement("span"); el.className = "sl-rx"; el.textContent = emo; el.style.setProperty("--dx", (Math.random() * 30 - 15).toFixed(0) + "px");
+    $("sl-ov").appendChild(el); el.style.left = ((e._cx || e.x) / W * 100) + "%"; el.style.top = (((e._top != null ? e._top : e.y - 30) - 2) / H * 100) + "%";
+    setTimeout(() => el.remove(), 2600);
+    if (!remote) { send({ t: "rx", e: emo }); }
+  }
+  function mano(on) { const e = myEnt(); if (!e) return; e.hand = on == null ? !e.hand : !!on; send({ t: "hand", on: e.hand }); people_(); bar(); }
+  function rxPicker() {
+    let p = document.querySelector(".sl-rxp"); if (p) { p.remove(); return; }
+    const e = myEnt(); if (!e) return;
+    p = document.createElement("div"); p.className = "sl-rxp"; p.setAttribute("role", "menu");
+    p.innerHTML = `<button type="button" class="sl-rxh${e.hand ? " on" : ""}" role="menuitemcheckbox" aria-checked="${!!e.hand}"><span>✋</span>${e.hand ? L("Bajar la mano", "Lower hand") : L("Levantar la mano", "Raise hand")}</button><div class="sl-rxe">${RX.map(r => `<button type="button" role="menuitem" data-e="${r[0]}" title="${esc(r[2])}" aria-label="${esc(r[2])}">${r[0]}</button>`).join("")}</div>`;
+    $("sl-bar").appendChild(p); const b = $("sl-rxb"), br = b.getBoundingClientRect(), bb = $("sl-bar").getBoundingClientRect();
+    p.style.left = Math.max(8, Math.min(bb.width - p.offsetWidth - 8, br.left - bb.left + br.width / 2 - p.offsetWidth / 2)) + "px";
+    p.onclick = ev => { const h = ev.target.closest(".sl-rxh"); if (h) { mano(); p.remove(); return; } const x = ev.target.closest("[data-e]"); if (x) { reaccion(myEnt(), x.dataset.e); p.classList.add("sent"); setTimeout(() => p.remove(), 160); } };
+    setTimeout(() => document.addEventListener("pointerdown", function h(ev) { if (!p.contains(ev.target) && !ev.target.closest("#sl-rxb")) { p.remove(); document.removeEventListener("pointerdown", h); } }), 0);
   }
   /* v218 · café y agua: vapor de la cafetera, taza o vaso en la mano y un sorbo cada tanto */
   function cupSprite(x, kind, px, py) { const R0 = (c, a, b, w, hh) => { x.fillStyle = c; x.fillRect(a, b, w, hh); }, ol = (S.pal || {}).ol || "#241f38";
@@ -477,7 +511,7 @@
       e.el.style.left = (e._cx / W * 100) + "%"; e.el.style.top = (e._top / H * 100) + "%";
       const tagY = s ? (s.side === "back" ? (TABLE.y + 11 - e._top) : s.side === "front" ? 39 : 33) : 33;
       e.el.style.setProperty("--ty", tagY);
-      e.el.classList.toggle("spk", !!e.speaking); e.el.classList.toggle("cam", !!e.cam); e.el.classList.toggle("me", e.id === S.myId); e.el.classList.toggle("seated", !!s);
+      e.el.classList.toggle("hand", !!e.hand); e.el.classList.toggle("spk", !!e.speaking); e.el.classList.toggle("cam", !!e.cam); e.el.classList.toggle("me", e.id === S.myId); e.el.classList.toggle("seated", !!s);
       e.el.querySelector(".sl-mic").hidden = !e.mic;
       if (e.bub) { e.bub.style.left = (e._cx / W * 100) + "%"; e.bub.style.top = ((e._top + 2) / H * 100) + "%"; }
     });
@@ -542,6 +576,7 @@
     seat: '<path d="M6 4v10h12V4"/><path d="M5 14h14M7 14v6M17 14v6"/>',
     send: '<path d="M5 12h14M13 6l6 6l-6 6"/>',
     log: '<path d="M5 6h14M5 12h14M5 18h9"/>',
+    rx: '<circle cx="12" cy="12" r="9"/><path d="M8.5 14.5a4.5 4.5 0 0 0 7 0M9 9.5h.01M15 9.5h.01"/>',
     expand: '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
     shrink: '<path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/>',
     side: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/>',
@@ -557,22 +592,23 @@
     set("sl-camb", e && e.cam, IC.cam, IC.camOff, L("Cámara encendida", "Camera on"), L("Cámara", "Camera"));
     set("sl-scr", !!S.media.screen, IC.screen, null, L("Dejar de compartir", "Stop sharing"), L("Pantalla", "Screen"));
     set("sl-seat", e && e.seat >= 0, IC.seat, null, L("Levantarme", "Stand up"), L("Sentarme", "Sit down"));
-    const out = !S.inside; ["sl-mic", "sl-camb", "sl-scr", "sl-projb", "sl-seat", "sl-in", "sl-send"].forEach(id => { const x = $(id); if (x) x.disabled = out; });
+    const rb = $("sl-rxb"); if (rb) rb.classList.toggle("on", !!(e && e.hand));
+    const out = !S.inside; ["sl-mic", "sl-camb", "sl-scr", "sl-projb", "sl-seat", "sl-rxb", "sl-in", "sl-send"].forEach(id => { const x = $(id); if (x) x.disabled = out; });
     const vw = $("sl-vw"); if (vw) { vw.classList.toggle("on", !!S.full); vw.querySelector("i").innerHTML = svg(S.full ? IC.shrink : IC.expand); vw.querySelector("span").textContent = S.full ? L("Reducir", "Exit wide view") : L("Ampliar", "Wide view"); vw.setAttribute("aria-pressed", S.full ? "true" : "false"); }
-    const sd = $("sl-sidet"); if (sd) { sd.hidden = !S.full; sd.classList.toggle("on", S.full && !S.sideOff); }
+    const sd = $("sl-sidet"); if (sd) { sd.hidden = false; const on = S.full ? !S.sideOff : !S.sideHide; sd.classList.toggle("on", on); sd.setAttribute("aria-pressed", on ? "true" : "false"); sd.querySelector("span").textContent = on ? L("Ocultar personas y chat", "Hide people & chat") : L("Mostrar personas y chat", "Show people & chat"); }
     b.classList.toggle("out", out); const x = $("sl-exit"); if (x) { x.classList.toggle("in", !out); x.querySelector("span").textContent = out ? L("Entrar a la sala", "Enter the room") : L("Salir de la sala", "Leave the room"); x.querySelector("i").innerHTML = svg(out ? IC.enter : IC.exit); }
   }
   function people_() {
-    const ul = $("sl-ppl"); if (!ul) return; const list = [...S.ents.values()].sort((a, b) => (b.id === S.myId) - (a.id === S.myId) || a.name.localeCompare(b.name));
+    const ul = $("sl-ppl"); if (!ul) return; const list = [...S.ents.values()].sort((a, b) => (!!b.hand - !!a.hand) || (b.id === S.myId) - (a.id === S.myId) || a.name.localeCompare(b.name));
     $("sl-n").textContent = list.length;
-    ul.innerHTML = list.map(e => `<li data-id="${esc(e.id)}"><img src="${PXA.headURL(e.cfg, null, 44)}" alt=""><span><b>${esc(tit(e.name))}${e.id === S.myId ? ` <em>${L("tú", "you")}</em>` : ""}</b><small>${esc(e.role)}</small></span><i class="${e.mic ? "on" : ""}" title="${e.mic ? L("Micrófono encendido", "Mic on") : L("Micrófono apagado", "Mic off")}">${svg(e.mic ? IC.mic : IC.micOff)}</i><i class="${e.cam || e.camR ? "on" : ""}" title="${e.cam || e.camR ? L("Cámara encendida", "Camera on") : L("Cámara apagada", "Camera off")}">${svg(e.cam || e.camR ? IC.cam : IC.camOff)}</i></li>`).join("");
+    ul.innerHTML = list.map(e => `<li data-id="${esc(e.id)}"><img src="${PXA.headURL(e.cfg, null, 44)}" alt=""><span><b>${e.hand ? `<span class="sl-hand" title="${L("Levantó la mano", "Raised hand")}">✋</span>` : ""}${esc(tit(e.name))}${e.id === S.myId ? ` <em>${L("tú", "you")}</em>` : ""}</b><small>${esc(e.role)}</small></span><i class="${e.mic ? "on" : ""}" title="${e.mic ? L("Micrófono encendido", "Mic on") : L("Micrófono apagado", "Mic off")}">${svg(e.mic ? IC.mic : IC.micOff)}</i><i class="${e.cam || e.camR ? "on" : ""}" title="${e.cam || e.camR ? L("Cámara encendida", "Camera on") : L("Cámara apagada", "Camera off")}">${svg(e.cam || e.camR ? IC.cam : IC.camOff)}</i></li>`).join("");
     if (!S.inside) lobby(); pill();
     paintTV();
   }
   function chatSend() { const i = $("sl-in"); const v = i.value.trim(); if (!v) { i.focus(); return; } i.value = ""; const e = myEnt(); if (!e) return; say(e, v); send({ t: "say", text: v }); }
   /* ---------- proyección: ventanas reales de la plataforma (proyecto, cliente, persona) y gráficas del equipo, en un cuadro 16:9 ----------
      ref = "proj:CLAVE" | "cli:Nombre" | "per:Nombre" | "chart:disp" | "chart:carga"  (una clave sin prefijo = proyecto) */
-  const FW = 1280, FH = 720;
+  const FW = 1280, FH = 720, fwOf = (r, bw) => { const v = /^(view):/.test(String(r || "")); return bw && bw < 600 ? (v ? 900 : 620) : (v ? 1280 : 960); };   /* en pantallas angostas el cuadro es más angosto: las letras quedan legibles */
   const parseRef = r => { r = String(r || ""); let y = 0; const m = r.match(/#y=(\d+)$/); if (m) { y = +m[1]; r = r.slice(0, m.index); } const i = r.indexOf(":"); return i < 0 ? { t: "proj", id: r, y, base: "proj:" + r } : { t: r.slice(0, i), id: r.slice(i + 1), y, base: r }; };
   const VIEWS_PJ = [["dashboard", ["Dashboard", "Dashboard"], "Disponibilidad, entregas y cargas"], ["traffic", ["Tráfico", "Traffic"], "La semana de todo el equipo"], ["projects", ["Proyectos", "Projects"], "Todas las fichas de proyecto"], ["team", ["Team", "Team"], "Grupos y personas"], ["clientes", ["Clientes", "Clients"], "Clientes, marcas y gráficas"], ["capacidad", ["Capacidad", "Capacity"], "Quién tiene cupo"], ["horas", ["Horas", "Hours"], "Horas registradas por persona"], ["mishoras", ["Mis horas", "My hours"], "Tus horas de la semana"], ["reportes", ["Reportes", "Reports"], "Reportes y time tables"], ["licencias", ["Licencias", "Licenses"], "Licencias de herramientas"], ["logros", ["Logros", "Achievements"], "Logros del equipo"], ["repositorio", ["Repositorio", "Repository"], "Proyectos aprobados"]];
   const CHARTS = { disp: { label: L("Disponibilidad del equipo", "Team availability"), sel: "#dash-wrap .lb-panel", sub: L("Libres, ocupados y en sobrecarga esta semana", "Free, busy and overloaded this week") },
@@ -588,14 +624,19 @@
     const st = document.createElement("style"); st.id = "sl-win-css"; st.textContent = out.join("\n"); document.head.appendChild(st);
   }
   /* ids → clases: la copia no repite ids en la página y conserva los estilos que dependían de ellos */
-  const SLID = new Set(); let slidCss = null;
+  const SLID = new Set(); let slidCss = null, idIdx = null, idIdxN = -1;
+  function idRules() {
+    const n = document.styleSheets.length; if (idIdx && idIdxN === n) return idIdx; idIdxN = n; idIdx = [];
+    const walk = (rules, wrap) => { for (const r of rules) { try { if (r.type === 1 && r.selectorText && r.selectorText.indexOf("#") >= 0) idIdx.push({ s: r.selectorText, t: r.cssText, w: wrap }); else if (r.type === 4) walk(r.cssRules, r.conditionText || r.media.mediaText); } catch (e) { } } };
+    for (const sh of document.styleSheets) { if (sh.ownerNode && /^sl-(slid|win|cli)-css$/.test(sh.ownerNode.id || "")) continue; try { walk(sh.cssRules, null); } catch (e) { } }
+    return idIdx;
+  }
   function scopeIds(root, extra) {
     const ids = (extra || []).slice();
     root.querySelectorAll("[id]").forEach(e => { if (e.closest("svg")) return; const id = e.id; e.removeAttribute("id"); if (/^[\w-]+$/.test(id)) { e.classList.add("slid-" + id); ids.push(id); } });
     const nuevos = [...new Set(ids)].filter(i => /^[\w-]+$/.test(i) && !SLID.has(i)); if (!nuevos.length) return;
     nuevos.forEach(i => SLID.add(i)); const re = new RegExp("#(" + nuevos.join("|") + ")(?![\\w-])", "g"), out = [];
-    const walk = (rules, wrap) => { for (const r of rules) { try { if (r.type === 1 && r.selectorText && (re.lastIndex = 0, re.test(r.selectorText))) { re.lastIndex = 0; const t = r.cssText.replace(re, ".slid-$1"); out.push(wrap ? `@media ${wrap}{${t}}` : t); } else if (r.type === 4) walk(r.cssRules, r.conditionText || r.media.mediaText); } catch (e) { } } };
-    for (const sh of document.styleSheets) { if (sh.ownerNode && sh.ownerNode.id === "sl-slid-css") continue; try { walk(sh.cssRules, null); } catch (e) { } }
+    idRules().forEach(r => { re.lastIndex = 0; if (re.test(r.s)) { re.lastIndex = 0; const t = r.t.replace(re, ".slid-$1"); out.push(r.w ? `@media ${r.w}{${t}}` : t); } });
     if (!slidCss) { slidCss = document.createElement("style"); slidCss.id = "sl-slid-css"; document.head.appendChild(slidCss); } slidCss.textContent += "\n" + out.join("\n");
   }
   /* copia un pedazo de la página: los lienzos (gráficas) pasan como imagen */
@@ -627,8 +668,18 @@
     }
     capCache.set(base, { t: Date.now(), html }); return html;
   }
-  function frameHTML(r, big) { const h = capture(r); return h ? `<div class="sl-frame${big ? " big" : ""}">${h}</div>` : `<div class="sl-frame empty"><p>${L("No pude abrir esa ventana.", "Couldn't open that window.")}</p></div>`; }
-  function fit(box, y) { const f = box.querySelector(".sl-frame"); if (!f) return; const k = box.clientWidth / FW; if (k > 0) f.style.zoom = k; if (y != null) f.scrollTop = y; }
+  function frameHTML(r, big, bw) { const w = fwOf(r, bw), st = `style="width:${w}px;height:${Math.round(w * 9 / 16)}px"`, h = capture(r);
+    return h ? `<div class="sl-frame${big ? " big" : ""}${w < FW ? " win" : ""}" data-w="${w}" ${st}>${h}</div>` : `<div class="sl-frame empty" data-w="${w}" ${st}><p>${L("No pude abrir esa ventana.", "Couldn't open that window.")}</p></div>`; }
+  function fit(box, y) { const f = box.querySelector(".sl-frame"); if (!f) return; const w = +f.dataset.w || FW, k = box.clientWidth / w; if (k > 0) { f.style.zoom = k; if (f.classList.contains("big") && box.clientHeight / k > w * 9 / 16 + 4) f.style.height = Math.floor(box.clientHeight / k) + "px"; } if (y != null) f.scrollTop = y; }   /* en grande y en pantallas altas, el cuadro usa todo el alto */
+  /* se arma un instante después (con aviso), para que el clic responda enseguida y la pantalla no se congele */
+  const cargando = () => `<div class="sl-idle sl-load"><i></i><span>${L("Preparando la proyección…", "Getting the screen ready…")}</span></div>`;
+  function frameLater(box, r, big, after) {
+    const bw = box.clientWidth;
+    /* TV muy pequeño (celular): una tarjeta clara con qué se proyecta; la ficha completa se ve al tocarlo */
+    if (box.id === "sl-tv" && bw && bw < 230) { box._tok = (box._tok || 0) + 1; const by = S.projBy ? tit(String(S.projBy).split(" ")[0]) : "";
+      box.innerHTML = `<div class="sl-mini"><small>${by ? `${esc(by)} ${L("proyecta", "is showing")}` : L("En el TV", "On the TV")}</small><b>${esc(refLabel(r))}</b><span>${L("Toca para verlo en grande", "Tap to enlarge")}</span></div>`; if (after) after(); return; }
+    box.innerHTML = cargando(); const tok = box._tok = (box._tok || 0) + 1;
+    setTimeout(() => requestAnimationFrame(() => { if (box._tok !== tok || !box.isConnected) return; scopeCss(); box.innerHTML = frameHTML(r, big, box.clientWidth || bw); requestAnimationFrame(() => { fit(box); if (after) after(); }); }), 30); }
   /* clics dentro de una copia: no abren nada (solo se desplaza) */
   const blockClicks = box => box.addEventListener("click", ev => { if (ev.target.closest(".sl-frame")) { ev.preventDefault(); ev.stopPropagation(); } }, true);
   const projHTML = (k) => frameHTML("proj:" + k);
@@ -642,7 +693,9 @@
     const tv = $("sl-tv"); if (!tv) return;
     const scr = pantalla();
     if (scr) { const v0 = tv.querySelector("video"); if (!v0 || v0.srcObject !== scr) { tv.innerHTML = ""; const v = document.createElement("video"); v.muted = true; v.autoplay = true; v.playsInline = true; v.srcObject = scr; tv.appendChild(v); v.play().catch(() => { }); } tv.dataset.mode = "screen"; return; }
-    if (S.proj) { const R = parseRef(S.proj); if (tv.dataset.k !== R.base || tv.dataset.mode !== "proj") { scopeCss(); tv.innerHTML = frameHTML(S.proj); tv.dataset.k = R.base; } tv.dataset.mode = "proj"; fit(tv); const f = tv.querySelector(".sl-frame"); if (f) f.scrollTo({ top: R.y, behavior: "smooth" }); return; }
+    if (S.proj) { const R = parseRef(S.proj); const go = () => { const f = tv.querySelector(".sl-frame"); if (f) f.scrollTo({ top: R.y, behavior: "smooth" }); };
+      if (tv.dataset.k !== R.base || tv.dataset.mode !== "proj") { tv.dataset.k = R.base; tv.dataset.mode = "proj"; frameLater(tv, S.proj, false, go); return; }
+      tv.dataset.mode = "proj"; fit(tv); go(); return; }
     tv.dataset.k = "";
     const n = S.ents.size; tv.dataset.mode = "idle";
     tv.innerHTML = `<div class="sl-idle"><b>${L("Sala de juntas", "Meeting room")}</b><span>${n} ${n === 1 ? L("persona", "person") : L("personas", "people")} · ${new Date().toLocaleTimeString("es-CO", { hour: "numeric", minute: "2-digit" })}</span></div>`;
@@ -675,7 +728,7 @@
     const PH = { proj: L("Busca un proyecto o cliente", "Search a project or client"), cli: L("Busca un cliente", "Search a client"), per: L("Busca a alguien del equipo", "Search a teammate"), chart: L("Busca una gráfica", "Search a chart"), view: L("Busca una pestaña de la plataforma", "Search a platform tab") };
     const draw = () => { ov.querySelectorAll(".sl-pj-tabs button").forEach(b => { b.classList.toggle("on", b.dataset.t === tab); b.setAttribute("aria-selected", b.dataset.t === tab); }); q.placeholder = PH[tab];
       const list = tiles(); g.innerHTML = list.join("") || `<p class="sl-pj-e">${L("Nada con ese nombre.", "Nothing by that name.")}</p>`; g.querySelectorAll(".sl-tl").forEach(b => b.setAttribute("aria-selected", b.dataset.r === sel)); };
-    const pick = r => { const R = parseRef(r); sel = R.base; g.querySelectorAll(".sl-tl").forEach(b => b.setAttribute("aria-selected", b.dataset.r === sel)); prev.innerHTML = frameHTML(sel); requestAnimationFrame(() => fit(prev, R.y)); $o(".sl-pj-n").textContent = refLabel(sel); go.disabled = false; };
+    const pick = r => { const R = parseRef(r); sel = R.base; g.querySelectorAll(".sl-tl").forEach(b => b.setAttribute("aria-selected", b.dataset.r === sel)); frameLater(prev, sel, false, () => fit(prev, R.y)); $o(".sl-pj-n").textContent = refLabel(sel); go.disabled = false; };
     blockClicks(prev);
     const doGo = () => { if (!sel) return; const f = prev.querySelector(".sl-frame"), y = f ? Math.round(f.scrollTop) : 0; setProj(sel + (y > 0 ? "#y=" + y : ""), me()); close(); const e = myEnt(); if (e) say(e, L("Les proyecto ", "Showing ") + refLabel(sel)); };
     ov.querySelector(".sl-pj-tabs").onclick = ev => { const b = ev.target.closest("[data-t]"); if (!b) return; tab = b.dataset.t; q.value = ""; draw(); q.focus(); };
@@ -697,7 +750,7 @@
     document.body.appendChild(ov); const c = ov.querySelector(".sl-big-c");
     const close = () => { ov.remove(); document.removeEventListener("keydown", k); }; const k = ev => { if (ev.key === "Escape") close(); };
     if (pantalla()) { const v = document.createElement("video"); v.muted = true; v.autoplay = true; v.playsInline = true; v.srcObject = pantalla(); c.appendChild(v); v.play().catch(() => { }); }
-    else { scopeCss(); const R = parseRef(S.proj); c.innerHTML = frameHTML(S.proj, true); blockClicks(c); requestAnimationFrame(() => { fit(c, R.y); const f = c.querySelector(".sl-frame"); let tm = 0;
+    else { const R = parseRef(S.proj); blockClicks(c); frameLater(c, S.proj, true, () => { fit(c, R.y); const f = c.querySelector(".sl-frame"); let tm = 0;
         if (f && S.projBy === me()) f.addEventListener("scroll", () => { clearTimeout(tm); tm = setTimeout(() => { if (!S.proj) return; const y = Math.round(f.scrollTop); setProj(parseRef(S.proj).base + (y > 0 ? "#y=" + y : ""), me()); }, 220); }); }); }
     document.addEventListener("keydown", k); ov.querySelector(".sl-big-x").onclick = close; ov.onclick = ev => { if (ev.target === ov) close(); };
     const o = ov.querySelector(".sl-big-o"); if (o) o.onclick = () => { close(); try { WIN[t].open(id); } catch (e) { } };
@@ -757,6 +810,7 @@
           <button type="button" class="sl-b" id="sl-scr"><i></i><span></span></button>
           <button type="button" class="sl-b" id="sl-projb"><i>${svg(IC.proj)}</i><span>${L("Proyectar", "Show project")}</span></button>
           <button type="button" class="sl-b" id="sl-seat"><i></i><span></span></button>
+          <button type="button" class="sl-b sl-rxbtn" id="sl-rxb" aria-haspopup="menu"><i>${svg(IC.rx)}</i><span>${L("Reaccionar", "React")}</span></button>
           <button type="button" class="sl-b sl-vwb" id="sl-vw"><i></i><span></span></button>
           <button type="button" class="sl-b sl-sideb" id="sl-sidet"><i>${svg(IC.side)}</i><span>${L("Personas y chat", "People & chat")}</span></button>
           <button type="button" class="sl-b sl-exit" id="sl-exit"><i></i><span></span></button>
@@ -768,7 +822,11 @@
     $("sl-stage").addEventListener("click", stageClick);
     $("sl-cafe").onclick = ev => { ev.stopPropagation(); if (S.inside) servir("cafe"); };
     $("sl-agua").onclick = ev => { ev.stopPropagation(); if (S.inside) servir("agua"); };
-    $("sl-mic").onclick = toggleMic; $("sl-camb").onclick = toggleCam; $("sl-scr").onclick = toggleScreen; $("sl-projb").onclick = projPicker; $("sl-exit").onclick = () => S.inside ? leaveAsk() : lobby(true); $("sl-vw").onclick = () => S.full ? exitFull() : goFull(); $("sl-sidet").onclick = () => { const w = document.querySelector(".sl-wrap"); w.classList.toggle("side-off"); S.sideOff = w.classList.contains("side-off"); fitFull(); };
+    $("sl-mic").onclick = toggleMic; $("sl-camb").onclick = toggleCam; $("sl-scr").onclick = toggleScreen; $("sl-projb").onclick = projPicker; $("sl-exit").onclick = () => S.inside ? leaveAsk() : lobby(true); $("sl-rxb").onclick = () => { if (S.inside) rxPicker(); }; $("sl-vw").onclick = () => S.full ? exitFull() : goFull(); $("sl-sidet").onclick = () => { const w = document.querySelector(".sl-wrap");
+      if (S.full) { w.classList.toggle("side-off"); S.sideOff = w.classList.contains("side-off"); fitFull(); }
+      else { S.sideHide = !S.sideHide; w.classList.toggle("side-hide", S.sideHide); try { localStorage.setItem("pxp_sala_side", S.sideHide ? "0" : "1"); } catch (e) { } const tv = $("sl-tv"); if (tv) setTimeout(() => fit(tv), 60); }
+      bar(); };
+    try { S.sideHide = localStorage.getItem("pxp_sala_side") === "0"; } catch (e) { } document.querySelector(".sl-wrap").classList.toggle("side-hide", !!S.sideHide);
     $("sl-seat").onclick = () => { const e = myEnt(); if (!e) return; if (e.seat >= 0) { const s = seatOf(e.seat); e.seat = -1; e.x = s.ax; e.y = s.ay; walkTo(e, s.ax, s.side === "back" ? 63 : s.side === "front" ? 184 : s.ay); bar(); sendState(); return; }
       let best = -1, bd = 1e9; SEATS.forEach((s, i) => { if (seatTaken(i, e.id)) return; const d = Math.hypot(s.ax - e.x, s.ay - e.y); if (d < bd) { bd = d; best = i; } }); if (best >= 0) { sitAt(e, best); send({ t: "mv", seat: best }); } };
     $("sl-send").onclick = chatSend; $("sl-in").addEventListener("keydown", ev => { if (ev.key === "Enter" && !ev.isComposing) { ev.preventDefault(); chatSend(); } ev.stopPropagation(); });
@@ -862,22 +920,34 @@
   const pantalla = () => S.media.screen || (DL.rScr && DL.rScr.stream) || null;
 
   /* ---------- entrar y salir: siempre con confirmación ---------- */
-  function lobby(show) {
+  /* v219 · entrada: afuera no se ve la sala, solo una puerta oscura con luz por la rendija; al entrar se abre y al salir se cierra */
+  const DOOR_IC = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4a1 1 0 0 1 1-1h9l4 2v16"/><path d="M3 21h18M12 12.5v.01"/></svg>';
+  function lobby(show, anim) {
     const st = $("sl-stage"); if (!st) return; let lb = $("sl-lobby");
-    if (S.inside) { if (lb) lb.remove(); return; }
-    if (!lb) { lb = document.createElement("div"); lb.id = "sl-lobby"; lb.className = "sl-lobby"; lb.setAttribute("role", "dialog"); lb.setAttribute("aria-modal", "false"); lb.setAttribute("aria-labelledby", "sl-lb-t"); st.appendChild(lb); show = true; }
-    const ppl = [...S.ents.values()].filter(e => e.id !== S.myId), n = ppl.length;
+    st.classList.toggle("sl-out", !S.inside);
+    if (S.inside) { if (lb && !lb.classList.contains("opening")) lb.remove(); return; }
+    if (lb && lb.classList.contains("opening")) { lb.remove(); lb = null; }
+    if (!lb) { lb = document.createElement("div"); lb.id = "sl-lobby"; lb.className = "sl-lobby" + (anim === "close" ? " closing" : "");
+      lb.innerHTML = `<div class="sl-door l"><i></i></div><div class="sl-door r"><i></i></div><div class="sl-lb-glow"></div><div class="sl-lb-c" role="dialog" aria-modal="false" aria-labelledby="sl-lb-t"></div>`;
+      st.appendChild(lb); show = true; if (anim === "close") { void lb.offsetWidth; requestAnimationFrame(() => lb.classList.add("shut")); setTimeout(() => lb.classList.remove("closing", "shut"), 1000); } }
+    const ppl = [...S.ents.values()].filter(e => e.id !== S.myId), n = ppl.length, c = lb.querySelector(".sl-lb-c");
     const k = n + ppl.map(e => e.id).join(",") + (window.pxpLang || ""); if (!show && lb.dataset.k === k) return; lb.dataset.k = k;
-    const heads = ppl.slice(0, 6).map(e => `<img src="${PXA.headURL(e.cfg, null, 44)}" alt="" title="${esc(tit(e.name))}">`).join("") + (n > 6 ? `<em>+${n - 6}</em>` : "");
-    const quien = n ? (n === 1 ? `${esc(tit(ppl[0].name.split(" ")[0]))} ${L("está adentro", "is inside")}` : n <= 3 ? `${ppl.map(e => esc(tit(e.name.split(" ")[0]))).join(", ").replace(/, ([^,]*)$/, " " + L("y", "and") + " $1")} ${L("están adentro", "are inside")}` : `${n} ${L("personas adentro", "people inside")}`) : L("No hay nadie todavía. Puedes ser la primera persona.", "Nobody's here yet. You can be the first.");
-    lb.innerHTML = `<div class="sl-lb-c"><h3 id="sl-lb-t">${L("¿Entrar a la sala de juntas?", "Enter the meeting room?")}</h3>${n ? `<div class="sl-lb-h">${heads}</div>` : ""}<p>${quien}</p><p class="sl-lb-s">${L("Al entrar, las demás personas te ven en la sala hasta que salgas.", "Once inside, others see you in the room until you leave.")}</p><div class="sl-lb-a"><button type="button" class="sl-lb-no">${L("Ahora no", "Not now")}</button><button type="button" class="sl-lb-si">${L("Entrar", "Enter")}</button></div></div>`;
-    lb.querySelector(".sl-lb-si").onclick = join;
-    lb.querySelector(".sl-lb-no").onclick = () => { const p = S.prevView && S.prevView !== "sala" ? S.prevView : "home"; try { switchView(p); window.scrollTo({ top: 0 }); } catch (e) { } };
-    if (show) setTimeout(() => { const b = lb.querySelector(".sl-lb-si"); if (b && salaVisible()) b.focus({ preventScroll: true }); }, 60);
+    const first = e => esc(tit(String(e.name).split(" ")[0]));
+    const heads = ppl.slice(0, 5).map((e, i) => `<span class="sl-lb-p" style="--d:${i * 0.18}s"><img src="${PXA.headURL(e.cfg, null, 56)}" alt=""><small>${first(e)}</small></span>`).join("") + (n > 5 ? `<span class="sl-lb-p mas"><em>+${n - 5}</em><small>${L("más", "more")}</small></span>` : "");
+    const titulo = n ? (n === 1 ? `${first(ppl[0])} ${L("está en la sala", "is in the room")}` : n <= 3 ? `${ppl.map(first).join(", ").replace(/, ([^,]*)$/, " " + L("y", "and") + " $1")} ${L("están en la sala", "are in the room")}` : `${n} ${L("personas en la sala", "people in the room")}`) : L("La sala está libre", "The room is free");
+    c.innerHTML = `<span class="sl-lb-k"><i class="${n ? "on" : ""}"></i>${L("Sala de juntas", "Meeting room")}${n ? ` · ${L("en vivo", "live")}` : ""}</span>
+      <h3 id="sl-lb-t">${titulo}</h3>
+      ${n ? `<div class="sl-lb-h">${heads}</div>` : `<div class="sl-lb-e" aria-hidden="true"><i></i><i></i><i></i></div>`}
+      <p class="sl-lb-s">${n ? L("Al entrar te ven en la sala. Tu micrófono y tu cámara empiezan apagados.", "Once in, they'll see you. Your mic and camera start off.") : L("Ábrela tú: los demás verán que estás adentro.", "Open it up: others will see you're in.")}</p>
+      <div class="sl-lb-a"><button type="button" class="sl-lb-si"><span>${L("Entrar", "Enter")}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6l-6 6"/></svg></button><button type="button" class="sl-lb-no">${L("Ahora no", "Not now")}</button></div>`;
+    c.querySelector(".sl-lb-si").onclick = join;
+    c.querySelector(".sl-lb-no").onclick = () => { const p = S.prevView && S.prevView !== "sala" ? S.prevView : "home"; try { switchView(p); window.scrollTo({ top: 0 }); } catch (e) { } };
+    if (show) setTimeout(() => { const b = c.querySelector(".sl-lb-si"); if (b && salaVisible()) b.focus({ preventScroll: true }); }, 80);
   }
   function join() {
     if (S.inside || !S.myId) return; S.inside = true; S.unread = 0;
-    const e = mkEnt({ name: me() }); e.x = DOOR.x; e.y = DOOR.y; walkTo(e, DOOR.x + 18, 180);
+    const lb0 = $("sl-lobby"); if (lb0) { lb0.classList.add("opening"); setTimeout(() => { if (lb0.classList.contains("opening")) lb0.remove(); }, 950); }
+    const e = mkEnt({ name: me() }); e.x = DOOR.x; e.y = DOOR.y; { const otros = [...S.ents.values()].filter(o => o.id !== S.myId); let tx = DOOR.x + 18, n = 0; while (n++ < 8 && otros.some(o => Math.abs(o.x - tx) < 14 && Math.abs(o.y - 180) < 10)) tx = DOOR.x + 18 + (n % 2 ? -1 : 1) * 16 * Math.ceil(n / 2); walkTo(e, tx, 180); }
     if (NET.on) { NET.dirty = true; clearTimeout(NET.t); if (!NET.busy) netTick(); else NET.q = setTimeout(netTick, 400); }
     else if (tr) tr.postMessage({ t: "hi", from: S.myId, name: me(), x: DOOR.x, y: DOOR.y, seat: -1, mic: false });
     lobby(); people_(); bar(); pill(); paintTV(); avHint(); dailyJoin();
@@ -890,14 +960,14 @@
     send({ t: "bye" }); NET.out = []; NET.proj = undefined;
     if (PROVIDER.impl && PROVIDER.impl.leave) try { PROVIDER.impl.leave(); } catch (er) { }
     dailyLeave();
-    if (e) rmEnt(S.myId); S.inside = false; S.unread = 0; S.keys.clear();
+    document.querySelectorAll(".sl-rxp").forEach(x => x.remove()); if (e) rmEnt(S.myId); S.inside = false; S.unread = 0; S.keys.clear();
     document.querySelectorAll(".sl-card").forEach(x => x.remove());
-    people_(); bar(); pill(); if (salaVisible()) lobby(true);
+    people_(); bar(); pill(); if (salaVisible()) lobby(true, "close");
   }
   function askBox(o) {
     document.querySelectorAll(".sl-ask").forEach(x => x.remove());
     const ov = document.createElement("div"); ov.className = "sl-ask"; ov.setAttribute("role", "alertdialog"); ov.setAttribute("aria-modal", "true"); ov.setAttribute("aria-labelledby", "sl-ask-t");
-    ov.innerHTML = `<div class="sl-ask-b"><h3 id="sl-ask-t">${o.title}</h3>${o.text ? `<p>${o.text}</p>` : ""}<div class="sl-lb-a"><button type="button" class="sl-lb-no">${o.no}</button><button type="button" class="sl-lb-si${o.danger ? " danger" : ""}">${o.yes}</button></div></div>`;
+    ov.innerHTML = `<div class="sl-ask-b">${o.icon ? `<span class="sl-ask-ic">${o.icon}</span>` : ""}<h3 id="sl-ask-t">${o.title}</h3>${o.text ? `<p>${o.text}</p>` : ""}<div class="sl-lb-a"><button type="button" class="sl-lb-no">${o.no}</button><button type="button" class="sl-lb-si${o.danger ? " danger" : ""}">${o.yes}</button></div></div>`;
     document.body.appendChild(ov); const back = document.activeElement;
     const close = () => { ov.remove(); document.removeEventListener("keydown", k, true); try { if (back && back.isConnected) back.focus({ preventScroll: true }); } catch (e) { } };
     const k = ev => { if (ev.key === "Escape") { ev.stopPropagation(); close(); } };
@@ -907,7 +977,7 @@
   }
   function leaveAsk() {
     const yo = S.proj && S.projBy === me();
-    askBox({ title: L("¿Salir de la sala?", "Leave the room?"), text: yo ? L("Estás proyectando: al salir se apaga el TV para todos.", "You're showing something: leaving turns the TV off for everyone.") : L("Las demás personas dejarán de verte en la sala.", "Others will stop seeing you in the room."), yes: L("Salir", "Leave"), no: L("Quedarme", "Stay"), danger: true, onYes: leave });
+    askBox({ title: L("¿Salir de la sala?", "Leave the room?"), text: yo ? L("Estás proyectando: al salir se apaga el TV para todos.", "You're showing something: leaving turns the TV off for everyone.") : L("Las demás personas dejarán de verte en la sala.", "Others will stop seeing you in the room."), yes: L("Salir", "Leave"), no: L("Quedarme", "Stay"), danger: true, icon: DOOR_IC, onYes: leave });
   }
   /* mientras estás adentro y miras otra pestaña: un aviso flotante para volver o salir */
   function pill() {
@@ -934,7 +1004,7 @@
     const ov = document.createElement("div"); ov.className = "sl-mp sl-np"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", L("Vista previa de ", "Preview of ") + m.label);
     ov.innerHTML = `<div class="sl-mp-b"><header><h3>${esc(m.label)}</h3><p>${esc(m.n != null ? m.tip : L("Vista previa", "Preview"))}</p>${S.inside ? `<button type="button" class="sl-np-pj">${L("Proyectar en el TV", "Show on the TV")}</button>` : ""}<button type="button" class="sl-mp-go">${L("Abrir ", "Open ")}${esc(m.label)}</button><button type="button" class="sl-mp-x" aria-label="${L("Cerrar", "Close")}">✕</button></header><div class="sl-np-prev"></div><p class="sl-np-h">${L("Desplázate para ver más. Al abrir la pestaña sigues en la sala.", "Scroll to see more. Opening the tab keeps you in the room.")}</p></div>`;
     document.body.appendChild(ov); const prev = ov.querySelector(".sl-np-prev");
-    prev.innerHTML = frameHTML("view:" + v, true); blockClicks(prev); requestAnimationFrame(() => fit(prev, 0));
+    blockClicks(prev); frameLater(prev, "view:" + v, true, () => fit(prev, 0));
     const ro = window.ResizeObserver ? new ResizeObserver(() => fit(prev)) : null; if (ro) ro.observe(prev);
     const close = () => { if (ro) ro.disconnect(); ov.remove(); document.removeEventListener("keydown", k); }; const k = ev => { if (ev.key === "Escape") close(); };
     document.addEventListener("keydown", k); ov.querySelector(".sl-mp-x").onclick = close; ov.onclick = ev => { if (ev.target === ov) close(); };
@@ -1000,12 +1070,14 @@
     say: t => { const e = myEnt(); if (e) { say(e, t); send({ t: "say", text: t }); } },
     seats: SEATS.length,
     llamada: () => ({ enabled: DL.enabled, state: DL.st, remotos: DL.call ? Object.values(DL.call.participants()).filter(p => !p.local).length : 0, pantalla: !!DL.rScr }),
+    proyectar: r => setProj(r || null, me()),
+    reaccionar: emo => reaccion(myEnt(), emo), mano: on => mano(on), manoArriba: () => !!(myEnt() || {}).hand,
     taza: () => { const e = myEnt(); return e ? e.cup || "" : ""; }, servir: k => servir(k),
     inside: () => S.inside, full: on => (on === false ? exitFull() : goFull()), join: () => { if (!S.inside) join(); }, leave: () => leave(),
   };
 
   const oSw = window.switchView;
-  if (typeof oSw === "function") window.switchView = function (name) { const cv = (document.querySelector(".view.active") || { id: "" }).id.replace(/^view-/, ""); if (name === "sala" && cv && cv !== "sala") S.prevView = cv; if (name !== "sala" && S.full && !S.capturing) exitFull(); const r = oSw.apply(this, arguments); if (name === "sala") { try { enter(); } catch (e) { console.error(e); } } try { pill(); } catch (e) { } return r; };
+  if (typeof oSw === "function") window.switchView = function (name) { const cv = (document.querySelector(".view.active") || { id: "" }).id.replace(/^view-/, ""); if (name === "sala" && cv && cv !== "sala") S.prevView = cv; if (name !== "sala" && S.full && !S.capturing) exitFull(); const r = oSw.apply(this, arguments); if (name === "sala" && !S.capturing) { try { enter(); } catch (e) { console.error(e); } } try { pill(); } catch (e) { } return r; };
   const tryMount = () => { try { if (me()) mount(); } catch (e) { } };
   const oEnter = window.enterApp; if (typeof oEnter === "function") window.enterApp = function () { const r = oEnter.apply(this, arguments); setTimeout(tryMount, 1900); return r; };
   let rt = null; const oRender = window.render; if (typeof oRender === "function") window.render = function () { const r = oRender.apply(this, arguments); clearTimeout(rt); rt = setTimeout(tryMount, 950); return r; };

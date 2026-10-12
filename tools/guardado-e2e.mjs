@@ -48,8 +48,9 @@ check("la tarea que Juliana se creó al mismo tiempo también", r.tJu);
 check("la etapa creada con el asistente está en el proyecto", r.etapa);
 check("el historial del proyecto dice que fue con el asistente", r.hist);
 // presencia de la sala no toca los datos del tablero
+await A.close(); await B.close(); await C.waitForTimeout(4000);   // se mide con solo esta persona conectada (los demás ya no guardan)
 const v0 = (await (await fetch(BASE + "/api/state?meta=1")).json()).version;
-await C.evaluate(() => switchView("sala")); await C.waitForTimeout(7000);
+await C.evaluate(() => { switchView("sala"); PXP_SALA.join(); PXP_SALA.reaccionar("👍"); PXP_SALA.mano(true); }); await C.waitForTimeout(7000);
 const v1 = (await (await fetch(BASE + "/api/state?meta=1")).json()).version;
 check("estar en la Sala no genera guardados del tablero", v0 === v1);
 check("sin errores: " + errs.slice(0, 3).join(" | "), errs.length === 0);

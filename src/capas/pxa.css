@@ -99,3 +99,23 @@
 .pxa-restore button{all:unset;cursor:pointer;font:600 12px/1 var(--pa-disp);letter-spacing:.08em;text-transform:uppercase;color:var(--pa-v)}
 .pxa-ed.is-dirty .pxa-save::after{content:"";width:7px;height:7px;border-radius:50%;background:#000;margin-left:2px}
 @keyframes pxaFade{from{opacity:0}to{opacity:1}}
+
+/* v219 · fila de pines pareja: Sin pin y Auto con texto, formas del mismo ancho */
+.pxa-pins .pxa-pinseg{display:flex;flex-wrap:nowrap}
+.pxa-pins .pxa-pinseg button{flex:1 1 0;min-width:0;padding:7px 2px!important;gap:6px}
+.pxa-pins .pxa-pinseg button.lbl{flex:2.2 1 0;min-width:78px;padding:7px 8px!important}
+.pxa-pins .pxa-pinseg button.lbl span{font-size:12px;letter-spacing:.04em}
+.pxa-pinseg svg{width:15px;height:15px}
+@media (max-width:760px){.pxa-pins .pxa-pinseg{flex-wrap:wrap}.pxa-pins .pxa-pinseg button.lbl{flex:1 1 45%;min-width:0;border-bottom:1px solid var(--pa-line)}.pxa-pins .pxa-pinseg button.shp{flex:1 0 18%}.pxa-pins .pxa-pinseg button.shp:nth-child(3){border-left:0}}
+/* efectos */
+.pxa-fx{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.pxa-fxb{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 4px 7px;border-radius:var(--pa-rs);border:1px solid var(--pa-line);background:var(--pa-bg0);transition:border-color .15s,background .15s}
+.pxa-fxb canvas{width:52px;height:52px;image-rendering:pixelated}
+.pxa-fxb span{font:600 11.5px/1.1 var(--pa-disp);letter-spacing:.04em;text-transform:uppercase;text-align:center;color:var(--pa-mute,#8a8696)}
+.pxa-fxb:hover{border-color:var(--pa-v)}
+.pxa-fxb.on{border-color:var(--pa-v);box-shadow:inset 0 0 0 1px var(--pa-v);background:color-mix(in srgb,var(--pa-v) 10%,var(--pa-bg0))}
+.pxa-fxb.on span{color:var(--pa-v)}
+.pxa-fxb:focus-visible{outline:2px solid var(--pa-v);outline-offset:2px}
+@media (max-width:520px){.pxa-fx{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.pxa-th.c5{grid-template-columns:repeat(8,minmax(0,1fr))}
+@media (max-width:760px){.pxa-th.c5{grid-template-columns:repeat(5,minmax(0,1fr))}}
