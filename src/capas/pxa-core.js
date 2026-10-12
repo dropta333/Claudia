@@ -31,10 +31,10 @@
     const c = norm(cfg); if (!c.fx || c.fx === "ninguno") return;
     const col = c.xc || (g && g.color) || "#F3FF57", px = (cc, i, j, w, h) => { x.fillStyle = cc; x.fillRect(ox + i, oy + j, w || 1, h || 1); };
     const rgb = hex2(col), rgba = al => `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${al.toFixed(3)})`;
-    if (c.fx === "aura" && layer !== "front") {
-      const pulse = .5 + .5 * Math.sin(t * 2.2);
-      for (let j = -2; j < 30; j++) for (let i = 1; i < 31; i++) { const dx = (i - 15.5) / 13, dy = (j - 13) / 16, d = Math.sqrt(dx * dx + dy * dy);
-        if (d < 1.04) { const al = d > .9 ? (.30 + .22 * pulse) * (1.04 - d) / .14 : .07 + .05 * pulse; if (al > .01) px(rgba(Math.min(.6, al)), i, j); } }
+    if (c.fx === "aura" && layer !== "front") {   /* tornasol psicodélico: el arcoíris gira y ondula */
+      for (let j = -2; j < 30; j++) for (let i = 1; i < 31; i++) { const dx = (i - 15.5) / 13, dy = (j - 13) / 16, d = Math.sqrt(dx * dx + dy * dy); if (d >= 1.06) continue;
+        const ang = Math.atan2(dy, dx) * 57.3, w = Math.sin(t * 2.4 + d * 9 + ang / 40), hue = (ang * 1.5 + t * 140 + d * 260 + w * 50) % 360, ring = d > .86;
+        const al = ring ? .42 + .2 * Math.sin(t * 3 + ang / 30) : .1 + .07 * w; x.fillStyle = `hsla(${hue.toFixed(0)},95%,${ring ? 62 : 66}%,${Math.max(.05, al).toFixed(2)})`; x.fillRect(ox + i, oy + j, 1, 1); }
       return;
     }
     if (layer === "back") return;
@@ -47,6 +47,11 @@
         const p = ((t * .45 + ph / 4) % 1), j = Math.round(-6 + p * 30), al = p < .15 ? p / .15 : p > .8 ? (1 - p) / .2 : 1; if (al <= 0) return;
         x.globalAlpha = al; px("#2a1a22", i - 1, j - 1, 5, 6); px("#ffe066", i, j, 3, 3); px("#fff6c2", i, j, 1, 1); px("#c9c4bc", i, j + 3, 3, 1); px("#8e8a94", i + 1, j + 4, 1, 1);
         if (n % 2 === 0 && p > .15 && p < .5) { px("#fff6c2", i - 2, j - 2); px("#fff6c2", i + 4, j - 2); } x.globalAlpha = 1; });
+    } else if (c.fx === "perro" || c.fx === "gato") {   /* mascota a los pies, moviendo la cola */
+      const cat = c.fx === "gato", F0 = cat ? "#f0a35a" : "#c98a4a", F1 = cat ? "#c97b3a" : "#7a4e2a", K = "#2a1a22", b = Math.floor(t * 2) % 2, wag = Math.floor(t * 5) % 2;
+      const M = cat ? ["K.....K.", "KoK..KoK", "KOOOOOOK", "KOEOOEOK", "KOOooOOK", ".KOOOOK.", "..K..K.."] : ["KK....KK", "KoK..KoK", "KOOOOOOK", "KOEOOEOK", "KOOKKOOK", ".KOOOOK.", "..K..K.."];
+      const bx = 23, by = 24 + b; M.forEach((r, jj) => { for (let ii = 0; ii < 8; ii++) { const ch = r[ii]; if (ch === ".") continue; px(ch === "K" || ch === "E" ? K : ch === "o" ? F1 : F0, bx + ii - 1, by + jj); } });
+      if (cat) { px(F1, bx + 7, by + 3 - wag); px(F1, bx + 8, by + 2 - wag); px(F1, bx + 8, by + 1 - wag); } else { px(F1, bx + 7, by + 4); px(F1, bx + 8, by + 3 + wag); }
     } else if (c.fx === "confeti") {
       const C = ["#F3FF57", "#ff8fb8", "#7fd0ff", "#b7a8ff", "#8ff0b4", "#ffb36b", col];
       for (let n = 0; n < 11; n++) { const p = ((t * .35 + n * .137) % 1), i = Math.round((n * 7.3) % 30 + Math.sin(t * 2 + n) * 1.5), j = Math.round(-3 + p * 33); if (j > 30) continue;
@@ -124,9 +129,9 @@
     acc: { ninguno: "Ninguno", gorra: "Gorra", boina: "Boina", "audífonos": "Audífonos", diadema: "Diadema", lazo: "Lazo", pinzas: "Pinzas", flor: "Flor" },
     ears: { ninguno: "Sin aretes", aretes: "Aretes", argollas: "Argollas" },
     nk: { ninguno: "Ninguna", cadena: "Cadena", gruesa: "Gruesa", perlas: "Perlas", dije: "Con dije" },
-    fx: { ninguno: "Ninguno", brillo: "Brillo", aura: "Aura", ideas: "Lluvia de ideas", confeti: "Confeti" },
+    fx: { ninguno: "Ninguno", brillo: "Brillo", aura: "Aura tornasol", ideas: "Lluvia de ideas", confeti: "Confeti", perro: "Perrito", gato: "Gatito" },
   };
-  const NK = ["ninguno", "cadena", "gruesa", "perlas", "dije"], FX = ["ninguno", "brillo", "aura", "ideas", "confeti"];
+  const NK = ["ninguno", "cadena", "gruesa", "perlas", "dije"], FX = ["ninguno", "brillo", "aura", "ideas", "confeti", "perro", "gato"];
   const GOLD = [["#e8c14a", "#f3d98a", "#c9a45a", "#a9adb6", "#e9e4dc", "#d98a6a", "#2a1a22", "#7fd0ff", "#e8a0b8", "#8ff0b4"]];
   const ICON = {
     cara: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 10h.01M15 10h.01M9.5 15a3.5 3.5 0 0 0 5 0"/></svg>',
@@ -135,7 +140,8 @@
     acc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 15a8 8 0 0 1 16 0"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></svg>',
     shuffle: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 4l3 3l-3 3"/><path d="M18 20l3 -3l-3 -3"/><path d="M3 7h3a5 5 0 0 1 5 5a5 5 0 0 0 5 5h5"/><path d="M21 7h-5a4.98 4.98 0 0 0 -3 1m-4 8a4.98 4.98 0 0 1 -3 1h-3"/></svg>',
   };
-  const TABS = [["cara", "Cara"], ["pelo", "Pelo"], ["ropa", "Ropa"], ["acc", "Accesorios"]];
+  const TABS = [["cara", "Cara"], ["pelo", "Pelo"], ["ropa", "Ropa"], ["acc", "Accesorios"], ["fx", "Efectos"]];
+  ICON.fx = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.6L12 15l-1.8-4.4L5.5 9l4.7-1.4z"/><path d="M18 15l.8 2l2 .8l-2 .7L18 21l-.8-2.5l-2-.7l2-.8z"/></svg>';
   const CROP = { face: [9, 8, 14, 14], head: [5, 0, 22, 22], body: [8, 16, 16, 16], top: [6, 0, 20, 20], neck: [9, 16, 14, 14] };
   const esc = s => String(s).replace(/[&<>"]/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[m]));
 
@@ -214,7 +220,7 @@
     /* colors: targets = [[key,label,rows,{group}]] — one full-width ribbon, a small switch when there are several targets */
     function colors(targets) {
       const box = $(".pxa-colors"); box.innerHTML = "";
-      if (!targets.length) { box.innerHTML = '<p class="pxa-note">Elige gafas o un accesorio para cambiar su color.</p>'; return; }
+      if (!targets.length) { box.innerHTML = `<p class="pxa-note">${tab === "fx" ? "El brillo y el confeti se pueden pintar del color que quieras." : "Elige gafas o un accesorio para cambiar su color."}</p>`; return; }
       const cur = targets.find(t => t[0] === tgt[tab]) || targets[0]; tgt[tab] = cur[0];
       const head = document.createElement("div"); head.className = "pxa-ch";
       if (targets.length > 1) {
@@ -259,7 +265,7 @@
       const gr = document.createElement("div"); gr.className = "pxa-fx";
       FX.forEach(v => { const b = document.createElement("button"); b.type = "button"; b.className = "pxa-fxb" + (st.fx === v ? " on" : ""); b.setAttribute("aria-pressed", st.fx === v);
         const c = document.createElement("canvas"); c.width = c.height = 64; const sp = document.createElement("span"); sp.textContent = NAMES.fx[v]; b.append(c, sp); b.onclick = () => set("fx", v); gr.appendChild(b);
-        const paint = () => { if (!c.isConnected) return false; const src = render(Object.assign({}, st, { fx: v }), { t: performance.now() / 1000 }, { color: g.color, nopin: true }); blit(c, src, [2, -2, 28, 28]); return true; };
+        const paint = () => { if (!c.isConnected) return false; const src = render(Object.assign({}, st, { fx: v }), { t: performance.now() / 1000 }, { color: g.color, nopin: true }); blit(c, src, [0, 0, 32, 32]); return true; };
         paint(); if (v !== "ninguno" && !reduce()) { const iv = setInterval(() => { if (!paint()) clearInterval(iv); }, 140); } });
       w.appendChild(gr); return w;
     }
@@ -272,9 +278,11 @@
       if (tab === "pelo") { body.append(thumbs("Estilo", "hair", O.hair, CROP.head, 8)); colors([["hc", "Cabello", RIB.hair]]); }
       if (tab === "ropa") { body.append(thumbs("Prenda", "fit", O.fit, CROP.body, 8), pins()); colors([["oc", "Prenda", SPECTRUM], ["dc", "Detalle", groupRow, { group: true }], ["pc", "Pin", groupRow, { group: true }], ["sh", "Zapatos", SPECTRUM]]); }
       if (tab === "acc") {
-        body.append(thumbs("Gafas", "gl", O.gl, CROP.face, 6), thumbs("Cabeza", "acc", O.acc, CROP.top, 8), thumbs("Cuello", "nk", NK, CROP.neck, 5), segmented("Orejas", "ears", O.ears), efectos());
+        body.append(thumbs("Gafas", "gl", O.gl, CROP.face, 6), thumbs("Cabeza", "acc", O.acc, CROP.top, 8), thumbs("Cuello", "nk", NK, CROP.neck, 5), segmented("Orejas", "ears", O.ears));
         const ts = []; if (st.gl !== "ninguna") { ts.push(["fc", "Montura", SPECTRUM]); ts.push(["lc", "Lentes", LENS, { none: "Sin tinte" }]); } if (st.acc !== "ninguno") ts.push(["ac", "Accesorio", SPECTRUM]);
-        if (st.nk !== "ninguno" && st.nk !== "perlas") ts.push(["kc", "Cadena", GOLD]); if (st.fx !== "ninguno" && st.fx !== "ideas") ts.push(["xc", "Efecto", groupRow, { group: true }]); colors(ts);
+        if (st.nk !== "ninguno" && st.nk !== "perlas") ts.push(["kc", "Cadena", GOLD]); colors(ts);
+      }
+      if (tab === "fx") { body.append(efectos()); colors(st.fx === "brillo" || st.fx === "confeti" ? [["xc", "Efecto", groupRow, { group: true }]] : []);
       }
     }
     $(".pxa-rnd").onclick = () => {

@@ -119,3 +119,4 @@
 @media (max-width:520px){.pxa-fx{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .pxa-th.c5{grid-template-columns:repeat(8,minmax(0,1fr))}
 @media (max-width:760px){.pxa-th.c5{grid-template-columns:repeat(5,minmax(0,1fr))}}
+.pxa-fx{grid-template-columns:repeat(4,minmax(0,1fr))!important}.pxa-fxb canvas{width:64px;height:64px}
