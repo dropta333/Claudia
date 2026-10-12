@@ -1,0 +1,41 @@
+/* v217 · Grupos plegables (Dashboard · Carga por persona, Tráfico) con el mismo control que Team */
+.pl-ch{all:unset;cursor:pointer;margin-left:auto;display:grid;place-items:center;width:30px;height:30px;border-radius:9px;flex:none;transition:background .15s}
+.pl-ch:hover{background:var(--surface2)}
+.pl-ch:focus-visible{outline:2px solid var(--brand)}
+.pl-ch::before{content:"";width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(225deg) translate(-2px,-2px);transition:transform .2s}
+.pl-closed > .pl-ch::before,.pl-closed .lg-t > .pl-ch::before,tr.pl-closed .pl-ch::before{transform:rotate(45deg) translate(-2px,-2px)}
+.pl-hid{display:none!important}
+/* Dashboard */
+#dash-wrap .lg-t{cursor:pointer;user-select:none}
+#dash-wrap .lg-t .pl-ch{width:26px;height:26px;margin:-6px -4px -6px auto}
+#dash-wrap .lg.pl-closed > :not(.lg-t){display:none!important}
+#dash-wrap .lg.pl-closed .lg-t{border-bottom-color:transparent;margin-bottom:0}
+#dash-wrap .hp-title > .pl-fold{margin-left:auto;transform:scale(.92);transform-origin:right center}
+#dash-wrap .hp-title:has(> .pl-fold){display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+/* Tráfico */
+#main-grid > .section-label.pl-h,#main-grid > .trf-grp.pl-h{cursor:pointer;user-select:none;display:flex;align-items:center;gap:10px;width:100%;box-sizing:border-box}
+
+
+#main-grid > .section-label.pl-h .pl-ch{width:28px;height:28px}
+#main-grid > .pl-closed{opacity:.85}
+#trf-table tr.pv-g.pl-h td{cursor:pointer;user-select:none}
+#trf-table tr.pv-g .pl-ch{float:right;width:26px;height:26px;margin:-4px 0}
+.trf-sort > .pl-fold{margin-left:auto}
+@media (max-width:760px){.trf-sort > .pl-fold{margin-left:0}#dash-wrap .hp-title > .pl-fold{margin-left:0}}
+/* barra de grupo en Tráfico con el diseño de Capacidad */
+#main-grid > .trf-grp.tg2{box-sizing:border-box;margin:0 0 2px!important;min-height:52px;padding:9px 12px 9px 12px;gap:12px;border:1px solid var(--border);border-left:4px solid var(--gc);border-radius:14px;background:linear-gradient(100deg,color-mix(in srgb,var(--gc) 14%,var(--surface)),var(--surface) 60%);letter-spacing:0;text-transform:none;min-width:0;overflow:hidden}
+#main-grid > .trf-grp.tg2::after{content:none!important}
+#main-grid > .trf-grp.tg2:hover{border-color:color-mix(in srgb,var(--gc) 55%,var(--border))}
+#main-grid > .trf-grp.tg2:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+#main-grid > .trf-grp.tg2 .gh-av{order:0;display:flex;flex:none}
+#main-grid > .trf-grp.tg2 .gh-av > *{margin-left:-7px;box-shadow:0 0 0 2px var(--surface)}
+#main-grid > .trf-grp.tg2 .gh-av > *:first-child{margin-left:0}
+#main-grid > .trf-grp.tg2 .gh-n{order:1;font:600 15px/1.1 var(--display);letter-spacing:.06em;text-transform:uppercase;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto;min-width:0}
+#main-grid > .trf-grp.tg2 .tg-c{order:2;font:700 13px/1 var(--display);padding:3px 8px;border-radius:99px;background:var(--surface2);color:var(--muted);flex:none}
+#main-grid > .trf-grp.tg2 .gh-m{order:3;font:400 13px/1.3 var(--sans);color:var(--muted);flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#main-grid > .trf-grp.tg2 .gh-m em{font-style:normal;font-weight:600}
+#main-grid > .trf-grp.tg2 .gh-m em.sc{color:var(--red)}
+#main-grid > .trf-grp.tg2 .gh-m em.al{color:var(--yellow)}
+#main-grid > .trf-grp.tg2 .gh-m em.ok{color:var(--green)}
+#main-grid > .trf-grp.tg2 .pl-ch{order:4;margin-left:auto}
+#main-grid > .trf-grp.tg2.pl-closed{opacity:1}

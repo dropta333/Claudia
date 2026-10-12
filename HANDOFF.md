@@ -1,6 +1,6 @@
 # Traspaso — Tráfico Post · Publicis postproducción · Colombian Hub
 
-Versión: **v216** · 11 oct 2026 · Resumen general en `HANDOFF-COMPLETO.md` · Responsable: Bastián Torres
+Versión: **v217** · 12 oct 2026 · Resumen general en `HANDOFF-COMPLETO.md` · Responsable: Bastián Torres
 
 ## v216 · Sala sin compañeros de demostración, luz según la hora con transición suave, "hoy" en hora local y revisión de guardado
 - **Sala:** se eliminaron por completo los compañeros de demostración (código, casilla y textos); solo aparece quien está de verdad. El chip de la hora solo informa (la sala sigue sola la hora real; `PXP_SALA.hora(h)` queda para pruebas).
@@ -328,3 +328,13 @@ Versión: **v216** · 11 oct 2026 · Resumen general en `HANDOFF-COMPLETO.md` ·
   - validar los roles en el servidor;
   - sacar las contraseñas del código;
   - proteger `/api/files`.
+
+## v217 · Sala con confirmación, perfil en celular, plegables en Dashboard y Tráfico, asistente por rol
+- Fuentes de las capas v211+ ahora en `src/capas/`; se insertan con `python3 tools/capas.py` y luego `python3 tools/build.py vNNN`.
+- Sala: pide confirmación para entrar (quien no ha entrado ve quién está, sin aparecer) y para salir; seguir en la sala desde otras pestañas (aviso flotante con no leídos); notas del tablero abren vista previa en ventana (Proyectar / Abrir); vista ampliada a pantalla completa y horizontal en celular.
+- Perfil y cliente en celular: una columna sin desbordes; red de proyectos vertical; filas de proyectos en dos líneas.
+- Home Global: «Más gráficas» reparte en las tres columnas (desempate por reparto parejo).
+- Dashboard (Carga por persona) y Tráfico (por cargo, secciones y tabla): grupos plegables con «Esconder todos / Mostrar todos»; en Tráfico por cargo cada grupo es un bloque con barra estilo Capacidad y se acomoda sin huecos.
+- Asistente: ayudas por rol (Administración: planear, asignar, seguimiento, reportes; creativos: mi día, registrar, organizarme, buscar) y nuevas consultas (resumen del equipo, sobrecarga, vencidas, entregas de la semana, standby, mi semana, mis horas, mis tareas).
+- Frases del avatar: ~90, amables y con humor de post, sin repetirse hasta agotarse; según hora, día y rol.
+- Pruebas: tools/test-v217.mjs (57), tools/sala-e2e.mjs actualizado.

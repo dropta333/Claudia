@@ -127,17 +127,56 @@
   }
 
   /* ---------- intérprete ---------- */
-  const HELP = { text: "Puedo buscar proyectos, contarte qué vence, decirte quién está libre, registrar horas, crear tareas y etapas, y cambiar estados. Prueba así:",
-    chips: [["Mis pendientes", "mis pendientes"], ["¿Quién está libre?", "quién está libre esta semana"], ["Registrar horas", "registra 2 horas hoy"], ["Nueva tarea", "crea una tarea revisar color mañana"], ["Ir a Reportes", "ve a reportes"]]
-      .map(([l, q]) => ({ label: l, ghost: true, onClick: () => window.PXA_AGENT._ask(q) })) };
+  /* v217 · ayuda por rol: Administración planea, asigna, sigue y cierra; el equipo creativo organiza su día, registra y pide */
+  const HELP_ROL = {
+    admin: { text: "Te ayudo a coordinar al equipo. Elige por dónde vamos:", cats: [
+      ["Planear la semana", "Cupo, cargas y entregas", [["Resumen del equipo", "resumen del equipo"], ["¿Quién está libre?", "quién está libre esta semana"], ["¿Quién está sobrecargado?", "quién está sobrecargado"], ["Entregas de la semana", "entregas de esta semana"]]],
+      ["Asignar y crear", "Proyectos, etapas y tareas", [["Nuevo proyecto", "crea un proyecto ", 1], ["Nueva etapa", "crea una etapa  en #", 1], ["Tarea para alguien", "crea una tarea  para @", 1], ["Abrir Tráfico", "ve a tráfico"]]],
+      ["Seguimiento", "Lo vencido y lo pausado", [["Etapas vencidas del equipo", "etapas vencidas"], ["Proyectos en standby", "proyectos en standby"], ["Mis pendientes", "mis pendientes"], ["Abrir Dashboard", "ve a dashboard"]]],
+      ["Reportes y cierre", "Exportar y aprobar", [["Exportar un reporte", "reporte de #", 1], ["Aprobar un proyecto", "aprueba #", 1], ["Pausar un proyecto", "pon en standby #", 1], ["Abrir Reportes", "ve a reportes"]]]] },
+    crea: { text: "Te ayudo con tu día. Elige por dónde vamos:", cats: [
+      ["Mi día", "Lo que te toca", [["Mi semana", "mi semana"], ["Mis pendientes", "mis pendientes"], ["Mis tareas", "mis tareas"], ["Mis entregas de la semana", "mis entregas finales de esta semana"]]],
+      ["Registrar", "Horas y avances", [["Registrar horas", "registra 2 horas hoy en #", 1], ["¿Cuántas horas llevo?", "cuántas horas llevo"], ["Pasar una etapa a revisión", "pasa a revisión la etapa ", 1], ["Marcar una etapa lista", "marca lista la etapa ", 1]]],
+      ["Organizarme", "Tareas y recordatorios", [["Nueva tarea", "crea una tarea  mañana", 1], ["Lo vencido", "mis etapas vencidas"], ["Ver Mis horas", "ve a mis horas"], ["Ir a la Sala", "ve a la sala"]]],
+      ["Buscar y pedir", "Proyectos y personas", [["Buscar un proyecto", "busca ", 1], ["Hablar de alguien", "@", 1], ["¿Quién está libre?", "quién está libre esta semana"], ["Abrir Proyectos", "ve a proyectos"]]]] },
+  };
+  const qChip = ([l, q, fill]) => ({ label: l, ghost: true, onClick: () => { if (fill && window.PXA_AGENT._fill) window.PXA_AGENT._fill(q); else window.PXA_AGENT._ask(q.trim()); } });
+  function help(ci) {
+    const R = HELP_ROL[admin() ? "admin" : "crea"];
+    if (ci == null || !R.cats[ci]) return { text: R.text, chips: R.cats.map(([l, s], i) => ({ label: l, sub: s, onClick: () => window.PXA_AGENT._show(help(i)) })) };
+    const [l, , qs] = R.cats[ci];
+    return { text: `${l}. Toca una o escríbela a tu manera:`, chips: qs.map(qChip).concat([{ label: "‹ Otras ayudas", ghost: true, onClick: () => window.PXA_AGENT._show(help()) }]) };
+  }
+  const HELP = { get text() { return help().text; }, get chips() { return help().chips; } };
+  /* datos del equipo para las ayudas nuevas */
+  const semana = () => { const d = new Date(), w = (d.getDay() + 6) % 7, a = new Date(d); a.setDate(d.getDate() - w); const b = new Date(a); b.setDate(a.getDate() + 6); return [iso(a), iso(b)]; };
+  const curW = () => (typeof currentWeek !== "undefined" ? currentWeek : 0);
+  const carga = p => { try { return window.pxpCargaAuto ? pxpCargaAuto(p, curW()) : ""; } catch (e) { return ""; } };
+  const equipo = () => people().filter(p => p.tipoMiembro !== "externo");
+  function vencidas(todos) {
+    const out = []; activos().forEach(k => { const pr = P()[k]; if (["aprobado", "entregado"].includes(pr.estadoGeneral)) return; (pr.etapas || []).forEach((e, i) => { if (e.estado !== "listo" && e.fecha && dias(e.fecha) < 0 && (todos || resps(e).includes(N(me())))) out.push({ k, i, e }); }); });
+    return out.sort((a, b) => a.e.fecha.localeCompare(b.e.fecha));
+  }
+  function entregas(todos) {
+    const out = []; activos().forEach(k => { const pr = P()[k]; if (["aprobado", "entregado"].includes(pr.estadoGeneral)) return;
+      if (!todos && !(pr.etapas || []).some(e => resps(e).includes(N(me())))) return;
+      let f = null; try { f = window.pxpEntregaFinal ? pxpEntregaFinal(pr) : null; } catch (e) { } if (f && dias(f) >= 0 && dias(f) <= 7) out.push({ k, f }); });
+    return out.sort((a, b) => a.f.localeCompare(b.f));
+  }
+  function misHoras() { const [a, b] = semana(), by = {}; let tot = 0;
+    Object.keys(P()).forEach(k => ((P()[k] || {}).etapas || []).forEach(e => (e.horas || []).forEach(h => { if (N(h.user) === N(me()) && h.fecha >= a && h.fecha <= b) { const v = +h.h || 0; tot += v; by[k] = (by[k] || 0) + v; } })));
+    return { tot, by }; }
+  const corto = (s, n) => { s = String(s || "").trim(); return s.length > n ? s.slice(0, n - 1).trim() + "…" : s; };
+  const nh = v => String(Math.round(v * 10) / 10).replace(".", ",");
+  const dEnt = f => { const d = dias(f); return d === 0 ? "hoy" : d === 1 ? "mañana" : fD(f); };
 
   function ask(raw, noAI) {
     const text = String(raw || "").trim(), t = N(text);
-    if (!t) return HELP;
+    if (!t) return help();
     const k = findProject(text), ppl = findPeople(text), fecha = parseDate(text), h = parseHours(text);
 
     if (/^(hola|buenas|hey|que mas|q mas)\b/.test(t) && t.length < 18) return { text: `¡Hola, ${tit(me()).split(" ")[0]}! ¿Qué sacamos hoy?`, chips: HELP.chips };
-    if (/(ayuda|que puedes|como funcionas|que sabes hacer|comandos)/.test(t)) return HELP;
+    if (/(ayuda|que puedes|como funcionas|que sabes hacer|comandos)/.test(t)) return help();
     if (/(gracias|genial|perfecto|buenisimo|de una)\b/.test(t) && t.length < 24) return { text: "Con gusto. Aquí sigo, en el set." };
 
     /* registrar horas */
@@ -208,6 +247,47 @@
     if (/(reporte|informe|pdf|time ?table|cronograma en pdf)/.test(t)) {
       go("reportes");
       return { text: k ? `Abrí Reportes. Busca ${pName(k)} y exporta el que necesites.` : "Abrí Reportes: proyecto, cliente, cargas o time table.", chips: k ? [{ label: "Abrir " + pName(k), onClick: () => openP(k) }] : [] };
+    }
+    /* v217 · resumen del equipo (Administración) o de tu semana */
+    if (/(resumen del equipo|como va el equipo|como esta el equipo|como vamos)/.test(t) && admin()) {
+      const v = vencidas(true), sob = equipo().filter(p => carga(p) === "saturado"), lib = equipo().filter(p => !isMe(p.name) && carga(p) === "libre"), en = entregas(true), act = activos().filter(k => !["aprobado", "entregado"].includes(P()[k].estadoGeneral)).length;
+      return { text: `Así va el equipo: ${act} proyectos en marcha, ${en.length} entrega${en.length === 1 ? "" : "s"} final${en.length === 1 ? "" : "es"} en 7 días, ${v.length} etapa${v.length === 1 ? "" : "s"} vencida${v.length === 1 ? "" : "s"}, ${sob.length} persona${sob.length === 1 ? "" : "s"} con sobrecarga y ${lib.length} con cupo.`,
+        chips: [["Etapas vencidas", "etapas vencidas"], ["Sobrecarga", "quién está sobrecargado"], ["Con cupo", "quién está libre esta semana"], ["Entregas de la semana", "entregas de esta semana"]].map(qChip).map((c, i) => Object.assign(c, { ghost: false, hot: !!((i === 0 && v.length) || (i === 1 && sob.length)) })) };
+    }
+    if (/(^mi semana$|como voy|resumen de mi semana|como va mi semana)/.test(t)) {
+      const st = myStages(), sem = st.filter(x => x.e.fecha && dias(x.e.fecha) >= 0 && dias(x.e.fecha) <= 7).length, ven = st.filter(x => x.e.fecha && dias(x.e.fecha) < 0).length, H = misHoras();
+      return { text: `Tu semana: ${st.length} etapa${st.length === 1 ? "" : "s"} activa${st.length === 1 ? "" : "s"}, ${sem} con fecha en los próximos 7 días${ven ? ` y ${ven} con la fecha ya pasada` : ""}. Llevas ${nh(H.tot)} h registradas.`,
+        chips: [["Mis pendientes", "mis pendientes"], ["Mis horas", "cuántas horas llevo"], ["Mis tareas", "mis tareas"]].map(qChip) };
+    }
+    if (/(sobrecargad|saturad|sobrecarga|no da abasto|muy cargad)/.test(t)) {
+      const sob = equipo().filter(p => carga(p) === "saturado");
+      if (!sob.length) return { text: "Nadie está en sobrecarga esta semana. Buen reparto.", chips: [qChip(["¿Quién tiene cupo?", "quién está libre esta semana"])] };
+      return { text: `${sob.length === 1 ? "Una persona está" : sob.length + " personas están"} en sobrecarga esta semana:`, chips: sob.slice(0, 6).map(p => ({ label: tit(p.name), sub: p.alias || p.role || "", hot: true, onClick: () => openPer(p.name) })).concat([qChip(["¿Quién tiene cupo?", "quién está libre esta semana"])]) };
+    }
+    if (/(vencid|atrasad|retrasad|paso su fecha)/.test(t)) {
+      const todos = admin() && !/\bmis\b/.test(t), v = vencidas(todos);
+      if (!v.length) return { text: todos ? "No hay etapas vencidas en el equipo. Todo al día." : "No tienes etapas vencidas. Vas al día." };
+      return { text: `${v.length} etapa${v.length === 1 ? "" : "s"} vencida${v.length === 1 ? "" : "s"}${todos ? " en el equipo" : ""}:`, chips: v.slice(0, 6).map(x => ({ label: `«${x.e.nombre || "Etapa"}» · ${pName(x.k)}`, sub: `${todos ? [].concat(x.e.resp || []).map(n => tit(String(n).split(" ")[0])).join(", ") + " · " : ""}venció ${fD(x.e.fecha)}`, hot: true, onClick: () => openP(x.k) })) };
+    }
+    if (/(entregas?( finales?)? (de|para) (esta|la) semana|que se entrega|entregas finales|proximas entregas)/.test(t)) {
+      const todos = admin() && !/\bmis\b/.test(t), en = entregas(todos);
+      if (!en.length) return { text: todos ? "No hay entregas finales en los próximos 7 días." : "No tienes entregas finales en los próximos 7 días." };
+      return { text: `${en.length} entrega${en.length === 1 ? "" : "s"} final${en.length === 1 ? "" : "es"} en los próximos 7 días:`, chips: en.slice(0, 6).map(x => ({ label: pName(x.k), sub: tit(P()[x.k].cliente || "") + " · " + dEnt(x.f), hot: dias(x.f) <= 1, onClick: () => openP(x.k) })) };
+    }
+    if (!k && /(standby|en pausa|pausados)/.test(t) && !/(pon|pasa|marca|cambia|deja|mueve)\b/.test(t)) {
+      const sb = activos().filter(kk => P()[kk].estadoGeneral === "standby");
+      if (!sb.length) return { text: "No hay proyectos en standby." };
+      return { text: `${sb.length} proyecto${sb.length === 1 ? "" : "s"} en standby:`, chips: sb.slice(0, 6).map(kk => ({ label: pName(kk), sub: tit(P()[kk].cliente || ""), onClick: () => openP(kk) })) };
+    }
+    if (/(cuantas horas|horas llevo|cuanto llevo|mis horas de (la|esta) semana)/.test(t) && !/(ve a|abre|ir a)\b/.test(t)) {
+      const H = misHoras(), top = Object.keys(H.by).sort((x, y) => H.by[y] - H.by[x]).slice(0, 4);
+      if (!H.tot) return { text: "Esta semana todavía no tienes horas registradas. Cuando quieras, las anotamos juntos.", chips: [qChip(["Registrar horas", "registra 2 horas hoy en #", 1])] };
+      return { text: `Esta semana llevas ${nh(H.tot)} h registradas${top.length ? ":" : "."}`, chips: top.map(kk => ({ label: pName(kk), sub: nh(H.by[kk]) + " h", onClick: () => openP(kk) })).concat([{ label: "Ver Mis horas", ghost: true, onClick: () => go("mishoras") }]) };
+    }
+    if (/(mis tareas|que tareas tengo|mis to ?dos?)/.test(t)) {
+      const p = findP(me()), ts = ((p && p.tareas) || []).filter(x => !x.hecho);
+      if (!ts.length) return { text: "No tienes tareas abiertas. ¿Creamos una?", chips: [qChip(["Nueva tarea", "crea una tarea  mañana", 1])] };
+      return { text: `Tienes ${ts.length} tarea${ts.length === 1 ? "" : "s"} abierta${ts.length === 1 ? "" : "s"}:`, chips: ts.slice(0, 6).map(x => ({ label: corto(x.texto, 40), sub: x.fecha ? "para " + fD(x.fecha) : (x.proyecto && P()[x.proyecto] ? pName(x.proyecto) : ""), hot: !!(x.fecha && dias(x.fecha) <= 0), onClick: () => { if (x.proyecto && P()[x.proyecto]) openP(x.proyecto); else openPer(me()); } })) };
     }
     /* quién está libre */
     if (/(quien|quienes|alguien)\b.*\b(libre|disponible|desocupad)|disponibilidad|casting/.test(t)) {
@@ -294,5 +374,5 @@
   }
   try { if (/^https?:/.test(location.protocol)) fetch(AI.url, { cache: "no-store" }).then(r => r.ok ? r.json() : null).then(j => { AI.on = !!(j && j.enabled); }).catch(() => { }); } catch (e) { }
 
-  window.PXA_AGENT = { ask, mentions, tools: () => toolSchemas(), runTool, ai: () => AI.on, _show: () => { }, _say: () => { }, _ask: () => { }, _close: () => { } };
+  window.PXA_AGENT = { ask, mentions, help, tools: () => toolSchemas(), runTool, ai: () => AI.on, _show: () => { }, _say: () => { }, _ask: () => { }, _fill: () => { }, _close: () => { } };
 })();

@@ -74,7 +74,41 @@
   /* tarjeta del Home: columna propia; clic = asistente, lápiz = editar */
   const PEN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-4-4L4 16v4"/><path d="M13.5 6.5l4 4"/></svg>';
   let bub = null;
-  const TIPS = ["¿Le damos play?", "Corte. Toma dos: ¿qué buscamos?", "Tus horas no se registran solas", "Tengo el cronograma en caché", "¿Quién está libre? Yo sé.", "¿Armamos una etapa nueva?", "Dime un proyecto y lo saco", "Las entregas no esperan. ¿Las vemos?", "Tu reporte, exportado en un clic", "Hoy pinta para versión final", "¿Qué vence esta semana? Te cuento", "Dame una palabra y busco", "Sin prisa, pero sin pausa", "Listo para el render, ¿y tú?"];
+  /* v217 · frases del avatar: muchas, amables, con humor de post y sin regaños. Se reparten sin repetirse hasta agotarlas
+     (las últimas que viste se recuerdan entre visitas). Algunas cambian según la hora, el día o tu rol. */
+  const TIPS_ALL = ["¿Le damos play?", "Corte. Toma dos: ¿qué buscamos?", "Tengo el cronograma en caché", "¿Quién está libre? Yo sé.", "Dime un proyecto y lo encuentro",
+    "Dame una palabra y busco", "Hoy pinta para versión final", "Sin prisa, pero sin pausa", "Listo para el render, ¿y tú?", "Respira: el timeline no se va a ningún lado",
+    "Versión_final_final_ahorasí.mov", "Un café y un buen LUT lo arreglan casi todo", "Si me necesitas, estoy en la línea de tiempo", "¿Exportamos o le damos una vuelta más?",
+    "Hoy es buen día para cerrar etapas", "Los pequeños avances también cuentan", "Modo enfoque: activado", "Si algo se acerca, te aviso primero", "¿Vemos qué viene esta semana?",
+    "Puedo crear una tarea por ti", "Escríbeme con @ y hablamos de alguien", "Con # encuentro cualquier proyecto", "Tú tranqui: yo llevo la cuenta", "Me sé las entregas de memoria",
+    "Bip bop. Datos al día.", "Mis píxeles están listos para ayudarte", "Renderizando buenas ideas…", "Este frame está bonito", "Un buen corte no se nota. Un buen tablero tampoco.",
+    "¿Ctrl+S? Yo ya guardé.", "Sincronizando audio y buenas vibras", "Me pongo los audífonos y te escucho", "Todo en orden (y en el cronograma)", "Hidrátate: también es parte del flujo",
+    "La sala de juntas tiene sillas libres", "Tengo más capas que un comp de VFX", "Proxy listo, ideas en alta", "Hoy no hay render que nos detenga", "Keyframe a keyframe se llega lejos",
+    "Si la idea es buena, el render espera", "Ajustando el balance de blancos del día", "Soy pequeñito pero organizado", "Pregúntame lo que quieras, no muerdo pixeles", "Rec ● ¿Qué grabamos hoy?",
+    "Todo pinta 24 cuadros por segundo de bien", "¿Pasamos algo a revisión?", "Corrijo el color de tu lunes, si quieres", "La paciencia también es un efecto especial", "Cargando inspiración… 99 %",
+    "Un brindis por los que exportan sin errores", "Ningún timeline se arma solo, pero juntos sí", "Te guardo los atajos: pídeme algo", "El mejor plugin es un buen equipo"];
+  const TIPS_HORAS = ["¿Anotamos tus horas? Te ayudo en un segundo", "Cuando quieras, registramos tus horas juntos", "Tus horas te esperan, sin afán"];
+  const TIPS_ADMIN = ["¿Vemos quién tiene cupo esta semana?", "Te armo el resumen del equipo en un toque", "¿Revisamos qué se pasó de fecha?", "Las entregas de la semana, en un clic",
+    "¿Creamos la etapa que falta?", "Asignar bien es medio proyecto hecho", "El equipo está on fire (en el buen sentido)", "¿Quién necesita una mano? Te digo", "Planear hoy, celebrar el viernes"];
+  const TIPS_CREA = ["¿Qué te toca hoy? Te cuento", "¿Cuántas horas llevas? Yo sumo", "Tú pones el talento, yo el cronograma", "Tu creatividad, mi logística", "¿Cerramos una etapa y celebramos?",
+    "Si te trabas, cuéntame y buscamos", "Hoy se nota tu mano en el corte"];
+  const TIPS_HORA = [[5, 11, ["Buenos días. ¿Qué sacamos hoy?", "Arrancamos suave: café y pendientes", "Mañana fresca, timeline limpio"]], [12, 14, ["¿Ya almorzaste? El render puede esperar", "Pausa para almorzar: merecidísima"]],
+    [15, 18, ["La tarde rinde. ¿Qué cerramos?", "Último empujón del día, con calma"]], [19, 23, ["Ya es tarde: lo que falte, mañana lo vemos", "Buen trabajo hoy. A descansar", "El render nocturno es para las máquinas, no para ti"]]];
+  const TIPS_DIA = { 1: ["Lunes: planeamos y arrancamos", "Lunes con buena cara, que la semana es larga"], 5: ["¡Viernes! Cerramos la semana con estilo", "Viernes de entregas felices"] };
+  function tipBag() {
+    const d = new Date(), h = d.getHours(), adm = (() => { try { return window.pxpPuedeEditar ? !!pxpPuedeEditar() : false; } catch (e) { return false; } })();
+    const t = TIPS_ALL.concat(adm ? TIPS_ADMIN : TIPS_CREA, TIPS_HORAS);
+    TIPS_HORA.forEach(([a, b, l]) => { if (h >= a && h <= b) t.push(...l, ...l); }); if (TIPS_DIA[d.getDay()]) t.push(...TIPS_DIA[d.getDay()], ...TIPS_DIA[d.getDay()]);
+    return t;
+  }
+  const SEEN_K = "pxa_tips_vistas";
+  function nextTip() {
+    let seen = []; try { seen = JSON.parse(localStorage.getItem(SEEN_K) || "[]"); } catch (e) { }
+    const bag = tipBag(), uniq = [...new Set(bag)]; let pool = bag.filter(x => !seen.includes(x));
+    if (!pool.length) { seen = seen.slice(-6); pool = bag.filter(x => !seen.includes(x)); }
+    const tx = pool[Math.floor(Math.random() * pool.length)]; seen.push(tx); seen = seen.slice(-Math.max(10, uniq.length - 4));
+    try { localStorage.setItem(SEEN_K, JSON.stringify(seen)); } catch (e) { } return tx;
+  }
   const esc = t => String(t).replace(/[&<>"]/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[m]));
   const R = (m, n) => m + Math.random() * (n - m);
   /* recordatorios reales: etapas asignadas, por vencer o vencidas, y entregas finales cercanas */
@@ -121,12 +155,16 @@
       hideTip();
       if (bub && bub.el.isConnected) { bub.close(); return; }
       const al = alerts(name).slice(0, 3);
-      bub = PXA.bubble(wk, { hello: al.length ? `¿En qué te ayudo? Tienes ${al.length === 1 ? "un pendiente" : al.length + " pendientes"}.` : "¿En qué te puedo ayudar hoy?",
-        chips: al.map(a => ({ label: a.t, hot: a.p >= 4, onClick: () => { if (bub) bub.close(); if (window.pxpOpenProject) pxpOpenProject(a.k); } })).concat(window.PXA_AGENT ? [{ label: "¿Qué puedo pedirte?", ghost: true, onClick: () => PXA_AGENT._ask("ayuda") }] : []),
+      const adm = (() => { try { return window.pxpPuedeEditar ? !!pxpPuedeEditar() : false; } catch (e) { return false; } })();
+      const quick = !window.PXA_AGENT ? [] : adm ? [["Resumen del equipo", "resumen del equipo"]] : [["Mi semana", "mi semana"]];
+      bub = PXA.bubble(wk, { hello: al.length ? `¿En qué te ayudo? Tienes ${al.length === 1 ? "un pendiente" : al.length + " pendientes"}.` : adm ? "¿Qué coordinamos hoy con el equipo?" : "¿En qué te puedo ayudar hoy?",
+        chips: al.map(a => ({ label: a.t, hot: a.p >= 4, onClick: () => { if (bub) bub.close(); if (window.pxpOpenProject) pxpOpenProject(a.k); } }))
+          .concat(quick.map(([l, q]) => ({ label: l, onClick: () => PXA_AGENT._ask(q) })))
+          .concat(window.PXA_AGENT ? [{ label: adm ? "Ayudas para Administración" : "¿Qué puedo pedirte?", ghost: true, onClick: () => PXA_AGENT._show(PXA_AGENT.help()) }] : []),
         onAsk: window.PXA_AGENT ? PXA_AGENT.ask : null, mentions: window.PXA_AGENT ? PXA_AGENT.mentions : null,
         reanchor: () => document.querySelector(".mr-pxa-w"),
         onClose: () => av.setAttribute("aria-expanded", "false") });
-      if (window.PXA_AGENT) { const B = bub; Object.assign(PXA_AGENT, { _show: r => B.el.isConnected && B.show(r), _say: x => B.el.isConnected && B.show({ text: x }), _ask: q => B.el.isConnected && B.ask(q), _close: () => B.el.isConnected && B.close() }); }
+      if (window.PXA_AGENT) { const B = bub; Object.assign(PXA_AGENT, { _show: r => B.el.isConnected && B.show(r), _say: x => B.el.isConnected && B.show({ text: x }), _ask: q => B.el.isConnected && B.ask(q), _fill: q => { if (!B.el.isConnected) return; const i = B.el.querySelector("input"); if (!i) return; i.value = q; i.focus(); const p = q.indexOf("  ") >= 0 ? q.indexOf("  ") + 1 : q.length; try { i.setSelectionRange(p, p); } catch (e) { } i.dispatchEvent(new Event("input", { bubbles: true })); }, _close: () => B.el.isConnected && B.close() }); }
       av.setAttribute("aria-expanded", "true");
     };
     wk.querySelector(".mr-pxa-ed").onclick = () => openEditor(name);
@@ -169,7 +207,7 @@
     addEventListener("resize", window.__pxaResize);
 
     /* frases cortas que aparecen y se desvanecen */
-    let tip = null, tipT = 0, ti = Math.floor(Math.random() * TIPS.length), turn = 0; const shown = new Set();
+    let tip = null, tipT = 0, turn = 0; const shown = new Set();
     function hideTip() { if (tip) { const t = tip; tip = null; t.classList.add("out"); setTimeout(() => t.remove(), 400); } clearTimeout(tipT); }
     let hoverT = 0;
     const showTip = (hover) => {
@@ -179,7 +217,7 @@
       const al = alerts(name).filter(a => !shown.has(a.t)), useAlert = al.length && (turn++ % 2 === 0);
       const a = useAlert ? al[0] : null; if (a) shown.add(a.t);
       tip = document.createElement("button"); tip.type = "button"; tip.className = "mr-pxa-tip pxb tr" + (a ? " alert" + (a.p >= 4 ? " hot" : "") : ""); tip.setAttribute("aria-live", "polite");
-      tip.innerHTML = `<span class="pxb-o"><span class="pxb-i">${a ? `<em>${a.p >= 4 ? "Urgente" : "Recordatorio"}</em>` : ""}${esc(a ? a.t : TIPS[ti++ % TIPS.length])}</span></span>${PXA.TAIL}`; wk.appendChild(tip);
+      tip.innerHTML = `<span class="pxb-o"><span class="pxb-i">${a ? `<em>${a.p >= 4 ? "Urgente" : "Recordatorio"}</em>` : ""}${esc(a ? a.t : nextTip())}</span></span>${PXA.TAIL}`; wk.appendChild(tip);
       tip.onclick = () => { if (a && window.pxpOpenProject) { hideTip(); pxpOpenProject(a.k); } else av.click(); };
       const wr = wk.getBoundingClientRect(), cr = mr.getBoundingClientRect();
       if (wr.left - tip.offsetWidth - 12 < cr.left) { tip.classList.add("right"); tip.classList.remove("tr"); }
